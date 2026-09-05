@@ -1,0 +1,15 @@
+[package]
+name = "grabitmap"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum = "0.7"
+tokio = { version = "1.0", features = ["full"] }
+sqlx = { version = "0.8", features = ["sqlite", "runtime-tokio", "tls-rustls"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+dotenvy = "0.15"
+tower-http = { version = "0.5", features = ["fs", "cors"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
