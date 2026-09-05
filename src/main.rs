@@ -73,7 +73,9 @@ fn validate_configuration() {
     match admin_key {
         Some(value) if value != "change-me" && value.len() >= 32 => {}
         Some(_) => {
-            eprintln!("ADMIN_KEY must be at least 32 characters and must not use the example value");
+            eprintln!(
+                "ADMIN_KEY must be at least 32 characters and must not use the example value"
+            );
             std::process::exit(1);
         }
         None => {
