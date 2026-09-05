@@ -76,7 +76,9 @@ fn client_message_id_is_valid(value: &str) -> bool {
 }
 
 fn media_root() -> PathBuf {
-    PathBuf::from("data/chat-media")
+    std::env::var("MEDIA_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| PathBuf::from("data/chat-media"))
 }
 
 fn detect_image(bytes: &[u8]) -> Option<(&'static str, &'static str)> {

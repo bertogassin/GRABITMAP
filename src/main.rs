@@ -17,6 +17,8 @@ use state::app_state::AppState;
 async fn main() {
     let _ = dotenvy::dotenv();
 
+    validate_configuration();
+
     drop(db::queries::init_db().expect("Не удалось инициализировать базу данных"));
 
     db::owner_bootstrap::bootstrap_owner_from_env()
@@ -60,4 +62,35 @@ async fn main() {
     axum::serve(listener, app)
         .await
         .expect("Ошибка HTTP сервера");
+}
+
+fn validate_configuration() {
+    let admin_key = env::var("ADMIN_KEY")
+        .ok()
+        .map(|value| value.trim().to_string())
+        .filter(|value| !value.is_empty());
+
+    match admin_key {
+        Some(value) if value != "change-me" && value.len() >= 32 => {}
+        Some(_) => {
+            eprintln!("ADMIN_KEY must be at least 32 characters and must not use the example value");
+            std::process::exit(1);
+        }
+        None => {
+            eprintln!("ADMIN_KEY is required");
+            std::process::exit(1);
+        }
+    }
+
+    if env::var("STRIPE_SECRET_KEY")
+        .ok()
+        .is_some_and(|value| !value.trim().is_empty())
+        && env::var("PUBLIC_BASE_URL")
+            .ok()
+            .map(|value| value.trim().is_empty())
+            .unwrap_or(true)
+    {
+        eprintln!("PUBLIC_BASE_URL is required when Stripe payments are enabled");
+        std::process::exit(1);
+    }
 }
