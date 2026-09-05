@@ -17,8 +17,14 @@ use axum::{
 async fn security_headers(request: Request<axum::body::Body>, next: Next) -> Response {
     let mut response = next.run(request).await;
     let headers = response.headers_mut();
-    headers.insert(header::X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static("nosniff"));
-    headers.insert(header::X_FRAME_OPTIONS, HeaderValue::from_static("SAMEORIGIN"));
+    headers.insert(
+        header::X_CONTENT_TYPE_OPTIONS,
+        HeaderValue::from_static("nosniff"),
+    );
+    headers.insert(
+        header::X_FRAME_OPTIONS,
+        HeaderValue::from_static("SAMEORIGIN"),
+    );
     headers.insert(
         header::REFERRER_POLICY,
         HeaderValue::from_static("strict-origin-when-cross-origin"),
