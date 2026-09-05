@@ -1,0 +1,10 @@
+/target/
+/data/*.db
+/data/*.db-*
+/data/chat-media/
+.env
+.env.*
+!.env.example
+*.log
+*.db
+backups/
