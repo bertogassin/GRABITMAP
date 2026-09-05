@@ -186,6 +186,8 @@ mod request_origin_tests {
         assert!(trusted_request_origin("https://t.me"));
         assert!(trusted_request_origin("https://web.telegram.org"));
         assert!(!trusted_request_origin("https://evil.example"));
-        assert!(!trusted_request_origin("https://grabitmap.com.evil.example"));
+        assert!(!trusted_request_origin(
+            "https://grabitmap.com.evil.example"
+        ));
     }
 }

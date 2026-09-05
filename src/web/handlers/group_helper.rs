@@ -328,11 +328,7 @@ pub async fn group_helper_panel(State(state): State<AppState>, headers: HeaderMa
     let user = match verify_authenticated_user(&state, &headers) {
         Some(user) => user,
         None => {
-            return (
-                StatusCode::UNAUTHORIZED,
-                "Требуется вход в аккаунт GRABIT",
-            )
-                .into_response();
+            return (StatusCode::UNAUTHORIZED, "Требуется вход в аккаунт GRABIT").into_response();
         }
     };
 
@@ -619,11 +615,7 @@ pub async fn group_helper_report_action(
     let user = match verify_authenticated_user(&state, &headers) {
         Some(user) => user,
         None => {
-            return (
-                StatusCode::UNAUTHORIZED,
-                "Требуется вход в аккаунт GRABIT",
-            )
-                .into_response();
+            return (StatusCode::UNAUTHORIZED, "Требуется вход в аккаунт GRABIT").into_response();
         }
     };
 

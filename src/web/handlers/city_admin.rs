@@ -288,10 +288,7 @@ fn render_page(
     );
 
     admin_ops_page_themed(
-        &format!(
-            "{} · Управление городом · GRABIT",
-            escape_html(&city.name)
-        ),
+        &format!("{} · Управление городом · GRABIT", escape_html(&city.name)),
         "rm-admin-ops--city",
         &content,
     )
@@ -301,11 +298,7 @@ pub async fn city_admin_panel(State(state): State<AppState>, headers: HeaderMap)
     let user = match verify_authenticated_user(&state, &headers) {
         Some(user) => user,
         None => {
-            return (
-                StatusCode::UNAUTHORIZED,
-                "Требуется вход в аккаунт GRABIT",
-            )
-                .into_response();
+            return (StatusCode::UNAUTHORIZED, "Требуется вход в аккаунт GRABIT").into_response();
         }
     };
 
