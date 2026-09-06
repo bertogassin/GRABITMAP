@@ -24,7 +24,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = "4.9.92";
+pub const STATIC_ASSET_VERSION: &str = "4.9.94";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -1109,7 +1109,11 @@ html[data-page="chat"] .bottom-nav {
 }
 
 html[data-page="chat"] .page {
-    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: 8px;
+}
+
+html[data-page="chat"] .rm-version-footer {
+    display: none;
 }
 
 @media (min-width: 900px) {
@@ -4224,12 +4228,12 @@ pub(crate) fn bottom_nav_with_badges(
         r#"
 <nav class="bottom-nav">
 
-    <a class="{map_class}" href="/app">
+    <a class="{map_class}" href="/app" data-nav-map-link>
         {nav_map}
         <span>Города</span>
     </a>
 
-    <a class="{search_class}" href="/app/search">
+    <a class="{search_class}" href="/app/search" data-nav-search-link>
         {nav_search}
         <span>Поиск</span>
     </a>

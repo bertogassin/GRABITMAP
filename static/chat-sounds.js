@@ -212,12 +212,20 @@
             return;
         }
 
-        if (kind === "send") {
-            navigator.vibrate(6);
+        if (kind === "tap") {
+            navigator.vibrate(10);
+        } else if (kind === "send") {
+            navigator.vibrate([12, 18, 8]);
         } else if (kind === "receive") {
-            navigator.vibrate([5, 24, 6]);
+            navigator.vibrate([8, 28, 12]);
+        } else if (kind === "voice") {
+            navigator.vibrate(16);
+        } else if (kind === "voice-send") {
+            navigator.vibrate([10, 22, 18]);
         } else if (kind === "error") {
-            navigator.vibrate([10, 36, 10]);
+            navigator.vibrate([18, 40, 18]);
+        } else {
+            navigator.vibrate(10);
         }
     }
 

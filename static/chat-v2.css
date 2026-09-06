@@ -2027,8 +2027,9 @@ html[data-page="chat"] main {
     width: 100% !important;
     min-width: 0 !important;
     max-width: 100% !important;
-    min-height: 46px !important;
-    max-height: 120px !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
     resize: none !important;
     overflow-y: auto !important;
     touch-action: pan-y;
@@ -2437,4 +2438,70 @@ html.light-theme #chat-send:not(:disabled),
 body.light-theme .chat-send-button:not(:disabled),
 body.light-theme #chat-send:not(:disabled) {
     color: var(--on-gold, #fffdf6) !important;
+}
+
+html[data-page="chat"],
+html[data-page="chat"] body {
+    height: 100dvh;
+    overflow: hidden;
+}
+
+html[data-page="chat"] body {
+    display: flex;
+    flex-direction: column;
+}
+
+html[data-page="chat"] .rm-version-footer {
+    display: none;
+}
+
+html[data-page="chat"] main.page {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding-bottom: 8px !important;
+}
+
+html[data-page="chat"] .topbar,
+html[data-page="chat"] .chat-header-premium {
+    flex: 0 0 auto;
+}
+
+html[data-page="chat"] .chat-shell {
+    flex: 1 1 auto;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin-bottom: 0 !important;
+}
+
+html[data-page="chat"] #chat-messages.chat-messages-panel {
+    flex: 1 1 auto;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+}
+
+html[data-page="chat"] #chat-form.chat-composer {
+    flex: 0 0 auto;
+    position: relative !important;
+    inset: auto !important;
+}
+
+html[data-page="chat"] body.chat-keyboard-open {
+    height: var(--chat-viewport-height, 100dvh);
+}
+
+html[data-page="chat"] body.chat-keyboard-open .chat-shell {
+    height: auto !important;
+    max-height: none !important;
+}
+
+#chat-form.chat-composer button:active,
+.chat-voice-btn:active,
+.chat-image-btn:active,
+.chat-send-button:active {
+    transform: scale(.96);
 }

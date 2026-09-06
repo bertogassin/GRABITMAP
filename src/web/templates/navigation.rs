@@ -260,7 +260,7 @@ pub fn render_geo_root(
         logo = icon("globe"),
     );
     let content = format!(
-        r#"<div id="rm-last-city-home" class="grid" hidden></div>{head}<div class="grid rm-map-grid">{cards}</div>"#,
+        r#"<div id="rm-last-city-home" class="grid rm-continue-home" hidden></div>{head}<div class="grid rm-map-grid">{cards}</div>"#,
         head = section_head("Континенты", "Все регионы мира без приоритетов", None),
     );
     let styles = r#"<style>
@@ -268,6 +268,9 @@ pub fn render_geo_root(
 .rm-map-stats div{padding:12px 6px;border:1px solid rgba(232,204,150,.22);border-radius:15px;text-align:center;background:rgba(255,255,255,.025)}
 .rm-map-stats strong,.rm-map-stats span{display:block}.rm-map-stats strong{color:var(--gold-light);font-size:21px}.rm-map-stats span{margin-top:4px;color:var(--muted);font-size:9px;text-transform:uppercase}
 .rm-map-grid{align-items:stretch}
+.rm-continue-home{margin-bottom:14px}
+.rm-continue-chips{margin-top:10px}
+.rm-continue-card{padding:16px;display:grid;gap:10px}
 </style>"#;
     page_document(
         "GRABIT · Глобальная карта",
@@ -1555,8 +1558,10 @@ pub fn render_search(
 
 pub fn render_menu() -> String {
     let content = format!(
-        r#"<section>
+        r#"        <section>
     {section_head_settings}
+
+    <div id="rm-continue-menu" class="grid" hidden></div>
 
     <div class="grid">
         {profile_card}
@@ -1771,5 +1776,17 @@ mod search_catalog_tests {
 
         assert!(html.contains("/app/map/city/99"));
         assert!(!html.contains("/app/0/0/0\""));
+    }
+
+    #[test]
+    fn menu_and_home_keep_continue_hosts() {
+        let menu = render_menu();
+        assert!(menu.contains("id=\"rm-continue-menu\""));
+        assert!(menu.contains("data-nav-map-link"));
+        assert!(menu.contains("data-nav-search-link"));
+
+        let home = render_geo_root(1, 1, 1, vec![(1, "Европа".to_string(), 3)], false);
+        assert!(home.contains("id=\"rm-last-city-home\""));
+        assert!(home.contains("data-nav-map-link"));
     }
 }

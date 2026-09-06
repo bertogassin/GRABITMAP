@@ -438,21 +438,8 @@ fn authenticated_body(snapshot: &StepSnapshot) -> String {
             <div class="rm-step-stat"><strong id="rm-step-best">{best}</strong><small>лучший день</small></div>
             <div class="rm-step-stat"><strong id="rm-step-life">{life}</strong><small>вся тропа</small></div>
         </div>
-        <p class="rm-step-hint" id="rm-step-status">Нажмите «Считать шаги».</p>
+        <p class="rm-step-hint" id="rm-step-status">Считаем шаги с телефона.</p>
         <div class="rm-step-actions">
-            <div class="rm-step-listen">
-                <button type="button" class="rm-step-listen-btn" id="rm-step-listen">Считать шаги</button>
-            </div>
-            <div class="rm-step-chips">
-                <button type="button" class="rm-step-chip" data-add="100">+100</button>
-                <button type="button" class="rm-step-chip" data-add="250">+250</button>
-                <button type="button" class="rm-step-chip" data-add="500">+500</button>
-                <button type="button" class="rm-step-chip" data-add="1000">+1000</button>
-            </div>
-            <form class="rm-step-add" id="rm-step-add-form">
-                <input id="rm-step-add-input" type="number" min="1" max="50000" inputmode="numeric" placeholder="Свои шаги">
-                <button type="submit" class="ui-button rm-step-add-btn">Добавить</button>
-            </form>
             <form class="rm-step-goal" id="rm-step-goal-form">
                 <label for="rm-step-goal">Цель дня</label>
                 <input id="rm-step-goal" type="number" min="1000" max="50000" value="{goal}">
@@ -588,7 +575,10 @@ mod tests {
     fn album_and_controls_render() {
         let html = render_steps(Some(&empty_snapshot()));
         assert!(html.contains("Месяц"));
-        assert!(html.contains("Считать шаги"));
+        assert!(html.contains("Считаем шаги с телефона"));
+        assert!(!html.contains("Считать шаги"));
+        assert!(!html.contains("data-add"));
+        assert!(!html.contains("Свои шаги"));
         assert!(html.contains("сентябр"));
         assert!(!html.contains("август"));
         assert!(!html.contains("2025"));

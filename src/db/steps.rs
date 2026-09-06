@@ -5,6 +5,7 @@ pub const DEFAULT_GOAL: i64 = 10_000;
 const MIN_GOAL: i64 = 1_000;
 const MAX_GOAL: i64 = 50_000;
 const MAX_DAY_STEPS: i64 = 200_000;
+#[allow(dead_code)]
 const MAX_ADD: i64 = 50_000;
 
 #[derive(Clone, Debug)]
@@ -114,6 +115,7 @@ pub fn clamp_day_steps(steps: i64) -> i64 {
     steps.clamp(0, MAX_DAY_STEPS)
 }
 
+#[allow(dead_code)]
 pub fn valid_add(delta: i64) -> bool {
     delta > 0 && delta <= MAX_ADD
 }
@@ -247,7 +249,7 @@ pub fn apply_steps(
     date: &str,
     source: &str,
     absolute: Option<i64>,
-    add: Option<i64>,
+    _add: Option<i64>,
 ) -> Result<(i64, i64)> {
     let current: i64 = conn
         .query_row(
@@ -260,13 +262,7 @@ pub fn apply_steps(
 
     let (next, delta, log_delta) = match source {
         "manual" => {
-            let add = add.filter(|value| valid_add(*value)).unwrap_or(0);
-            if add == 0 {
-                return Ok((current, 0));
-            }
-            let next = clamp_day_steps(current.saturating_add(add));
-            let applied = next - current;
-            (next, applied, applied)
+            return Ok((current, 0));
         }
         _ => {
             let absolute = absolute
@@ -339,10 +335,14 @@ mod tests {
     }
 
     #[test]
-    fn manual_adds_and_sensor_never_lowers() {
+    fn manual_adds_are_ignored_and_sensor_never_lowers() {
         let conn = Connection::open_in_memory().unwrap();
         initialize(&conn).unwrap();
+        assert!(valid_add(500));
         let (count, delta) = apply_steps(&conn, 1, "2026-09-06", "manual", None, Some(500)).unwrap();
+        assert_eq!((count, delta), (0, 0));
+        let (count, delta) =
+            apply_steps(&conn, 1, "2026-09-06", "sensor", Some(500), None).unwrap();
         assert_eq!((count, delta), (500, 500));
         let (count, delta) =
             apply_steps(&conn, 1, "2026-09-06", "sensor", Some(120), None).unwrap();

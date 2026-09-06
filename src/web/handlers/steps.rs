@@ -167,10 +167,13 @@ pub async fn api_steps_write(
         }
     };
 
-    let source = match payload.source.as_deref().unwrap_or("manual") {
-        "sensor" => "sensor",
-        _ => "manual",
-    };
+    if payload.add.is_some() || payload.source.as_deref() == Some("manual") {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "ok": false, "error": "manual_disabled" })),
+        )
+            .into_response();
+    }
 
     let db = match crate::db::pool::get_connection(&state.db_pool) {
         Ok(db) => db,
@@ -193,8 +196,8 @@ pub async fn api_steps_write(
         }
     }
 
-    if payload.steps.is_some() || payload.add.is_some() {
-        if apply_steps(&db, user_id, &date, source, payload.steps, payload.add).is_err() {
+    if payload.steps.is_some() {
+        if apply_steps(&db, user_id, &date, "sensor", payload.steps, None).is_err() {
             return (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 Json(json!({ "ok": false, "error": "save_failed" })),

@@ -401,9 +401,14 @@
                 );
             }
 
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+
             if (
                 keyboardOpen &&
-                document.activeElement === input
+                document.activeElement === input &&
+                nearBottom()
             ) {
                 window.requestAnimationFrame(function () {
                     messages.scrollTop =
@@ -412,15 +417,14 @@
             }
         }
 
+        function haptic(kind) {
+            if (typeof window.chatHaptic === "function") {
+                window.chatHaptic(kind);
+            }
+        }
+
         function autoResize() {
-            input.style.height = "auto";
-
-            var nextHeight = Math.min(
-                Math.max(input.scrollHeight, 48),
-                150
-            );
-
-            input.style.height = nextHeight + "px";
+            input.style.height = "48px";
         }
 
         function updateComposer() {
@@ -1611,9 +1615,7 @@
                         );
                     } catch (_) {}
 
-                    if (navigator.vibrate) {
-                        navigator.vibrate(12);
-                    }
+                    haptic("voice");
 
                     startVoiceRecording();
                 }
@@ -1635,9 +1637,7 @@
                         stopVoiceRecording(true);
                     }
 
-                    if (navigator.vibrate) {
-                        navigator.vibrate([8, 24, 12]);
-                    }
+                    haptic("voice-send");
 
                     voicePointerId = null;
                 }
@@ -1821,12 +1821,33 @@
                 updateViewportHeight,
                 { passive: true }
             );
+            window.visualViewport.addEventListener(
+                "scroll",
+                function () {
+                    window.scrollTo(0, 0);
+                },
+                { passive: true }
+            );
         }
 
         window.addEventListener(
             "resize",
             updateViewportHeight
         );
+
+        input.addEventListener("focus", function () {
+            window.scrollTo(0, 0);
+        });
+
+        ["chat-send", "chat-image-btn", "chat-clear"].forEach(function (id) {
+            var button = document.getElementById(id);
+            if (!button) {
+                return;
+            }
+            button.addEventListener("pointerdown", function () {
+                haptic("tap");
+            });
+        });
 
         try {
             input.value =

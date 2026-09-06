@@ -3,7 +3,6 @@
     if (!root) return;
 
     const STORAGE_KEY = "resursmap:steps";
-    const LISTEN_KEY = "resursmap:steps-listen";
     const CIRC = 2 * Math.PI * 78;
     const DEFAULT_GOAL = 10000;
     const MONTHS = [
@@ -18,15 +17,12 @@
     const bestEl = document.getElementById("rm-step-best");
     const lifeEl = document.getElementById("rm-step-life");
     const statusEl = document.getElementById("rm-step-status");
-    const listenBtn = document.getElementById("rm-step-listen");
     const monthsEl = document.getElementById("rm-step-months");
     const logEl = document.getElementById("rm-step-log");
     const dayCard = document.getElementById("rm-step-day");
     const dayDate = document.getElementById("rm-step-day-date");
     const daySteps = document.getElementById("rm-step-day-steps");
     const dayMeta = document.getElementById("rm-step-day-meta");
-    const addForm = document.getElementById("rm-step-add-form");
-    const addInput = document.getElementById("rm-step-add-input");
     const goalForm = document.getElementById("rm-step-goal-form");
     const goalInput = document.getElementById("rm-step-goal");
 
@@ -97,21 +93,6 @@
                 date: localToday,
                 count: localCount
             }));
-        } catch (e) {}
-    }
-
-    function listenWanted() {
-        try {
-            return localStorage.getItem(LISTEN_KEY) === "1";
-        } catch (e) {
-            return false;
-        }
-    }
-
-    function setListenWanted(on) {
-        try {
-            if (on) localStorage.setItem(LISTEN_KEY, "1");
-            else localStorage.removeItem(LISTEN_KEY);
         } catch (e) {}
     }
 
@@ -256,27 +237,6 @@
         if (data) applySnapshot(data);
     }
 
-    async function addManual(delta) {
-        const value = Math.floor(Number(delta) || 0);
-        if (value < 1) return;
-        const previous = localCount;
-        localCount += value;
-        writeLocal();
-        paint();
-        const data = await send({
-            date: localToday,
-            add: value,
-            source: "manual"
-        });
-        if (data) {
-            applySnapshot(data);
-            return;
-        }
-        localCount = previous;
-        writeLocal();
-        paint();
-    }
-
     function onMotion(event) {
         const acc = event.accelerationIncludingGravity || event.acceleration;
         if (!acc) return;
@@ -323,48 +283,31 @@
         if (listening) return;
         window.addEventListener("devicemotion", onMotion, { passive: true });
         listening = true;
-        setListenWanted(true);
-        if (listenBtn) {
-            listenBtn.classList.add("is-on");
-            listenBtn.textContent = "Стоп";
-        }
-        setStatus("Считаем шаги.");
+        setStatus("Считаем шаги с телефона.");
         holdScreen();
-        syncTimer = window.setInterval(function () { syncSensor(false); }, 8000);
-        syncSensor(true);
-    }
-
-    function stopListen() {
-        window.removeEventListener("devicemotion", onMotion);
-        listening = false;
-        setListenWanted(false);
-        if (listenBtn) {
-            listenBtn.classList.remove("is-on");
-            listenBtn.textContent = "Считать шаги";
+        if (!syncTimer) {
+            syncTimer = window.setInterval(function () { syncSensor(false); }, 8000);
         }
-        setStatus("Счёт остановлен.");
-        window.clearInterval(syncTimer);
-        releaseScreen();
         syncSensor(true);
     }
 
     async function requestListen() {
-        if (listening) {
-            stopListen();
+        if (listening) return;
+        if (typeof DeviceMotionEvent === "undefined") {
+            setStatus("На компьютере шаги не считаются. Откройте на телефоне.");
             return;
         }
         try {
-            if (typeof DeviceMotionEvent !== "undefined" &&
-                typeof DeviceMotionEvent.requestPermission === "function") {
+            if (typeof DeviceMotionEvent.requestPermission === "function") {
                 const permission = await DeviceMotionEvent.requestPermission();
                 if (permission !== "granted") {
-                    setStatus("Нет доступа к датчику. Добавляйте шаги кнопками.");
+                    setStatus("Нужен доступ к движению телефона.");
                     return;
                 }
             }
             startListen();
         } catch (e) {
-            setStatus("Датчик недоступен. Добавляйте шаги кнопками.");
+            setStatus("Датчик недоступен. Откройте шагомер на телефоне.");
         }
     }
 
@@ -377,22 +320,9 @@
 
     function bindClicks() {
         root.addEventListener("click", function (event) {
-            const chip = event.target.closest("[data-add]");
-            if (chip) {
-                addManual(chip.getAttribute("data-add"));
-                return;
-            }
             const day = event.target.closest("[data-date]");
             if (day) openDay(day.getAttribute("data-date"));
         });
-        if (listenBtn) listenBtn.addEventListener("click", requestListen);
-        if (addForm) {
-            addForm.addEventListener("submit", function (event) {
-                event.preventDefault();
-                addManual(addInput.value);
-                addInput.value = "";
-            });
-        }
         if (goalForm) {
             goalForm.addEventListener("submit", async function (event) {
                 event.preventDefault();
@@ -438,11 +368,10 @@
             setStatus("Нет сети. Шаги пока на этом телефоне.");
         }
         if (localCount > 0) syncSensor(true);
-        if (listenWanted()) {
+        requestListen();
+        document.addEventListener("pointerdown", function () {
             requestListen();
-        } else {
-            setStatus("Нажмите «Считать шаги».");
-        }
+        }, { once: true, passive: true });
     }
 
     boot();
