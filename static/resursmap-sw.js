@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_VERSION = "grabit-shell-v4.9.91";
+const CACHE_VERSION = "grabit-shell-v4.9.92";
 
 const STATIC_ASSETS = [
     "/static/manifest.webmanifest",
@@ -73,3 +73,54 @@ self.addEventListener("fetch", function (event) {
         );
     }
 });
+
+self.addEventListener("periodicsync", function (event) {
+    if (event.tag !== "grabit-nudge") {
+        return;
+    }
+    event.waitUntil(remindIfNeeded());
+});
+
+self.addEventListener("notificationclick", function (event) {
+    event.notification.close();
+    event.waitUntil(
+        self.clients.matchAll({
+            type: "window",
+            includeUncontrolled: true
+        }).then(function (clients) {
+            for (var i = 0; i < clients.length; i += 1) {
+                if (clients[i].url && "focus" in clients[i]) {
+                    return clients[i].focus();
+                }
+            }
+            if (self.clients.openWindow) {
+                return self.clients.openWindow("/app");
+            }
+            return undefined;
+        })
+    );
+});
+
+function remindIfNeeded() {
+    return fetch("/api/account/attention-count", {
+        credentials: "include",
+        headers: { Accept: "application/json" }
+    }).then(function (response) {
+        if (!response.ok) {
+            return;
+        }
+        return response.json();
+    }).then(function (data) {
+        var nudges = data && data.nudges;
+        if (!nudges || !nudges.length) {
+            return;
+        }
+        return Promise.all(nudges.map(function (nudge) {
+            return self.registration.showNotification(nudge.title || "GRABIT", {
+                body: nudge.body || "",
+                icon: "/static/app-icon-192.png",
+                tag: "grabit-nudge-" + String(nudge.kind || "day")
+            });
+        }));
+    }).catch(function () {});
+}

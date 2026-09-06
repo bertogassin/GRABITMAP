@@ -1,6 +1,7 @@
 use super::super::handlers::{
     api_map_country_cities, app_city, app_continent, app_country, app_geo_city, app_geo_continent,
-    app_geo_country, app_geo_professions, app_menu, app_root, app_search, home,
+    app_geo_country, app_geo_professions, app_menu, app_root, app_search, home, privacy_page,
+    rules_page,
 };
 use crate::state::app_state::AppState;
 use axum::{routing::get, Router};
@@ -8,6 +9,8 @@ use axum::{routing::get, Router};
 pub(super) fn routes() -> Router<AppState> {
     Router::new()
         .route("/", get(home))
+        .route("/rules", get(rules_page))
+        .route("/privacy", get(privacy_page))
         .route("/app/menu", get(app_menu))
         .route("/app", get(app_root))
         .route("/app/", get(app_root))

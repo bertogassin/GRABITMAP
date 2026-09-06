@@ -75,6 +75,9 @@ mod types;
 mod health;
 pub use health::*;
 
+mod legal;
+pub use legal::{privacy_page, rules_page};
+
 mod common;
 
 mod auth;

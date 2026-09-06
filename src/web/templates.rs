@@ -27,6 +27,9 @@ pub use profile_account::*;
 mod steps;
 pub use steps::*;
 
+mod legal;
+pub use legal::*;
+
 mod communication;
 pub use communication::*;
 

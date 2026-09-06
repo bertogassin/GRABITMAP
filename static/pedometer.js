@@ -414,11 +414,15 @@
                 syncSensor(true);
             }
         });
+        document.addEventListener("freeze", function () { syncSensor(true); });
         window.addEventListener("pagehide", function () { syncSensor(true); });
         window.addEventListener("online", function () { syncSensor(true); });
     }
 
     async function boot() {
+        if (navigator.storage && navigator.storage.persist) {
+            navigator.storage.persist().catch(function () {});
+        }
         readLocal();
         paint();
         bindClicks();

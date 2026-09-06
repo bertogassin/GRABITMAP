@@ -142,7 +142,7 @@ fn render_page(
                         </div>
                         <div class="right">
                             <span class="badge warning">{status}</span>
-                            <small>Ресурс #{resource_id} · время {created_at}</small>
+                            <small>Объявление #{resource_id} · время {created_at}</small>
                         </div>
                     </div>"#,
                     id = id,
@@ -158,7 +158,7 @@ fn render_page(
     };
 
     let resource_rows = if resources.is_empty() {
-        empty_state("Ресурсов в городе пока нет.")
+        empty_state("Объявлений в городе пока нет.")
     } else {
         resources
             .iter()
@@ -226,7 +226,7 @@ fn render_page(
         </div>
         <span class="badge">{context_title}</span>
     </div>
-    <p>Защищённое управление ресурсами, жалобами, помощниками и подключёнными сообществами города.</p>
+    <p>Защищённое управление объявлениями, жалобами, помощниками и подключёнными сообществами города.</p>
     <div class="actions">
         <a class="button primary" href="/app/center/geography?q={stable_key}">Платформы города</a>
         <a class="button" href="/app/center/city/helpers">Помощники города</a>
@@ -235,7 +235,7 @@ fn render_page(
 </section>
 
 <section class="metrics">
-    <div class="metric"><strong>{resource_count}</strong><span>Ресурсы</span></div>
+    <div class="metric"><strong>{resource_count}</strong><span>Объявления</span></div>
     <div class="metric"><strong>{pending_resources}</strong><span>На проверке</span></div>
     <div class="metric"><strong>{open_reports}</strong><span>Жалобы</span></div>
     <div class="metric"><strong>{active_platforms}</strong><span>Платформы</span></div>
@@ -252,7 +252,7 @@ fn render_page(
 <div class="section-head"><h2>Открытые жалобы</h2><span>До {report_limit}</span></div>
 <section class="panel">{report_rows}</section>
 
-<div class="section-head"><h2>Ресурсы города</h2><span>До {resource_limit}</span></div>
+<div class="section-head"><h2>Объявления города</h2><span>До {resource_limit}</span></div>
 <section class="panel">{resource_rows}</section>
 
 <div class="section-head"><h2>Безопасность сообществ</h2><span>До {security_limit}</span></div>

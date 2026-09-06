@@ -24,7 +24,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = "4.9.91";
+pub const STATIC_ASSET_VERSION: &str = "4.9.92";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -3963,6 +3963,12 @@ body {
     opacity: .55;
 }
 
+.rm-version-footer a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
 html.light-theme .card:hover,
 body.light-theme .card:hover {
     box-shadow:
@@ -4051,6 +4057,12 @@ pub(crate) fn page_document(
     letter-spacing: .04em;
     opacity: .82;
 }}
+
+.rm-version-footer a {{
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}}
 </style>
 
 {body_before_main}
@@ -4063,6 +4075,10 @@ pub(crate) fn page_document(
 
 <footer class="rm-version-footer"
         aria-label="Версия приложения">
+    <a href="/rules">Правила</a>
+    ·
+    <a href="/privacy">Политика</a>
+    ·
     GRABIT · v{asset_version}
 </footer>
 
@@ -6018,6 +6034,10 @@ mod public_entry_tests {
         let page = page_document("Тест", "", "", "<p>ok</p>", "", "");
         assert!(page.contains("/static/pwa-install.js"));
         assert!(page.contains("apple-touch-icon.png"));
+        assert!(page.contains("href=\"/rules\""));
+        assert!(page.contains("href=\"/privacy\""));
+        assert!(page.contains("Правила"));
+        assert!(page.contains("Политика"));
     }
 
     #[test]

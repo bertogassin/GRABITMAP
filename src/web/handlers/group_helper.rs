@@ -216,7 +216,7 @@ fn render_page(
                         <p>{reason}</p>
                         <div class="meta">
                             <span>Жалоба #{id}</span>
-                            <span>Ресурс #{resource_id}</span>
+                            <span>Объявление #{resource_id}</span>
                             <span>время: {created_at}</span>
                         </div>
                         {actions}

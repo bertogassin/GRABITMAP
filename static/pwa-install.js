@@ -39,7 +39,14 @@
             navigator.serviceWorker.register(
                 "/static/resursmap-sw.js?v=" + assetVersion(),
                 { scope: "/" }
-            ).catch(function () {});
+            ).then(function (registration) {
+                if (!registration.periodicSync) {
+                    return;
+                }
+                return registration.periodicSync.register("grabit-nudge", {
+                    minInterval: 12 * 60 * 60 * 1000
+                });
+            }).catch(function () {});
         }, { once: true });
     }
 

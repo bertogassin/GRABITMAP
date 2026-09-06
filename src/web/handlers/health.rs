@@ -23,6 +23,8 @@ pub async fn robots_txt() -> Response {
     (
         [(header::CONTENT_TYPE, "text/plain; charset=utf-8")],
         "User-agent: *\n\
+Allow: /rules\n\
+Allow: /privacy\n\
 Disallow: /app/user/\n\
 Disallow: /app/me\n\
 Disallow: /app/chat\n\
@@ -31,4 +33,14 @@ Disallow: /login\n\
 Disallow: /register\n",
     )
         .into_response()
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn robots_allows_legal_pages() {
+        let source = include_str!("health.rs");
+        assert!(source.contains("Allow: /rules"));
+        assert!(source.contains("Allow: /privacy"));
+    }
 }
