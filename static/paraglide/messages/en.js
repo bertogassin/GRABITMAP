@@ -191,9 +191,33 @@
 /** @typedef {{}} Search_TitleInputs */
 /** @typedef {{}} Search_WhatInputs */
 /** @typedef {{}} SpecialistInputs */
+/** @typedef {{}} Steps_BestInputs */
+/** @typedef {{}} Steps_CountingInputs */
+/** @typedef {{}} Steps_DesktopInputs */
+/** @typedef {{}} Steps_EmptyInputs */
+/** @typedef {{}} Steps_Goal_DoneInputs */
+/** @typedef {{}} Steps_Goal_LabelInputs */
+/** @typedef {{}} Steps_Goal_UpdatedInputs */
 /** @typedef {{}} Steps_InstallInputs */
+/** @typedef {{}} Steps_Keep_PanelInputs */
 /** @typedef {{}} Steps_LeadInputs */
+/** @typedef {{}} Steps_LifeInputs */
+/** @typedef {{ pct: NonNullable<unknown>, km: NonNullable<unknown>, goal: NonNullable<unknown> }} Steps_Live_BodyInputs */
+/** @typedef {{}} Steps_LogInputs */
+/** @typedef {{}} Steps_Need_MotionInputs */
+/** @typedef {{ goal: NonNullable<unknown> }} Steps_Of_GoalInputs */
+/** @typedef {{}} Steps_OkInputs */
+/** @typedef {{}} Steps_PinInputs */
+/** @typedef {{}} Steps_Sensor_QuietInputs */
+/** @typedef {{}} Steps_StreakInputs */
 /** @typedef {{}} Steps_TitleInputs */
+/** @typedef {{ pct: NonNullable<unknown> }} Steps_Today_PctInputs */
+/** @typedef {{}} Steps_WeekInputs */
+/** @typedef {{}} Steps_Word_FewInputs */
+/** @typedef {{}} Steps_Word_ManyInputs */
+/** @typedef {{}} Steps_Word_OneInputs */
+/** @typedef {{}} Steps_YearInputs */
+/** @typedef {{}} Steps_Year_HintInputs */
 
 
 export const auth_email = /** @type {(inputs: Auth_EmailInputs) => LocalizedString} */ () => {
@@ -960,14 +984,110 @@ export const specialist = /** @type {(inputs: SpecialistInputs) => LocalizedStri
 	return /** @type {LocalizedString} */ (`Specialist`)
 };
 
+export const steps_best = /** @type {(inputs: Steps_BestInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Best`)
+};
+
+export const steps_counting = /** @type {(inputs: Steps_CountingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Counting steps from your phone`)
+};
+
+export const steps_desktop = /** @type {(inputs: Steps_DesktopInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Steps aren’t counted on desktop. Open on your phone.`)
+};
+
+export const steps_empty = /** @type {(inputs: Steps_EmptyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Nothing yet`)
+};
+
+export const steps_goal_done = /** @type {(inputs: Steps_Goal_DoneInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Daily goal reached`)
+};
+
+export const steps_goal_label = /** @type {(inputs: Steps_Goal_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Goal`)
+};
+
+export const steps_goal_updated = /** @type {(inputs: Steps_Goal_UpdatedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Goal updated`)
+};
+
 export const steps_install = /** @type {(inputs: Steps_InstallInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Add to home screen`)
 };
 
+export const steps_keep_panel = /** @type {(inputs: Steps_Keep_PanelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Phone panel updates itself — you can check less often`)
+};
+
 export const steps_lead = /** @type {(inputs: Steps_LeadInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Daily goal — 10,000 steps.`)
+	return /** @type {LocalizedString} */ (`Phone counts. Live panel — check less often.`)
+};
+
+export const steps_life = /** @type {(inputs: Steps_LifeInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Total`)
+};
+
+export const steps_live_body = /** @type {(inputs: Steps_Live_BodyInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`${i?.pct}% · ${i?.km} km · goal ${i?.goal}`)
+};
+
+export const steps_log = /** @type {(inputs: Steps_LogInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Activity`)
+};
+
+export const steps_need_motion = /** @type {(inputs: Steps_Need_MotionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Motion access is required`)
+};
+
+export const steps_of_goal = /** @type {(inputs: Steps_Of_GoalInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`of ${i?.goal}`)
+};
+
+export const steps_ok = /** @type {(inputs: Steps_OkInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`OK`)
+};
+
+export const steps_pin = /** @type {(inputs: Steps_PinInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Phone panel`)
+};
+
+export const steps_sensor_quiet = /** @type {(inputs: Steps_Sensor_QuietInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Sensor is quiet. Keep the screen awake or install the shortcut.`)
+};
+
+export const steps_streak = /** @type {(inputs: Steps_StreakInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Streak`)
 };
 
 export const steps_title = /** @type {(inputs: Steps_TitleInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Pedometer`)
+};
+
+export const steps_today_pct = /** @type {(inputs: Steps_Today_PctInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`${i?.pct}% today`)
+};
+
+export const steps_week = /** @type {(inputs: Steps_WeekInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Week`)
+};
+
+export const steps_word_few = /** @type {(inputs: Steps_Word_FewInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`steps`)
+};
+
+export const steps_word_many = /** @type {(inputs: Steps_Word_ManyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`steps`)
+};
+
+export const steps_word_one = /** @type {(inputs: Steps_Word_OneInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`step`)
+};
+
+export const steps_year = /** @type {(inputs: Steps_YearInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Year`)
+};
+
+export const steps_year_hint = /** @type {(inputs: Steps_Year_HintInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Day color shows how far you walked`)
 };

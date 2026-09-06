@@ -191,9 +191,33 @@
 /** @typedef {{}} Search_TitleInputs */
 /** @typedef {{}} Search_WhatInputs */
 /** @typedef {{}} SpecialistInputs */
+/** @typedef {{}} Steps_BestInputs */
+/** @typedef {{}} Steps_CountingInputs */
+/** @typedef {{}} Steps_DesktopInputs */
+/** @typedef {{}} Steps_EmptyInputs */
+/** @typedef {{}} Steps_Goal_DoneInputs */
+/** @typedef {{}} Steps_Goal_LabelInputs */
+/** @typedef {{}} Steps_Goal_UpdatedInputs */
 /** @typedef {{}} Steps_InstallInputs */
+/** @typedef {{}} Steps_Keep_PanelInputs */
 /** @typedef {{}} Steps_LeadInputs */
+/** @typedef {{}} Steps_LifeInputs */
+/** @typedef {{ pct: NonNullable<unknown>, km: NonNullable<unknown>, goal: NonNullable<unknown> }} Steps_Live_BodyInputs */
+/** @typedef {{}} Steps_LogInputs */
+/** @typedef {{}} Steps_Need_MotionInputs */
+/** @typedef {{ goal: NonNullable<unknown> }} Steps_Of_GoalInputs */
+/** @typedef {{}} Steps_OkInputs */
+/** @typedef {{}} Steps_PinInputs */
+/** @typedef {{}} Steps_Sensor_QuietInputs */
+/** @typedef {{}} Steps_StreakInputs */
 /** @typedef {{}} Steps_TitleInputs */
+/** @typedef {{ pct: NonNullable<unknown> }} Steps_Today_PctInputs */
+/** @typedef {{}} Steps_WeekInputs */
+/** @typedef {{}} Steps_Word_FewInputs */
+/** @typedef {{}} Steps_Word_ManyInputs */
+/** @typedef {{}} Steps_Word_OneInputs */
+/** @typedef {{}} Steps_YearInputs */
+/** @typedef {{}} Steps_Year_HintInputs */
 
 
 export const auth_email = /** @type {(inputs: Auth_EmailInputs) => LocalizedString} */ () => {
@@ -960,14 +984,110 @@ export const specialist = /** @type {(inputs: SpecialistInputs) => LocalizedStri
 	return /** @type {LocalizedString} */ (`Uzman`)
 };
 
+export const steps_best = /** @type {(inputs: Steps_BestInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Rekor`)
+};
+
+export const steps_counting = /** @type {(inputs: Steps_CountingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Telefondan adımlar sayılıyor`)
+};
+
+export const steps_desktop = /** @type {(inputs: Steps_DesktopInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Bilgisayarda sayılmaz. Telefonda açın.`)
+};
+
+export const steps_empty = /** @type {(inputs: Steps_EmptyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Henüz yok`)
+};
+
+export const steps_goal_done = /** @type {(inputs: Steps_Goal_DoneInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Günlük hedef tamam`)
+};
+
+export const steps_goal_label = /** @type {(inputs: Steps_Goal_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Hedef`)
+};
+
+export const steps_goal_updated = /** @type {(inputs: Steps_Goal_UpdatedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Hedef güncellendi`)
+};
+
 export const steps_install = /** @type {(inputs: Steps_InstallInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Add to home screen`)
+};
+
+export const steps_keep_panel = /** @type {(inputs: Steps_Keep_PanelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Panel kendiliğinden güncellenir`)
 };
 
 export const steps_lead = /** @type {(inputs: Steps_LeadInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Daily goal — 10,000 steps.`)
 };
 
+export const steps_life = /** @type {(inputs: Steps_LifeInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Toplam`)
+};
+
+export const steps_live_body = /** @type {(inputs: Steps_Live_BodyInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`%${i?.pct} · ${i?.km} km · hedef ${i?.goal}`)
+};
+
+export const steps_log = /** @type {(inputs: Steps_LogInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Aktivite`)
+};
+
+export const steps_need_motion = /** @type {(inputs: Steps_Need_MotionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Hareket izni gerekli`)
+};
+
+export const steps_of_goal = /** @type {(inputs: Steps_Of_GoalInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`/ ${i?.goal}`)
+};
+
+export const steps_ok = /** @type {(inputs: Steps_OkInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Tamam`)
+};
+
+export const steps_pin = /** @type {(inputs: Steps_PinInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Telefon paneli`)
+};
+
+export const steps_sensor_quiet = /** @type {(inputs: Steps_Sensor_QuietInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Sensör sessiz. Ekranı açık tutun veya kısayol ekleyin.`)
+};
+
+export const steps_streak = /** @type {(inputs: Steps_StreakInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Seri`)
+};
+
 export const steps_title = /** @type {(inputs: Steps_TitleInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Adımsayar`)
+};
+
+export const steps_today_pct = /** @type {(inputs: Steps_Today_PctInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`bugün %${i?.pct}`)
+};
+
+export const steps_week = /** @type {(inputs: Steps_WeekInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Hafta`)
+};
+
+export const steps_word_few = /** @type {(inputs: Steps_Word_FewInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`adım`)
+};
+
+export const steps_word_many = /** @type {(inputs: Steps_Word_ManyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`adım`)
+};
+
+export const steps_word_one = /** @type {(inputs: Steps_Word_OneInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`adım`)
+};
+
+export const steps_year = /** @type {(inputs: Steps_YearInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Yıl`)
+};
+
+export const steps_year_hint = /** @type {(inputs: Steps_Year_HintInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Renk adımları gösterir`)
 };

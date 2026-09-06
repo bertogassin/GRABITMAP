@@ -191,9 +191,33 @@
 /** @typedef {{}} Search_TitleInputs */
 /** @typedef {{}} Search_WhatInputs */
 /** @typedef {{}} SpecialistInputs */
+/** @typedef {{}} Steps_BestInputs */
+/** @typedef {{}} Steps_CountingInputs */
+/** @typedef {{}} Steps_DesktopInputs */
+/** @typedef {{}} Steps_EmptyInputs */
+/** @typedef {{}} Steps_Goal_DoneInputs */
+/** @typedef {{}} Steps_Goal_LabelInputs */
+/** @typedef {{}} Steps_Goal_UpdatedInputs */
 /** @typedef {{}} Steps_InstallInputs */
+/** @typedef {{}} Steps_Keep_PanelInputs */
 /** @typedef {{}} Steps_LeadInputs */
+/** @typedef {{}} Steps_LifeInputs */
+/** @typedef {{ pct: NonNullable<unknown>, km: NonNullable<unknown>, goal: NonNullable<unknown> }} Steps_Live_BodyInputs */
+/** @typedef {{}} Steps_LogInputs */
+/** @typedef {{}} Steps_Need_MotionInputs */
+/** @typedef {{ goal: NonNullable<unknown> }} Steps_Of_GoalInputs */
+/** @typedef {{}} Steps_OkInputs */
+/** @typedef {{}} Steps_PinInputs */
+/** @typedef {{}} Steps_Sensor_QuietInputs */
+/** @typedef {{}} Steps_StreakInputs */
 /** @typedef {{}} Steps_TitleInputs */
+/** @typedef {{ pct: NonNullable<unknown> }} Steps_Today_PctInputs */
+/** @typedef {{}} Steps_WeekInputs */
+/** @typedef {{}} Steps_Word_FewInputs */
+/** @typedef {{}} Steps_Word_ManyInputs */
+/** @typedef {{}} Steps_Word_OneInputs */
+/** @typedef {{}} Steps_YearInputs */
+/** @typedef {{}} Steps_Year_HintInputs */
 
 
 export const auth_email = /** @type {(inputs: Auth_EmailInputs) => LocalizedString} */ () => {
@@ -960,14 +984,110 @@ export const specialist = /** @type {(inputs: SpecialistInputs) => LocalizedStri
 	return /** @type {LocalizedString} */ (`متخصص`)
 };
 
+export const steps_best = /** @type {(inputs: Steps_BestInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`بهترین`)
+};
+
+export const steps_counting = /** @type {(inputs: Steps_CountingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`شمارش گام از تلفن`)
+};
+
+export const steps_desktop = /** @type {(inputs: Steps_DesktopInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`روی رایانه شمرده نمی‌شود. در تلفن باز کنید.`)
+};
+
+export const steps_empty = /** @type {(inputs: Steps_EmptyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`هنوز خالی`)
+};
+
+export const steps_goal_done = /** @type {(inputs: Steps_Goal_DoneInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`هدف روز رسید`)
+};
+
+export const steps_goal_label = /** @type {(inputs: Steps_Goal_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`هدف`)
+};
+
+export const steps_goal_updated = /** @type {(inputs: Steps_Goal_UpdatedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`هدف به‌روز شد`)
+};
+
 export const steps_install = /** @type {(inputs: Steps_InstallInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Add to home screen`)
+};
+
+export const steps_keep_panel = /** @type {(inputs: Steps_Keep_PanelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`پنل خودش به‌روز می‌شود`)
 };
 
 export const steps_lead = /** @type {(inputs: Steps_LeadInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Daily goal — 10,000 steps.`)
 };
 
+export const steps_life = /** @type {(inputs: Steps_LifeInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`مجموع`)
+};
+
+export const steps_live_body = /** @type {(inputs: Steps_Live_BodyInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`${i?.pct}% · ${i?.km} کم · هدف ${i?.goal}`)
+};
+
+export const steps_log = /** @type {(inputs: Steps_LogInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`فعالیت`)
+};
+
+export const steps_need_motion = /** @type {(inputs: Steps_Need_MotionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`دسترسی به حرکت لازم است`)
+};
+
+export const steps_of_goal = /** @type {(inputs: Steps_Of_GoalInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`از ${i?.goal}`)
+};
+
+export const steps_ok = /** @type {(inputs: Steps_OkInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`باشه`)
+};
+
+export const steps_pin = /** @type {(inputs: Steps_PinInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`پنل تلفن`)
+};
+
+export const steps_sensor_quiet = /** @type {(inputs: Steps_Sensor_QuietInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`حسگر ساکت است. صفحه را باز بگذارید یا میانبر نصب کنید.`)
+};
+
+export const steps_streak = /** @type {(inputs: Steps_StreakInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`رشته`)
+};
+
 export const steps_title = /** @type {(inputs: Steps_TitleInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`گام‌شمار`)
+};
+
+export const steps_today_pct = /** @type {(inputs: Steps_Today_PctInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`${i?.pct}% امروز`)
+};
+
+export const steps_week = /** @type {(inputs: Steps_WeekInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`هفته`)
+};
+
+export const steps_word_few = /** @type {(inputs: Steps_Word_FewInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`گام`)
+};
+
+export const steps_word_many = /** @type {(inputs: Steps_Word_ManyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`گام`)
+};
+
+export const steps_word_one = /** @type {(inputs: Steps_Word_OneInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`گام`)
+};
+
+export const steps_year = /** @type {(inputs: Steps_YearInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`سال`)
+};
+
+export const steps_year_hint = /** @type {(inputs: Steps_Year_HintInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`رنگ نشان‌دهنده گام‌هاست`)
 };

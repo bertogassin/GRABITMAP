@@ -76,26 +76,63 @@
         var key = "resursmap:steps-panel:" + new Date().toISOString().slice(0, 10);
         try {
             if (localStorage.getItem(key) === "1") {
+                refreshStepsLivePanel();
                 return;
             }
             localStorage.setItem(key, "1");
         } catch (e) {}
+        refreshStepsLivePanel(true);
+    }
+
+    function refreshStepsLivePanel(force) {
+        if (!notifyReady()) {
+            return;
+        }
+        var count = 0;
+        var goal = 10000;
+        try {
+            var raw = localStorage.getItem("resursmap:steps");
+            if (raw) {
+                var data = JSON.parse(raw);
+                var today = new Date().toISOString().slice(0, 10);
+                // local date may differ from UTC — prefer stored date match via pedometer key
+                if (data && typeof data.count === "number") {
+                    count = Math.max(0, Math.floor(data.count));
+                }
+                if (data && typeof data.goal === "number" && data.goal > 0) {
+                    goal = Math.floor(data.goal);
+                }
+                void today;
+            }
+        } catch (e) {}
+        var pct = goal > 0 ? Math.min(999, Math.round((count / goal) * 100)) : 0;
+        var km = ((count * 0.75) / 1000).toFixed(1);
+        var title = count > 0
+            ? (count + " / " + goal)
+            : t("notify_steps_title", "Шагомер GRABIT");
+        var body = count > 0
+            ? t("steps_live_body", "{pct}% · {km} km · goal {goal}")
+                .replace("{pct}", String(pct))
+                .replace("{km}", km)
+                .replace("{goal}", String(goal))
+            : t("notify_steps_body", "Нажмите — сразу считать шаги.");
         var options = {
-            body: t("notify_steps_body", "Нажмите — сразу считать шаги."),
+            body: body,
             icon: "/static/app-icon-192.png",
-            tag: "grabit-steps-panel",
-            renotify: false,
+            tag: "grabit-steps-live",
+            renotify: Boolean(force),
+            silent: true,
             data: { url: "/app/steps" },
             actions: [{ action: "open-steps", title: t("notify_steps_action", "Открыть шагомер") }]
         };
         if (navigator.serviceWorker && navigator.serviceWorker.ready) {
             navigator.serviceWorker.ready.then(function (reg) {
-                return reg.showNotification(t("notify_steps_title", "Шагомер GRABIT"), options);
+                return reg.showNotification(title, options);
             }).catch(function () {});
             return;
         }
         try {
-            new Notification("Шагомер GRABIT", options);
+            new Notification(title, options);
         } catch (e) {}
     }
 
@@ -182,7 +219,7 @@
                         notifySound();
                         showSystemNotice(
                             "GRABIT",
-                            "Есть новое уведомление.",
+                            t("notify_generic", "Есть новое уведомление."),
                             "grabit-inbox",
                             "/app/notifications"
                         );
@@ -190,8 +227,8 @@
                     if (messages > lastMessages) {
                         notifySound();
                         showSystemNotice(
-                            "Новое сообщение",
-                            "Откройте чат в GRABIT.",
+                            t("notify_new_message", "Новое сообщение"),
+                            t("notify_open_chat", "Откройте чат в GRABIT."),
                             "grabit-chat",
                             "/app/messages"
                         );

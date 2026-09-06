@@ -193,9 +193,33 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Search_TitleInputs */
 /** @typedef {{}} Search_WhatInputs */
 /** @typedef {{}} SpecialistInputs */
+/** @typedef {{}} Steps_BestInputs */
+/** @typedef {{}} Steps_CountingInputs */
+/** @typedef {{}} Steps_DesktopInputs */
+/** @typedef {{}} Steps_EmptyInputs */
+/** @typedef {{}} Steps_Goal_DoneInputs */
+/** @typedef {{}} Steps_Goal_LabelInputs */
+/** @typedef {{}} Steps_Goal_UpdatedInputs */
 /** @typedef {{}} Steps_InstallInputs */
+/** @typedef {{}} Steps_Keep_PanelInputs */
 /** @typedef {{}} Steps_LeadInputs */
+/** @typedef {{}} Steps_LifeInputs */
+/** @typedef {{ pct: NonNullable<unknown>, km: NonNullable<unknown>, goal: NonNullable<unknown> }} Steps_Live_BodyInputs */
+/** @typedef {{}} Steps_LogInputs */
+/** @typedef {{}} Steps_Need_MotionInputs */
+/** @typedef {{ goal: NonNullable<unknown> }} Steps_Of_GoalInputs */
+/** @typedef {{}} Steps_OkInputs */
+/** @typedef {{}} Steps_PinInputs */
+/** @typedef {{}} Steps_Sensor_QuietInputs */
+/** @typedef {{}} Steps_StreakInputs */
 /** @typedef {{}} Steps_TitleInputs */
+/** @typedef {{ pct: NonNullable<unknown> }} Steps_Today_PctInputs */
+/** @typedef {{}} Steps_WeekInputs */
+/** @typedef {{}} Steps_Word_FewInputs */
+/** @typedef {{}} Steps_Word_ManyInputs */
+/** @typedef {{}} Steps_Word_OneInputs */
+/** @typedef {{}} Steps_YearInputs */
+/** @typedef {{}} Steps_Year_HintInputs */
 import * as __ru from "./ru.js"
 import * as __en from "./en.js"
 import * as __fr from "./fr.js"
@@ -8636,6 +8660,314 @@ export const specialist = /** @type {((inputs?: SpecialistInputs, options?: { lo
 /**
 * | output |
 * | --- |
+* | "Best" |
+*
+* @param {Steps_BestInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_best = /** @type {((inputs?: Steps_BestInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_BestInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_best(inputs)
+	if (locale === "fr") return __fr.steps_best(inputs)
+	if (locale === "es") return __es.steps_best(inputs)
+	if (locale === "zh") return __zh.steps_best(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_best(inputs)
+	if (locale === "hi") return __hi.steps_best(inputs)
+	if (locale === "ar") return __ar.steps_best(inputs)
+	if (locale === "pt") return __pt.steps_best(inputs)
+	if (locale === "de") return __de.steps_best(inputs)
+	if (locale === "ja") return __ja.steps_best(inputs)
+	if (locale === "ko") return __ko.steps_best(inputs)
+	if (locale === "it") return __it.steps_best(inputs)
+	if (locale === "tr") return __tr.steps_best(inputs)
+	if (locale === "pl") return __pl.steps_best(inputs)
+	if (locale === "uk") return __uk.steps_best(inputs)
+	if (locale === "nl") return __nl.steps_best(inputs)
+	if (locale === "vi") return __vi.steps_best(inputs)
+	if (locale === "id") return __id.steps_best(inputs)
+	if (locale === "ms") return __ms.steps_best(inputs)
+	if (locale === "th") return __th.steps_best(inputs)
+	if (locale === "fa") return __fa.steps_best(inputs)
+	if (locale === "ur") return __ur.steps_best(inputs)
+	if (locale === "bn") return __bn.steps_best(inputs)
+	if (locale === "pa") return __pa.steps_best(inputs)
+	if (locale === "sw") return __sw.steps_best(inputs)
+	if (locale === "el") return __el.steps_best(inputs)
+	if (locale === "cs") return __cs.steps_best(inputs)
+	if (locale === "ro") return __ro.steps_best(inputs)
+	if (locale === "hu") return __hu.steps_best(inputs)
+	if (locale === "sv") return __sv.steps_best(inputs)
+	if (locale === "he") return __he.steps_best(inputs)
+	return __ru.steps_best(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Counting steps from your phone" |
+*
+* @param {Steps_CountingInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_counting = /** @type {((inputs?: Steps_CountingInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_CountingInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_counting(inputs)
+	if (locale === "fr") return __fr.steps_counting(inputs)
+	if (locale === "es") return __es.steps_counting(inputs)
+	if (locale === "zh") return __zh.steps_counting(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_counting(inputs)
+	if (locale === "hi") return __hi.steps_counting(inputs)
+	if (locale === "ar") return __ar.steps_counting(inputs)
+	if (locale === "pt") return __pt.steps_counting(inputs)
+	if (locale === "de") return __de.steps_counting(inputs)
+	if (locale === "ja") return __ja.steps_counting(inputs)
+	if (locale === "ko") return __ko.steps_counting(inputs)
+	if (locale === "it") return __it.steps_counting(inputs)
+	if (locale === "tr") return __tr.steps_counting(inputs)
+	if (locale === "pl") return __pl.steps_counting(inputs)
+	if (locale === "uk") return __uk.steps_counting(inputs)
+	if (locale === "nl") return __nl.steps_counting(inputs)
+	if (locale === "vi") return __vi.steps_counting(inputs)
+	if (locale === "id") return __id.steps_counting(inputs)
+	if (locale === "ms") return __ms.steps_counting(inputs)
+	if (locale === "th") return __th.steps_counting(inputs)
+	if (locale === "fa") return __fa.steps_counting(inputs)
+	if (locale === "ur") return __ur.steps_counting(inputs)
+	if (locale === "bn") return __bn.steps_counting(inputs)
+	if (locale === "pa") return __pa.steps_counting(inputs)
+	if (locale === "sw") return __sw.steps_counting(inputs)
+	if (locale === "el") return __el.steps_counting(inputs)
+	if (locale === "cs") return __cs.steps_counting(inputs)
+	if (locale === "ro") return __ro.steps_counting(inputs)
+	if (locale === "hu") return __hu.steps_counting(inputs)
+	if (locale === "sv") return __sv.steps_counting(inputs)
+	if (locale === "he") return __he.steps_counting(inputs)
+	return __ru.steps_counting(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Steps aren’t counted on desktop. Open on your phone." |
+*
+* @param {Steps_DesktopInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_desktop = /** @type {((inputs?: Steps_DesktopInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_DesktopInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_desktop(inputs)
+	if (locale === "fr") return __fr.steps_desktop(inputs)
+	if (locale === "es") return __es.steps_desktop(inputs)
+	if (locale === "zh") return __zh.steps_desktop(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_desktop(inputs)
+	if (locale === "hi") return __hi.steps_desktop(inputs)
+	if (locale === "ar") return __ar.steps_desktop(inputs)
+	if (locale === "pt") return __pt.steps_desktop(inputs)
+	if (locale === "de") return __de.steps_desktop(inputs)
+	if (locale === "ja") return __ja.steps_desktop(inputs)
+	if (locale === "ko") return __ko.steps_desktop(inputs)
+	if (locale === "it") return __it.steps_desktop(inputs)
+	if (locale === "tr") return __tr.steps_desktop(inputs)
+	if (locale === "pl") return __pl.steps_desktop(inputs)
+	if (locale === "uk") return __uk.steps_desktop(inputs)
+	if (locale === "nl") return __nl.steps_desktop(inputs)
+	if (locale === "vi") return __vi.steps_desktop(inputs)
+	if (locale === "id") return __id.steps_desktop(inputs)
+	if (locale === "ms") return __ms.steps_desktop(inputs)
+	if (locale === "th") return __th.steps_desktop(inputs)
+	if (locale === "fa") return __fa.steps_desktop(inputs)
+	if (locale === "ur") return __ur.steps_desktop(inputs)
+	if (locale === "bn") return __bn.steps_desktop(inputs)
+	if (locale === "pa") return __pa.steps_desktop(inputs)
+	if (locale === "sw") return __sw.steps_desktop(inputs)
+	if (locale === "el") return __el.steps_desktop(inputs)
+	if (locale === "cs") return __cs.steps_desktop(inputs)
+	if (locale === "ro") return __ro.steps_desktop(inputs)
+	if (locale === "hu") return __hu.steps_desktop(inputs)
+	if (locale === "sv") return __sv.steps_desktop(inputs)
+	if (locale === "he") return __he.steps_desktop(inputs)
+	return __ru.steps_desktop(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Nothing yet" |
+*
+* @param {Steps_EmptyInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_empty = /** @type {((inputs?: Steps_EmptyInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_EmptyInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_empty(inputs)
+	if (locale === "fr") return __fr.steps_empty(inputs)
+	if (locale === "es") return __es.steps_empty(inputs)
+	if (locale === "zh") return __zh.steps_empty(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_empty(inputs)
+	if (locale === "hi") return __hi.steps_empty(inputs)
+	if (locale === "ar") return __ar.steps_empty(inputs)
+	if (locale === "pt") return __pt.steps_empty(inputs)
+	if (locale === "de") return __de.steps_empty(inputs)
+	if (locale === "ja") return __ja.steps_empty(inputs)
+	if (locale === "ko") return __ko.steps_empty(inputs)
+	if (locale === "it") return __it.steps_empty(inputs)
+	if (locale === "tr") return __tr.steps_empty(inputs)
+	if (locale === "pl") return __pl.steps_empty(inputs)
+	if (locale === "uk") return __uk.steps_empty(inputs)
+	if (locale === "nl") return __nl.steps_empty(inputs)
+	if (locale === "vi") return __vi.steps_empty(inputs)
+	if (locale === "id") return __id.steps_empty(inputs)
+	if (locale === "ms") return __ms.steps_empty(inputs)
+	if (locale === "th") return __th.steps_empty(inputs)
+	if (locale === "fa") return __fa.steps_empty(inputs)
+	if (locale === "ur") return __ur.steps_empty(inputs)
+	if (locale === "bn") return __bn.steps_empty(inputs)
+	if (locale === "pa") return __pa.steps_empty(inputs)
+	if (locale === "sw") return __sw.steps_empty(inputs)
+	if (locale === "el") return __el.steps_empty(inputs)
+	if (locale === "cs") return __cs.steps_empty(inputs)
+	if (locale === "ro") return __ro.steps_empty(inputs)
+	if (locale === "hu") return __hu.steps_empty(inputs)
+	if (locale === "sv") return __sv.steps_empty(inputs)
+	if (locale === "he") return __he.steps_empty(inputs)
+	return __ru.steps_empty(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Daily goal reached" |
+*
+* @param {Steps_Goal_DoneInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_goal_done = /** @type {((inputs?: Steps_Goal_DoneInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_Goal_DoneInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_goal_done(inputs)
+	if (locale === "fr") return __fr.steps_goal_done(inputs)
+	if (locale === "es") return __es.steps_goal_done(inputs)
+	if (locale === "zh") return __zh.steps_goal_done(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_goal_done(inputs)
+	if (locale === "hi") return __hi.steps_goal_done(inputs)
+	if (locale === "ar") return __ar.steps_goal_done(inputs)
+	if (locale === "pt") return __pt.steps_goal_done(inputs)
+	if (locale === "de") return __de.steps_goal_done(inputs)
+	if (locale === "ja") return __ja.steps_goal_done(inputs)
+	if (locale === "ko") return __ko.steps_goal_done(inputs)
+	if (locale === "it") return __it.steps_goal_done(inputs)
+	if (locale === "tr") return __tr.steps_goal_done(inputs)
+	if (locale === "pl") return __pl.steps_goal_done(inputs)
+	if (locale === "uk") return __uk.steps_goal_done(inputs)
+	if (locale === "nl") return __nl.steps_goal_done(inputs)
+	if (locale === "vi") return __vi.steps_goal_done(inputs)
+	if (locale === "id") return __id.steps_goal_done(inputs)
+	if (locale === "ms") return __ms.steps_goal_done(inputs)
+	if (locale === "th") return __th.steps_goal_done(inputs)
+	if (locale === "fa") return __fa.steps_goal_done(inputs)
+	if (locale === "ur") return __ur.steps_goal_done(inputs)
+	if (locale === "bn") return __bn.steps_goal_done(inputs)
+	if (locale === "pa") return __pa.steps_goal_done(inputs)
+	if (locale === "sw") return __sw.steps_goal_done(inputs)
+	if (locale === "el") return __el.steps_goal_done(inputs)
+	if (locale === "cs") return __cs.steps_goal_done(inputs)
+	if (locale === "ro") return __ro.steps_goal_done(inputs)
+	if (locale === "hu") return __hu.steps_goal_done(inputs)
+	if (locale === "sv") return __sv.steps_goal_done(inputs)
+	if (locale === "he") return __he.steps_goal_done(inputs)
+	return __ru.steps_goal_done(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Goal" |
+*
+* @param {Steps_Goal_LabelInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_goal_label = /** @type {((inputs?: Steps_Goal_LabelInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_Goal_LabelInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_goal_label(inputs)
+	if (locale === "fr") return __fr.steps_goal_label(inputs)
+	if (locale === "es") return __es.steps_goal_label(inputs)
+	if (locale === "zh") return __zh.steps_goal_label(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_goal_label(inputs)
+	if (locale === "hi") return __hi.steps_goal_label(inputs)
+	if (locale === "ar") return __ar.steps_goal_label(inputs)
+	if (locale === "pt") return __pt.steps_goal_label(inputs)
+	if (locale === "de") return __de.steps_goal_label(inputs)
+	if (locale === "ja") return __ja.steps_goal_label(inputs)
+	if (locale === "ko") return __ko.steps_goal_label(inputs)
+	if (locale === "it") return __it.steps_goal_label(inputs)
+	if (locale === "tr") return __tr.steps_goal_label(inputs)
+	if (locale === "pl") return __pl.steps_goal_label(inputs)
+	if (locale === "uk") return __uk.steps_goal_label(inputs)
+	if (locale === "nl") return __nl.steps_goal_label(inputs)
+	if (locale === "vi") return __vi.steps_goal_label(inputs)
+	if (locale === "id") return __id.steps_goal_label(inputs)
+	if (locale === "ms") return __ms.steps_goal_label(inputs)
+	if (locale === "th") return __th.steps_goal_label(inputs)
+	if (locale === "fa") return __fa.steps_goal_label(inputs)
+	if (locale === "ur") return __ur.steps_goal_label(inputs)
+	if (locale === "bn") return __bn.steps_goal_label(inputs)
+	if (locale === "pa") return __pa.steps_goal_label(inputs)
+	if (locale === "sw") return __sw.steps_goal_label(inputs)
+	if (locale === "el") return __el.steps_goal_label(inputs)
+	if (locale === "cs") return __cs.steps_goal_label(inputs)
+	if (locale === "ro") return __ro.steps_goal_label(inputs)
+	if (locale === "hu") return __hu.steps_goal_label(inputs)
+	if (locale === "sv") return __sv.steps_goal_label(inputs)
+	if (locale === "he") return __he.steps_goal_label(inputs)
+	return __ru.steps_goal_label(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Goal updated" |
+*
+* @param {Steps_Goal_UpdatedInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_goal_updated = /** @type {((inputs?: Steps_Goal_UpdatedInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_Goal_UpdatedInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_goal_updated(inputs)
+	if (locale === "fr") return __fr.steps_goal_updated(inputs)
+	if (locale === "es") return __es.steps_goal_updated(inputs)
+	if (locale === "zh") return __zh.steps_goal_updated(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_goal_updated(inputs)
+	if (locale === "hi") return __hi.steps_goal_updated(inputs)
+	if (locale === "ar") return __ar.steps_goal_updated(inputs)
+	if (locale === "pt") return __pt.steps_goal_updated(inputs)
+	if (locale === "de") return __de.steps_goal_updated(inputs)
+	if (locale === "ja") return __ja.steps_goal_updated(inputs)
+	if (locale === "ko") return __ko.steps_goal_updated(inputs)
+	if (locale === "it") return __it.steps_goal_updated(inputs)
+	if (locale === "tr") return __tr.steps_goal_updated(inputs)
+	if (locale === "pl") return __pl.steps_goal_updated(inputs)
+	if (locale === "uk") return __uk.steps_goal_updated(inputs)
+	if (locale === "nl") return __nl.steps_goal_updated(inputs)
+	if (locale === "vi") return __vi.steps_goal_updated(inputs)
+	if (locale === "id") return __id.steps_goal_updated(inputs)
+	if (locale === "ms") return __ms.steps_goal_updated(inputs)
+	if (locale === "th") return __th.steps_goal_updated(inputs)
+	if (locale === "fa") return __fa.steps_goal_updated(inputs)
+	if (locale === "ur") return __ur.steps_goal_updated(inputs)
+	if (locale === "bn") return __bn.steps_goal_updated(inputs)
+	if (locale === "pa") return __pa.steps_goal_updated(inputs)
+	if (locale === "sw") return __sw.steps_goal_updated(inputs)
+	if (locale === "el") return __el.steps_goal_updated(inputs)
+	if (locale === "cs") return __cs.steps_goal_updated(inputs)
+	if (locale === "ro") return __ro.steps_goal_updated(inputs)
+	if (locale === "hu") return __hu.steps_goal_updated(inputs)
+	if (locale === "sv") return __sv.steps_goal_updated(inputs)
+	if (locale === "he") return __he.steps_goal_updated(inputs)
+	return __ru.steps_goal_updated(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "Add to home screen" |
 *
 * @param {Steps_InstallInputs} inputs
@@ -8680,7 +9012,51 @@ export const steps_install = /** @type {((inputs?: Steps_InstallInputs, options?
 /**
 * | output |
 * | --- |
-* | "Daily goal — 10,000 steps." |
+* | "Phone panel updates itself — you can check less often" |
+*
+* @param {Steps_Keep_PanelInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_keep_panel = /** @type {((inputs?: Steps_Keep_PanelInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_Keep_PanelInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_keep_panel(inputs)
+	if (locale === "fr") return __fr.steps_keep_panel(inputs)
+	if (locale === "es") return __es.steps_keep_panel(inputs)
+	if (locale === "zh") return __zh.steps_keep_panel(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_keep_panel(inputs)
+	if (locale === "hi") return __hi.steps_keep_panel(inputs)
+	if (locale === "ar") return __ar.steps_keep_panel(inputs)
+	if (locale === "pt") return __pt.steps_keep_panel(inputs)
+	if (locale === "de") return __de.steps_keep_panel(inputs)
+	if (locale === "ja") return __ja.steps_keep_panel(inputs)
+	if (locale === "ko") return __ko.steps_keep_panel(inputs)
+	if (locale === "it") return __it.steps_keep_panel(inputs)
+	if (locale === "tr") return __tr.steps_keep_panel(inputs)
+	if (locale === "pl") return __pl.steps_keep_panel(inputs)
+	if (locale === "uk") return __uk.steps_keep_panel(inputs)
+	if (locale === "nl") return __nl.steps_keep_panel(inputs)
+	if (locale === "vi") return __vi.steps_keep_panel(inputs)
+	if (locale === "id") return __id.steps_keep_panel(inputs)
+	if (locale === "ms") return __ms.steps_keep_panel(inputs)
+	if (locale === "th") return __th.steps_keep_panel(inputs)
+	if (locale === "fa") return __fa.steps_keep_panel(inputs)
+	if (locale === "ur") return __ur.steps_keep_panel(inputs)
+	if (locale === "bn") return __bn.steps_keep_panel(inputs)
+	if (locale === "pa") return __pa.steps_keep_panel(inputs)
+	if (locale === "sw") return __sw.steps_keep_panel(inputs)
+	if (locale === "el") return __el.steps_keep_panel(inputs)
+	if (locale === "cs") return __cs.steps_keep_panel(inputs)
+	if (locale === "ro") return __ro.steps_keep_panel(inputs)
+	if (locale === "hu") return __hu.steps_keep_panel(inputs)
+	if (locale === "sv") return __sv.steps_keep_panel(inputs)
+	if (locale === "he") return __he.steps_keep_panel(inputs)
+	return __ru.steps_keep_panel(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Phone counts. Live panel — check less often." |
 *
 * @param {Steps_LeadInputs} inputs
 * @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
@@ -8720,6 +9096,402 @@ export const steps_lead = /** @type {((inputs?: Steps_LeadInputs, options?: { lo
 	if (locale === "sv") return __sv.steps_lead(inputs)
 	if (locale === "he") return __he.steps_lead(inputs)
 	return __ru.steps_lead(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Total" |
+*
+* @param {Steps_LifeInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_life = /** @type {((inputs?: Steps_LifeInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_LifeInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_life(inputs)
+	if (locale === "fr") return __fr.steps_life(inputs)
+	if (locale === "es") return __es.steps_life(inputs)
+	if (locale === "zh") return __zh.steps_life(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_life(inputs)
+	if (locale === "hi") return __hi.steps_life(inputs)
+	if (locale === "ar") return __ar.steps_life(inputs)
+	if (locale === "pt") return __pt.steps_life(inputs)
+	if (locale === "de") return __de.steps_life(inputs)
+	if (locale === "ja") return __ja.steps_life(inputs)
+	if (locale === "ko") return __ko.steps_life(inputs)
+	if (locale === "it") return __it.steps_life(inputs)
+	if (locale === "tr") return __tr.steps_life(inputs)
+	if (locale === "pl") return __pl.steps_life(inputs)
+	if (locale === "uk") return __uk.steps_life(inputs)
+	if (locale === "nl") return __nl.steps_life(inputs)
+	if (locale === "vi") return __vi.steps_life(inputs)
+	if (locale === "id") return __id.steps_life(inputs)
+	if (locale === "ms") return __ms.steps_life(inputs)
+	if (locale === "th") return __th.steps_life(inputs)
+	if (locale === "fa") return __fa.steps_life(inputs)
+	if (locale === "ur") return __ur.steps_life(inputs)
+	if (locale === "bn") return __bn.steps_life(inputs)
+	if (locale === "pa") return __pa.steps_life(inputs)
+	if (locale === "sw") return __sw.steps_life(inputs)
+	if (locale === "el") return __el.steps_life(inputs)
+	if (locale === "cs") return __cs.steps_life(inputs)
+	if (locale === "ro") return __ro.steps_life(inputs)
+	if (locale === "hu") return __hu.steps_life(inputs)
+	if (locale === "sv") return __sv.steps_life(inputs)
+	if (locale === "he") return __he.steps_life(inputs)
+	return __ru.steps_life(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "{pct}% · {km} km · goal {goal}" |
+*
+* @param {Steps_Live_BodyInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_live_body = /** @type {((inputs: Steps_Live_BodyInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_Live_BodyInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_live_body(inputs)
+	if (locale === "fr") return __fr.steps_live_body(inputs)
+	if (locale === "es") return __es.steps_live_body(inputs)
+	if (locale === "zh") return __zh.steps_live_body(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_live_body(inputs)
+	if (locale === "hi") return __hi.steps_live_body(inputs)
+	if (locale === "ar") return __ar.steps_live_body(inputs)
+	if (locale === "pt") return __pt.steps_live_body(inputs)
+	if (locale === "de") return __de.steps_live_body(inputs)
+	if (locale === "ja") return __ja.steps_live_body(inputs)
+	if (locale === "ko") return __ko.steps_live_body(inputs)
+	if (locale === "it") return __it.steps_live_body(inputs)
+	if (locale === "tr") return __tr.steps_live_body(inputs)
+	if (locale === "pl") return __pl.steps_live_body(inputs)
+	if (locale === "uk") return __uk.steps_live_body(inputs)
+	if (locale === "nl") return __nl.steps_live_body(inputs)
+	if (locale === "vi") return __vi.steps_live_body(inputs)
+	if (locale === "id") return __id.steps_live_body(inputs)
+	if (locale === "ms") return __ms.steps_live_body(inputs)
+	if (locale === "th") return __th.steps_live_body(inputs)
+	if (locale === "fa") return __fa.steps_live_body(inputs)
+	if (locale === "ur") return __ur.steps_live_body(inputs)
+	if (locale === "bn") return __bn.steps_live_body(inputs)
+	if (locale === "pa") return __pa.steps_live_body(inputs)
+	if (locale === "sw") return __sw.steps_live_body(inputs)
+	if (locale === "el") return __el.steps_live_body(inputs)
+	if (locale === "cs") return __cs.steps_live_body(inputs)
+	if (locale === "ro") return __ro.steps_live_body(inputs)
+	if (locale === "hu") return __hu.steps_live_body(inputs)
+	if (locale === "sv") return __sv.steps_live_body(inputs)
+	if (locale === "he") return __he.steps_live_body(inputs)
+	return __ru.steps_live_body(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Activity" |
+*
+* @param {Steps_LogInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_log = /** @type {((inputs?: Steps_LogInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_LogInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_log(inputs)
+	if (locale === "fr") return __fr.steps_log(inputs)
+	if (locale === "es") return __es.steps_log(inputs)
+	if (locale === "zh") return __zh.steps_log(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_log(inputs)
+	if (locale === "hi") return __hi.steps_log(inputs)
+	if (locale === "ar") return __ar.steps_log(inputs)
+	if (locale === "pt") return __pt.steps_log(inputs)
+	if (locale === "de") return __de.steps_log(inputs)
+	if (locale === "ja") return __ja.steps_log(inputs)
+	if (locale === "ko") return __ko.steps_log(inputs)
+	if (locale === "it") return __it.steps_log(inputs)
+	if (locale === "tr") return __tr.steps_log(inputs)
+	if (locale === "pl") return __pl.steps_log(inputs)
+	if (locale === "uk") return __uk.steps_log(inputs)
+	if (locale === "nl") return __nl.steps_log(inputs)
+	if (locale === "vi") return __vi.steps_log(inputs)
+	if (locale === "id") return __id.steps_log(inputs)
+	if (locale === "ms") return __ms.steps_log(inputs)
+	if (locale === "th") return __th.steps_log(inputs)
+	if (locale === "fa") return __fa.steps_log(inputs)
+	if (locale === "ur") return __ur.steps_log(inputs)
+	if (locale === "bn") return __bn.steps_log(inputs)
+	if (locale === "pa") return __pa.steps_log(inputs)
+	if (locale === "sw") return __sw.steps_log(inputs)
+	if (locale === "el") return __el.steps_log(inputs)
+	if (locale === "cs") return __cs.steps_log(inputs)
+	if (locale === "ro") return __ro.steps_log(inputs)
+	if (locale === "hu") return __hu.steps_log(inputs)
+	if (locale === "sv") return __sv.steps_log(inputs)
+	if (locale === "he") return __he.steps_log(inputs)
+	return __ru.steps_log(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Motion access is required" |
+*
+* @param {Steps_Need_MotionInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_need_motion = /** @type {((inputs?: Steps_Need_MotionInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_Need_MotionInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_need_motion(inputs)
+	if (locale === "fr") return __fr.steps_need_motion(inputs)
+	if (locale === "es") return __es.steps_need_motion(inputs)
+	if (locale === "zh") return __zh.steps_need_motion(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_need_motion(inputs)
+	if (locale === "hi") return __hi.steps_need_motion(inputs)
+	if (locale === "ar") return __ar.steps_need_motion(inputs)
+	if (locale === "pt") return __pt.steps_need_motion(inputs)
+	if (locale === "de") return __de.steps_need_motion(inputs)
+	if (locale === "ja") return __ja.steps_need_motion(inputs)
+	if (locale === "ko") return __ko.steps_need_motion(inputs)
+	if (locale === "it") return __it.steps_need_motion(inputs)
+	if (locale === "tr") return __tr.steps_need_motion(inputs)
+	if (locale === "pl") return __pl.steps_need_motion(inputs)
+	if (locale === "uk") return __uk.steps_need_motion(inputs)
+	if (locale === "nl") return __nl.steps_need_motion(inputs)
+	if (locale === "vi") return __vi.steps_need_motion(inputs)
+	if (locale === "id") return __id.steps_need_motion(inputs)
+	if (locale === "ms") return __ms.steps_need_motion(inputs)
+	if (locale === "th") return __th.steps_need_motion(inputs)
+	if (locale === "fa") return __fa.steps_need_motion(inputs)
+	if (locale === "ur") return __ur.steps_need_motion(inputs)
+	if (locale === "bn") return __bn.steps_need_motion(inputs)
+	if (locale === "pa") return __pa.steps_need_motion(inputs)
+	if (locale === "sw") return __sw.steps_need_motion(inputs)
+	if (locale === "el") return __el.steps_need_motion(inputs)
+	if (locale === "cs") return __cs.steps_need_motion(inputs)
+	if (locale === "ro") return __ro.steps_need_motion(inputs)
+	if (locale === "hu") return __hu.steps_need_motion(inputs)
+	if (locale === "sv") return __sv.steps_need_motion(inputs)
+	if (locale === "he") return __he.steps_need_motion(inputs)
+	return __ru.steps_need_motion(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "of {goal}" |
+*
+* @param {Steps_Of_GoalInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_of_goal = /** @type {((inputs: Steps_Of_GoalInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_Of_GoalInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_of_goal(inputs)
+	if (locale === "fr") return __fr.steps_of_goal(inputs)
+	if (locale === "es") return __es.steps_of_goal(inputs)
+	if (locale === "zh") return __zh.steps_of_goal(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_of_goal(inputs)
+	if (locale === "hi") return __hi.steps_of_goal(inputs)
+	if (locale === "ar") return __ar.steps_of_goal(inputs)
+	if (locale === "pt") return __pt.steps_of_goal(inputs)
+	if (locale === "de") return __de.steps_of_goal(inputs)
+	if (locale === "ja") return __ja.steps_of_goal(inputs)
+	if (locale === "ko") return __ko.steps_of_goal(inputs)
+	if (locale === "it") return __it.steps_of_goal(inputs)
+	if (locale === "tr") return __tr.steps_of_goal(inputs)
+	if (locale === "pl") return __pl.steps_of_goal(inputs)
+	if (locale === "uk") return __uk.steps_of_goal(inputs)
+	if (locale === "nl") return __nl.steps_of_goal(inputs)
+	if (locale === "vi") return __vi.steps_of_goal(inputs)
+	if (locale === "id") return __id.steps_of_goal(inputs)
+	if (locale === "ms") return __ms.steps_of_goal(inputs)
+	if (locale === "th") return __th.steps_of_goal(inputs)
+	if (locale === "fa") return __fa.steps_of_goal(inputs)
+	if (locale === "ur") return __ur.steps_of_goal(inputs)
+	if (locale === "bn") return __bn.steps_of_goal(inputs)
+	if (locale === "pa") return __pa.steps_of_goal(inputs)
+	if (locale === "sw") return __sw.steps_of_goal(inputs)
+	if (locale === "el") return __el.steps_of_goal(inputs)
+	if (locale === "cs") return __cs.steps_of_goal(inputs)
+	if (locale === "ro") return __ro.steps_of_goal(inputs)
+	if (locale === "hu") return __hu.steps_of_goal(inputs)
+	if (locale === "sv") return __sv.steps_of_goal(inputs)
+	if (locale === "he") return __he.steps_of_goal(inputs)
+	return __ru.steps_of_goal(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "OK" |
+*
+* @param {Steps_OkInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_ok = /** @type {((inputs?: Steps_OkInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_OkInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_ok(inputs)
+	if (locale === "fr") return __fr.steps_ok(inputs)
+	if (locale === "es") return __es.steps_ok(inputs)
+	if (locale === "zh") return __zh.steps_ok(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_ok(inputs)
+	if (locale === "hi") return __hi.steps_ok(inputs)
+	if (locale === "ar") return __ar.steps_ok(inputs)
+	if (locale === "pt") return __pt.steps_ok(inputs)
+	if (locale === "de") return __de.steps_ok(inputs)
+	if (locale === "ja") return __ja.steps_ok(inputs)
+	if (locale === "ko") return __ko.steps_ok(inputs)
+	if (locale === "it") return __it.steps_ok(inputs)
+	if (locale === "tr") return __tr.steps_ok(inputs)
+	if (locale === "pl") return __pl.steps_ok(inputs)
+	if (locale === "uk") return __uk.steps_ok(inputs)
+	if (locale === "nl") return __nl.steps_ok(inputs)
+	if (locale === "vi") return __vi.steps_ok(inputs)
+	if (locale === "id") return __id.steps_ok(inputs)
+	if (locale === "ms") return __ms.steps_ok(inputs)
+	if (locale === "th") return __th.steps_ok(inputs)
+	if (locale === "fa") return __fa.steps_ok(inputs)
+	if (locale === "ur") return __ur.steps_ok(inputs)
+	if (locale === "bn") return __bn.steps_ok(inputs)
+	if (locale === "pa") return __pa.steps_ok(inputs)
+	if (locale === "sw") return __sw.steps_ok(inputs)
+	if (locale === "el") return __el.steps_ok(inputs)
+	if (locale === "cs") return __cs.steps_ok(inputs)
+	if (locale === "ro") return __ro.steps_ok(inputs)
+	if (locale === "hu") return __hu.steps_ok(inputs)
+	if (locale === "sv") return __sv.steps_ok(inputs)
+	if (locale === "he") return __he.steps_ok(inputs)
+	return __ru.steps_ok(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Phone panel" |
+*
+* @param {Steps_PinInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_pin = /** @type {((inputs?: Steps_PinInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_PinInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_pin(inputs)
+	if (locale === "fr") return __fr.steps_pin(inputs)
+	if (locale === "es") return __es.steps_pin(inputs)
+	if (locale === "zh") return __zh.steps_pin(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_pin(inputs)
+	if (locale === "hi") return __hi.steps_pin(inputs)
+	if (locale === "ar") return __ar.steps_pin(inputs)
+	if (locale === "pt") return __pt.steps_pin(inputs)
+	if (locale === "de") return __de.steps_pin(inputs)
+	if (locale === "ja") return __ja.steps_pin(inputs)
+	if (locale === "ko") return __ko.steps_pin(inputs)
+	if (locale === "it") return __it.steps_pin(inputs)
+	if (locale === "tr") return __tr.steps_pin(inputs)
+	if (locale === "pl") return __pl.steps_pin(inputs)
+	if (locale === "uk") return __uk.steps_pin(inputs)
+	if (locale === "nl") return __nl.steps_pin(inputs)
+	if (locale === "vi") return __vi.steps_pin(inputs)
+	if (locale === "id") return __id.steps_pin(inputs)
+	if (locale === "ms") return __ms.steps_pin(inputs)
+	if (locale === "th") return __th.steps_pin(inputs)
+	if (locale === "fa") return __fa.steps_pin(inputs)
+	if (locale === "ur") return __ur.steps_pin(inputs)
+	if (locale === "bn") return __bn.steps_pin(inputs)
+	if (locale === "pa") return __pa.steps_pin(inputs)
+	if (locale === "sw") return __sw.steps_pin(inputs)
+	if (locale === "el") return __el.steps_pin(inputs)
+	if (locale === "cs") return __cs.steps_pin(inputs)
+	if (locale === "ro") return __ro.steps_pin(inputs)
+	if (locale === "hu") return __hu.steps_pin(inputs)
+	if (locale === "sv") return __sv.steps_pin(inputs)
+	if (locale === "he") return __he.steps_pin(inputs)
+	return __ru.steps_pin(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Sensor is quiet. Keep the screen awake or install the shortcut." |
+*
+* @param {Steps_Sensor_QuietInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_sensor_quiet = /** @type {((inputs?: Steps_Sensor_QuietInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_Sensor_QuietInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_sensor_quiet(inputs)
+	if (locale === "fr") return __fr.steps_sensor_quiet(inputs)
+	if (locale === "es") return __es.steps_sensor_quiet(inputs)
+	if (locale === "zh") return __zh.steps_sensor_quiet(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_sensor_quiet(inputs)
+	if (locale === "hi") return __hi.steps_sensor_quiet(inputs)
+	if (locale === "ar") return __ar.steps_sensor_quiet(inputs)
+	if (locale === "pt") return __pt.steps_sensor_quiet(inputs)
+	if (locale === "de") return __de.steps_sensor_quiet(inputs)
+	if (locale === "ja") return __ja.steps_sensor_quiet(inputs)
+	if (locale === "ko") return __ko.steps_sensor_quiet(inputs)
+	if (locale === "it") return __it.steps_sensor_quiet(inputs)
+	if (locale === "tr") return __tr.steps_sensor_quiet(inputs)
+	if (locale === "pl") return __pl.steps_sensor_quiet(inputs)
+	if (locale === "uk") return __uk.steps_sensor_quiet(inputs)
+	if (locale === "nl") return __nl.steps_sensor_quiet(inputs)
+	if (locale === "vi") return __vi.steps_sensor_quiet(inputs)
+	if (locale === "id") return __id.steps_sensor_quiet(inputs)
+	if (locale === "ms") return __ms.steps_sensor_quiet(inputs)
+	if (locale === "th") return __th.steps_sensor_quiet(inputs)
+	if (locale === "fa") return __fa.steps_sensor_quiet(inputs)
+	if (locale === "ur") return __ur.steps_sensor_quiet(inputs)
+	if (locale === "bn") return __bn.steps_sensor_quiet(inputs)
+	if (locale === "pa") return __pa.steps_sensor_quiet(inputs)
+	if (locale === "sw") return __sw.steps_sensor_quiet(inputs)
+	if (locale === "el") return __el.steps_sensor_quiet(inputs)
+	if (locale === "cs") return __cs.steps_sensor_quiet(inputs)
+	if (locale === "ro") return __ro.steps_sensor_quiet(inputs)
+	if (locale === "hu") return __hu.steps_sensor_quiet(inputs)
+	if (locale === "sv") return __sv.steps_sensor_quiet(inputs)
+	if (locale === "he") return __he.steps_sensor_quiet(inputs)
+	return __ru.steps_sensor_quiet(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Streak" |
+*
+* @param {Steps_StreakInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_streak = /** @type {((inputs?: Steps_StreakInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_StreakInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_streak(inputs)
+	if (locale === "fr") return __fr.steps_streak(inputs)
+	if (locale === "es") return __es.steps_streak(inputs)
+	if (locale === "zh") return __zh.steps_streak(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_streak(inputs)
+	if (locale === "hi") return __hi.steps_streak(inputs)
+	if (locale === "ar") return __ar.steps_streak(inputs)
+	if (locale === "pt") return __pt.steps_streak(inputs)
+	if (locale === "de") return __de.steps_streak(inputs)
+	if (locale === "ja") return __ja.steps_streak(inputs)
+	if (locale === "ko") return __ko.steps_streak(inputs)
+	if (locale === "it") return __it.steps_streak(inputs)
+	if (locale === "tr") return __tr.steps_streak(inputs)
+	if (locale === "pl") return __pl.steps_streak(inputs)
+	if (locale === "uk") return __uk.steps_streak(inputs)
+	if (locale === "nl") return __nl.steps_streak(inputs)
+	if (locale === "vi") return __vi.steps_streak(inputs)
+	if (locale === "id") return __id.steps_streak(inputs)
+	if (locale === "ms") return __ms.steps_streak(inputs)
+	if (locale === "th") return __th.steps_streak(inputs)
+	if (locale === "fa") return __fa.steps_streak(inputs)
+	if (locale === "ur") return __ur.steps_streak(inputs)
+	if (locale === "bn") return __bn.steps_streak(inputs)
+	if (locale === "pa") return __pa.steps_streak(inputs)
+	if (locale === "sw") return __sw.steps_streak(inputs)
+	if (locale === "el") return __el.steps_streak(inputs)
+	if (locale === "cs") return __cs.steps_streak(inputs)
+	if (locale === "ro") return __ro.steps_streak(inputs)
+	if (locale === "hu") return __hu.steps_streak(inputs)
+	if (locale === "sv") return __sv.steps_streak(inputs)
+	if (locale === "he") return __he.steps_streak(inputs)
+	return __ru.steps_streak(inputs)
 });
 /**
 * | output |
@@ -8764,4 +9536,312 @@ export const steps_title = /** @type {((inputs?: Steps_TitleInputs, options?: { 
 	if (locale === "sv") return __sv.steps_title(inputs)
 	if (locale === "he") return __he.steps_title(inputs)
 	return __ru.steps_title(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "{pct}% today" |
+*
+* @param {Steps_Today_PctInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_today_pct = /** @type {((inputs: Steps_Today_PctInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_Today_PctInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_today_pct(inputs)
+	if (locale === "fr") return __fr.steps_today_pct(inputs)
+	if (locale === "es") return __es.steps_today_pct(inputs)
+	if (locale === "zh") return __zh.steps_today_pct(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_today_pct(inputs)
+	if (locale === "hi") return __hi.steps_today_pct(inputs)
+	if (locale === "ar") return __ar.steps_today_pct(inputs)
+	if (locale === "pt") return __pt.steps_today_pct(inputs)
+	if (locale === "de") return __de.steps_today_pct(inputs)
+	if (locale === "ja") return __ja.steps_today_pct(inputs)
+	if (locale === "ko") return __ko.steps_today_pct(inputs)
+	if (locale === "it") return __it.steps_today_pct(inputs)
+	if (locale === "tr") return __tr.steps_today_pct(inputs)
+	if (locale === "pl") return __pl.steps_today_pct(inputs)
+	if (locale === "uk") return __uk.steps_today_pct(inputs)
+	if (locale === "nl") return __nl.steps_today_pct(inputs)
+	if (locale === "vi") return __vi.steps_today_pct(inputs)
+	if (locale === "id") return __id.steps_today_pct(inputs)
+	if (locale === "ms") return __ms.steps_today_pct(inputs)
+	if (locale === "th") return __th.steps_today_pct(inputs)
+	if (locale === "fa") return __fa.steps_today_pct(inputs)
+	if (locale === "ur") return __ur.steps_today_pct(inputs)
+	if (locale === "bn") return __bn.steps_today_pct(inputs)
+	if (locale === "pa") return __pa.steps_today_pct(inputs)
+	if (locale === "sw") return __sw.steps_today_pct(inputs)
+	if (locale === "el") return __el.steps_today_pct(inputs)
+	if (locale === "cs") return __cs.steps_today_pct(inputs)
+	if (locale === "ro") return __ro.steps_today_pct(inputs)
+	if (locale === "hu") return __hu.steps_today_pct(inputs)
+	if (locale === "sv") return __sv.steps_today_pct(inputs)
+	if (locale === "he") return __he.steps_today_pct(inputs)
+	return __ru.steps_today_pct(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Week" |
+*
+* @param {Steps_WeekInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_week = /** @type {((inputs?: Steps_WeekInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_WeekInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_week(inputs)
+	if (locale === "fr") return __fr.steps_week(inputs)
+	if (locale === "es") return __es.steps_week(inputs)
+	if (locale === "zh") return __zh.steps_week(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_week(inputs)
+	if (locale === "hi") return __hi.steps_week(inputs)
+	if (locale === "ar") return __ar.steps_week(inputs)
+	if (locale === "pt") return __pt.steps_week(inputs)
+	if (locale === "de") return __de.steps_week(inputs)
+	if (locale === "ja") return __ja.steps_week(inputs)
+	if (locale === "ko") return __ko.steps_week(inputs)
+	if (locale === "it") return __it.steps_week(inputs)
+	if (locale === "tr") return __tr.steps_week(inputs)
+	if (locale === "pl") return __pl.steps_week(inputs)
+	if (locale === "uk") return __uk.steps_week(inputs)
+	if (locale === "nl") return __nl.steps_week(inputs)
+	if (locale === "vi") return __vi.steps_week(inputs)
+	if (locale === "id") return __id.steps_week(inputs)
+	if (locale === "ms") return __ms.steps_week(inputs)
+	if (locale === "th") return __th.steps_week(inputs)
+	if (locale === "fa") return __fa.steps_week(inputs)
+	if (locale === "ur") return __ur.steps_week(inputs)
+	if (locale === "bn") return __bn.steps_week(inputs)
+	if (locale === "pa") return __pa.steps_week(inputs)
+	if (locale === "sw") return __sw.steps_week(inputs)
+	if (locale === "el") return __el.steps_week(inputs)
+	if (locale === "cs") return __cs.steps_week(inputs)
+	if (locale === "ro") return __ro.steps_week(inputs)
+	if (locale === "hu") return __hu.steps_week(inputs)
+	if (locale === "sv") return __sv.steps_week(inputs)
+	if (locale === "he") return __he.steps_week(inputs)
+	return __ru.steps_week(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "steps" |
+*
+* @param {Steps_Word_FewInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_word_few = /** @type {((inputs?: Steps_Word_FewInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_Word_FewInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_word_few(inputs)
+	if (locale === "fr") return __fr.steps_word_few(inputs)
+	if (locale === "es") return __es.steps_word_few(inputs)
+	if (locale === "zh") return __zh.steps_word_few(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_word_few(inputs)
+	if (locale === "hi") return __hi.steps_word_few(inputs)
+	if (locale === "ar") return __ar.steps_word_few(inputs)
+	if (locale === "pt") return __pt.steps_word_few(inputs)
+	if (locale === "de") return __de.steps_word_few(inputs)
+	if (locale === "ja") return __ja.steps_word_few(inputs)
+	if (locale === "ko") return __ko.steps_word_few(inputs)
+	if (locale === "it") return __it.steps_word_few(inputs)
+	if (locale === "tr") return __tr.steps_word_few(inputs)
+	if (locale === "pl") return __pl.steps_word_few(inputs)
+	if (locale === "uk") return __uk.steps_word_few(inputs)
+	if (locale === "nl") return __nl.steps_word_few(inputs)
+	if (locale === "vi") return __vi.steps_word_few(inputs)
+	if (locale === "id") return __id.steps_word_few(inputs)
+	if (locale === "ms") return __ms.steps_word_few(inputs)
+	if (locale === "th") return __th.steps_word_few(inputs)
+	if (locale === "fa") return __fa.steps_word_few(inputs)
+	if (locale === "ur") return __ur.steps_word_few(inputs)
+	if (locale === "bn") return __bn.steps_word_few(inputs)
+	if (locale === "pa") return __pa.steps_word_few(inputs)
+	if (locale === "sw") return __sw.steps_word_few(inputs)
+	if (locale === "el") return __el.steps_word_few(inputs)
+	if (locale === "cs") return __cs.steps_word_few(inputs)
+	if (locale === "ro") return __ro.steps_word_few(inputs)
+	if (locale === "hu") return __hu.steps_word_few(inputs)
+	if (locale === "sv") return __sv.steps_word_few(inputs)
+	if (locale === "he") return __he.steps_word_few(inputs)
+	return __ru.steps_word_few(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "steps" |
+*
+* @param {Steps_Word_ManyInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_word_many = /** @type {((inputs?: Steps_Word_ManyInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_Word_ManyInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_word_many(inputs)
+	if (locale === "fr") return __fr.steps_word_many(inputs)
+	if (locale === "es") return __es.steps_word_many(inputs)
+	if (locale === "zh") return __zh.steps_word_many(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_word_many(inputs)
+	if (locale === "hi") return __hi.steps_word_many(inputs)
+	if (locale === "ar") return __ar.steps_word_many(inputs)
+	if (locale === "pt") return __pt.steps_word_many(inputs)
+	if (locale === "de") return __de.steps_word_many(inputs)
+	if (locale === "ja") return __ja.steps_word_many(inputs)
+	if (locale === "ko") return __ko.steps_word_many(inputs)
+	if (locale === "it") return __it.steps_word_many(inputs)
+	if (locale === "tr") return __tr.steps_word_many(inputs)
+	if (locale === "pl") return __pl.steps_word_many(inputs)
+	if (locale === "uk") return __uk.steps_word_many(inputs)
+	if (locale === "nl") return __nl.steps_word_many(inputs)
+	if (locale === "vi") return __vi.steps_word_many(inputs)
+	if (locale === "id") return __id.steps_word_many(inputs)
+	if (locale === "ms") return __ms.steps_word_many(inputs)
+	if (locale === "th") return __th.steps_word_many(inputs)
+	if (locale === "fa") return __fa.steps_word_many(inputs)
+	if (locale === "ur") return __ur.steps_word_many(inputs)
+	if (locale === "bn") return __bn.steps_word_many(inputs)
+	if (locale === "pa") return __pa.steps_word_many(inputs)
+	if (locale === "sw") return __sw.steps_word_many(inputs)
+	if (locale === "el") return __el.steps_word_many(inputs)
+	if (locale === "cs") return __cs.steps_word_many(inputs)
+	if (locale === "ro") return __ro.steps_word_many(inputs)
+	if (locale === "hu") return __hu.steps_word_many(inputs)
+	if (locale === "sv") return __sv.steps_word_many(inputs)
+	if (locale === "he") return __he.steps_word_many(inputs)
+	return __ru.steps_word_many(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "step" |
+*
+* @param {Steps_Word_OneInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_word_one = /** @type {((inputs?: Steps_Word_OneInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_Word_OneInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_word_one(inputs)
+	if (locale === "fr") return __fr.steps_word_one(inputs)
+	if (locale === "es") return __es.steps_word_one(inputs)
+	if (locale === "zh") return __zh.steps_word_one(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_word_one(inputs)
+	if (locale === "hi") return __hi.steps_word_one(inputs)
+	if (locale === "ar") return __ar.steps_word_one(inputs)
+	if (locale === "pt") return __pt.steps_word_one(inputs)
+	if (locale === "de") return __de.steps_word_one(inputs)
+	if (locale === "ja") return __ja.steps_word_one(inputs)
+	if (locale === "ko") return __ko.steps_word_one(inputs)
+	if (locale === "it") return __it.steps_word_one(inputs)
+	if (locale === "tr") return __tr.steps_word_one(inputs)
+	if (locale === "pl") return __pl.steps_word_one(inputs)
+	if (locale === "uk") return __uk.steps_word_one(inputs)
+	if (locale === "nl") return __nl.steps_word_one(inputs)
+	if (locale === "vi") return __vi.steps_word_one(inputs)
+	if (locale === "id") return __id.steps_word_one(inputs)
+	if (locale === "ms") return __ms.steps_word_one(inputs)
+	if (locale === "th") return __th.steps_word_one(inputs)
+	if (locale === "fa") return __fa.steps_word_one(inputs)
+	if (locale === "ur") return __ur.steps_word_one(inputs)
+	if (locale === "bn") return __bn.steps_word_one(inputs)
+	if (locale === "pa") return __pa.steps_word_one(inputs)
+	if (locale === "sw") return __sw.steps_word_one(inputs)
+	if (locale === "el") return __el.steps_word_one(inputs)
+	if (locale === "cs") return __cs.steps_word_one(inputs)
+	if (locale === "ro") return __ro.steps_word_one(inputs)
+	if (locale === "hu") return __hu.steps_word_one(inputs)
+	if (locale === "sv") return __sv.steps_word_one(inputs)
+	if (locale === "he") return __he.steps_word_one(inputs)
+	return __ru.steps_word_one(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Year" |
+*
+* @param {Steps_YearInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_year = /** @type {((inputs?: Steps_YearInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_YearInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_year(inputs)
+	if (locale === "fr") return __fr.steps_year(inputs)
+	if (locale === "es") return __es.steps_year(inputs)
+	if (locale === "zh") return __zh.steps_year(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_year(inputs)
+	if (locale === "hi") return __hi.steps_year(inputs)
+	if (locale === "ar") return __ar.steps_year(inputs)
+	if (locale === "pt") return __pt.steps_year(inputs)
+	if (locale === "de") return __de.steps_year(inputs)
+	if (locale === "ja") return __ja.steps_year(inputs)
+	if (locale === "ko") return __ko.steps_year(inputs)
+	if (locale === "it") return __it.steps_year(inputs)
+	if (locale === "tr") return __tr.steps_year(inputs)
+	if (locale === "pl") return __pl.steps_year(inputs)
+	if (locale === "uk") return __uk.steps_year(inputs)
+	if (locale === "nl") return __nl.steps_year(inputs)
+	if (locale === "vi") return __vi.steps_year(inputs)
+	if (locale === "id") return __id.steps_year(inputs)
+	if (locale === "ms") return __ms.steps_year(inputs)
+	if (locale === "th") return __th.steps_year(inputs)
+	if (locale === "fa") return __fa.steps_year(inputs)
+	if (locale === "ur") return __ur.steps_year(inputs)
+	if (locale === "bn") return __bn.steps_year(inputs)
+	if (locale === "pa") return __pa.steps_year(inputs)
+	if (locale === "sw") return __sw.steps_year(inputs)
+	if (locale === "el") return __el.steps_year(inputs)
+	if (locale === "cs") return __cs.steps_year(inputs)
+	if (locale === "ro") return __ro.steps_year(inputs)
+	if (locale === "hu") return __hu.steps_year(inputs)
+	if (locale === "sv") return __sv.steps_year(inputs)
+	if (locale === "he") return __he.steps_year(inputs)
+	return __ru.steps_year(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Day color shows how far you walked" |
+*
+* @param {Steps_Year_HintInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const steps_year_hint = /** @type {((inputs?: Steps_Year_HintInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Steps_Year_HintInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.steps_year_hint(inputs)
+	if (locale === "fr") return __fr.steps_year_hint(inputs)
+	if (locale === "es") return __es.steps_year_hint(inputs)
+	if (locale === "zh") return __zh.steps_year_hint(inputs)
+	if (locale === "zh-TW") return __zh_tw2.steps_year_hint(inputs)
+	if (locale === "hi") return __hi.steps_year_hint(inputs)
+	if (locale === "ar") return __ar.steps_year_hint(inputs)
+	if (locale === "pt") return __pt.steps_year_hint(inputs)
+	if (locale === "de") return __de.steps_year_hint(inputs)
+	if (locale === "ja") return __ja.steps_year_hint(inputs)
+	if (locale === "ko") return __ko.steps_year_hint(inputs)
+	if (locale === "it") return __it.steps_year_hint(inputs)
+	if (locale === "tr") return __tr.steps_year_hint(inputs)
+	if (locale === "pl") return __pl.steps_year_hint(inputs)
+	if (locale === "uk") return __uk.steps_year_hint(inputs)
+	if (locale === "nl") return __nl.steps_year_hint(inputs)
+	if (locale === "vi") return __vi.steps_year_hint(inputs)
+	if (locale === "id") return __id.steps_year_hint(inputs)
+	if (locale === "ms") return __ms.steps_year_hint(inputs)
+	if (locale === "th") return __th.steps_year_hint(inputs)
+	if (locale === "fa") return __fa.steps_year_hint(inputs)
+	if (locale === "ur") return __ur.steps_year_hint(inputs)
+	if (locale === "bn") return __bn.steps_year_hint(inputs)
+	if (locale === "pa") return __pa.steps_year_hint(inputs)
+	if (locale === "sw") return __sw.steps_year_hint(inputs)
+	if (locale === "el") return __el.steps_year_hint(inputs)
+	if (locale === "cs") return __cs.steps_year_hint(inputs)
+	if (locale === "ro") return __ro.steps_year_hint(inputs)
+	if (locale === "hu") return __hu.steps_year_hint(inputs)
+	if (locale === "sv") return __sv.steps_year_hint(inputs)
+	if (locale === "he") return __he.steps_year_hint(inputs)
+	return __ru.steps_year_hint(inputs)
 });
