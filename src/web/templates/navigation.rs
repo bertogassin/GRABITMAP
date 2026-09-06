@@ -1625,13 +1625,6 @@ pub fn render_menu() -> String {
                 </span>
             </button>
 
-            <div class="rm-menu-row" aria-hidden="true">
-                <span class="rm-menu-row-icon">{globe_icon}</span>
-                <span class="rm-menu-row-copy">
-                    <strong>Язык</strong>
-                    <small class="rm-menu-row-state">Русский</small>
-                </span>
-            </div>
         </div>
     </div>
 </section>"#,
@@ -1653,7 +1646,6 @@ pub fn render_menu() -> String {
         phone_icon = icon("smartphone"),
         play_icon = icon("play"),
         sun_icon = icon("sun"),
-        globe_icon = icon("globe"),
     );
 
     let main_html = format!(

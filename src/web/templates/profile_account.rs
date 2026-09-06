@@ -367,7 +367,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
         </div>
 
         <div class="card-meta rm-me-rejected-copy">
-            Ресурсы, которым требуется исправление
+            Объявления, которым требуется исправление
         </div>
     </div>
 

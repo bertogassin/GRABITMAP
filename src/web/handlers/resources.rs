@@ -325,9 +325,9 @@ pub async fn resource_profile(
 
             if !is_public && !is_owner {
                 return Html(templates::status_page(
-                    "Ресурс не найден · GRABIT",
+                    "Объявление не найдено · GRABIT",
                     "⚠ GRABIT",
-                    "Ресурс не найден",
+                    "Объявление не найдено",
                     "Это объявление ещё на проверке, скрыто или было удалено.",
                     &templates::navigation_card(
                         "/app",
@@ -397,9 +397,9 @@ pub async fn resource_profile(
         }
 
         None => Html(templates::status_page(
-            "Ресурс не найден · GRABIT",
+            "Объявление не найдено · GRABIT",
             "⚠ GRABIT",
-            "Ресурс не найден",
+            "Объявление не найдено",
             "Это объявление больше недоступно или было удалено.",
             &templates::navigation_card("/app", "map", "Вернуться к городам", "Открыть GRABIT"),
         )),

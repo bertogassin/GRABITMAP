@@ -131,36 +131,20 @@ fn render_months(snapshot: &StepSnapshot) -> String {
         .map(|day| (day.date.as_str(), day.steps))
         .collect();
 
-    let mut start = today.with_day(1).unwrap_or(today) - Duration::days(31 * 11);
-    start = start.with_day(1).unwrap_or(start);
-    if let Some(oldest) = snapshot
-        .days
-        .iter()
-        .filter(|day| day.steps > 0)
-        .filter_map(|day| NaiveDate::parse_from_str(&day.date, "%Y-%m-%d").ok())
-        .min()
-    {
-        let oldest_month = oldest.with_day(1).unwrap_or(oldest);
-        if oldest_month < start {
-            start = oldest_month;
+    let mut months: Vec<(i32, u32)> = vec![(today.year(), today.month())];
+    for day in &snapshot.days {
+        if day.steps <= 0 {
+            continue;
         }
-    }
-
-    let mut months: Vec<(i32, u32)> = Vec::new();
-    let mut cursor = start;
-    let end_month = today.with_day(1).unwrap_or(today);
-    while cursor <= end_month {
-        months.push((cursor.year(), cursor.month()));
-        cursor = if cursor.month() == 12 {
-            NaiveDate::from_ymd_opt(cursor.year() + 1, 1, 1).unwrap_or(cursor)
-        } else {
-            NaiveDate::from_ymd_opt(cursor.year(), cursor.month() + 1, 1).unwrap_or(cursor)
+        let Some(date) = NaiveDate::parse_from_str(&day.date, "%Y-%m-%d").ok() else {
+            continue;
         };
-        if months.len() > 240 {
-            break;
+        let key = (date.year(), date.month());
+        if !months.contains(&key) {
+            months.push(key);
         }
     }
-    months.reverse();
+    months.sort_by(|a, b| b.cmp(a));
 
     months
         .into_iter()
@@ -513,7 +497,7 @@ fn authenticated_body(snapshot: &StepSnapshot) -> String {
         week_head = super::common::section_head("Неделя", "", None),
         week = render_week(&snapshot.days, &snapshot.today, snapshot.goal),
         path_head = super::common::section_head(
-            "Альбом",
+            "Месяц",
             "",
             Some(24),
         ),
@@ -603,9 +587,11 @@ mod tests {
     #[test]
     fn album_and_controls_render() {
         let html = render_steps(Some(&empty_snapshot()));
-        assert!(html.contains("Альбом"));
+        assert!(html.contains("Месяц"));
         assert!(html.contains("Считать шаги"));
         assert!(html.contains("сентябр"));
+        assert!(!html.contains("август"));
+        assert!(!html.contains("2025"));
         assert!(html.contains("/static/pedometer.js"));
     }
 }

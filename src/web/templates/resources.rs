@@ -2,7 +2,7 @@ use super::common::{
     back_hero, back_link, bottom_nav, empty_state_action, empty_state_card_with_actions,
     escape_html, guest_locked_section, icon, kind_chip, my_resource_moderation_badge,
     navigation_card, page_document, page_shell, premium_badge_html, profession_label,
-    resource_card_link_class, resource_detail_section_class, resource_listing_label,
+    resource_card_link_class, resource_detail_section_class, resource_listing_label, ru_count,
     search_people_cards, section_head, topbar, verified_badge_html,
 };
 
@@ -215,7 +215,7 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                             </div>
 
                             <div class="card-meta">
-                                Оценка {rating:.1} · {votes} голосов
+                                Оценка {rating:.1} · {votes}
                             </div>
 
                             <div class="card-meta">
@@ -242,7 +242,7 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                         listing_label = listing_label,
                         description = safe_description,
                         rating = rating,
-                        votes = votes,
+                        votes = ru_count(*votes, "голос", "голоса", "голосов"),
                         address = safe_address,
                         verified_badge = verified_badge,
                         write_html = write_html,
@@ -530,13 +530,13 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
         <span class="rm-resource-listing-label">{listing_label}</span>
 
         <span id="rating-summary" class="rm-resource-rating-summary">
-            Оценка <strong>{rating:.1}</strong> · {votes} голосов
+            Оценка <strong>{rating:.1}</strong> · {votes}
         </span>"#,
         premium_badge = premium_badge,
         verified_badge = verified_badge,
         listing_label = listing_label,
         rating = rating,
-        votes = votes,
+        votes = ru_count(votes, "голос", "голоса", "голосов"),
     );
     let favorite_label = if viewer_favorite {
         "В избранном"
@@ -967,8 +967,17 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
                 paint(score);
 
                 if (summary) {{
+                    function ruVotes(n) {{
+                        const abs = Math.abs(n) % 100;
+                        const last = abs % 10;
+                        let word = "голосов";
+                        if (abs > 10 && abs < 20) word = "голосов";
+                        else if (last === 1) word = "голос";
+                        else if (last >= 2 && last <= 4) word = "голоса";
+                        return n + " " + word;
+                    }}
                     summary.innerHTML =
-                        `Оценка <strong>${{Number(data.rating).toFixed(1)}}</strong> · ${{data.votes}} голосов`;
+                        `Оценка <strong>${{Number(data.rating).toFixed(1)}}</strong> · ${{ruVotes(Number(data.votes) || 0)}}`;
                 }}
 
                 status.textContent = "Оценка сохранена";
@@ -994,7 +1003,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
         "",
         &format!(
             "{topbar}\n\n{hero}\n\n{content}",
-            topbar = topbar("Ресурс", "map"),
+            topbar = topbar("Объявление", "map"),
             hero = back_hero(
                 &back_link(&back_url, back_label, "arrow-left"),
                 "map-pin",
@@ -1601,7 +1610,7 @@ pub fn render_my_resources(
                     category = category_line,
                     description = safe_description,
                     rating = rating,
-                    votes = votes,
+                    votes = ru_count(*votes, "голос", "голоса", "голосов"),
                     premium_badge = premium_badge,
                     moderation_badge = moderation_badge,
                     rejection_html = rejection_html,

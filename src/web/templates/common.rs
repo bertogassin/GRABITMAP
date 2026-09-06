@@ -24,7 +24,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = "4.9.90";
+pub const STATIC_ASSET_VERSION: &str = "4.9.91";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -4708,7 +4708,7 @@ pub(crate) fn profile_resource_card(params: ProfileResourceCardParams<'_>) -> St
         <div class="card-meta card-meta--desc">{description}</div>
 
         {address_html}
-        <div class="card-meta card-meta--mt-8">Оценка {rating:.1} · {votes} голосов</div>
+        <div class="card-meta card-meta--mt-8">Оценка {rating:.1} · {votes}</div>
 
         <div class="rm-card-row--badges">
             {premium_badge}
@@ -4725,7 +4725,7 @@ pub(crate) fn profile_resource_card(params: ProfileResourceCardParams<'_>) -> St
         description = escape_html(description),
         address_html = address_html,
         rating = rating,
-        votes = votes,
+        votes = ru_count(votes, "голос", "голоса", "голосов"),
         premium_badge = premium_badge_html,
         verified_badge = verified_badge_html,
         arrow = icon("chevron"),

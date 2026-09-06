@@ -19,6 +19,7 @@
     const lifeEl = document.getElementById("rm-step-life");
     const statusEl = document.getElementById("rm-step-status");
     const listenBtn = document.getElementById("rm-step-listen");
+    const monthsEl = document.getElementById("rm-step-months");
     const logEl = document.getElementById("rm-step-log");
     const dayCard = document.getElementById("rm-step-day");
     const dayDate = document.getElementById("rm-step-day-date");
@@ -136,6 +137,49 @@
         maybeGoalNotice();
     }
 
+    function renderMonths() {
+        if (!monthsEl || !snapshot) return;
+        const goal = snapshot.goal || DEFAULT_GOAL;
+        const keys = {};
+        keys[localToday.slice(0, 7)] = true;
+        snapshot.days.forEach(function (day) {
+            if (day.steps > 0) keys[String(day.date).slice(0, 7)] = true;
+        });
+        const months = Object.keys(keys).sort().reverse();
+        const weekdays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+        monthsEl.innerHTML = months.map(function (key) {
+            const year = Number(key.slice(0, 4));
+            const month = Number(key.slice(5, 7));
+            const first = new Date(year, month - 1, 1);
+            const pad = (first.getDay() + 6) % 7;
+            const lastDay = new Date(year, month, 0).getDate();
+            let walked = 0;
+            let total = 0;
+            let cells = "";
+            for (let i = 0; i < pad; i++) {
+                cells += "<span class=\"rm-step-cell is-pad\" aria-hidden=\"true\"></span>";
+            }
+            for (let day = 1; day <= lastDay; day++) {
+                const date = key + "-" + String(day).padStart(2, "0");
+                const steps = date === localToday ? localCount : dayStepsFor(date);
+                if (steps > 0) {
+                    walked += 1;
+                    total += steps;
+                }
+                const todayClass = date === localToday ? " is-today" : "";
+                cells += "<button type=\"button\" class=\"rm-step-cell is-" + tone(steps, goal) +
+                    todayClass + "\" data-date=\"" + date + "\">" + day + "</button>";
+            }
+            return "<article class=\"card rm-step-month\"><header class=\"rm-step-month-head\">" +
+                "<strong>" + (MONTHS[month - 1] || "") + " " + year + "</strong>" +
+                "<small>" + ruCount(walked, "день", "дня", "дней") + " · " +
+                ruCount(total, "шаг", "шага", "шагов") + "</small></header>" +
+                "<div class=\"rm-step-weekdays\">" + weekdays.map(function (d) {
+                    return "<span>" + d + "</span>";
+                }).join("") + "</div><div class=\"rm-step-grid\">" + cells + "</div></article>";
+        }).join("");
+    }
+
     function paint() {
         const goal = snapshot ? snapshot.goal : DEFAULT_GOAL;
         if (todayCount) todayCount.textContent = String(localCount);
@@ -149,7 +193,9 @@
         if (goalInput && snapshot) goalInput.value = String(snapshot.goal);
         if (!snapshot) return;
 
-        root.querySelectorAll("[data-date]").forEach(function (node) {
+        renderMonths();
+
+        root.querySelectorAll(".rm-step-week [data-date]").forEach(function (node) {
             const date = node.getAttribute("data-date");
             const steps = date === localToday ? localCount : dayStepsFor(date);
             const strong = node.querySelector("strong");
