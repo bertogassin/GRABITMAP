@@ -1246,11 +1246,8 @@ body.light-theme .rm-command-icon {{
                 const data = await response.json();
 
                 if (response.status === 401 || data.error === "login_required") {
-                    if (status) {
-                        status.textContent =
-                            "Войдите в аккаунт.";
-                    }
-
+                    window.location.href =
+                        "/login?next=" + encodeURIComponent("/app/me");
                     return;
                 }
 
@@ -1391,10 +1388,25 @@ pub fn render_notifications(
             .join("")
     };
 
+    let mark_all_html = if authenticated
+        && notifications
+            .iter()
+            .any(|(_, _, _, _, _, is_read, _)| *is_read == 0)
+    {
+        r#"<div class="rm-notif-toolbar">
+    <a href="/app/notifications/read-all" class="rm-notif-read-all">Прочитать все</a>
+</div>"#
+            .to_string()
+    } else {
+        String::new()
+    };
+
     let content = format!(
-        r#"<section>
+        r#"{mark_all}
+<section>
     {cards}
 </section>"#,
+        mark_all = mark_all_html,
         cards = cards,
     );
 

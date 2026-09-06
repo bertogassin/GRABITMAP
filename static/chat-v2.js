@@ -966,11 +966,10 @@
                 setConnection("Связь есть", "is-online");
             } catch (error) {
                 if (error.status === 401) {
-                    setConnection(
-                        "Требуется повторный вход",
-                        "is-error"
-                    );
-                    window.clearInterval(pollTimer);
+                    window.location.href =
+                        "/login?next=" +
+                        encodeURIComponent(window.location.pathname + window.location.search);
+                    return;
                 } else {
                     setConnection(
                         "Связь восстанавливается…",

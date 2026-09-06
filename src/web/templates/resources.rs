@@ -406,6 +406,8 @@ pub struct RenderResourceProfileParams<'a> {
     pub owner_preview: bool,
     pub moderation_status: &'a str,
     pub is_active: i64,
+    pub viewer_score: i64,
+    pub viewer_favorite: bool,
 }
 
 pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> String {
@@ -432,6 +434,8 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
         owner_preview,
         moderation_status,
         is_active,
+        viewer_score,
+        viewer_favorite,
     } = params;
     let safe_description = escape_html(description);
     let safe_contact = escape_html(contact);
@@ -517,6 +521,19 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
         rating = rating,
         votes = votes,
     );
+    let favorite_label = if viewer_favorite {
+        "В избранном"
+    } else {
+        "В избранное"
+    };
+    let stars_html = (1..=5)
+        .map(|score| {
+            let glyph = if score <= viewer_score { "★" } else { "☆" };
+            format!(
+                r#"<button type="button" data-score="{score}" class="ui-button rm-resource-star-btn">{glyph}</button>"#
+            )
+        })
+        .collect::<String>();
     let public_actions_html = if owner_preview {
         String::new()
     } else {
@@ -525,7 +542,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
         id="favorite-button"
         type="button"
         class="ui-button rm-resource-favorite-btn">
-        В избранное
+        {favorite_label}
     </button>
 
     <button
@@ -553,14 +570,12 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
     <div class="rm-resource-rating-block">
         <div class="rm-resource-rating-kicker">Оценить</div>
         <div id="rating-stars" class="rm-resource-stars">
-            <button type="button" data-score="1" class="ui-button rm-resource-star-btn">☆</button>
-            <button type="button" data-score="2" class="ui-button rm-resource-star-btn">☆</button>
-            <button type="button" data-score="3" class="ui-button rm-resource-star-btn">☆</button>
-            <button type="button" data-score="4" class="ui-button rm-resource-star-btn">☆</button>
-            <button type="button" data-score="5" class="ui-button rm-resource-star-btn">☆</button>
+            {stars_html}
         </div>
         <div id="vote-status" class="ui-status rm-resource-vote-status"></div>
-    </div>"#
+    </div>"#,
+            favorite_label = favorite_label,
+            stars_html = stars_html,
         )
     };
 
@@ -775,20 +790,6 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
                 : "В избранное";
     }}
 
-    async function loadFavorite() {{
-        try {{
-            const response = await fetch(
-                `/api/resource/${{resourceId}}/favorite`
-            );
-
-            const data = await response.json();
-
-            if (data.ok) {{
-                renderFavorite(Boolean(data.favorite));
-            }}
-        }} catch (_) {{}}
-    }}
-
     if (favoriteButton) {{
         favoriteButton.addEventListener("click", async () => {{
             favoriteButton.disabled = true;
@@ -833,8 +834,6 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
             favoriteButton.disabled = false;
         }});
     }}
-
-    loadFavorite();
 
     const reportStatus =
         document.getElementById("report-status");
@@ -897,7 +896,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
         return;
     }}
 
-    let savedScore = 0;
+    let savedScore = {viewer_score};
 
     function paint(score) {{
         stars.forEach((star) => {{
@@ -905,6 +904,8 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
             star.textContent = value <= score ? "★" : "☆";
         }});
     }}
+
+    paint(savedScore);
 
     stars.forEach((star) => {{
         star.addEventListener("mouseenter", () => {{
@@ -962,6 +963,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
 }})();
 </script>"####,
             id = id,
+            viewer_score = viewer_score.max(0).min(5),
         )
     };
 
@@ -2069,6 +2071,8 @@ mod catalog_publish_tests {
             owner_preview: true,
             moderation_status: "pending",
             is_active: 1,
+            viewer_score: 0,
+            viewer_favorite: false,
         });
 
         assert!(html.contains("На проверке"));

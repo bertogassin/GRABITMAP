@@ -7,7 +7,7 @@ pub fn escape_html(value: &str) -> String {
         .replace('\'', "&#39;")
 }
 
-pub const STATIC_ASSET_VERSION: &str = "4.9.70";
+pub const STATIC_ASSET_VERSION: &str = "4.9.71";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -1927,6 +1927,25 @@ a.feature.rm-feature-add {
     color: var(--gold);
     text-transform: uppercase;
     letter-spacing: .06em;
+}
+
+.rm-notif-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 0 10px;
+}
+
+.rm-notif-read-all {
+    min-height: 40px;
+    padding: 0 14px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--gold-light);
+    font-size: 13px;
+    font-weight: 800;
+    background: rgba(232, 204, 150, .12);
 }
 
 .rm-notif-action {
@@ -5627,8 +5646,21 @@ pub(crate) fn admin_ops_page_styled(
     )
 }
 
-pub(crate) fn guest_mode_hint() -> &'static str {
-    r#"<p class="rm-guest-hint">Вы смотрите как гость. Города и поиск доступны без регистрации. <a href="/login">Войти</a> · <a href="/register">Регистрация</a></p>"#
+pub(crate) fn guest_mode_hint(next_path: &str) -> String {
+    let login_href = if next_path.is_empty() {
+        "/login".to_string()
+    } else {
+        format!("/login?next={}", urlencoding::encode(next_path))
+    };
+    let register_href = if next_path.is_empty() {
+        "/register".to_string()
+    } else {
+        format!("/register?next={}", urlencoding::encode(next_path))
+    };
+
+    format!(
+        r#"<p class="rm-guest-hint">Вы смотрите как гость. Города и поиск доступны без регистрации. <a href="{login_href}">Войти</a> · <a href="{register_href}">Регистрация</a></p>"#
+    )
 }
 
 pub(crate) fn guest_mode_panel(next_path: &str) -> String {

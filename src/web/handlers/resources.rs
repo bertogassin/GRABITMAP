@@ -315,7 +315,8 @@ pub async fn resource_profile(
             owner_user_id,
         )) => {
             let is_public = is_active != 0 && moderation_status == "approved";
-            let is_owner = verify_authenticated_user(&state, &headers).is_some_and(|user| {
+            let viewer = verify_authenticated_user(&state, &headers);
+            let is_owner = viewer.as_ref().is_some_and(|user| {
                 !owner_client_id.is_empty() && user.client_id == owner_client_id
             });
 
@@ -333,6 +334,34 @@ pub async fn resource_profile(
                     ),
                 ));
             }
+
+            let (viewer_score, viewer_favorite) = viewer
+                .as_ref()
+                .and_then(|user| {
+                    let db = crate::db::pool::get_connection(&state.db_pool).ok()?;
+                    let score = db
+                        .query_row(
+                            "SELECT score
+                             FROM resource_votes
+                             WHERE resource_id = ?1
+                               AND client_id = ?2",
+                            rusqlite::params![id, user.client_id],
+                            |row| row.get::<_, i64>(0),
+                        )
+                        .unwrap_or(0);
+                    let favorite = db
+                        .query_row(
+                            "SELECT 1
+                             FROM favorites
+                             WHERE user_id = ?1
+                               AND resource_id = ?2",
+                            rusqlite::params![user.user_id, id],
+                            |_| Ok(true),
+                        )
+                        .unwrap_or(false);
+                    Some((score, favorite))
+                })
+                .unwrap_or((0, false));
 
             Html(templates::render_resource_profile(
                 templates::RenderResourceProfileParams {
@@ -358,6 +387,8 @@ pub async fn resource_profile(
                     owner_preview: !is_public,
                     moderation_status: &moderation_status,
                     is_active,
+                    viewer_score,
+                    viewer_favorite,
                 },
             ))
         }

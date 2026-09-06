@@ -126,6 +126,28 @@ pub async fn open_notification(
     Redirect::temporary(&target).into_response()
 }
 
+pub async fn mark_all_notifications_read(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+) -> Response {
+    let Some(user_id) = verify_user_session(&state, &headers) else {
+        return Redirect::temporary("/login?next=%2Fapp%2Fnotifications").into_response();
+    };
+
+    if let Ok(db) = crate::db::pool::get_connection(&state.db_pool) {
+        let _ = db.execute(
+            "UPDATE user_notifications
+             SET is_read = 1
+             WHERE user_id = ?1
+               AND is_read = 0
+               AND kind NOT IN ('chat_message', 'contact_request', 'contact_accepted', 'contact_rejected')",
+            rusqlite::params![user_id],
+        );
+    }
+
+    Redirect::temporary("/app/notifications").into_response()
+}
+
 pub async fn unread_count(State(state): State<AppState>, headers: HeaderMap) -> Response {
     let user = match verify_authenticated_user(&state, &headers) {
         Some(user) => user,

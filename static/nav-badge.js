@@ -1,6 +1,13 @@
 (function () {
     "use strict";
 
+    if (
+        !document.querySelector("[data-nav-chats-link]") &&
+        !document.querySelector("[data-nav-menu-link]")
+    ) {
+        return;
+    }
+
     function notifySound() {
         if (typeof window.resursmapPlayNotificationSound === "function") {
             window.resursmapPlayNotificationSound();

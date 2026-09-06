@@ -233,7 +233,11 @@ pub fn render_geo_root(
         })
         .collect::<Vec<_>>()
         .join("");
-    let guest_hint = if guest_mode { guest_mode_hint() } else { "" };
+    let guest_hint = if guest_mode {
+        guest_mode_hint("/app")
+    } else {
+        String::new()
+    };
     let hero = format!(
         r#"<section class="hero rm-map-hero">
     <div class="eyebrow">{logo} GRABIT</div>
@@ -804,7 +808,11 @@ pub fn render_continents(
 
     let body_before_main = r####""####;
 
-    let guest_hint = if guest_mode { guest_mode_hint() } else { "" };
+    let guest_hint = if guest_mode {
+        guest_mode_hint("/app")
+    } else {
+        String::new()
+    };
 
     let explore_index = build_home_explore_index(&_categories, &people_by_category);
 
@@ -1113,7 +1121,11 @@ pub fn render_search(
     city_name: Option<&str>,
     city_geo_ids: &BTreeMap<(usize, usize, usize), i64>,
 ) -> String {
-    let guest_hint = if guest_mode { guest_mode_hint() } else { "" };
+    let guest_hint = if guest_mode {
+        guest_mode_hint("/app/search")
+    } else {
+        String::new()
+    };
     let world_data = world();
 
     let query_lower = q.trim().to_lowercase();

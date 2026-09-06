@@ -235,8 +235,8 @@
                 });
 
                 if (response.status === 401) {
-                    stopped = true;
-                    setLiveState(false);
+                    window.location.href =
+                        "/login?next=" + encodeURIComponent("/app/messages");
                     return;
                 }
 
