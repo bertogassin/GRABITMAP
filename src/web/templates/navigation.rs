@@ -1551,6 +1551,7 @@ pub fn render_menu() -> String {
 
     <div class="grid">
         {profile_card}
+        {steps_card}
         {add_card}
     </div>
 
@@ -1627,6 +1628,12 @@ pub fn render_menu() -> String {
 </section>"#,
         section_head_settings = section_head("Меню", "Профиль, объявление и настройки", None),
         profile_card = navigation_card("/app/me", "user", "Профиль", "Аккаунт и объявления"),
+        steps_card = navigation_card(
+            "/app/steps",
+            "footprints",
+            "Шагомер",
+            "Тропа и история каждого дня"
+        ),
         add_card = navigation_card(
             "/app/add",
             "plus",

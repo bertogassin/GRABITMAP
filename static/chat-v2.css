@@ -263,7 +263,7 @@
 
 .chat-request-gate p {
     margin: 6px 0 0;
-    color: var(--text-muted, #9ca3af);
+    color: var(--text-muted, var(--muted));
 }
 
 .chat-request-actions {

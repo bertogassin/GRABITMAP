@@ -397,8 +397,8 @@ pub fn render_admin_administrators(data: AdminAdministratorsData) -> String {
     --red:#ff6d78;
     --blue:#7ab9ff;
     --violet:#a893ff;
-    --text:#f5f2eb;
-    --muted:#9298a6;
+    --text:#fffdf8;
+    --muted:#d0d5de;
     --line:rgba(223,192,127,.18);
 }}
 * {{ box-sizing:border-box; }}

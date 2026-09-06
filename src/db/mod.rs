@@ -12,3 +12,4 @@ pub mod queries;
 pub mod search_fts;
 pub mod security;
 pub mod services;
+pub mod steps;

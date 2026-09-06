@@ -24,7 +24,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = "4.9.85";
+pub const STATIC_ASSET_VERSION: &str = "4.9.86";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -159,6 +159,10 @@ pub(crate) fn icon(name: &str) -> &'static str {
             r#"<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>"#
         }
 
+        "footprints" => {
+            r#"<svg class="icon" viewBox="0 0 24 24"><ellipse cx="8" cy="7.2" rx="2.1" ry="3.1" transform="rotate(-18 8 7.2)"/><path d="M7.2 11.4c.2 1.6-.4 3.1-1.6 3.8"/><ellipse cx="16.2" cy="12.2" rx="2.1" ry="3.1" transform="rotate(16 16.2 12.2)"/><path d="M16.8 16.4c-.1 1.6.6 3 1.8 3.6"/></svg>"#
+        }
+
         "edit" => {
             r#"<svg class="icon" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>"#
         }
@@ -202,8 +206,9 @@ pub(crate) fn base_style() -> &'static str {
     --card-hover: rgba(32, 37, 46, .94);
     --line: rgba(232, 204, 150, .26);
 
-    --text: #f8f5ef;
-    --muted: #a3a9b4;
+    --text: #fffdf8;
+    --muted: #d0d5de;
+    --text-muted: #d0d5de;
 
     --gold: #e8cc96;
     --gold-light: #ffe4b8;
@@ -237,8 +242,9 @@ body.light-theme {
     --card-hover: #fffdf8;
     --line: rgba(26, 29, 33, .12);
 
-    --text: #1a1d21;
-    --muted: #5a616c;
+    --text: #111318;
+    --muted: #3d4450;
+    --text-muted: #3d4450;
 
     --gold: #a5761f;
     --gold-light: #7a5814;
@@ -2624,7 +2630,7 @@ a.feature.rm-feature-add {
 
 .rm-mod-card-kicker {
     font-size: 11px;
-    color: #8f96a3;
+    color: var(--muted);
     margin-bottom: 6px;
 }
 
@@ -2638,12 +2644,12 @@ a.feature.rm-feature-add {
 }
 
 .rm-mod-card-category {
-    color: #9ca3af;
+    color: var(--muted);
     font-size: 13px;
 }
 
 .rm-mod-card-desc {
-    color: #9ca3af;
+    color: var(--muted);
     line-height: 1.5;
     max-width: 620px;
 }
@@ -2912,7 +2918,7 @@ a.feature.rm-feature-add {
 .rm-mod-empty-dashed {
     padding: 30px;
     text-align: center;
-    color: #8f96a3;
+    color: var(--muted);
     border: 1px dashed rgba(214, 183, 122, .25);
     border-radius: 18px;
 }

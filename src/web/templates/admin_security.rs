@@ -46,7 +46,7 @@ pub fn render_admin_security(data: AdminSecurityData) -> String {
 <style>
 :root {{
  --gold:#dfc07f;--green:#62e0ad;--orange:#f3a94f;
- --text:#f5f2eb;--muted:#959ba8;--line:rgba(223,192,127,.2);
+ --text:#fffdf8;--muted:#d0d5de;--line:rgba(223,192,127,.2);
 }}
 *{{box-sizing:border-box}}
 body{{

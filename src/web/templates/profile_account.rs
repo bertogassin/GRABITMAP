@@ -827,6 +827,22 @@ body.light-theme .rm-command-icon {{
         </a>
 
         <a class="rm-command-card"
+           href="/app/steps">
+            <span class="rm-command-icon">
+                {steps_icon}
+            </span>
+            <span class="rm-command-copy">
+                <strong>Шагомер</strong>
+                <small>
+                    Тропа шагов и история каждого дня
+                </small>
+            </span>
+            <span class="rm-command-arrow">
+                {arrow}
+            </span>
+        </a>
+
+        <a class="rm-command-card"
            href="/app/notifications">
             <span class="rm-command-icon">
                 {notifications_icon}
@@ -878,6 +894,7 @@ body.light-theme .rm-command-icon {{
             resources_icon = icon("map"),
             plus_icon = icon("plus"),
             favorites_icon = icon("heart"),
+            steps_icon = icon("footprints"),
             notifications_icon = icon("bell"),
             search_icon = icon("search"),
             arrow = icon("chevron"),
@@ -1836,6 +1853,7 @@ mod personal_center_tests {
         assert!(html.contains("/app/my-resources"));
         assert!(!html.contains("/app/contact-requests"));
         assert!(html.contains("/app/favorites"));
+        assert!(html.contains("/app/steps"));
         assert!(html.contains("/app/notifications"));
         assert!(html.contains("Реальные разделы аккаунта"));
         assert!(html.contains("data-nav-chats-link"));
