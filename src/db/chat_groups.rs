@@ -52,6 +52,13 @@ pub fn initialize(conn: &Connection) -> Result<()> {
         [],
     )?;
 
+    conn.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS idx_group_messages_client_id
+         ON group_messages(sender_user_id, client_message_id)
+         WHERE client_message_id != ''",
+        [],
+    )?;
+
     let _ = conn.execute(
         "ALTER TABLE chat_group_members
          ADD COLUMN last_read_message_id INTEGER NOT NULL DEFAULT 0",

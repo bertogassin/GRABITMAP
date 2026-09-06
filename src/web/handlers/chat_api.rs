@@ -800,6 +800,15 @@ pub async fn api_chat_messages(
                 .unwrap_or(0);
 
             if read_changed > 0 {
+                let _ = connection.execute(
+                    "UPDATE user_notifications
+                     SET is_read = 1
+                     WHERE user_id = ?1
+                       AND kind = 'chat_message'
+                       AND is_read = 0
+                       AND resource_id = ?2",
+                    rusqlite::params![user_id, other_user_id],
+                );
                 state.publish_chat_event(
                     "message.read",
                     conversation_id,

@@ -28,6 +28,35 @@ fn json_error(status: StatusCode, error: &str) -> Response {
     (status, Json(json!({"ok": false, "error": error}))).into_response()
 }
 
+fn client_message_id_ok(value: &str) -> bool {
+    (16..=80).contains(&value.len())
+        && value
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || byte == b'-' || byte == b'_')
+}
+
+fn find_group_message_by_client_id(
+    db: &rusqlite::Connection,
+    group_id: i64,
+    user_id: i64,
+    client_message_id: &str,
+) -> Option<crate::web::view_models::ChatMessageRow> {
+    let existing_id: i64 = db
+        .query_row(
+            "SELECT id FROM group_messages
+             WHERE group_id = ?1
+               AND sender_user_id = ?2
+               AND client_message_id = ?3
+             LIMIT 1",
+            rusqlite::params![group_id, user_id, client_message_id],
+            |row| row.get(0),
+        )
+        .ok()?;
+    load_group_messages(db, group_id, user_id, existing_id - 1, 0, 1)
+        .into_iter()
+        .find(|row| row.id == existing_id)
+}
+
 fn group_member_ids(db: &rusqlite::Connection, group_id: i64) -> Vec<i64> {
     db.prepare("SELECT user_id FROM chat_group_members WHERE group_id = ?1")
         .and_then(|mut stmt| {
@@ -126,48 +155,61 @@ fn load_group_messages(
     before_id: i64,
     limit: i64,
 ) -> Vec<crate::web::view_models::ChatMessageRow> {
-    let mut sql = String::from(
-        "SELECT id, sender_user_id, message, created_at, edited_at, deleted_at,
-                attachment_kind, attachment_path, client_message_id, reply_to_message_id
-         FROM group_messages
-         WHERE group_id = ?1",
-    );
-    if after_id > 0 {
-        sql.push_str(" AND id > ?2");
-    } else if before_id > 0 {
-        sql.push_str(" AND id < ?2");
-    }
-    sql.push_str(" ORDER BY id ");
-    sql.push_str(if before_id > 0 { "DESC" } else { "ASC" });
-    if after_id > 0 || before_id > 0 {
-        sql.push_str(" LIMIT ?3");
-    } else {
-        sql.push_str(" LIMIT ?2");
-    }
-
-    let mut stmt = match db.prepare(&sql) {
-        Ok(stmt) => stmt,
-        Err(_) => return Vec::new(),
-    };
     let mut messages = if after_id > 0 {
-        stmt.query_map(rusqlite::params![group_id, after_id, limit], map_group_message_row)
+        let sql = "SELECT id, sender_user_id, message, created_at, edited_at, deleted_at,
+                          attachment_kind, attachment_path, client_message_id, reply_to_message_id
+                   FROM group_messages
+                   WHERE group_id = ?1 AND id > ?2
+                   ORDER BY id ASC
+                   LIMIT ?3";
+        db.prepare(sql)
             .ok()
-            .map(|rows| rows.filter_map(Result::ok).collect::<Vec<_>>())
+            .and_then(|mut stmt| {
+                stmt.query_map(rusqlite::params![group_id, after_id, limit], map_group_message_row)
+                    .ok()
+                    .map(|rows| rows.filter_map(Result::ok).collect::<Vec<_>>())
+            })
             .unwrap_or_default()
     } else if before_id > 0 {
-        stmt.query_map(rusqlite::params![group_id, before_id, limit], map_group_message_row)
+        let sql = "SELECT id, sender_user_id, message, created_at, edited_at, deleted_at,
+                          attachment_kind, attachment_path, client_message_id, reply_to_message_id
+                   FROM group_messages
+                   WHERE group_id = ?1 AND id < ?2
+                   ORDER BY id DESC
+                   LIMIT ?3";
+        let mut rows = db
+            .prepare(sql)
             .ok()
-            .map(|rows| rows.filter_map(Result::ok).collect::<Vec<_>>())
-            .unwrap_or_default()
+            .and_then(|mut stmt| {
+                stmt.query_map(rusqlite::params![group_id, before_id, limit], map_group_message_row)
+                    .ok()
+                    .map(|rows| rows.filter_map(Result::ok).collect::<Vec<_>>())
+            })
+            .unwrap_or_default();
+        rows.reverse();
+        rows
     } else {
-        stmt.query_map(rusqlite::params![group_id, limit], map_group_message_row)
+        // Newest page: take latest N then present ascending (same as DM).
+        let sql = "SELECT gm.id, gm.sender_user_id, gm.message, gm.created_at, gm.edited_at, gm.deleted_at,
+                          gm.attachment_kind, gm.attachment_path, gm.client_message_id, gm.reply_to_message_id
+                   FROM (
+                        SELECT id
+                        FROM group_messages
+                        WHERE group_id = ?1
+                        ORDER BY id DESC
+                        LIMIT ?2
+                   ) AS recent
+                   INNER JOIN group_messages gm ON gm.id = recent.id
+                   ORDER BY gm.id ASC";
+        db.prepare(sql)
             .ok()
-            .map(|rows| rows.filter_map(Result::ok).collect::<Vec<_>>())
+            .and_then(|mut stmt| {
+                stmt.query_map(rusqlite::params![group_id, limit], map_group_message_row)
+                    .ok()
+                    .map(|rows| rows.filter_map(Result::ok).collect::<Vec<_>>())
+            })
             .unwrap_or_default()
     };
-    if before_id > 0 {
-        messages.reverse();
-    }
     decorate_group_messages(db, viewer_user_id, &mut messages);
     apply_group_delivery_ticks(db, group_id, viewer_user_id, &mut messages);
     messages
@@ -205,12 +247,12 @@ fn apply_group_delivery_ticks(
         if message.sender_user_id != viewer_user_id || message.deleted_at > 0 {
             continue;
         }
-        // Persisted for other members = delivered.
-        message.delivered_at = message.created_at.max(1);
         if max_other_read >= message.id {
+            message.delivered_at = message.created_at.max(1);
             message.read_at = message.created_at.max(1);
             message.is_read = 1;
         } else {
+            message.delivered_at = 0;
             message.read_at = 0;
             message.is_read = 0;
         }
@@ -331,20 +373,43 @@ fn mark_group_notifications_read(db: &rusqlite::Connection, user_id: i64, group_
     );
 }
 
-fn mark_group_read(db: &rusqlite::Connection, group_id: i64, user_id: i64, through_id: i64) {
+fn mark_group_read(
+    state: Option<&AppState>,
+    db: &rusqlite::Connection,
+    group_id: i64,
+    user_id: i64,
+    through_id: i64,
+) {
     if group_id <= 0 || user_id <= 0 || through_id <= 0 {
         return;
     }
-    let _ = db.execute(
-        "UPDATE chat_group_members
-         SET last_read_message_id = CASE
-                WHEN COALESCE(last_read_message_id, 0) > ?3 THEN last_read_message_id
-                ELSE ?3
-             END
-         WHERE group_id = ?1 AND user_id = ?2",
-        rusqlite::params![group_id, user_id, through_id],
-    );
+    let previous: i64 = db
+        .query_row(
+            "SELECT COALESCE(last_read_message_id, 0)
+             FROM chat_group_members
+             WHERE group_id = ?1 AND user_id = ?2",
+            rusqlite::params![group_id, user_id],
+            |row| row.get(0),
+        )
+        .unwrap_or(0);
+    let changed = db
+        .execute(
+            "UPDATE chat_group_members
+             SET last_read_message_id = CASE
+                    WHEN COALESCE(last_read_message_id, 0) > ?3 THEN last_read_message_id
+                    ELSE ?3
+                 END
+             WHERE group_id = ?1 AND user_id = ?2",
+            rusqlite::params![group_id, user_id, through_id],
+        )
+        .unwrap_or(0);
     mark_group_notifications_read(db, user_id, group_id);
+    if changed > 0 && through_id > previous {
+        if let Some(state) = state {
+            let members = group_member_ids(db, group_id);
+            state.publish_group_chat_event("message.read", group_id, through_id, &members);
+        }
+    }
 }
 
 fn map_group_message_row(
@@ -353,6 +418,7 @@ fn map_group_message_row(
             let deleted_at: i64 = row.get(5)?;
             let attachment_kind: String = row.get(6)?;
             let attachment_path: String = row.get(7)?;
+            let client_message_id: String = row.get(8)?;
             let message_id: i64 = row.get(0)?;
             Ok(crate::web::view_models::ChatMessageRow {
                 id: message_id,
@@ -378,6 +444,7 @@ fn map_group_message_row(
                 },
                 reactions: Vec::new(),
                 sender_name: String::new(),
+                client_message_id,
             })
 }
 
@@ -395,7 +462,7 @@ fn message_json(message: &crate::web::view_models::ChatMessageRow, viewer_user_i
         "reply_message": message.reply_message,
         "edited_at": message.edited_at,
         "deleted_at": message.deleted_at,
-        "client_message_id": "",
+        "client_message_id": message.client_message_id,
         "attachment_kind": message.attachment_kind,
         "attachment_url": message.attachment_url,
         "sender_name": message.sender_name,
@@ -547,7 +614,7 @@ pub async fn group_chat_page(
         .unwrap_or(0);
     let messages = load_group_messages(&db, group_id, user_id, 0, 0, 100);
     if let Some(last) = messages.last() {
-        mark_group_read(&db, group_id, user_id, last.id);
+        mark_group_read(Some(&state), &db, group_id, user_id, last.id);
     } else {
         mark_group_notifications_read(&db, user_id, group_id);
     }
@@ -599,7 +666,7 @@ pub async fn api_group_messages(
     let messages = load_group_messages(&db, group_id, user_id, after_id, before_id, limit);
     if mark_read {
         let through = read_through.max(messages.last().map(|m| m.id).unwrap_or(0));
-        mark_group_read(&db, group_id, user_id, through);
+        mark_group_read(Some(&state), &db, group_id, user_id, through);
     }
     let items: Vec<serde_json::Value> = messages
         .iter()
@@ -648,7 +715,23 @@ pub async fn api_group_send(
     if group_id <= 0 || !is_member(&db, group_id, user_id) {
         return json_error(StatusCode::FORBIDDEN, "not_a_member");
     }
+    let client_message_id = payload.client_message_id.trim().to_string();
+    if !client_message_id.is_empty() && !client_message_id_ok(&client_message_id) {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_client_message_id");
+    }
     let now = unix_now();
+    if !client_message_id.is_empty() {
+        if let Some(existing) =
+            find_group_message_by_client_id(&db, group_id, user_id, &client_message_id)
+        {
+            return Json(json!({
+                "ok": true,
+                "message": message_json(&existing, user_id),
+                "deduped": true
+            }))
+            .into_response();
+        }
+    }
     if db
         .execute(
             "INSERT INTO group_messages (
@@ -659,12 +742,24 @@ pub async fn api_group_send(
                 user_id,
                 message,
                 now,
-                payload.client_message_id.trim(),
+                client_message_id,
                 payload.reply_to_message_id.max(0)
             ],
         )
         .is_err()
     {
+        if !client_message_id.is_empty() {
+            if let Some(existing) =
+                find_group_message_by_client_id(&db, group_id, user_id, &client_message_id)
+            {
+                return Json(json!({
+                    "ok": true,
+                    "message": message_json(&existing, user_id),
+                    "deduped": true
+                }))
+                .into_response();
+            }
+        }
         return json_error(StatusCode::INTERNAL_SERVER_ERROR, "message_store_failed");
     }
     let message_id = db.last_insert_rowid();
@@ -687,6 +782,7 @@ pub async fn api_group_send(
             "message": message,
             "is_mine": true,
             "created_at": now,
+            "client_message_id": client_message_id,
             "attachment_kind": "",
             "attachment_url": "",
         }));

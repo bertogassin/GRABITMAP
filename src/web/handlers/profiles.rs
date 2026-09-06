@@ -390,7 +390,8 @@ fn unread_message_count(db: &rusqlite::Connection, user_id: i64) -> i64 {
                ON c.id = m.conversation_id
              WHERE (c.user1_id = ?1 OR c.user2_id = ?1)
                AND m.sender_user_id <> ?1
-               AND m.is_read = 0",
+               AND m.is_read = 0
+               AND COALESCE(m.deleted_at, 0) = 0",
             rusqlite::params![user_id],
             |row| row.get(0),
         )

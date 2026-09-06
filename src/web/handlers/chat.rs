@@ -96,6 +96,7 @@ fn load_recent_chat_messages(
                     },
                     reactions: Vec::new(),
                     sender_name: String::new(),
+                    client_message_id: String::new(),
                 })
             })?
             .collect::<Result<Vec<_>, _>>()
@@ -166,6 +167,7 @@ pub(super) fn load_user_conversations(
                 WHERE m.conversation_id = c.id
                   AND m.sender_user_id <> ?1
                   AND m.is_read = 0
+                  AND COALESCE(m.deleted_at, 0) = 0
             ) AS unread_count,
 
             c.updated_at,

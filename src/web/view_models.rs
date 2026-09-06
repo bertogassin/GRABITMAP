@@ -64,6 +64,7 @@ pub struct ChatMessageRow {
     pub attachment_url: String,
     pub reactions: Vec<ChatReactionRow>,
     pub sender_name: String,
+    pub client_message_id: String,
 }
 
 pub type PublicProfileResourceRow = (i64, String, String, String, f64, i64, i64, i64);

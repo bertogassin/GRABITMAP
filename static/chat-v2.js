@@ -671,6 +671,9 @@
 
             status.className = "chat-message-status";
 
+            row.dataset.deliveredAt = String(Number(message.delivered_at) || 0);
+            row.dataset.readAt = String(Number(message.read_at) || 0);
+
             if (mine) {
                 if (Number(message.read_at) > 0) {
                     status.textContent = "✓✓";
@@ -848,6 +851,13 @@
                 var id = Number(row.dataset.messageId);
 
                 if (id <= readThroughId) {
+                    row.dataset.readAt = String(readThroughId);
+                    row.dataset.deliveredAt = String(
+                        Math.max(
+                            Number(row.dataset.deliveredAt) || 0,
+                            1
+                        )
+                    );
                     var status = row.querySelector(
                         ".chat-message-status"
                     );
@@ -856,6 +866,32 @@
                         status.textContent = "✓✓";
                         status.classList.add("is-read");
                     }
+                }
+            });
+        }
+
+        function updateDeliveryStatuses(deliveredThroughId) {
+            if (!Number.isSafeInteger(deliveredThroughId) ||
+                deliveredThroughId <= 0) {
+                return;
+            }
+
+            history.querySelectorAll(
+                '.chat-message-row[data-mine="1"]'
+            ).forEach(function (row) {
+                var id = Number(row.dataset.messageId);
+                if (id > deliveredThroughId) {
+                    return;
+                }
+                if (Number(row.dataset.readAt) > 0) {
+                    return;
+                }
+                row.dataset.deliveredAt = String(
+                    Math.max(Number(row.dataset.deliveredAt) || 0, 1)
+                );
+                var status = row.querySelector(".chat-message-status");
+                if (status && !status.classList.contains("is-read")) {
+                    status.textContent = "✓✓";
                 }
             });
         }
@@ -3145,6 +3181,24 @@
             }
 
             applyMessageBody(body, message);
+
+            row.dataset.deliveredAt = String(Number(message.delivered_at) || 0);
+            row.dataset.readAt = String(Number(message.read_at) || 0);
+            if (message.is_mine) {
+                var statusNode = row.querySelector(".chat-message-status");
+                if (statusNode) {
+                    if (Number(message.read_at) > 0) {
+                        statusNode.textContent = "✓✓";
+                        statusNode.classList.add("is-read");
+                    } else if (Number(message.delivered_at) > 0) {
+                        statusNode.textContent = "✓✓";
+                        statusNode.classList.remove("is-read");
+                    } else {
+                        statusNode.textContent = "✓";
+                        statusNode.classList.remove("is-read");
+                    }
+                }
+            }
 
             if (
                 Number(message.reply_to_message_id) > 0
