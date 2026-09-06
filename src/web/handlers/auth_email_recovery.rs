@@ -439,8 +439,8 @@ pub async fn login_code_page(Query(query): Query<AuthNextQuery>) -> Html<String>
     let login_href = auth_related_href("/login", &redirect_target);
 
     let body_html = r##"
-        <label class="rm-auth-label" for="email-input">Email</label>
-        <input id="email-input" class="ui-input rm-auth-input" type="email" autocomplete="email" maxlength="254" placeholder="name@example.com">
+        <label class="rm-auth-label" for="email-input">Почта</label>
+        <input id="email-input" class="ui-input rm-auth-input" type="email" autocomplete="email" maxlength="254" placeholder="pochta@mail.ru">
 
         <button id="request-button" type="button" class="ui-button rm-auth-button rm-auth-button--compact">Получить код</button>
 
@@ -483,7 +483,7 @@ pub async fn login_code_page(Query(query): Query<AuthNextQuery>) -> Html<String>
             code_expired: "Срок действия кода истёк.",
             wrong_code: "Код введён неверно.",
             rate_limited: "Слишком много попыток. Попробуйте позже.",
-            mail_unavailable: "Почта не настроена. Войдите email и паролем."
+            mail_unavailable: "Почта не настроена. Войдите по почте и паролю."
         }};
         return messages[error] || "Не удалось выполнить запрос.";
     }}
@@ -591,8 +591,8 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
     let login_href = auth_related_href("/login", &redirect_target);
 
     let body_html = r##"
-        <label class="rm-auth-label" for="email-input">Email</label>
-        <input id="email-input" class="ui-input rm-auth-input" type="email" autocomplete="email" maxlength="254" placeholder="name@example.com">
+        <label class="rm-auth-label" for="email-input">Почта</label>
+        <input id="email-input" class="ui-input rm-auth-input" type="email" autocomplete="email" maxlength="254" placeholder="pochta@mail.ru">
 
         <button id="request-button" type="button" class="ui-button rm-auth-button rm-auth-button--compact">Отправить код</button>
 
@@ -640,7 +640,7 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
             code_expired: "Срок действия кода истёк.",
             wrong_code: "Код введён неверно.",
             rate_limited: "Слишком много попыток.",
-            mail_unavailable: "Почта не настроена. Войдите email и паролем."
+            mail_unavailable: "Почта не настроена. Войдите по почте и паролю."
         }};
         return messages[error] || "Не удалось выполнить запрос.";
     }}

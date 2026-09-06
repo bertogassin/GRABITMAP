@@ -94,7 +94,7 @@
             if (hits.length === 0) {
                 if (input.value.trim().length >= 2) {
                     results.innerHTML =
-                        '<div class="rm-explore-empty">Ничего не найдено</div>';
+                        '<div class="rm-explore-empty">Ничего не найдено. Нажмите Enter — откроется полный поиск.</div>';
                     results.hidden = false;
                 } else {
                     results.innerHTML = "";

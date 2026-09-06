@@ -108,7 +108,11 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                 ),
             )
         } else {
-            String::new()
+            empty_state_card_with_actions(
+                "Объявлений нет",
+                "Есть участники по этому запросу, но объявлений пока нет.",
+                &empty_state_action(&add_url, "Добавить объявление"),
+            )
         }
     } else {
         resources
@@ -759,7 +763,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
 <section class="card rm-resource-section">
 
     <div class="rm-resource-section-kicker rm-resource-section-kicker--contacts">
-        ID ресурса
+        Номер объявления
     </div>
 
     <div class="rm-resource-id-value">

@@ -1,7 +1,8 @@
 use super::common::{
-    back_hero, back_link, bottom_nav, bottom_nav_with_badges, empty_state_action, empty_state_card,
+    back_hero, back_link, bottom_nav, bottom_nav_with_badges, empty_state_action,
     empty_state_card_with_actions, escape_html, guest_locked_section, guest_mode_panel, icon,
     moderator_level_badge, navigation_card, page_document, page_shell, premium_badge_html,
+    ru_count, ru_plural,
     profession_label, profile_resource_card, section_head, simple_hero, topbar,
     verified_badge_html,
 };
@@ -242,7 +243,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
 
     let telegram_id_html = if authenticated {
         format!(
-            r#"<div class="rm-me-account-id">ID аккаунта · {}</div>"#,
+            r#"<div class="rm-me-account-id">Номер аккаунта · {}</div>"#,
             user_id
         )
     } else {
@@ -751,7 +752,7 @@ body.light-theme .rm-command-icon {{
     <div class="rm-center-metrics">
         <div class="rm-center-metric">
             <strong>{resources_count}</strong>
-            <span>моих ресурсов</span>
+            <span>{resources_word}</span>
         </div>
         <div class="rm-center-metric">
             <strong>{approved_count}</strong>
@@ -868,6 +869,7 @@ body.light-theme .rm-command-icon {{
             availability_text = availability_text,
             category_text = category_text,
             resources_count = resources_count,
+            resources_word = ru_plural(resources_count, "объявление", "объявления", "объявлений"),
             approved_count = approved_count,
             pending_count = pending_count,
             rejected_count = rejected_count,
@@ -1323,9 +1325,14 @@ pub fn render_notifications(
     let cards = if !authenticated {
         guest_locked_section("Уведомления", "/app/notifications")
     } else if notifications.is_empty() {
-        empty_state_card(
+        empty_state_card_with_actions(
             "Уведомлений нет",
-            "Здесь появятся результаты модерации и важные изменения ваших ресурсов.",
+            "Здесь появятся результаты модерации и важные изменения ваших объявлений.",
+            &format!(
+                "{}{}",
+                empty_state_action("/app/my-resources", "Мои объявления"),
+                empty_state_action("/app/add", "Добавить объявление"),
+            ),
         )
     } else {
         notifications
@@ -1524,7 +1531,7 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
     </div>
 
     <div class="card-meta rm-public-copy">
-        Войдите и напишите сразу. Подтверждение не нужно.
+        Войдите, чтобы написать участнику.
     </div>
 
     <a href="/login?next=/app/user/{public_id}" class="rm-public-chat-link">
@@ -1561,9 +1568,10 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
     let resource_count = resources.len();
 
     let cards = if resources.is_empty() {
-        empty_state_card(
-            "Ресурсы не опубликованы",
-            "В профиле нет опубликованных ресурсов.",
+        empty_state_card_with_actions(
+            "Объявлений нет",
+            "В профиле нет опубликованных объявлений.",
+            &empty_state_action("/app/search", "Вернуться к поиску"),
         )
     } else {
         resources
@@ -1605,7 +1613,7 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
     };
 
     let section_head_resources =
-        section_head("Ресурсы участника", "Только активные и одобренные", None);
+        section_head("Объявления участника", "Только активные и одобренные", None);
 
     let main_html = format!(
         r####"<section class="card rm-public-profile-card">
@@ -1627,7 +1635,7 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
             </div>
 
             <div class="card-meta rm-public-resource-meta">
-                {resource_count} ресурсов
+                {resource_word}
             </div>
 
         </div>
@@ -1657,7 +1665,7 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
         } else {
             person_line.clone()
         },
-        resource_count = resource_count,
+        resource_word = ru_count(resource_count as i64, "объявление", "объявления", "объявлений"),
         contact_html = contact_html,
         intent_html = intent_html,
         internal_contact_html = internal_contact_html,

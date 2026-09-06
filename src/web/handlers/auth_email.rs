@@ -509,8 +509,8 @@ pub async fn login_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
 
     let body_html = format!(
         r##"
-        <label class="rm-auth-label" for="email-input">Email</label>
-        <input id="email-input" class="ui-input rm-auth-input" type="email" autocomplete="email" maxlength="254" placeholder="name@example.com">
+        <label class="rm-auth-label" for="email-input">Почта</label>
+        <input id="email-input" class="ui-input rm-auth-input" type="email" autocomplete="email" maxlength="254" placeholder="pochta@mail.ru">
 
         <label class="rm-auth-label" for="password-input">Пароль</label>
         <div class="rm-auth-password-row">
@@ -641,8 +641,8 @@ pub async fn register_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
     let forgot_href = auth_related_href("/login/forgot", &redirect_target);
 
     let body_html = r##"
-        <label class="rm-auth-label" for="email-input">Email</label>
-        <input id="email-input" class="ui-input rm-auth-input" type="email" autocomplete="email" maxlength="254" placeholder="name@example.com">
+        <label class="rm-auth-label" for="email-input">Почта</label>
+        <input id="email-input" class="ui-input rm-auth-input" type="email" autocomplete="email" maxlength="254" placeholder="pochta@mail.ru">
 
         <label class="rm-auth-label" for="password-input">Пароль</label>
         <div class="rm-auth-password-row">

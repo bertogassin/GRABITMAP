@@ -30,7 +30,7 @@
             var current = ++requestId;
             results.replaceChildren();
             var localCount = filterCards(categories, query) + filterCards(sectors, query);
-            if (!query) { status.textContent = "Полный каталог направлений города"; return; }
+            if (!query) { status.textContent = "Выберите раздел ниже или начните вводить"; return; }
             status.textContent = "Ищем в каталоге профессий и услуг…";
             try {
                 var response = await fetch("/api/professions/suggest?q=" + encodeURIComponent(query) + "&limit=200", { headers: { Accept: "application/json" } });
@@ -53,5 +53,6 @@
 
         input.addEventListener("input", function () { window.clearTimeout(timer); timer = window.setTimeout(refresh, 90); });
         if (clear) clear.addEventListener("click", function () { input.value = ""; input.focus(); refresh(); });
+        refresh();
     }, { once: true });
 })();

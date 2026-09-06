@@ -66,5 +66,8 @@
         });
         if (clear) clear.addEventListener("click", function () { input.value = ""; input.focus(); refresh(false); });
         if (button) button.addEventListener("click", function () { refresh(true); });
+        if (!input.value.trim()) {
+            status.textContent = "Города по алфавиту · начните вводить для поиска";
+        }
     }, { once: true });
 })();

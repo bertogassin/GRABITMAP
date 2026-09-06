@@ -120,9 +120,20 @@
             );
         }
 
+        function unreadCaption(totalUnread) {
+            var n = Number(totalUnread || 0);
+            if (n <= 0) {
+                return "Все прочитано";
+            }
+            if (n % 10 === 1 && n % 100 !== 11) {
+                return n + " непрочитанное";
+            }
+            return n + " непрочитанных";
+        }
+
         function renderEmptyState() {
             return (
-                '<div class="card empty-state-card"><div class="card-content"><div class="card-title">Диалогов пока нет</div><div class="card-meta">Откройте профиль участника и напишите сразу.</div></div></div>'
+                '<div class="card rm-empty-state"><div class="card-content"><div class="card-title">Нет диалогов</div><div class="card-meta">Откройте профиль участника, чтобы начать диалог.</div><div class="rm-empty-state-actions"><a class="rm-empty-action ui-button" href="/app/search">Найти участников</a></div></div></div>'
             );
         }
 
@@ -202,8 +213,7 @@
             lastSnapshot = snapshot;
 
             if (caption) {
-                caption.textContent =
-                    "Непрочитанных: " + String(data.total_unread || 0);
+                caption.textContent = unreadCaption(data.total_unread);
             }
 
             if (typeof window.resursmapRefreshAttentionBadge === "function") {

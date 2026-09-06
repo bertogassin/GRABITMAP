@@ -1,7 +1,7 @@
 use super::common::{
     back_hero, back_link, bottom_nav, bottom_nav_with_badge, empty_state_action, empty_state_card,
     empty_state_card_with_actions, escape_html, guest_locked_section, icon, page_document,
-    page_shell, section_head, simple_hero, static_asset, topbar,
+    page_shell, ru_count, section_head, simple_hero, static_asset, topbar,
 };
 
 // ============================================================
@@ -32,6 +32,8 @@ pub(crate) fn conversation_display_name(
 }
 
 pub(crate) fn format_inbox_time(updated_at: i64) -> String {
+    use chrono::Datelike;
+
     if updated_at <= 0 {
         return String::new();
     }
@@ -52,9 +54,30 @@ pub(crate) fn format_inbox_time(updated_at: i64) -> String {
     } else if date == today - chrono::Duration::days(1) {
         "Вчера".to_string()
     } else if today.signed_duration_since(date).num_days() < 7 {
-        dt.format("%a").to_string()
+        ru_weekday_short(dt.weekday())
     } else {
         dt.format("%d.%m").to_string()
+    }
+}
+
+fn ru_weekday_short(weekday: chrono::Weekday) -> String {
+    match weekday {
+        chrono::Weekday::Mon => "пн",
+        chrono::Weekday::Tue => "вт",
+        chrono::Weekday::Wed => "ср",
+        chrono::Weekday::Thu => "чт",
+        chrono::Weekday::Fri => "пт",
+        chrono::Weekday::Sat => "сб",
+        chrono::Weekday::Sun => "вс",
+    }
+    .to_string()
+}
+
+fn inbox_unread_caption(total_unread: i64) -> String {
+    if total_unread <= 0 {
+        "Все прочитано".to_string()
+    } else {
+        ru_count(total_unread, "непрочитанное", "непрочитанных", "непрочитанных")
     }
 }
 
@@ -176,19 +199,19 @@ pub fn render_messages(
             .join("")
     };
 
+    let unread_caption = inbox_unread_caption(total_unread);
     let section_head_dialogs = if authenticated {
         format!(
             r#"<div class="section-head" id="inbox-section-head">
     <div>
         <h2 class="section-title">Диалоги</h2>
-        <p class="section-caption" id="inbox-unread-caption">Непрочитанных: {total_unread}</p>
+        <p class="section-caption" id="inbox-unread-caption">{unread_caption}</p>
     </div>
     <span class="inbox-live-badge" id="inbox-live-badge" hidden aria-hidden="true">связь</span>
-</div>"#,
-            total_unread = total_unread,
+</div>"#
         )
     } else {
-        section_head("Диалоги", &format!("Непрочитанных: {}", total_unread), None)
+        section_head("Диалоги", &unread_caption, None)
     };
 
     let list_attributes = if authenticated {
@@ -228,12 +251,12 @@ pub fn render_messages(
     );
 
     page_shell(
-        "Сообщения · GRABIT",
-        &topbar("Сообщения", "message-circle"),
+        "Чаты · GRABIT",
+        &topbar("Чаты", "message-circle"),
         &simple_hero(
             "message-circle",
             "Чаты",
-            "Сообщения",
+            "Диалоги",
             "Пишите сразу. Потом можно заблокировать или удалить.",
         ),
         &content_html,
@@ -543,7 +566,7 @@ pub fn render_chat(
 <div class="chat-empty-thread">
     <div class="chat-empty-thread-icon" aria-hidden="true"></div>
     <strong>Диалог открыт</strong>
-    <p>Напишите сразу — сообщение сразу дойдёт. Потом можно заблокировать или удалить.</p>
+    <p>Напишите первое сообщение — оно отправится сразу. Потом можно заблокировать или удалить.</p>
 </div>
 "#
             .to_string()

@@ -1289,7 +1289,16 @@ pub fn render_search(
             ),
         )
     } else if resources.is_empty() {
-        String::new()
+        empty_state_card_with_actions(
+            "Объявлений нет",
+            "Есть участники или города по этому запросу, но объявлений пока нет.",
+            &empty_state_action(
+                &city_id
+                    .map(|id| format!("/app/add/city/{id}"))
+                    .unwrap_or_else(|| "/app/add".to_string()),
+                "Добавить объявление",
+            ),
+        )
     } else {
         resources
             .iter()
