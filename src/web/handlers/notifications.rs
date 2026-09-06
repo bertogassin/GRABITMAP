@@ -1,5 +1,6 @@
 use super::auth::verify_authenticated_user;
 use super::auth::verify_user_session;
+use crate::db::steps::today_local;
 use crate::state::app_state::AppState;
 use crate::web::templates;
 use axum::{
@@ -8,7 +9,130 @@ use axum::{
     response::{Html, IntoResponse, Redirect, Response},
     Json,
 };
+use chrono::TimeZone;
 use serde_json::json;
+
+#[derive(Clone)]
+pub struct DailyNudge {
+    pub kind: &'static str,
+    pub title: &'static str,
+    pub message: &'static str,
+    pub href: &'static str,
+}
+
+const STEP_NUDGE: DailyNudge = DailyNudge {
+    kind: "step_nudge",
+    title: "10 000 шагов",
+    message: "Сделайте хотя бы 10 000 шагов сегодня.",
+    href: "/app/steps",
+};
+
+const WORK_NUDGE: DailyNudge = DailyNudge {
+    kind: "work_nudge",
+    title: "Работа рядом",
+    message: "Откройте карту и найдите работу на сегодня.",
+    href: "/app/search?kind=work",
+};
+
+fn today_start_unix() -> i64 {
+    let today = chrono::Utc::now()
+        .with_timezone(&chrono_tz::Europe::Paris)
+        .date_naive();
+    let midnight = today.and_hms_opt(0, 0, 0).expect("midnight");
+    chrono_tz::Europe::Paris
+        .from_local_datetime(&midnight)
+        .earliest()
+        .or_else(|| chrono_tz::Europe::Paris.from_local_datetime(&midnight).latest())
+        .map(|value| value.timestamp())
+        .unwrap_or(0)
+}
+
+fn already_nudged_today(
+    db: &rusqlite::Connection,
+    user_id: i64,
+    kind: &str,
+    since: i64,
+) -> bool {
+    db.query_row(
+        "SELECT EXISTS(
+            SELECT 1
+            FROM user_notifications
+            WHERE user_id = ?1
+              AND kind = ?2
+              AND created_at >= ?3
+         )",
+        rusqlite::params![user_id, kind, since],
+        |row| row.get::<_, i64>(0),
+    )
+    .unwrap_or(0)
+        == 1
+}
+
+fn insert_nudge(db: &rusqlite::Connection, user_id: i64, nudge: &DailyNudge) -> bool {
+    db.execute(
+        "INSERT INTO user_notifications (
+            user_id,
+            resource_id,
+            kind,
+            title,
+            message,
+            is_read,
+            created_at
+         )
+         VALUES (?1, NULL, ?2, ?3, ?4, 0, strftime('%s','now'))",
+        rusqlite::params![user_id, nudge.kind, nudge.title, nudge.message],
+    )
+    .unwrap_or(0)
+        == 1
+}
+
+pub fn ensure_daily_nudges(
+    db: &rusqlite::Connection,
+    user_id: i64,
+) -> Vec<DailyNudge> {
+    if user_id <= 0 {
+        return Vec::new();
+    }
+
+    let since = today_start_unix();
+    let today = today_local();
+    let mut created = Vec::new();
+
+    let _ = db.execute(
+        "UPDATE user_notifications
+         SET is_read = 1
+         WHERE user_id = ?1
+           AND kind IN ('step_nudge', 'work_nudge')
+           AND is_read = 0
+           AND created_at < ?2",
+        rusqlite::params![user_id, since],
+    );
+
+    let steps_today: i64 = db
+        .query_row(
+            "SELECT step_count
+             FROM user_step_days
+             WHERE user_id = ?1
+               AND step_date = ?2",
+            rusqlite::params![user_id, today],
+            |row| row.get(0),
+        )
+        .unwrap_or(0);
+
+    if steps_today < 10_000 && !already_nudged_today(db, user_id, STEP_NUDGE.kind, since) {
+        if insert_nudge(db, user_id, &STEP_NUDGE) {
+            created.push(STEP_NUDGE);
+        }
+    }
+
+    if !already_nudged_today(db, user_id, WORK_NUDGE.kind, since) {
+        if insert_nudge(db, user_id, &WORK_NUDGE) {
+            created.push(WORK_NUDGE);
+        }
+    }
+
+    created
+}
 
 pub async fn notifications_page(State(state): State<AppState>, headers: HeaderMap) -> Html<String> {
     let user_id = match verify_user_session(&state, &headers) {
@@ -117,6 +241,10 @@ pub async fn open_notification(
         } else {
             format!("/app/resource/{resource_id}")
         }
+    } else if kind == "step_nudge" {
+        "/app/steps".to_string()
+    } else if kind == "work_nudge" {
+        "/app/search?kind=work".to_string()
     } else if kind == "admin_assignment" {
         "/app/center".to_string()
     } else {
@@ -174,4 +302,50 @@ pub async fn unread_count(State(state): State<AppState>, headers: HeaderMap) -> 
         .unwrap_or(0);
 
     Json(json!({ "count": count })).into_response()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::db::steps::{initialize, today_local};
+
+    #[test]
+    fn daily_nudges_insert_once_and_skip_after_goal() {
+        let db = rusqlite::Connection::open_in_memory().expect("database");
+        db.execute_batch(
+            "CREATE TABLE user_notifications (
+                id INTEGER PRIMARY KEY,
+                user_id INTEGER NOT NULL,
+                resource_id INTEGER,
+                kind TEXT NOT NULL,
+                title TEXT NOT NULL,
+                message TEXT NOT NULL,
+                is_read INTEGER NOT NULL DEFAULT 0,
+                created_at INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+             );",
+        )
+        .expect("notifications");
+        initialize(&db).expect("steps");
+
+        let first = ensure_daily_nudges(&db, 9);
+        assert_eq!(first.len(), 2);
+        let second = ensure_daily_nudges(&db, 9);
+        assert!(second.is_empty());
+
+        db.execute(
+            "INSERT INTO user_step_days (user_id, step_date, step_count)
+             VALUES (9, ?1, 10000)",
+            rusqlite::params![today_local()],
+        )
+        .expect("steps row");
+
+        let count: i64 = db
+            .query_row(
+                "SELECT COUNT(*) FROM user_notifications WHERE user_id = 9",
+                [],
+                |row| row.get(0),
+            )
+            .expect("count");
+        assert_eq!(count, 2);
+    }
 }

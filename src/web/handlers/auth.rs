@@ -190,6 +190,67 @@ async fn send_email_code(email: &str, code: &str) -> Result<(), String> {
     Ok(())
 }
 
+fn store_login_code(state: &AppState, email: &str, code: &str) -> Result<(), &'static str> {
+    let expires_at = unix_now() + EMAIL_CODE_TTL_SECONDS;
+    let code_hash = hash_email_code(state, email, code, expires_at);
+    let db = crate::db::pool::get_connection(&state.db_pool).map_err(|_| "database_unavailable")?;
+
+    let _ = db.execute(
+        "UPDATE email_login_codes
+         SET consumed_at = ?2
+         WHERE email = ?1
+           AND purpose = 'login'
+           AND consumed_at = 0",
+        rusqlite::params![email, unix_now()],
+    );
+
+    db.execute(
+        "INSERT INTO email_login_codes (
+            email,
+            code_hash,
+            expires_at,
+            attempts,
+            consumed_at,
+            created_at,
+            purpose
+         )
+         VALUES (?1, ?2, ?3, 0, 0, ?4, 'login')",
+        rusqlite::params![email, &code_hash, expires_at, unix_now()],
+    )
+    .map_err(|_| "code_store_failed")?;
+
+    Ok(())
+}
+
+fn consume_login_codes(state: &AppState, email: &str) {
+    if let Ok(db) = crate::db::pool::get_connection(&state.db_pool) {
+        let _ = db.execute(
+            "UPDATE email_login_codes
+             SET consumed_at = ?2
+             WHERE email = ?1
+               AND purpose = 'login'
+               AND consumed_at = 0",
+            rusqlite::params![email, unix_now()],
+        );
+    }
+}
+
+pub(super) async fn issue_and_send_login_code(
+    state: &AppState,
+    email: &str,
+) -> Result<(), &'static str> {
+    let code = generate_email_code();
+    store_login_code(state, email, &code)?;
+
+    if let Err(error) = send_email_code(email, &code).await {
+        eprintln!("email auth send failed: {error}");
+        consume_login_codes(state, email);
+        return Err("mail_unavailable");
+    }
+
+    Ok(())
+}
+
 pub async fn email_auth_request(
     State(state): State<AppState>,
     headers: HeaderMap,
@@ -231,75 +292,17 @@ pub async fn email_auth_request(
             .into_response();
     }
 
-    let code = generate_email_code();
-    let expires_at = unix_now() + EMAIL_CODE_TTL_SECONDS;
-    let code_hash = hash_email_code(&state, &email, &code, expires_at);
-
-    let db = match crate::db::pool::get_connection(&state.db_pool) {
-        Ok(db) => db,
-
-        Err(_) => {
-            return (
-                StatusCode::SERVICE_UNAVAILABLE,
-                Json(json!({
-                    "ok": false,
-                    "error": "database_unavailable"
-                })),
-            )
-                .into_response();
-        }
-    };
-
-    let _ = db.execute(
-        "UPDATE email_login_codes
-         SET consumed_at = ?2
-         WHERE email = ?1
-           AND purpose = 'login'
-           AND consumed_at = 0",
-        rusqlite::params![&email, unix_now()],
-    );
-
-    let result = db.execute(
-        "INSERT INTO email_login_codes (
-            email,
-            code_hash,
-            expires_at,
-            attempts,
-            consumed_at,
-            created_at,
-            purpose
-         )
-         VALUES (?1, ?2, ?3, 0, 0, ?4, 'login')",
-        rusqlite::params![&email, &code_hash, expires_at, unix_now(),],
-    );
-
-    if result.is_err() {
+    if let Err(error) = issue_and_send_login_code(&state, &email).await {
+        let status = if error == "database_unavailable" || error == "mail_unavailable" {
+            StatusCode::SERVICE_UNAVAILABLE
+        } else {
+            StatusCode::INTERNAL_SERVER_ERROR
+        };
         return (
-            StatusCode::INTERNAL_SERVER_ERROR,
+            status,
             Json(json!({
                 "ok": false,
-                "error": "code_store_failed"
-            })),
-        )
-            .into_response();
-    }
-
-    if let Err(error) = send_email_code(&email, &code).await {
-        eprintln!("email auth send failed: {error}");
-
-        let _ = db.execute(
-            "UPDATE email_login_codes
-             SET consumed_at = ?2
-             WHERE email = ?1
-               AND consumed_at = 0",
-            rusqlite::params![&email, unix_now()],
-        );
-
-        return (
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(json!({
-                "ok": false,
-                "error": "mail_unavailable"
+                "error": error
             })),
         )
             .into_response();

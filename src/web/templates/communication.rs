@@ -257,7 +257,7 @@ pub fn render_messages(
             "message-circle",
             "Чаты",
             "Диалоги",
-            "Пишите сразу. Потом можно заблокировать или удалить.",
+            "Личные диалоги.",
         ),
         &content_html,
         &bottom_nav_with_badge("chats", total_unread),
@@ -566,7 +566,7 @@ pub fn render_chat(
 <div class="chat-empty-thread">
     <div class="chat-empty-thread-icon" aria-hidden="true"></div>
     <strong>Диалог открыт</strong>
-    <p>Напишите первое сообщение — оно отправится сразу. Потом можно заблокировать или удалить.</p>
+    <p>Напишите сообщение.</p>
 </div>
 "#
             .to_string()

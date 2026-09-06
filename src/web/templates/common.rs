@@ -24,7 +24,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = "4.9.86";
+pub const STATIC_ASSET_VERSION: &str = "4.9.88";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -5769,16 +5769,25 @@ pub(crate) fn section_head(title: &str, caption: &str, margin_top: Option<u32>) 
         _ => "",
     };
 
+    let caption_html = if caption.trim().is_empty() {
+        String::new()
+    } else {
+        format!(
+            r#"<p class="section-caption">{}</p>"#,
+            escape_html(caption)
+        )
+    };
+
     format!(
         r#"<div class="section-head{class_extra}">
     <div>
         <h2 class="section-title">{title}</h2>
-        <p class="section-caption">{caption}</p>
+        {caption_html}
     </div>
 </div>"#,
         class_extra = class_extra,
         title = escape_html(title),
-        caption = escape_html(caption),
+        caption_html = caption_html,
     )
 }
 

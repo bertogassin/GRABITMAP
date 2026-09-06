@@ -161,22 +161,44 @@ pub async fn api_favorite_toggle(
         .unwrap_or(false);
 
     let favorite = if exists {
-        let _ = db.execute(
-            "DELETE FROM favorites
-             WHERE user_id = ?1
-               AND resource_id = ?2",
-            rusqlite::params![user_id, id],
-        );
+        if db
+            .execute(
+                "DELETE FROM favorites
+                 WHERE user_id = ?1
+                   AND resource_id = ?2",
+                rusqlite::params![user_id, id],
+            )
+            .is_err()
+        {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({
+                    "ok": false,
+                    "error": "database_error"
+                })),
+            )
+                .into_response();
+        }
 
         false
-    } else {
-        let _ = db.execute(
+    } else if db
+        .execute(
             "INSERT OR IGNORE INTO favorites
              (user_id, resource_id, created_at)
              VALUES (?1, ?2, strftime('%s','now'))",
             rusqlite::params![user_id, id],
-        );
-
+        )
+        .is_err()
+    {
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({
+                "ok": false,
+                "error": "database_error"
+            })),
+        )
+            .into_response();
+    } else {
         true
     };
 

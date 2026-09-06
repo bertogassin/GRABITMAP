@@ -203,6 +203,13 @@ pub fn init_db() -> Result<Connection> {
         conn.execute("ALTER TABLE profiles ADD COLUMN user_id INTEGER", [])?;
     }
 
+    if !profile_columns.iter().any(|name| name == "last_seen_at") {
+        conn.execute(
+            "ALTER TABLE profiles ADD COLUMN last_seen_at INTEGER NOT NULL DEFAULT 0",
+            [],
+        )?;
+    }
+
     // Backfill all existing Telegram profiles.
     conn.execute(
         "INSERT OR IGNORE INTO users (id)

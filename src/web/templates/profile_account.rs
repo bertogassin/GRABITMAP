@@ -834,7 +834,7 @@ body.light-theme .rm-command-icon {{
             <span class="rm-command-copy">
                 <strong>Шагомер</strong>
                 <small>
-                    Тропа шагов и история каждого дня
+                    10 000 шагов за день
                 </small>
             </span>
             <span class="rm-command-arrow">
@@ -1368,6 +1368,8 @@ pub fn render_notifications(
                         "promotion_publish_failed" => (icon("alert-triangle"), "rm-notif-card--rejected", "rm-notif-icon--rejected"),
                         "promotion_rejected" => (icon("x"), "rm-notif-card--rejected", "rm-notif-icon--rejected"),
                         "admin_assignment" => (icon("shield"), "rm-notif-card--contact", "rm-notif-icon--contact"),
+                        "step_nudge" => (icon("footprints"), "rm-notif-card--contact", "rm-notif-icon--contact"),
+                        "work_nudge" => (icon("search"), "rm-notif-card--approved", "rm-notif-icon--approved"),
                         _ => (icon("bell"), "", "rm-notif-icon--default"),
                     };
 

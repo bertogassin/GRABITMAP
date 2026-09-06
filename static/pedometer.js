@@ -3,7 +3,9 @@
     if (!root) return;
 
     const STORAGE_KEY = "resursmap:steps";
+    const LISTEN_KEY = "resursmap:steps-listen";
     const CIRC = 2 * Math.PI * 78;
+    const DEFAULT_GOAL = 10000;
     const MONTHS = [
         "январь", "февраль", "март", "апрель", "май", "июнь",
         "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"
@@ -35,6 +37,7 @@
     let lastStepAt = 0;
     let syncTimer = 0;
     let pendingSync = 0;
+    let wakeLock = null;
 
     function localDate() {
         const now = new Date();
@@ -96,9 +99,30 @@
         } catch (e) {}
     }
 
+    function listenWanted() {
+        try {
+            return localStorage.getItem(LISTEN_KEY) === "1";
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function setListenWanted(on) {
+        try {
+            if (on) localStorage.setItem(LISTEN_KEY, "1");
+            else localStorage.removeItem(LISTEN_KEY);
+        } catch (e) {}
+    }
+
     function ringOffset(steps, goal) {
         const ratio = goal > 0 ? Math.min(1, steps / goal) : 0;
         return CIRC * (1 - ratio);
+    }
+
+    function dayStepsFor(date) {
+        if (!snapshot || !snapshot.days) return 0;
+        const found = snapshot.days.find(function (day) { return day.date === date; });
+        return found ? found.steps : 0;
     }
 
     function applySnapshot(data) {
@@ -109,10 +133,11 @@
         localCount = Math.max(localCount, serverToday);
         writeLocal();
         paint();
+        maybeGoalNotice();
     }
 
     function paint() {
-        const goal = snapshot ? snapshot.goal : 8000;
+        const goal = snapshot ? snapshot.goal : DEFAULT_GOAL;
         if (todayCount) todayCount.textContent = String(localCount);
         if (todayCaption) todayCaption.textContent = "из " + goal + " сегодня";
         if (ring) ring.setAttribute("stroke-dashoffset", String(ringOffset(localCount, goal)));
@@ -122,32 +147,27 @@
             lifeEl.textContent = ruCount(snapshot.lifetime, "шаг", "шага", "шагов");
         }
         if (goalInput && snapshot) goalInput.value = String(snapshot.goal);
-        if (snapshot) {
-            root.querySelectorAll("[data-date]").forEach(function (node) {
-                const date = node.getAttribute("data-date");
-                const steps = date === localToday ? localCount : dayStepsFor(date);
-                const strong = node.querySelector("strong");
-                if (strong) strong.textContent = String(steps);
-                node.classList.remove("is-none", "is-low", "is-mid", "is-high", "is-goal");
-                node.classList.add("is-" + tone(steps, goal));
-            });
-            if (logEl) {
-                if (!snapshot.log.length) {
-                    logEl.innerHTML = "<li class=\"rm-step-empty\">Записей ещё нет — тропа начнётся с первого дня.</li>";
-                } else {
-                    logEl.innerHTML = snapshot.log.map(function (entry) {
-                        const source = entry.source === "sensor" ? "телефон" : "вручную";
-                        return "<li><strong>+" + entry.delta + "</strong><span>" +
-                            humanDate(entry.date) + " · " + source + "</span></li>";
-                    }).join("");
-                }
-            }
-        }
+        if (!snapshot) return;
 
-    function dayStepsFor(date) {
-        if (!snapshot || !snapshot.days) return 0;
-        const found = snapshot.days.find(function (day) { return day.date === date; });
-        return found ? found.steps : 0;
+        root.querySelectorAll("[data-date]").forEach(function (node) {
+            const date = node.getAttribute("data-date");
+            const steps = date === localToday ? localCount : dayStepsFor(date);
+            const strong = node.querySelector("strong");
+            if (strong) strong.textContent = String(steps);
+            node.classList.remove("is-none", "is-low", "is-mid", "is-high", "is-goal");
+            node.classList.add("is-" + tone(steps, goal));
+        });
+
+        if (!logEl) return;
+        if (!snapshot.log.length) {
+            logEl.innerHTML = "<li class=\"rm-step-empty\">Пока пусто</li>";
+        } else {
+            logEl.innerHTML = snapshot.log.map(function (entry) {
+                const source = entry.source === "sensor" ? "телефон" : "вручную";
+                return "<li><strong>+" + entry.delta + "</strong><span>" +
+                    humanDate(entry.date) + " · " + source + "</span></li>";
+            }).join("");
+        }
     }
 
     function openDay(date) {
@@ -157,7 +177,7 @@
         if (dayDate) dayDate.textContent = humanDate(date);
         if (daySteps) daySteps.textContent = ruCount(steps, "шаг", "шага", "шагов");
         if (dayMeta) {
-            dayMeta.textContent = km(steps) + " км · камень тропы";
+            dayMeta.textContent = km(steps) + " км";
         }
     }
 
@@ -170,9 +190,9 @@
         });
         if (!response.ok) {
             if (response.status === 401) {
-                setStatus("Войдите в аккаунт, чтобы сохранить тропу.");
+                setStatus("Войдите, чтобы сохранить шаги.");
             } else {
-                setStatus("Не удалось сохранить. Попробуйте ещё раз.");
+                setStatus("Не удалось сохранить.");
             }
             return null;
         }
@@ -193,6 +213,7 @@
     async function addManual(delta) {
         const value = Math.floor(Number(delta) || 0);
         if (value < 1) return;
+        const previous = localCount;
         localCount += value;
         writeLocal();
         paint();
@@ -201,7 +222,13 @@
             add: value,
             source: "manual"
         });
-        if (data) applySnapshot(data);
+        if (data) {
+            applySnapshot(data);
+            return;
+        }
+        localCount = previous;
+        writeLocal();
+        paint();
     }
 
     function onMotion(event) {
@@ -223,27 +250,55 @@
                 if (localCount % 100 === 0 && navigator.vibrate) {
                     navigator.vibrate(12);
                 }
+                if (pendingSync >= 20) syncSensor(false);
             }
         }
         lastMag = mag;
     }
 
+    async function holdScreen() {
+        if (!("wakeLock" in navigator) || !listening) return;
+        try {
+            wakeLock = await navigator.wakeLock.request("screen");
+            wakeLock.addEventListener("release", function () {
+                wakeLock = null;
+            });
+        } catch (e) {}
+    }
+
+    function releaseScreen() {
+        if (wakeLock) {
+            wakeLock.release().catch(function () {});
+            wakeLock = null;
+        }
+    }
+
     function startListen() {
+        if (listening) return;
         window.addEventListener("devicemotion", onMotion, { passive: true });
         listening = true;
-        listenBtn.classList.add("is-on");
-        listenBtn.textContent = "Стоп";
-        setStatus("Слушаю шаги. Держите телефон при себе. История пишется сама.");
-        syncTimer = window.setInterval(function () { syncSensor(false); }, 12000);
+        setListenWanted(true);
+        if (listenBtn) {
+            listenBtn.classList.add("is-on");
+            listenBtn.textContent = "Стоп";
+        }
+        setStatus("Считаем шаги.");
+        holdScreen();
+        syncTimer = window.setInterval(function () { syncSensor(false); }, 8000);
+        syncSensor(true);
     }
 
     function stopListen() {
         window.removeEventListener("devicemotion", onMotion);
         listening = false;
-        listenBtn.classList.remove("is-on");
-        listenBtn.textContent = "Считать шаги";
-        setStatus("Счёт остановлен. Всё уже сохранённое осталось в тропе.");
+        setListenWanted(false);
+        if (listenBtn) {
+            listenBtn.classList.remove("is-on");
+            listenBtn.textContent = "Считать шаги";
+        }
+        setStatus("Счёт остановлен.");
         window.clearInterval(syncTimer);
+        releaseScreen();
         syncSensor(true);
     }
 
@@ -257,13 +312,20 @@
                 typeof DeviceMotionEvent.requestPermission === "function") {
                 const permission = await DeviceMotionEvent.requestPermission();
                 if (permission !== "granted") {
-                    setStatus("Телефон не дал доступ. Добавляйте шаги кнопками — история всё равно полная.");
+                    setStatus("Нет доступа к датчику. Добавляйте шаги кнопками.");
                     return;
                 }
             }
             startListen();
         } catch (e) {
-            setStatus("Датчик недоступен. Добавляйте шаги вручную — тропа сохранится.");
+            setStatus("Датчик недоступен. Добавляйте шаги кнопками.");
+        }
+    }
+
+    function maybeGoalNotice() {
+        if (localCount < DEFAULT_GOAL) return;
+        if (statusEl && listening) {
+            setStatus("Цель 10 000 есть. Можно искать работу.");
         }
     }
 
@@ -277,27 +339,37 @@
             const day = event.target.closest("[data-date]");
             if (day) openDay(day.getAttribute("data-date"));
         });
-        listenBtn.addEventListener("click", requestListen);
-        addForm.addEventListener("submit", function (event) {
-            event.preventDefault();
-            addManual(addInput.value);
-            addInput.value = "";
-        });
-        goalForm.addEventListener("submit", async function (event) {
-            event.preventDefault();
-            const data = await send({
-                date: localToday,
-                goal: Number(goalInput.value || 8000)
+        if (listenBtn) listenBtn.addEventListener("click", requestListen);
+        if (addForm) {
+            addForm.addEventListener("submit", function (event) {
+                event.preventDefault();
+                addManual(addInput.value);
+                addInput.value = "";
             });
-            if (data) {
-                applySnapshot(data);
-                setStatus("Цель обновлена.");
+        }
+        if (goalForm) {
+            goalForm.addEventListener("submit", async function (event) {
+                event.preventDefault();
+                const data = await send({
+                    date: localToday,
+                    goal: Number(goalInput.value || DEFAULT_GOAL)
+                });
+                if (data) {
+                    applySnapshot(data);
+                    setStatus("Цель обновлена.");
+                }
+            });
+        }
+        document.addEventListener("visibilitychange", function () {
+            if (document.hidden) {
+                syncSensor(true);
+            } else if (listening) {
+                holdScreen();
+                syncSensor(true);
             }
         });
-        document.addEventListener("visibilitychange", function () {
-            if (document.hidden) syncSensor(true);
-        });
         window.addEventListener("pagehide", function () { syncSensor(true); });
+        window.addEventListener("online", function () { syncSensor(true); });
     }
 
     async function boot() {
@@ -313,9 +385,14 @@
                 applySnapshot(data);
             }
         } catch (e) {
-            setStatus("Нет сети. Сегодняшние шаги пока только на этом телефоне.");
+            setStatus("Нет сети. Шаги пока на этом телефоне.");
         }
         if (localCount > 0) syncSensor(true);
+        if (listenWanted()) {
+            requestListen();
+        } else {
+            setStatus("Нажмите «Считать шаги».");
+        }
     }
 
     boot();

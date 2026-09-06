@@ -1632,7 +1632,7 @@ pub fn render_menu() -> String {
             "/app/steps",
             "footprints",
             "Шагомер",
-            "Тропа и история каждого дня"
+            "10 000 шагов за день"
         ),
         add_card = navigation_card(
             "/app/add",

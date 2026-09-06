@@ -16,6 +16,33 @@
 
     var lastNotifications = 0;
 
+    function showNudgeNotifications(nudges) {
+        if (!nudges || !nudges.length || !("Notification" in window)) {
+            return;
+        }
+        if (Notification.permission !== "granted") {
+            return;
+        }
+
+        nudges.forEach(function (nudge) {
+            var key = "resursmap:nudge:" + String(nudge.kind || "") + ":" +
+                new Date().toISOString().slice(0, 10);
+            try {
+                if (localStorage.getItem(key) === "1") {
+                    return;
+                }
+                localStorage.setItem(key, "1");
+            } catch (e) {}
+
+            try {
+                new Notification(nudge.title || "GRABIT", {
+                    body: nudge.body || "",
+                    icon: "/static/app-icon.svg"
+                });
+            } catch (e) {}
+        });
+    }
+
     function formatCount(value) {
         var count = Number(value) || 0;
 
@@ -77,6 +104,7 @@
                 lastNotifications = notifications;
                 setBadge(document.querySelector("[data-nav-chats-link]"), messages);
                 setBadge(document.querySelector("[data-nav-menu-link]"), menuCount);
+                showNudgeNotifications(data.nudges);
 
                 if (typeof window.resursmapOnAttentionCount === "function") {
                     window.resursmapOnAttentionCount(data);

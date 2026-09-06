@@ -7,6 +7,106 @@ use axum::{
     response::Html,
 };
 
+fn optional_i64(row: &rusqlite::Row<'_>, index: usize) -> rusqlite::Result<i64> {
+    Ok(row.get::<_, Option<i64>>(index)?.unwrap_or(0))
+}
+
+fn load_recent_chat_messages(
+    db: &rusqlite::Connection,
+    conversation_id: i64,
+) -> Vec<crate::web::view_models::ChatMessageRow> {
+    if conversation_id <= 0 {
+        return Vec::new();
+    }
+
+    match db
+        .prepare(
+            "SELECT
+                messages.id,
+                messages.sender_user_id,
+                messages.message,
+                COALESCE(messages.is_read, 0),
+                COALESCE(messages.created_at, 0),
+                COALESCE(messages.delivered_at, 0),
+                COALESCE(messages.read_at, 0),
+                COALESCE(messages.reply_to_message_id, 0),
+                (
+                    SELECT reply.sender_user_id
+                    FROM messages AS reply
+                    WHERE reply.id =
+                        messages.reply_to_message_id
+                      AND reply.conversation_id =
+                        messages.conversation_id
+                ),
+                COALESCE((
+                    SELECT CASE
+                        WHEN reply.deleted_at > 0
+                        THEN 'Сообщение удалено'
+                        ELSE reply.message
+                    END
+                    FROM messages AS reply
+                    WHERE reply.id =
+                        messages.reply_to_message_id
+                      AND reply.conversation_id =
+                        messages.conversation_id
+                ), ''),
+                COALESCE(messages.edited_at, 0),
+                COALESCE(messages.deleted_at, 0),
+                COALESCE(messages.attachment_kind, ''),
+                COALESCE(messages.attachment_path, '')
+             FROM (
+                SELECT id
+                FROM messages
+                WHERE conversation_id = ?1
+                ORDER BY id DESC
+                LIMIT 100
+             ) AS recent
+             INNER JOIN messages
+               ON messages.id = recent.id
+             ORDER BY messages.id ASC",
+        )
+        .and_then(|mut stmt| {
+            stmt.query_map(rusqlite::params![conversation_id], |row| {
+                let deleted_at = optional_i64(row, 11)?;
+                let attachment_kind: String = row.get(12)?;
+                let attachment_path: String = row.get(13)?;
+                let message_id: i64 = row.get(0)?;
+
+                Ok(crate::web::view_models::ChatMessageRow {
+                    id: message_id,
+                    sender_user_id: row.get(1)?,
+                    message: row.get(2)?,
+                    is_read: optional_i64(row, 3)?,
+                    created_at: optional_i64(row, 4)?,
+                    delivered_at: optional_i64(row, 5)?,
+                    read_at: optional_i64(row, 6)?,
+                    reply_to_message_id: optional_i64(row, 7)?,
+                    reply_sender_user_id: optional_i64(row, 8)?,
+                    reply_message: row.get(9)?,
+                    edited_at: optional_i64(row, 10)?,
+                    deleted_at,
+                    attachment_kind: attachment_kind.clone(),
+                    attachment_url: if deleted_at == 0
+                        && (attachment_kind == "image" || attachment_kind == "voice")
+                        && !attachment_path.is_empty()
+                    {
+                        format!("/api/chat/media/{message_id}")
+                    } else {
+                        String::new()
+                    },
+                    reactions: Vec::new(),
+                })
+            })?
+            .collect::<Result<Vec<_>, _>>()
+        }) {
+        Ok(messages) => messages,
+        Err(error) => {
+            eprintln!("chat page history failed for conversation {conversation_id}: {error}");
+            Vec::new()
+        }
+    }
+}
+
 pub(super) fn mark_user_messages_delivered(db: &rusqlite::Connection, user_id: i64) -> usize {
     if user_id <= 0 {
         return 0;
@@ -212,90 +312,8 @@ pub async fn chat_page(
     let (other_username, other_first_name, other_last_name) =
         other_profile.unwrap_or_else(|| (String::new(), String::new(), String::new()));
 
-    let mut messages: Vec<crate::web::view_models::ChatMessageRow> = if conversation_id <= 0 {
-        Vec::new()
-    } else {
-        db.prepare(
-            "SELECT
-                messages.id,
-                messages.sender_user_id,
-                messages.message,
-                messages.is_read,
-                messages.created_at,
-                messages.delivered_at,
-                messages.read_at,
-                messages.reply_to_message_id,
-                (
-                    SELECT reply.sender_user_id
-                    FROM messages AS reply
-                    WHERE reply.id =
-                        messages.reply_to_message_id
-                      AND reply.conversation_id =
-                        messages.conversation_id
-                ),
-                COALESCE((
-                    SELECT CASE
-                        WHEN reply.deleted_at > 0
-                        THEN 'Сообщение удалено'
-                        ELSE reply.message
-                    END
-                    FROM messages AS reply
-                    WHERE reply.id =
-                        messages.reply_to_message_id
-                      AND reply.conversation_id =
-                        messages.conversation_id
-                ), ''),
-                messages.edited_at,
-                messages.deleted_at,
-                COALESCE(messages.attachment_kind, ''),
-                COALESCE(messages.attachment_path, '')
-             FROM (
-                SELECT id
-                FROM messages
-                WHERE conversation_id = ?1
-                ORDER BY id DESC
-                LIMIT 100
-             ) AS recent
-             INNER JOIN messages
-               ON messages.id = recent.id
-             ORDER BY messages.id ASC",
-        )
-        .and_then(|mut stmt| {
-            stmt.query_map(rusqlite::params![conversation_id], |row| {
-                let deleted_at: i64 = row.get(11)?;
-                let attachment_kind: String = row.get(12)?;
-                let attachment_path: String = row.get(13)?;
-                let message_id: i64 = row.get(0)?;
-
-                Ok(crate::web::view_models::ChatMessageRow {
-                    id: message_id,
-                    sender_user_id: row.get(1)?,
-                    message: row.get(2)?,
-                    is_read: row.get(3)?,
-                    created_at: row.get(4)?,
-                    delivered_at: row.get(5)?,
-                    read_at: row.get(6)?,
-                    reply_to_message_id: row.get(7)?,
-                    reply_sender_user_id: row.get::<_, Option<i64>>(8)?.unwrap_or(0),
-                    reply_message: row.get(9)?,
-                    edited_at: row.get(10)?,
-                    deleted_at,
-                    attachment_kind: attachment_kind.clone(),
-                    attachment_url: if deleted_at == 0
-                        && (attachment_kind == "image" || attachment_kind == "voice")
-                        && !attachment_path.is_empty()
-                    {
-                        format!("/api/chat/media/{message_id}")
-                    } else {
-                        String::new()
-                    },
-                    reactions: Vec::new(),
-                })
-            })?
-            .collect::<Result<Vec<_>, _>>()
-        })
-        .unwrap_or_default()
-    };
+    let mut messages: Vec<crate::web::view_models::ChatMessageRow> =
+        load_recent_chat_messages(&db, conversation_id);
 
     let message_ids: Vec<i64> = messages.iter().map(|message| message.id).collect();
     let reactions_by_message = super::chat_api::reactions_for_view(&db, &message_ids, user_id);
@@ -410,5 +428,37 @@ mod tests {
         assert!(delivered[0].1 > 0);
         assert_eq!(delivered[1].1, 0);
         assert!(delivered[2].1 > 0);
+    }
+
+    #[test]
+    fn page_keeps_messages_when_reply_id_is_null() {
+        let db = rusqlite::Connection::open_in_memory().expect("database");
+        db.execute_batch(
+            "CREATE TABLE messages (
+                id INTEGER PRIMARY KEY,
+                conversation_id INTEGER NOT NULL,
+                sender_user_id INTEGER NOT NULL,
+                message TEXT NOT NULL,
+                is_read INTEGER NOT NULL DEFAULT 0,
+                created_at INTEGER NOT NULL DEFAULT 0,
+                delivered_at INTEGER,
+                read_at INTEGER,
+                reply_to_message_id INTEGER,
+                edited_at INTEGER,
+                deleted_at INTEGER,
+                attachment_kind TEXT,
+                attachment_path TEXT
+             );
+             INSERT INTO messages (
+                id, conversation_id, sender_user_id, message
+             ) VALUES (11, 4, 7, 'Привет');",
+        )
+        .expect("schema");
+
+        let messages = load_recent_chat_messages(&db, 4);
+        assert_eq!(messages.len(), 1);
+        assert_eq!(messages[0].id, 11);
+        assert_eq!(messages[0].message, "Привет");
+        assert_eq!(messages[0].reply_to_message_id, 0);
     }
 }

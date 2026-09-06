@@ -36,6 +36,8 @@ pub struct EmailRegisterRequest {
 #[derive(Debug, Deserialize)]
 pub struct AuthNextQuery {
     pub next: Option<String>,
+    pub email: Option<String>,
+    pub resend: Option<String>,
 }
 
 pub(super) fn auth_related_href(base: &str, redirect_target: &str) -> String {
@@ -83,6 +85,20 @@ fn verify_password(password: &str, password_hash: &str) -> bool {
     Argon2::default()
         .verify_password(password.as_bytes(), &parsed)
         .is_ok()
+}
+
+fn username_from_email(email: &str) -> String {
+    let local = email.split('@').next().unwrap_or("").trim();
+    let cleaned: String = local
+        .chars()
+        .filter(|ch| ch.is_ascii_alphanumeric() || *ch == '_' || *ch == '.' || *ch == '-')
+        .take(32)
+        .collect();
+    if cleaned.is_empty() {
+        "user".to_string()
+    } else {
+        cleaned
+    }
 }
 
 fn allocate_email_user_id(transaction: &rusqlite::Transaction<'_>) -> i64 {
@@ -170,6 +186,7 @@ fn provision_email_account(
         .map_err(|_| "identity_create_failed")?;
 
     let client_id = format!("user:{next_id}");
+    let username = username_from_email(email);
 
     transaction
         .execute(
@@ -177,15 +194,17 @@ fn provision_email_account(
                 client_id,
                 user_id,
                 public_id,
+                username,
                 updated_at
              )
              VALUES (
                 ?1,
                 ?2,
                 lower(hex(randomblob(16))),
-                ?3
+                ?3,
+                ?4
              )",
-            rusqlite::params![&client_id, next_id, now],
+            rusqlite::params![&client_id, next_id, username, now],
         )
         .map_err(|_| "profile_create_failed")?;
 
@@ -565,7 +584,7 @@ pub async fn login_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
             invalid_password: "Введите пароль.",
             invalid_credentials: "Неверная почта или пароль.",
             password_not_set: "Для этой почты пароль ещё не задан.",
-            verification_required: "Подтвердите почту кодом из письма. Если письма нет — войдите паролем после регистрации.",
+            verification_required: "Сначала подтвердите почту кодом из письма. Если письма нет — запросите код ещё раз.",
             rate_limited: "Слишком много попыток. Попробуйте позже.",
             database_unavailable: "Сервис временно недоступен."
         }};
@@ -761,9 +780,28 @@ pub async fn register_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
             }}
 
             if (data.verification_required) {{
-                setStatus("Теперь подтвердите почту кодом.", false);
-                const next = encodeURIComponent(redirectTarget);
-                window.location.replace("/login/code?next=" + next);
+                setStatus("Отправляем код на почту...", false);
+                let mailSent = false;
+                try {{
+                    const codeResponse = await fetch("/auth/email/request", {{
+                        method: "POST",
+                        headers: {{ "Content-Type": "application/json" }},
+                        body: JSON.stringify({{ email }})
+                    }});
+                    const codeData = await codeResponse.json().catch(function () {{
+                        return {{ ok: false }};
+                    }});
+                    mailSent = Boolean(codeResponse.ok && codeData.ok);
+                }} catch (_) {{
+                    mailSent = false;
+                }}
+                const params = new URLSearchParams();
+                params.set("next", redirectTarget);
+                params.set("email", email);
+                if (!mailSent) {{
+                    params.set("resend", "1");
+                }}
+                window.location.replace("/login/code?" + params.toString());
                 return;
             }}
 

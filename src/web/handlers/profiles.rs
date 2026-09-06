@@ -336,12 +336,19 @@ pub async fn api_attention_count(State(state): State<AppState>, headers: HeaderM
         rusqlite::params![user_id],
     );
 
+    let nudges = super::notifications::ensure_daily_nudges(&db, user_id);
     let counts = query_attention_counts(&db, user_id);
 
     Json(json!({
         "count": counts.0,
         "messages": counts.1,
         "notifications": counts.2,
+        "nudges": nudges.iter().map(|nudge| json!({
+            "kind": nudge.kind,
+            "title": nudge.title,
+            "body": nudge.message,
+            "href": nudge.href
+        })).collect::<Vec<_>>(),
     }))
     .into_response()
 }

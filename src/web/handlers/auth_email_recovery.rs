@@ -29,6 +29,8 @@ pub struct EmailResetConfirmRequest {
     pub email: String,
     pub code: String,
     pub password: String,
+    #[serde(default)]
+    pub password_confirm: String,
 }
 
 const EMAIL_CODE_TTL_SECONDS: i64 = 600;
@@ -177,9 +179,16 @@ pub async fn forgot_password_request(
                  VALUES (?1, ?2, ?3, 0, 0, ?4, 'reset')",
                 rusqlite::params![&email, &code_hash, expires_at, unix_now()],
             )
-            .is_ok()
-            && send_reset_email(&email, &code).await.is_err()
+            .is_err()
         {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({ "ok": false, "error": "code_store_failed" })),
+            )
+                .into_response();
+        }
+
+        if send_reset_email(&email, &code).await.is_err() {
             let _ = db.execute(
                 "UPDATE email_login_codes
                  SET consumed_at = ?2
@@ -231,6 +240,16 @@ pub async fn reset_password(
         return (
             StatusCode::BAD_REQUEST,
             Json(json!({ "ok": false, "error": error })),
+        )
+            .into_response();
+    }
+
+    if payload.password_confirm.trim().is_empty()
+        || payload.password.trim() != payload.password_confirm.trim()
+    {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "ok": false, "error": "password_mismatch" })),
         )
             .into_response();
     }
@@ -479,6 +498,8 @@ pub async fn login_code_page(Query(query): Query<AuthNextQuery>) -> Html<String>
 <script>
 (function () {{
     const redirectTarget = {redirect_target_json};
+    const presetEmail = {preset_email_json};
+    const needResend = {need_resend_json};
     const emailInput = document.getElementById("email-input");
     const codeInput = document.getElementById("code-input");
     const codeSection = document.getElementById("code-section");
@@ -583,12 +604,37 @@ pub async fn login_code_page(Query(query): Query<AuthNextQuery>) -> Html<String>
     codeInput.addEventListener("input", function () {{
         codeInput.value = codeInput.value.replace(/[^0-9]/g, "").slice(0, 6);
     }});
-    emailInput.focus();
+    if (presetEmail) {{
+        emailInput.value = presetEmail;
+        if (!needResend) {{
+            codeSection.hidden = false;
+            setStatus("Код уже отправлен. Проверьте входящие и спам.", false);
+            codeInput.focus();
+        }} else {{
+            setStatus("Аккаунт создан. Нажмите «Получить код», если письмо не пришло.", false);
+            emailInput.focus();
+        }}
+    }} else {{
+        emailInput.focus();
+    }}
 }})();
 </script>
 "##,
         redirect_target_json =
             serde_json::to_string(&redirect_target).unwrap_or_else(|_| "\"/app\"".to_string()),
+        preset_email_json = serde_json::to_string(
+            &query
+                .email
+                .as_deref()
+                .and_then(normalize_email)
+                .unwrap_or_default()
+        )
+        .unwrap_or_else(|_| "\"\"".to_string()),
+        need_resend_json = if query.resend.as_deref() == Some("1") {
+            "true"
+        } else {
+            "false"
+        },
     );
 
     Html(crate::web::templates::render_auth_page(
@@ -640,6 +686,12 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
                 <button id="password-toggle" type="button" class="rm-auth-password-toggle" aria-label="Показать пароль">Показать</button>
             </div>
 
+            <label class="rm-auth-label" for="password-confirm-input">Повторите пароль</label>
+            <div class="rm-auth-password-row">
+                <input id="password-confirm-input" class="ui-input rm-auth-input" type="password" autocomplete="new-password" maxlength="128" placeholder="Ещё раз">
+                <button id="password-confirm-toggle" type="button" class="rm-auth-password-toggle" aria-label="Показать пароль">Показать</button>
+            </div>
+
             <button id="reset-button" type="button" class="ui-button rm-auth-button rm-auth-button--compact">Сохранить пароль</button>
         </div>
 "##;
@@ -657,7 +709,9 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
     const emailInput = document.getElementById("email-input");
     const codeInput = document.getElementById("code-input");
     const passwordInput = document.getElementById("password-input");
+    const passwordConfirmInput = document.getElementById("password-confirm-input");
     const passwordToggle = document.getElementById("password-toggle");
+    const passwordConfirmToggle = document.getElementById("password-confirm-toggle");
     const resetSection = document.getElementById("reset-section");
     const requestButton = document.getElementById("request-button");
     const resetButton = document.getElementById("reset-button");
@@ -673,6 +727,8 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
             invalid_email: "Проверьте правильность почты.",
             invalid_code: "Введите шестизначный код.",
             password_too_short: "Пароль должен быть не короче 8 символов.",
+            password_mismatch: "Пароли не совпадают.",
+            code_store_failed: "Не удалось сохранить код. Попробуйте ещё раз.",
             code_not_found: "Сначала запросите код.",
             code_used: "Этот код уже использован.",
             code_expired: "Срок действия кода истёк.",
@@ -723,10 +779,17 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
         const email = emailInput.value.trim();
         const code = codeInput.value.trim();
         const password = passwordInput.value;
+        const passwordConfirm = passwordConfirmInput.value;
 
         if (password.length < 8) {{
             setStatus("Пароль должен быть не короче 8 символов.", true);
             passwordInput.focus();
+            return;
+        }}
+
+        if (password !== passwordConfirm) {{
+            setStatus("Пароли не совпадают.", true);
+            passwordConfirmInput.focus();
             return;
         }}
 
@@ -737,7 +800,7 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
             const response = await fetch("/auth/reset-password", {{
                 method: "POST",
                 headers: {{ "Content-Type": "application/json" }},
-                body: JSON.stringify({{ email, code, password }})
+                body: JSON.stringify({{ email, code, password, password_confirm: passwordConfirm }})
             }});
             const data = await response.json().catch(function () {{
                 return {{ ok: false, error: "invalid_response" }};
@@ -758,7 +821,14 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
     }}
 
     if (window.resursmapAuthForms) {{
-        window.resursmapAuthForms.bindPasswordToggle(passwordToggle, passwordInput);
+        if (window.resursmapAuthForms.bindLinkedPasswordToggles) {{
+            window.resursmapAuthForms.bindLinkedPasswordToggles([
+                {{ button: passwordToggle, input: passwordInput }},
+                {{ button: passwordConfirmToggle, input: passwordConfirmInput }}
+            ]);
+        }} else {{
+            window.resursmapAuthForms.bindPasswordToggle(passwordToggle, passwordInput);
+        }}
     }}
 
     requestButton.addEventListener("click", requestCode);

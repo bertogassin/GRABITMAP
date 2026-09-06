@@ -1,7 +1,7 @@
 use super::auth::verify_user_session;
 use super::common::{csrf_rejected_response, rate_limit_retry_after, request_is_cross_site};
 use crate::db::steps::{
-    apply_steps, clamp_goal, date_is_allowed, load_snapshot, parse_step_date, save_goal, today_utc,
+    apply_steps, clamp_goal, date_is_allowed, load_snapshot, parse_step_date, save_goal, today_local,
 };
 use crate::state::app_state::AppState;
 use crate::web::templates;
@@ -60,7 +60,7 @@ fn resolved_date(raw: Option<&str>) -> Option<String> {
         .filter(|value| !value.is_empty())
         .unwrap_or("");
     let date = if value.is_empty() {
-        parse_step_date(&today_utc())?
+        parse_step_date(&today_local())?
     } else {
         parse_step_date(value)?
     };
@@ -77,7 +77,7 @@ pub async fn steps_page(State(state): State<AppState>, headers: HeaderMap) -> Ht
     };
 
     let snapshot = match crate::db::pool::get_connection(&state.db_pool) {
-        Ok(db) => load_snapshot(&db, user_id, &today_utc()).ok(),
+        Ok(db) => load_snapshot(&db, user_id, &today_local()).ok(),
         Err(_) => None,
     };
 
@@ -111,7 +111,7 @@ pub async fn api_steps_get(
         }
     };
 
-    let today = resolved_date(query.today.as_deref()).unwrap_or_else(today_utc);
+    let today = resolved_date(query.today.as_deref()).unwrap_or_else(today_local);
 
     match load_snapshot(&db, user_id, &today) {
         Ok(snapshot) => Json(snapshot_json(&snapshot)).into_response(),
@@ -184,7 +184,13 @@ pub async fn api_steps_write(
     };
 
     if let Some(goal) = payload.goal {
-        let _ = save_goal(&db, user_id, clamp_goal(goal));
+        if save_goal(&db, user_id, clamp_goal(goal)).is_err() {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({ "ok": false, "error": "save_failed" })),
+            )
+                .into_response();
+        }
     }
 
     if payload.steps.is_some() || payload.add.is_some() {
@@ -207,6 +213,16 @@ pub async fn api_steps_write(
                 .map(|day| day.steps)
                 .unwrap_or(0);
             snapshot.streak = crate::db::steps::walk_streak(&snapshot.days, &snapshot.today);
+            if snapshot.today_steps >= 10_000 {
+                let _ = db.execute(
+                    "UPDATE user_notifications
+                     SET is_read = 1
+                     WHERE user_id = ?1
+                       AND kind = 'step_nudge'
+                       AND is_read = 0",
+                    rusqlite::params![user_id],
+                );
+            }
             Json(snapshot_json(&snapshot)).into_response()
         }
         Err(_) => (

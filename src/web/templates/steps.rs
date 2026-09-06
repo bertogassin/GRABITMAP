@@ -205,7 +205,7 @@ fn render_week(days: &[StepDay], today: &str, goal: i64) -> String {
 
 fn render_log(entries: &[StepLogEntry]) -> String {
     if entries.is_empty() {
-        return r#"<p class="rm-step-empty">Записей ещё нет — тропа начнётся с первого дня.</p>"#
+        return r#"<p class="rm-step-empty">Пока пусто</p>"#
             .to_string();
     }
 
@@ -454,7 +454,7 @@ fn authenticated_body(snapshot: &StepSnapshot) -> String {
             <div class="rm-step-stat"><strong id="rm-step-best">{best}</strong><small>лучший день</small></div>
             <div class="rm-step-stat"><strong id="rm-step-life">{life}</strong><small>вся тропа</small></div>
         </div>
-        <p class="rm-step-hint" id="rm-step-status">Счёт идёт, пока страница открыта. Вся история остаётся в аккаунте.</p>
+        <p class="rm-step-hint" id="rm-step-status">Нажмите «Считать шаги».</p>
         <div class="rm-step-actions">
             <div class="rm-step-listen">
                 <button type="button" class="rm-step-listen-btn" id="rm-step-listen">Считать шаги</button>
@@ -510,17 +510,17 @@ fn authenticated_body(snapshot: &StepSnapshot) -> String {
             "—".to_string()
         },
         life = ru_count(snapshot.lifetime, "шаг", "шага", "шагов"),
-        week_head = super::common::section_head("Неделя", "Семь камней текущей тропы", None),
+        week_head = super::common::section_head("Неделя", "", None),
         week = render_week(&snapshot.days, &snapshot.today, snapshot.goal),
         path_head = super::common::section_head(
-            "Альбом тропы",
-            "Каждый день — камень. Ярче золото — больше шагов. Пустые дни тоже видны.",
+            "Альбом",
+            "",
             Some(24),
         ),
         months = render_months(snapshot),
         log_head = super::common::section_head(
             "Лента",
-            "Все добавления: телефон и ручные записи.",
+            "",
             None,
         ),
         log = render_log(&snapshot.log),
@@ -545,7 +545,7 @@ pub fn render_steps(snapshot: Option<&StepSnapshot>) -> String {
             "footprints",
             "Тропа",
             "Шагомер",
-            "Считайте шаги. Вся история остаётся красивой лентой дней — ничего не стирается.",
+            "Цель дня — 10 000 шагов.",
         ),
         content = content,
     );
@@ -578,7 +578,7 @@ mod tests {
         StepSnapshot {
             today: "2026-09-06".into(),
             today_steps: 0,
-            goal: 8000,
+            goal: 10000,
             lifetime: 0,
             walked_days: 0,
             streak: 0,
@@ -603,7 +603,7 @@ mod tests {
     #[test]
     fn album_and_controls_render() {
         let html = render_steps(Some(&empty_snapshot()));
-        assert!(html.contains("Альбом тропы"));
+        assert!(html.contains("Альбом"));
         assert!(html.contains("Считать шаги"));
         assert!(html.contains("сентябр"));
         assert!(html.contains("/static/pedometer.js"));

@@ -1,7 +1,7 @@
 use chrono::{Duration, NaiveDate, Utc};
 use rusqlite::{Connection, OptionalExtension, Result};
 
-pub const DEFAULT_GOAL: i64 = 8_000;
+pub const DEFAULT_GOAL: i64 = 10_000;
 const MIN_GOAL: i64 = 1_000;
 const MAX_GOAL: i64 = 50_000;
 const MAX_DAY_STEPS: i64 = 200_000;
@@ -74,7 +74,7 @@ pub fn initialize(conn: &Connection) -> Result<()> {
     conn.execute(
         "CREATE TABLE IF NOT EXISTS user_step_prefs (
             user_id INTEGER PRIMARY KEY,
-            daily_goal INTEGER NOT NULL DEFAULT 8000,
+            daily_goal INTEGER NOT NULL DEFAULT 10000,
             updated_at INTEGER NOT NULL DEFAULT (strftime('%s','now'))
         )",
         [],
@@ -98,8 +98,12 @@ pub fn date_is_allowed(date: NaiveDate) -> bool {
     date >= earliest && date <= latest
 }
 
-pub fn today_utc() -> String {
-    Utc::now().date_naive().format("%Y-%m-%d").to_string()
+pub fn today_local() -> String {
+    Utc::now()
+        .with_timezone(&chrono_tz::Europe::Paris)
+        .date_naive()
+        .format("%Y-%m-%d")
+        .to_string()
 }
 
 pub fn clamp_goal(goal: i64) -> i64 {
