@@ -7,7 +7,7 @@ pub fn escape_html(value: &str) -> String {
         .replace('\'', "&#39;")
 }
 
-pub const STATIC_ASSET_VERSION: &str = "4.9.81";
+pub const STATIC_ASSET_VERSION: &str = "4.9.82";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -3766,7 +3766,8 @@ a.feature.rm-feature-add {
     }
 }
 
-.card--person {
+.card--person,
+.card--listing {
     display: flex;
     flex-direction: column;
     gap: 0;
@@ -4524,6 +4525,7 @@ pub(crate) struct ResourceResultCardParams<'a> {
     pub address_html: &'a str,
     pub premium_badge_html: &'a str,
     pub verified_badge_html: &'a str,
+    pub write_href: &'a str,
 }
 
 pub(crate) fn resource_result_card(params: ResourceResultCardParams<'_>) -> String {
@@ -4538,10 +4540,20 @@ pub(crate) fn resource_result_card(params: ResourceResultCardParams<'_>) -> Stri
         address_html,
         premium_badge_html,
         verified_badge_html,
+        write_href,
     } = params;
+    let write_html = if write_href.is_empty() {
+        String::new()
+    } else {
+        format!(
+            r#"<a href="{href}" class="rm-person-write">Написать</a>"#,
+            href = escape_html(write_href),
+        )
+    };
     format!(
         r#"
-<a href="{href}" class="card card--result">
+<div class="card card--result card--listing">
+<a href="{href}" class="rm-person-main">
 
     <div class="card-icon">{resource_icon}</div>
 
@@ -4582,6 +4594,8 @@ pub(crate) fn resource_result_card(params: ResourceResultCardParams<'_>) -> Stri
 
     <div class="card-arrow">{arrow}</div>
 </a>
+{write_html}
+</div>
 "#,
         href = escape_html(href),
         resource_icon = icon("map-pin"),
@@ -4595,6 +4609,7 @@ pub(crate) fn resource_result_card(params: ResourceResultCardParams<'_>) -> Stri
         premium_badge = premium_badge_html,
         verified_badge = verified_badge_html,
         arrow = icon("chevron"),
+        write_html = write_html,
     )
 }
 

@@ -1286,6 +1286,7 @@ pub fn render_search(
                     zi,
                     listing_type,
                     rubric,
+                    owner_user_id,
                 )| {
                     let location = world_data
                         .iter()
@@ -1341,6 +1342,12 @@ pub fn render_search(
                         ""
                     };
 
+                    let write_href = if *owner_user_id > 0 {
+                        format!("/app/chat/{owner_user_id}")
+                    } else {
+                        String::new()
+                    };
+
                     resource_result_card(crate::web::templates::common::ResourceResultCardParams {
                         href: &format!("/app/resource/{}", id),
                         title_html: &escape_html(title),
@@ -1352,6 +1359,7 @@ pub fn render_search(
                         address_html: &escape_html(address),
                         premium_badge_html: premium_badge,
                         verified_badge_html: verified_badge,
+                        write_href: &write_href,
                     })
                 },
             )
@@ -1501,10 +1509,6 @@ pub fn render_search(
         &bottom_nav("search"),
     )
 }
-
-// ============================================================
-// CONTACT REQUESTS
-// ============================================================
 
 pub fn render_menu() -> String {
     let pwa_install_js = super::common::static_asset("pwa-install.js");

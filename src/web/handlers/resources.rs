@@ -59,27 +59,29 @@ pub async fn app_cat(
         .flatten();
 
     let order_sql = if sort == "new" {
-        "ORDER BY id DESC"
+        "ORDER BY r.id DESC"
     } else {
-        "ORDER BY is_verified DESC, rating DESC, votes DESC, id DESC"
+        "ORDER BY r.is_verified DESC, r.rating DESC, r.votes DESC, r.id DESC"
     };
     let list_sql = format!(
-        "SELECT id, title, description, contact, address, rating, votes, is_verified, is_premium,
-                COALESCE(listing_type, 'general'), COALESCE(rubric, '')
-         FROM resources
+        "SELECT r.id, r.title, r.description, r.contact, r.address, r.rating, r.votes, r.is_verified, r.is_premium,
+                COALESCE(r.listing_type, 'general'), COALESCE(r.rubric, ''), COALESCE(p.user_id, 0)
+         FROM resources r
+         LEFT JOIN profiles p
+           ON p.client_id = r.client_id
          WHERE (
-                (continent_index = ?1 AND country_index = ?2 AND city_index = ?3)
-                OR (?6 IS NOT NULL AND city_id = ?6)
+                (r.continent_index = ?1 AND r.country_index = ?2 AND r.city_index = ?3)
+                OR (?6 IS NOT NULL AND r.city_id = ?6)
               )
            AND (
                 LOWER(?4) = 'all'
-                OR (LOWER(?4) = 'business' AND category IN ('business', 'services'))
-                OR category = ?4
+                OR (LOWER(?4) = 'business' AND r.category IN ('business', 'services'))
+                OR r.category = ?4
            )
-           AND (?5 IS NULL OR listing_type = ?5)
-           AND (?7 IS NULL OR rubric = ?7)
-           AND is_active = 1
-           AND moderation_status = 'approved'
+           AND (?5 IS NULL OR r.listing_type = ?5)
+           AND (?7 IS NULL OR r.rubric = ?7)
+           AND r.is_active = 1
+           AND r.moderation_status = 'approved'
          {order_sql}"
     );
     let resources: Vec<crate::web::view_models::CategoryResourceRow> = db
@@ -100,6 +102,7 @@ pub async fn app_cat(
                         row.get(8)?,
                         row.get(9)?,
                         row.get(10)?,
+                        row.get(11)?,
                     ))
                 },
             )?
@@ -596,7 +599,12 @@ pub async fn add_resource(
             "⚠ Авторизация",
             "Не удалось подтвердить пользователя",
             "Войдите в аккаунт и попробуйте добавить ресурс снова.",
-            &templates::navigation_card("/login", "user", "Войти в аккаунт", ""),
+            &templates::navigation_card(
+                &format!("/login?next={}", urlencoding::encode("/app/add")),
+                "user",
+                "Войти в аккаунт",
+                "",
+            ),
         ))
         .into_response();
     }
@@ -974,7 +982,12 @@ pub async fn edit_resource(
                 "⚠ Доступ",
                 "Не удалось подтвердить владельца",
                 "Войдите в аккаунт и попробуйте снова.",
-                &templates::navigation_card("/login", "user", "Войти в аккаунт", ""),
+                &templates::navigation_card(
+                    &format!("/login?next={}", urlencoding::encode("/app/add")),
+                    "user",
+                    "Войти в аккаунт",
+                    "",
+                ),
             ))
             .into_response();
         }

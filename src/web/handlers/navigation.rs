@@ -631,6 +631,7 @@ fn map_search_resource_row(
         row.get(11)?,
         row.get(12)?,
         row.get(13)?,
+        row.get(14)?,
     ))
 }
 
@@ -735,7 +736,8 @@ pub async fn app_search(
                     r.country_index,
                     r.city_index,
                     COALESCE(r.listing_type, 'general'),
-                    COALESCE(r.rubric, '')";
+                    COALESCE(r.rubric, ''),
+                    COALESCE(p.user_id, 0)";
 
         let mut sql = if use_fts {
             format!(
@@ -743,6 +745,8 @@ pub async fn app_search(
                  FROM resources_fts f
                  JOIN resources r
                    ON r.id = f.rowid
+                 LEFT JOIN profiles p
+                   ON p.client_id = r.client_id
                  WHERE r.is_active = 1
                    AND r.moderation_status = 'approved'"
             )
@@ -750,6 +754,8 @@ pub async fn app_search(
             format!(
                 "{resource_select}
                  FROM resources r
+                 LEFT JOIN profiles p
+                   ON p.client_id = r.client_id
                  WHERE r.is_active = 1
                    AND r.moderation_status = 'approved'"
             )

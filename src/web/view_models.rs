@@ -12,6 +12,7 @@ pub type CategoryResourceRow = (
     i64,
     String,
     String,
+    i64,
 );
 pub type FavoriteResourceRow = (i64, String, String, String, String, f64, i64, i64, i64);
 pub type NotificationRow = (i64, Option<i64>, String, String, String, i64, i64);
@@ -117,6 +118,7 @@ pub type SearchResourceRow = (
     usize,
     String,
     String,
+    i64,
 );
 pub type SearchPersonRow = (
     String,

@@ -118,7 +118,7 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                     id,
                     title,
                     description,
-                    contact,
+                    _contact,
                     address,
                     rating,
                     votes,
@@ -126,10 +126,10 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                     premium,
                     row_listing_type,
                     row_rubric,
+                    owner_user_id,
                 )| {
                     let safe_title = escape_html(title);
                     let safe_description = escape_html(description);
-                    let safe_contact = escape_html(contact);
                     let safe_address = escape_html(address);
                     let rubric_label = profession_label(row_rubric);
                     let listing_label = {
@@ -174,10 +174,25 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                         ""
                     };
 
+                    let write_href = if *owner_user_id > 0 {
+                        format!("/app/chat/{owner_user_id}")
+                    } else {
+                        String::new()
+                    };
+                    let write_html = if write_href.is_empty() {
+                        String::new()
+                    } else {
+                        format!(
+                            r#"<a href="{href}" class="rm-person-write">Написать</a>"#,
+                            href = escape_html(&write_href),
+                        )
+                    };
+
                     format!(
                         r#"
-                    <a href="/app/resource/{id}" class="{card_class}">
+                    <div class="{card_class} card--listing">
                         {premium_shine}
+                        <a href="/app/resource/{id}" class="rm-person-main">
                         <div class="card-icon">{map_icon}</div>
 
                         <div class="card-content">
@@ -203,10 +218,6 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                                 {address}
                             </div>
 
-                            <div class="card-meta">
-                                {contact}
-                            </div>
-
                             <div class="rm-resource-verified-row">
                                 {verified_badge}
                             </div>
@@ -214,7 +225,9 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                         </div>
 
                         <div class="card-arrow">›</div>
-                    </a>
+                        </a>
+                        {write_html}
+                    </div>
                     "#,
                         id = id,
                         card_class = card_class,
@@ -227,8 +240,8 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                         rating = rating,
                         votes = votes,
                         address = safe_address,
-                        contact = safe_contact,
                         verified_badge = verified_badge,
+                        write_html = write_html,
                     )
                 },
             )
