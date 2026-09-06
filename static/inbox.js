@@ -55,7 +55,7 @@
 
             liveBadge.hidden = false;
             liveBadge.dataset.state = online ? "online" : "offline";
-            liveBadge.textContent = online ? "live" : "sync";
+            liveBadge.textContent = online ? "связь" : "нет";
         }
 
         function conversationKey(conversation) {

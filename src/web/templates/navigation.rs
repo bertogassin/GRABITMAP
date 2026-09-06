@@ -1,6 +1,6 @@
 use super::common::{
     back_navigation_card, bottom_nav, empty_state_action, empty_state_card_with_actions,
-    escape_html, guest_mode_hint, icon,
+    escape_html, guest_mode_hint, icon, ru_count, ru_plural,
     intent_kind_chips, kind_chip, navigation_card, page_document, page_shell, premium_badge_html,
     profession_label, resource_listing_label, resource_result_card, search_form_hero,
     search_people_cards, section_head, simple_hero, static_asset, topbar, verified_badge_html,
@@ -228,7 +228,7 @@ pub fn render_geo_root(
                 &format!("/app/map/continent/{id}"),
                 "globe",
                 name,
-                &format!("{countries} стран"),
+                &ru_count(*countries, "страна", "страны", "стран"),
             )
         })
         .collect::<Vec<_>>()
@@ -238,16 +238,18 @@ pub fn render_geo_root(
     } else {
         String::new()
     };
+    let users_word = ru_plural(users_count, "участник", "участника", "участников");
+    let resources_word = ru_plural(resources_count, "объявление", "объявления", "объявлений");
     let hero = format!(
         r#"<section class="hero rm-map-hero">
     <div class="eyebrow">{logo} GRABIT</div>
     <h1>Глобальная карта</h1>
-    <p>Выберите континент и двигайтесь последовательно: страна, город, раздел и профессия.</p>
+    <p>Выберите континент. Дальше — страна, город и объявления.</p>
     {guest_hint}
     <div class="rm-map-stats">
-        <div><strong>{users_count}</strong><span>участников</span></div>
+        <div><strong>{users_count}</strong><span>{users_word}</span></div>
         <div><strong>{online_count}</strong><span>онлайн</span></div>
-        <div><strong>{resources_count}</strong><span>объявлений</span></div>
+        <div><strong>{resources_count}</strong><span>{resources_word}</span></div>
     </div>
 </section>"#,
         logo = icon("globe"),
@@ -284,7 +286,7 @@ pub fn render_geo_continent(
                 &format!("/app/map/country/{id}"),
                 "building",
                 country,
-                &format!("{cities} городов"),
+                &ru_count(*cities, "город", "города", "городов"),
             )
         })
         .collect::<Vec<_>>()
@@ -294,7 +296,10 @@ pub fn render_geo_continent(
         back = back_navigation_card("/app", "Все континенты", "Назад к карте"),
         head = section_head(
             "Страны",
-            &format!("{} · по алфавиту", countries.len()),
+            &format!(
+                "{} · по алфавиту",
+                ru_count(countries.len() as i64, "страна", "страны", "стран")
+            ),
             Some(22)
         ),
     );
@@ -392,7 +397,7 @@ pub fn render_geo_city(
                 ),
                 "briefcase",
                 name,
-                &format!("{count} профессий"),
+                &ru_count(*count, "профессия", "профессии", "профессий"),
             )
         })
         .collect::<Vec<_>>()
@@ -402,7 +407,7 @@ pub fn render_geo_city(
         icon = icon("search"),
     );
     let content = format!(
-        r#"{back}{search}{search_status}{section_head}<div class="grid" id="rm-city-category-grid">{work}{services}{business}{housing}{transport}{education}{help}{other}</div>{profession_head}<div class="grid" id="rm-city-sector-grid">{sector_cards}</div><div class="grid" id="rm-city-profession-results"></div><script src="{catalog_script}" defer></script>"#,
+        r#"{back}{search}{search_status}{section_head}{add}<div class="grid" id="rm-city-category-grid">{work}{services}{business}{housing}{transport}{education}{help}{other}</div>{profession_head}<div class="grid" id="rm-city-sector-grid">{sector_cards}</div><div class="grid" id="rm-city-profession-results"></div><script src="{catalog_script}" defer></script>"#,
         back = back_navigation_card(
             &format!("/app/map/country/{country_id}"),
             country,
@@ -410,6 +415,13 @@ pub fn render_geo_city(
         ),
         search = catalog_search,
         search_status = r#"<div class="rm-catalog-search-status" id="rm-city-catalog-status" aria-live="polite"></div>"#,
+        add = format!(
+            r#"<div class="rm-city-add">{action}</div>"#,
+            action = empty_state_action(
+                &format!("/app/add/city/{city_id}"),
+                "Добавить объявление",
+            ),
+        ),
         section_head = section_head(
             "Что вам нужно",
             "Ищу или предлагаю — всё внутри города",
@@ -867,7 +879,7 @@ pub fn render_continents(
     <div class="rm-stats-row">
         <div class="rm-stat">
             <strong>{users_count}</strong>
-            <span>участников</span>
+            <span>{users_word}</span>
         </div>
         <div class="rm-stat rm-stat-online">
             <strong>{online_count}</strong>
@@ -875,12 +887,14 @@ pub fn render_continents(
         </div>
         <div class="rm-stat">
             <strong>{resources_count}</strong>
-            <span>объявлений</span>
+            <span>{resources_word}</span>
         </div>
     </div>
 </section>"#,
         globe_icon = icon("globe"),
         guest_hint = guest_hint,
+        users_word = ru_plural(users_count, "участник", "участника", "участников"),
+        resources_word = ru_plural(resources_count, "объявление", "объявления", "объявлений"),
         kind_chips = intent_kind_chips(
             "",
             false,
@@ -1000,7 +1014,11 @@ pub fn render_country(ci: usize, si: usize) -> String {
             }
 
             let section_head_cities =
-                section_head("Города", &format!("{} городов", cities.len()), None);
+                section_head(
+                    "Города",
+                    &ru_count(cities.len() as i64, "город", "города", "городов"),
+                    None,
+                );
 
             let content = format!(
                 r#"
@@ -1262,7 +1280,12 @@ pub fn render_search(
             &format!(
                 "{}{}",
                 empty_state_action("/app", "Другой город"),
-                empty_state_action("/app/add", "Добавить объявление"),
+                empty_state_action(
+                    &city_id
+                        .map(|id| format!("/app/add/city/{id}"))
+                        .unwrap_or_else(|| "/app/add".to_string()),
+                    "Добавить объявление",
+                ),
             ),
         )
     } else if resources.is_empty() {
@@ -1579,7 +1602,7 @@ pub fn render_menu() -> String {
                 <span class="rm-menu-row-icon">{sun_icon}</span>
                 <span class="rm-menu-row-copy">
                     <strong>Тема</strong>
-                    <small class="theme-toggle-label">Светлая тема</small>
+                    <small class="theme-toggle-label">Сейчас тёмная</small>
                 </span>
             </button>
 
@@ -1699,6 +1722,7 @@ mod search_catalog_tests {
         assert!(html.contains("aria-label=\"Город\""));
         assert!(html.contains("Ницца · сбросить"));
         assert!(html.contains("В городе «Ницца» пока нет объявлений."));
+        assert!(html.contains("href=\"/app/add/city/7\""));
         assert!(html.contains("name=\"city_id\""));
         assert!(html.contains("value=\"7\""));
     }

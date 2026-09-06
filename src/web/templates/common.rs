@@ -7,7 +7,24 @@ pub fn escape_html(value: &str) -> String {
         .replace('\'', "&#39;")
 }
 
-pub const STATIC_ASSET_VERSION: &str = "4.9.82";
+pub(crate) fn ru_plural(n: i64, one: &'static str, few: &'static str, many: &'static str) -> &'static str {
+    let n = n.abs();
+    let n10 = n % 10;
+    let n100 = n % 100;
+    if n10 == 1 && n100 != 11 {
+        one
+    } else if (2..=4).contains(&n10) && !(12..=14).contains(&n100) {
+        few
+    } else {
+        many
+    }
+}
+
+pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'static str) -> String {
+    format!("{n} {}", ru_plural(n, one, few, many))
+}
+
+pub const STATIC_ASSET_VERSION: &str = "4.9.83";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -1807,6 +1824,14 @@ a.feature.rm-feature-add {
     flex-wrap: wrap;
     gap: 10px;
     margin-top: 18px;
+}
+
+.rm-city-add {
+    margin: 4px 0 16px;
+}
+
+.rm-city-add .rm-empty-action {
+    width: 100%;
 }
 
 .rm-empty-action {
@@ -5669,7 +5694,7 @@ pub(crate) fn guest_mode_hint(next_path: &str) -> String {
     };
 
     format!(
-        r#"<p class="rm-guest-hint">Вы смотрите как гость. Города и поиск доступны без регистрации. <a href="{login_href}">Войти</a> · <a href="{register_href}">Регистрация</a></p>"#
+        r#"<p class="rm-guest-hint">Города и поиск без входа. <a href="{login_href}">Войти</a> · <a href="{register_href}">Регистрация</a></p>"#
     )
 }
 
@@ -5708,7 +5733,7 @@ pub(crate) fn guest_mode_panel(next_path: &str) -> String {
 </div>"#,
         map_card = navigation_card("/app", "globe", "Города", "Страны и города"),
         search_card = navigation_card("/app/search", "search", "Поиск", "Люди и ресурсы"),
-        login_card = navigation_card(&login_href, "user", "Войти", "Email и пароль",),
+        login_card = navigation_card(&login_href, "user", "Войти", "Логин и пароль",),
         register_card = navigation_card(
             &register_href,
             "edit",
@@ -5980,5 +6005,18 @@ mod public_entry_tests {
     fn legacy_services_label_reads_as_business() {
         assert_eq!(profession_label("services"), "Бизнес");
         assert_eq!(profession_label("community"), "");
+    }
+
+    #[test]
+    fn russian_counts_follow_plural_rules() {
+        assert_eq!(ru_count(1, "страна", "страны", "стран"), "1 страна");
+        assert_eq!(ru_count(2, "страна", "страны", "стран"), "2 страны");
+        assert_eq!(ru_count(5, "страна", "страны", "стран"), "5 стран");
+        assert_eq!(ru_count(11, "страна", "страны", "стран"), "11 стран");
+        assert_eq!(ru_count(21, "страна", "страны", "стран"), "21 страна");
+        assert_eq!(
+            ru_count(1, "объявление", "объявления", "объявлений"),
+            "1 объявление"
+        );
     }
 }

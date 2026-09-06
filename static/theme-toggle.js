@@ -5,18 +5,10 @@
     }
 
     function setButtonLabels(isLight) {
-        var label = isLight ? "Тёмная тема" : "Светлая тема";
+        var label = isLight ? "Сейчас светлая" : "Сейчас тёмная";
         var labels = document.querySelectorAll(".theme-toggle-label");
-        if (labels.length) {
-            for (var i = 0; i < labels.length; i++) {
-                labels[i].textContent = label;
-            }
-            return;
-        }
-
-        var allBtns = document.querySelectorAll(".theme-toggle-btn");
-        for (var j = 0; j < allBtns.length; j++) {
-            allBtns[j].textContent = label;
+        for (var i = 0; i < labels.length; i++) {
+            labels[i].textContent = label;
         }
     }
 

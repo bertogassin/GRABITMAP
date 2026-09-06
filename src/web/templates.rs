@@ -7,6 +7,7 @@ pub use common::brand_logo;
 pub use common::escape_html;
 pub(crate) use common::icon;
 pub(crate) use common::navigation_card;
+pub(crate) use common::ru_count;
 pub(crate) use common::page_document;
 pub(crate) use common::status_page;
 pub use common::transactional_code_email_html;

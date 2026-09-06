@@ -183,7 +183,7 @@ pub fn render_messages(
         <h2 class="section-title">Диалоги</h2>
         <p class="section-caption" id="inbox-unread-caption">Непрочитанных: {total_unread}</p>
     </div>
-    <span class="inbox-live-badge" id="inbox-live-badge" hidden aria-hidden="true">live</span>
+    <span class="inbox-live-badge" id="inbox-live-badge" hidden aria-hidden="true">связь</span>
 </div>"#,
             total_unread = total_unread,
         )

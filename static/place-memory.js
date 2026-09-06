@@ -130,10 +130,13 @@
         var html = "";
 
         if (city && city.href) {
+            var cityLabel = (city.name && String(city.name).trim()) || "Последний город";
             html +=
                 '<a class="rm-kind-chip" href="' +
-                city.href +
-                '">Последний город</a>';
+                escapeHtml(city.href) +
+                '">' +
+                escapeHtml(cityLabel) +
+                "</a>";
         }
 
         rows.forEach(function (row) {
@@ -178,12 +181,15 @@
             '<a class="card" href="' +
             escapeHtml(city.href) +
             '">' +
+            '<div class="card-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-4.4 7-10.2A7 7 0 0 0 5 10.8C5 16.6 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.4"/></svg></div>' +
             '<div class="card-content">' +
             '<div class="card-title">' +
             escapeHtml(title || "Последний город") +
             "</div>" +
-            '<div class="card-meta">Продолжить просмотр этого города</div>' +
-            "</div></a>";
+            '<div class="card-meta">Продолжить этот город</div>' +
+            "</div>" +
+            '<div class="card-arrow"><svg class="icon small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></div>' +
+            "</a>";
         host.hidden = false;
     }
 

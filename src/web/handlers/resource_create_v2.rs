@@ -196,7 +196,7 @@ pub async fn resource_create_start(State(state): State<AppState>, headers: Heade
                 &format!("/app/add/continent/{id}"),
                 "globe",
                 name,
-                &format!("{count} стран"),
+                &templates::ru_count(*count, "страна", "страны", "стран"),
             )
         })
         .collect::<Vec<_>>()
@@ -277,7 +277,7 @@ pub async fn resource_create_continent(
                 &format!("/app/add/country/{id}"),
                 "building",
                 name,
-                &format!("{count} городов"),
+                &templates::ru_count(*count, "город", "города", "городов"),
             )
         })
         .collect::<Vec<_>>()
