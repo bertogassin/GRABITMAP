@@ -2391,5 +2391,50 @@ body.chat-overlay-open #chat-form.chat-composer {
 }
 
 .chat-empty-thread p {
-    color: #a3a9b4;
+    color: var(--muted);
+}
+
+.chat-shell {
+    border-radius: var(--radius, 20px) !important;
+}
+
+#chat-form.chat-composer {
+    background: var(--surface) !important;
+    border: 1px solid var(--line) !important;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .16) !important;
+}
+
+#chat-input {
+    color: var(--text) !important;
+    background: var(--bg-soft) !important;
+    border: 1px solid var(--line) !important;
+}
+
+#chat-input::placeholder {
+    color: var(--muted) !important;
+}
+
+.chat-send-button:not(:disabled),
+#chat-send:not(:disabled) {
+    border: 0 !important;
+    background: linear-gradient(135deg, var(--gold-light), var(--gold)) !important;
+    color: var(--on-gold, #16120c) !important;
+}
+
+html.light-theme #chat-form.chat-composer,
+body.light-theme #chat-form.chat-composer {
+    background: #fff !important;
+}
+
+html.light-theme #chat-input,
+body.light-theme #chat-input {
+    background: #fff !important;
+    color: var(--text) !important;
+}
+
+html.light-theme .chat-send-button:not(:disabled),
+html.light-theme #chat-send:not(:disabled),
+body.light-theme .chat-send-button:not(:disabled),
+body.light-theme #chat-send:not(:disabled) {
+    color: var(--on-gold, #fffdf6) !important;
 }
