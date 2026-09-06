@@ -30,6 +30,9 @@ pub use steps::*;
 mod legal;
 pub use legal::*;
 
+mod invite;
+pub use invite::*;
+
 mod communication;
 pub use communication::*;
 

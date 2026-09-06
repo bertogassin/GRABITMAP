@@ -28,6 +28,7 @@ pub struct RenderMeParams<'a> {
     pub home_country_index: i64,
     pub home_city_index: i64,
     pub user_sessions: Vec<crate::web::view_models::UserSessionRow>,
+    pub invite_public_id: &'a str,
 }
 
 fn home_city_select_html(continent: i64, country: i64, city: i64) -> String {
@@ -196,6 +197,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
         home_country_index,
         home_city_index,
         user_sessions,
+        invite_public_id,
     } = params;
     let safe_username = escape_html(username);
     let safe_first_name = escape_html(first_name);
@@ -910,6 +912,8 @@ body.light-theme .rm-command-icon {{
 
 {account_header}
 
+{invite}
+
 
 {statistics}
 
@@ -959,7 +963,7 @@ body.light-theme .rm-command-icon {{
 
         <a href="/app/menu"
            class="ui-button rm-profile-settings-link">
-            ⚙️ Тема, звук и ярлык
+            ⚙️ Звук и ярлык
         </a>
     </div>
 
@@ -1051,6 +1055,7 @@ body.light-theme .rm-command-icon {{
 
 </section>"####,
         account_header = account_header,
+        invite = super::invite::invite_share_block(invite_public_id),
         statistics = statistics,
         settings_icon = icon("settings"),
         intent_status_text = intent_status_text,
@@ -1533,12 +1538,13 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
     <a href="/app/chat/{chat_user_id}" class="rm-public-chat-link">
         Написать
     </a>
-    <button type="button" class="ui-button" data-share data-share-title="Профиль GRABIT" data-share-status="share-status">Поделиться</button>
+    <button type="button" class="ui-button" data-share data-share-title="GRABIT" data-share-text="Заходи в GRABIT по моей ссылке. Чат сразу, шагомер и работа рядом." data-share-url="/app/join/{public_id}" data-share-status="share-status">Поделиться</button>
     <div id="share-status" class="ui-status"></div>
 
 </section>
 "#,
             chat_user_id = chat_user_id,
+            public_id = escape_html(public_id),
         )
     } else {
         format!(
@@ -1556,7 +1562,7 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
     <a href="/login?next=/app/user/{public_id}" class="rm-public-chat-link">
         Войти и написать
     </a>
-    <button type="button" class="ui-button" data-share data-share-title="Профиль GRABIT" data-share-status="share-status">Поделиться</button>
+    <button type="button" class="ui-button" data-share data-share-title="GRABIT" data-share-text="Заходи в GRABIT по моей ссылке. Чат сразу, шагомер и работа рядом." data-share-url="/app/join/{public_id}" data-share-status="share-status">Поделиться</button>
     <div id="share-status" class="ui-status"></div>
 
 </section>
@@ -1844,6 +1850,7 @@ mod personal_center_tests {
             home_country_index: -1,
             home_city_index: -1,
             user_sessions: vec![],
+            invite_public_id: "abc123",
         }
     }
 
@@ -1861,6 +1868,7 @@ mod personal_center_tests {
         assert!(html.contains("data-nav-chats-link"));
         assert!(html.contains(r#"<span class="nav-badge">6</span>"#));
         assert!(html.contains("data-nav-menu-link"));
+        assert!(html.contains("/app/join/abc123?to=steps"));
         assert!(html.contains(r#"<span class="nav-badge">5</span>"#));
     }
 

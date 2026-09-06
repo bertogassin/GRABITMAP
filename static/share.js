@@ -12,6 +12,9 @@
         var title = button.getAttribute("data-share-title") || document.title;
         var text = button.getAttribute("data-share-text") || "";
         var url = button.getAttribute("data-share-url") || window.location.href;
+        if (url.indexOf("/") === 0) {
+            url = window.location.origin + url;
+        }
         var status = document.getElementById(button.getAttribute("data-share-status") || "");
 
         function done(message) {

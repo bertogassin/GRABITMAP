@@ -78,6 +78,9 @@ pub use health::*;
 mod legal;
 pub use legal::{privacy_page, rules_page};
 
+mod invite;
+pub use invite::join_invite;
+
 mod common;
 
 mod auth;

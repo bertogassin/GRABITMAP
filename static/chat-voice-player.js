@@ -153,7 +153,10 @@
         player.insertBefore(progress, audio);
         player.insertBefore(time, audio);
 
-        button.addEventListener("click", function () {
+        button.addEventListener("click", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
             if (activeAudio && activeAudio !== audio) {
                 activeAudio.pause();
             }
@@ -167,12 +170,21 @@
                 audio.pause();
             }
 
-            if (navigator.vibrate) {
-                navigator.vibrate(8);
+            if (typeof window.chatHaptic === "function") {
+                window.chatHaptic("tap");
             }
         });
 
-        progress.addEventListener("input", function () {
+        progress.addEventListener("pointerdown", function (event) {
+            event.stopPropagation();
+        });
+
+        progress.addEventListener("click", function (event) {
+            event.stopPropagation();
+        });
+
+        progress.addEventListener("input", function (event) {
+            event.stopPropagation();
             var duration = finiteDuration(audio);
 
             if (duration <= 0) {

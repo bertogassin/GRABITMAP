@@ -3340,7 +3340,7 @@
 
                 if (
                     event.target.closest(
-                        ".chat-message-meta, .chat-message-status, .chat-message-reactions"
+                        ".chat-message-meta, .chat-message-status, .chat-message-reactions, .chat-voice-player, .chat-voice-play, .chat-voice-progress, audio, .chat-message-image"
                     )
                 ) {
                     return;

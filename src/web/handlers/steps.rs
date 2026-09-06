@@ -73,15 +73,27 @@ fn resolved_date(raw: Option<&str>) -> Option<String> {
 pub async fn steps_page(State(state): State<AppState>, headers: HeaderMap) -> Html<String> {
     let user_id = match verify_user_session(&state, &headers) {
         Some(id) => id,
-        None => return Html(templates::render_steps(None)),
+        None => return Html(templates::render_steps(None, "")),
     };
 
-    let snapshot = match crate::db::pool::get_connection(&state.db_pool) {
-        Ok(db) => load_snapshot(&db, user_id, &today_local()).ok(),
-        Err(_) => None,
+    let (snapshot, invite_public_id) = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => {
+            let public_id = db
+                .query_row(
+                    "SELECT COALESCE(public_id, '') FROM profiles WHERE user_id = ?1",
+                    rusqlite::params![user_id],
+                    |row| row.get::<_, String>(0),
+                )
+                .unwrap_or_default();
+            (load_snapshot(&db, user_id, &today_local()).ok(), public_id)
+        }
+        Err(_) => (None, String::new()),
     };
 
-    Html(templates::render_steps(snapshot.as_ref()))
+    Html(templates::render_steps(
+        snapshot.as_ref(),
+        &invite_public_id,
+    ))
 }
 
 pub async fn api_steps_get(

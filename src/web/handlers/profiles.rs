@@ -35,6 +35,7 @@ type MeProfileRow = (
     i64,
     i64,
     i64,
+    String,
 );
 
 fn noindex_html(html: String) -> Response {
@@ -108,6 +109,7 @@ pub async fn app_me(State(state): State<AppState>, headers: HeaderMap) -> Html<S
                 home_country_index: -1,
                 home_city_index: -1,
                 user_sessions: vec![],
+                invite_public_id: "",
             }));
         }
     };
@@ -134,7 +136,8 @@ pub async fn app_me(State(state): State<AppState>, headers: HeaderMap) -> Html<S
                 category,
                 COALESCE(home_continent_index, -1),
                 COALESCE(home_country_index, -1),
-                COALESCE(home_city_index, -1)
+                COALESCE(home_city_index, -1),
+                COALESCE(public_id, '')
              FROM profiles
              WHERE client_id = ?1",
             rusqlite::params![&client_id],
@@ -150,6 +153,7 @@ pub async fn app_me(State(state): State<AppState>, headers: HeaderMap) -> Html<S
                     row.get(7)?,
                     row.get(8)?,
                     row.get(9)?,
+                    row.get(10)?,
                 ))
             },
         )
@@ -166,6 +170,7 @@ pub async fn app_me(State(state): State<AppState>, headers: HeaderMap) -> Html<S
         home_continent_index,
         home_country_index,
         home_city_index,
+        invite_public_id,
     ) = profile.unwrap_or_else(|| {
         (
             String::new(),
@@ -178,6 +183,7 @@ pub async fn app_me(State(state): State<AppState>, headers: HeaderMap) -> Html<S
             -1,
             -1,
             -1,
+            String::new(),
         )
     });
 
@@ -302,6 +308,7 @@ pub async fn app_me(State(state): State<AppState>, headers: HeaderMap) -> Html<S
         home_country_index,
         home_city_index,
         user_sessions,
+        invite_public_id: &invite_public_id,
     }))
 }
 

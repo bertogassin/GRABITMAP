@@ -14,8 +14,10 @@ pub async fn home() -> Redirect {
     Redirect::permanent("/app")
 }
 
-pub async fn app_menu() -> Html<String> {
-    Html(templates::render_menu())
+pub async fn app_menu(State(state): State<AppState>, headers: HeaderMap) -> Html<String> {
+    Html(templates::render_menu(
+        &super::invite::current_user_public_id(&state, &headers),
+    ))
 }
 
 pub async fn app_root(State(state): State<AppState>, headers: HeaderMap) -> Html<String> {

@@ -1,10 +1,11 @@
 "use strict";
 
-const CACHE_VERSION = "grabit-shell-v4.9.94";
+const CACHE_VERSION = "grabit-shell-v4.9.97";
 
 const STATIC_ASSETS = [
     "/static/manifest.webmanifest",
     "/static/map-catalog-search.js",
+    "/static/map-countries.js",
     "/static/app-icon.svg",
     "/static/app-icon-192.png",
     "/static/app-icon-512.png",
@@ -28,24 +29,36 @@ self.addEventListener("activate", function (event) {
     event.waitUntil(
         caches.keys()
             .then(function (keys) {
-                return Promise.all(
-                    keys
-                        .filter(function (key) {
-                            return (
-                                (
-                                    key.startsWith("resursmap-shell-") ||
-                                    key.startsWith("grabit-shell-")
-                                ) &&
-                                key !== CACHE_VERSION
-                            );
-                        })
-                        .map(function (key) {
-                            return caches.delete(key);
-                        })
-                );
+                var stale = keys.filter(function (key) {
+                    return (
+                        (
+                            key.startsWith("resursmap-shell-") ||
+                            key.startsWith("grabit-shell-")
+                        ) &&
+                        key !== CACHE_VERSION
+                    );
+                });
+                return Promise.all(stale.map(function (key) {
+                    return caches.delete(key);
+                })).then(function () {
+                    return stale.length;
+                });
             })
-            .then(function () {
-                return self.clients.claim();
+            .then(function (replaced) {
+                return self.clients.claim().then(function () {
+                    return replaced;
+                });
+            })
+            .then(function (replaced) {
+                if (!replaced) {
+                    return;
+                }
+                return self.registration.showNotification("GRABIT обновлён", {
+                    body: "Откройте приложение. Шагомер на панели — сразу считать шаги.",
+                    icon: "/static/app-icon-192.png",
+                    tag: "grabit-update",
+                    data: { url: "/app" }
+                }).catch(function () {});
             })
     );
 });
@@ -83,18 +96,31 @@ self.addEventListener("periodicsync", function (event) {
 
 self.addEventListener("notificationclick", function (event) {
     event.notification.close();
+    var target = "/app";
+    if (event.action === "open-steps") {
+        target = "/app/steps";
+    } else if (event.notification && event.notification.data && event.notification.data.url) {
+        target = event.notification.data.url;
+    }
     event.waitUntil(
         self.clients.matchAll({
             type: "window",
             includeUncontrolled: true
         }).then(function (clients) {
             for (var i = 0; i < clients.length; i += 1) {
-                if (clients[i].url && "focus" in clients[i]) {
+                if (clients[i].url && clients[i].url.indexOf(target) !== -1 && "focus" in clients[i]) {
                     return clients[i].focus();
                 }
             }
+            for (var j = 0; j < clients.length; j += 1) {
+                if ("navigate" in clients[j]) {
+                    return clients[j].navigate(target).then(function (client) {
+                        return client && client.focus ? client.focus() : client;
+                    });
+                }
+            }
             if (self.clients.openWindow) {
-                return self.clients.openWindow("/app");
+                return self.clients.openWindow(target);
             }
             return undefined;
         })
@@ -119,7 +145,8 @@ function remindIfNeeded() {
             return self.registration.showNotification(nudge.title || "GRABIT", {
                 body: nudge.body || "",
                 icon: "/static/app-icon-192.png",
-                tag: "grabit-nudge-" + String(nudge.kind || "day")
+                tag: "grabit-nudge-" + String(nudge.kind || "day"),
+                data: { url: nudge.href || "/app" }
             });
         }));
     }).catch(function () {});

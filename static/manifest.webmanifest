@@ -35,5 +35,32 @@
       "type": "image/png",
       "purpose": "any"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "Шагомер",
+      "short_name": "Шаги",
+      "description": "Считать шаги сразу",
+      "url": "/app/steps",
+      "icons": [
+        {
+          "src": "/static/app-icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Чаты",
+      "short_name": "Чаты",
+      "url": "/app/messages",
+      "icons": [
+        {
+          "src": "/static/app-icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
   ]
 }

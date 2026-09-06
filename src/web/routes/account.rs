@@ -4,7 +4,7 @@ use super::super::handlers::{
     favorites_page, forgot_password_page, forgot_password_request, login_code_page, login_email,
     login_page, mark_all_notifications_read, notifications_page, open_notification,
     public_user_profile, register_email, register_page, reset_password, steps_page, unread_count,
-    api_steps_get, api_steps_write,
+    api_steps_get, api_steps_write, join_invite,
 };
 use crate::state::app_state::AppState;
 use axum::{
@@ -35,6 +35,7 @@ pub(super) fn routes() -> Router<AppState> {
         .route("/app/me", get(app_me))
         .route("/app/favorites", get(favorites_page))
         .route("/app/steps", get(steps_page))
+        .route("/app/join/{public_id}", get(join_invite))
         .route("/api/steps", get(api_steps_get).post(api_steps_write))
         .route("/app/notifications", get(notifications_page))
         .route(

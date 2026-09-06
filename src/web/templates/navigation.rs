@@ -299,8 +299,12 @@ pub fn render_geo_continent(
         })
         .collect::<Vec<_>>()
         .join("");
+    let country_search = format!(
+        r#"<div class="search rm-catalog-search"><span aria-hidden="true">{icon}</span><input id="rm-map-country-search" type="search" autocomplete="off" placeholder="Найти страну на этом континенте"><button id="rm-map-country-clear" type="button" aria-label="Очистить поиск">×</button></div>"#,
+        icon = icon("search"),
+    );
     let content = format!(
-        r#"{back}{head}<div class="grid">{cards}</div>"#,
+        r#"{back}{head}{search}<div class="grid" id="rm-map-country-grid">{cards}</div><div class="rm-catalog-search-status" id="rm-map-country-status" aria-live="polite"></div><script src="{script}" defer></script>"#,
         back = back_navigation_card("/app", "Все континенты", "Назад к карте"),
         head = section_head(
             "Страны",
@@ -310,6 +314,8 @@ pub fn render_geo_continent(
             ),
             Some(22)
         ),
+        search = country_search,
+        script = static_asset("map-countries.js"),
     );
     page_shell(
         name,
@@ -1556,12 +1562,14 @@ pub fn render_search(
     )
 }
 
-pub fn render_menu() -> String {
+pub fn render_menu(invite_public_id: &str) -> String {
     let content = format!(
         r#"        <section>
     {section_head_settings}
 
     <div id="rm-continue-menu" class="grid" hidden></div>
+
+    {invite}
 
     <div class="grid">
         {profile_card}
@@ -1622,14 +1630,6 @@ pub fn render_menu() -> String {
                 </span>
             </button>
 
-            <button class="theme-toggle-btn rm-menu-row rm-settings-theme-btn" type="button">
-                <span class="rm-menu-row-icon">{sun_icon}</span>
-                <span class="rm-menu-row-copy">
-                    <strong>Тема</strong>
-                    <small class="theme-toggle-label">Сейчас тёмная</small>
-                </span>
-            </button>
-
         </div>
     </div>
 </section>"#,
@@ -1647,10 +1647,10 @@ pub fn render_menu() -> String {
             "Добавить объявление",
             "Город, рубрика и текст объявления"
         ),
+        invite = super::invite::invite_share_block(invite_public_id),
         volume_icon = icon("volume"),
         phone_icon = icon("smartphone"),
         play_icon = icon("play"),
-        sun_icon = icon("sun"),
     );
 
     let main_html = format!(
@@ -1664,7 +1664,7 @@ pub fn render_menu() -> String {
             "sliders",
             "GRABIT",
             "Меню",
-            "Тема, звук и ярлык на главном экране.",
+            "Звук, вибрация и ярлык на главном экране.",
         ),
         content = content,
     );
@@ -1780,13 +1780,36 @@ mod search_catalog_tests {
 
     #[test]
     fn menu_and_home_keep_continue_hosts() {
-        let menu = render_menu();
+        let menu = render_menu("abc123");
         assert!(menu.contains("id=\"rm-continue-menu\""));
+        assert!(menu.contains("/app/join/abc123?to=steps"));
+        assert!(!menu.contains("<strong>Тема</strong>"));
         assert!(menu.contains("data-nav-map-link"));
         assert!(menu.contains("data-nav-search-link"));
 
         let home = render_geo_root(1, 1, 1, vec![(1, "Европа".to_string(), 3)], false);
         assert!(home.contains("id=\"rm-last-city-home\""));
         assert!(home.contains("data-nav-map-link"));
+    }
+
+    #[test]
+    fn continent_has_country_search_like_cities() {
+        let html = render_geo_continent(
+            1,
+            "Европа",
+            vec![(7, "Франция".to_string(), 12)],
+        );
+        assert!(html.contains("id=\"rm-map-country-search\""));
+        assert!(html.contains("Найти страну"));
+        assert!(html.contains("/app/map/country/7"));
+        assert!(html.contains("Франция"));
+        assert!(html.contains("/static/map-countries.js"));
+    }
+
+    #[test]
+    fn menu_has_no_theme_toggle() {
+        let html = render_menu("");
+        assert!(!html.contains("<strong>Тема</strong>"));
+        assert!(html.contains("<strong>Звук</strong>"));
     }
 }

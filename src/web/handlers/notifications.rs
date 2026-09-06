@@ -150,6 +150,8 @@ pub async fn notifications_page(State(state): State<AppState>, headers: HeaderMa
         }
     };
 
+    let _ = ensure_daily_nudges(&db, user_id);
+
     let notifications: Vec<crate::web::view_models::NotificationRow> = db
         .prepare(
             "SELECT

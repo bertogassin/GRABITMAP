@@ -15,12 +15,76 @@
     }
 
     var lastNotifications = 0;
+    var lastMessages = 0;
 
-    function showNudgeNotifications(nudges) {
-        if (!nudges || !nudges.length || !("Notification" in window)) {
+    function notifyReady() {
+        return "Notification" in window && Notification.permission === "granted";
+    }
+
+    function askNotifyPermission() {
+        if (!("Notification" in window) || Notification.permission !== "default") {
             return;
         }
-        if (Notification.permission !== "granted") {
+        Notification.requestPermission().then(function (permission) {
+            if (permission === "granted") {
+                pinStepsPanel();
+            }
+        }).catch(function () {});
+    }
+
+    function showSystemNotice(title, body, tag, url) {
+        if (!notifyReady()) {
+            return;
+        }
+        var options = {
+            body: body || "",
+            icon: "/static/app-icon-192.png",
+            tag: tag || "grabit",
+            data: { url: url || "/app" }
+        };
+        if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+            navigator.serviceWorker.ready.then(function (reg) {
+                return reg.showNotification(title || "GRABIT", options);
+            }).catch(function () {});
+            return;
+        }
+        try {
+            new Notification(title || "GRABIT", options);
+        } catch (e) {}
+    }
+
+    function pinStepsPanel() {
+        if (!notifyReady()) {
+            return;
+        }
+        var key = "resursmap:steps-panel:" + new Date().toISOString().slice(0, 10);
+        try {
+            if (localStorage.getItem(key) === "1") {
+                return;
+            }
+            localStorage.setItem(key, "1");
+        } catch (e) {}
+        var options = {
+            body: "Нажмите — сразу считать шаги.",
+            icon: "/static/app-icon-192.png",
+            tag: "grabit-steps-panel",
+            renotify: false,
+            data: { url: "/app/steps" },
+            actions: [{ action: "open-steps", title: "Открыть шагомер" }]
+        };
+        if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+            navigator.serviceWorker.ready.then(function (reg) {
+                return reg.showNotification("Шагомер GRABIT", options);
+            }).catch(function () {});
+            return;
+        }
+        try {
+            new Notification("Шагомер GRABIT", options);
+        } catch (e) {}
+    }
+
+    function showNudgeNotifications(nudges) {
+        if (!nudges || !nudges.length || !notifyReady()) {
             return;
         }
 
@@ -34,12 +98,12 @@
                 localStorage.setItem(key, "1");
             } catch (e) {}
 
-            try {
-                new Notification(nudge.title || "GRABIT", {
-                    body: nudge.body || "",
-                    icon: "/static/app-icon.svg"
-                });
-            } catch (e) {}
+            showSystemNotice(
+                nudge.title || "GRABIT",
+                nudge.body || "",
+                "grabit-nudge-" + String(nudge.kind || "day"),
+                nudge.href || "/app"
+            );
         });
     }
 
@@ -99,12 +163,29 @@
 
                 if (notifications > lastNotifications && lastNotifications > 0) {
                     notifySound();
+                    showSystemNotice(
+                        "GRABIT",
+                        "Есть новое уведомление.",
+                        "grabit-inbox",
+                        "/app/notifications"
+                    );
+                }
+                if (messages > lastMessages && lastMessages > 0) {
+                    notifySound();
+                    showSystemNotice(
+                        "Новое сообщение",
+                        "Откройте чат в GRABIT.",
+                        "grabit-chat",
+                        "/app/messages"
+                    );
                 }
 
                 lastNotifications = notifications;
+                lastMessages = messages;
                 setBadge(document.querySelector("[data-nav-chats-link]"), messages);
                 setBadge(document.querySelector("[data-nav-menu-link]"), menuCount);
                 showNudgeNotifications(data.nudges);
+                pinStepsPanel();
 
                 if (typeof window.resursmapOnAttentionCount === "function") {
                     window.resursmapOnAttentionCount(data);
@@ -123,4 +204,8 @@
 
     setInterval(refreshAttention, 8000);
     setTimeout(refreshAttention, 400);
+    askNotifyPermission();
+    document.addEventListener("pointerdown", function () {
+        askNotifyPermission();
+    }, { once: true, passive: true });
 })();
