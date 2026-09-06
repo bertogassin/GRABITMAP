@@ -400,6 +400,9 @@
                     payload.type === "ready"
                 ) {
                     scheduleSync();
+                    if (typeof window.resursmapRefreshAttentionBadge === "function") {
+                        window.resursmapRefreshAttentionBadge();
+                    }
                 }
             });
 

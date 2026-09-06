@@ -33,6 +33,7 @@ pub(super) fn routes() -> Router<AppState> {
         .route("/app/sessions/revoke", post(app_revoke_session))
         .route("/app/auth/email/request", post(email_auth_request))
         .route("/app/auth/email/verify", post(email_auth_verify))
+        .route("/app/locale", post(crate::i18n::set_locale))
         .route("/app/me", get(app_me))
         .route("/app/favorites", get(favorites_page))
         .route("/app/steps", get(steps_page))

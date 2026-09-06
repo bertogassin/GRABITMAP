@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_VERSION = "grabit-shell-v4.9.99";
+const CACHE_VERSION = "grabit-shell-v5.0.1";
 
 const STATIC_ASSETS = [
     "/static/manifest.webmanifest",
@@ -137,17 +137,41 @@ function remindIfNeeded() {
         }
         return response.json();
     }).then(function (data) {
-        var nudges = data && data.nudges;
-        if (!nudges || !nudges.length) {
+        if (!data) {
             return;
         }
-        return Promise.all(nudges.map(function (nudge) {
-            return self.registration.showNotification(nudge.title || "GRABIT", {
-                body: nudge.body || "",
+        var tasks = [];
+        var messages = Number(data.messages) || 0;
+        var notifications = Number(data.notifications) || 0;
+        if (messages > 0) {
+            tasks.push(self.registration.showNotification("Новое сообщение", {
+                body: "Откройте чат в GRABIT.",
                 icon: "/static/app-icon-192.png",
-                tag: "grabit-nudge-" + String(nudge.kind || "day"),
-                data: { url: nudge.href || "/app" }
+                tag: "grabit-chat",
+                data: { url: "/app/messages" }
+            }));
+        } else if (notifications > 0) {
+            tasks.push(self.registration.showNotification("GRABIT", {
+                body: "Есть новое уведомление.",
+                icon: "/static/app-icon-192.png",
+                tag: "grabit-inbox",
+                data: { url: "/app/notifications" }
+            }));
+        }
+        var nudges = data.nudges;
+        if (nudges && nudges.length) {
+            nudges.forEach(function (nudge) {
+                tasks.push(self.registration.showNotification(nudge.title || "GRABIT", {
+                    body: nudge.body || "",
+                    icon: "/static/app-icon-192.png",
+                    tag: "grabit-nudge-" + String(nudge.kind || "day"),
+                    data: { url: nudge.href || "/app" }
+                }));
             });
-        }));
+        }
+        if (!tasks.length) {
+            return;
+        }
+        return Promise.all(tasks);
     }).catch(function () {});
 }

@@ -1,9 +1,13 @@
+.hero.chat-header-premium {
+    overflow: visible !important;
+}
+
 .chat-shell {
     position: relative;
     display: block;
     padding: 14px !important;
     margin-bottom: 14px;
-    overflow: hidden;
+    overflow: visible;
     border: 1px solid rgba(232, 204, 150, .22) !important;
     background:
         radial-gradient(circle at 100% 0%, rgba(126, 212, 228, .08), transparent 38%),
@@ -660,16 +664,18 @@
     overflow:hidden;
 }
 .chat-action-sheet,
-.chat-editor {
+.chat-editor,
+.chat-delete-confirm {
     position:fixed;
     inset:0;
-    z-index:10000;
+    z-index:10050;
     display:grid;
     align-items:end;
 }
 .chat-action-sheet[hidden],
-.chat-editor[hidden] {
-    display:none;
+.chat-editor[hidden],
+.chat-delete-confirm[hidden] {
+    display:none !important;
 }
 .chat-sheet-backdrop {
     position:absolute;
@@ -743,7 +749,7 @@
     display:grid;
     gap:8px;
 }
-.chat-sheet-actions button {
+.chat-sheet-actions > button {
     min-height:52px;
     display:flex;
     align-items:center;
@@ -758,18 +764,22 @@
     font-weight:800;
     cursor:pointer;
 }
-.chat-sheet-actions button span {
+.chat-sheet-actions > button[hidden],
+.chat-sheet-reactions[hidden] {
+    display: none !important;
+}
+.chat-sheet-actions > button span {
     width:30px;
     color:var(--gold);
     font-size:21px;
     text-align:center;
 }
-.chat-sheet-actions button.is-danger {
+.chat-sheet-actions > button.is-danger {
     color:var(--danger-light, #ff8b93);
     border-color:rgba(255,109,120,.18);
     background:rgba(255,109,120,.055);
 }
-.chat-sheet-actions button.is-danger span {
+.chat-sheet-actions > button.is-danger span {
     color:var(--danger-light, #ff8b93);
 }
 .chat-editor-title {
@@ -2555,6 +2565,8 @@ html[data-page="chat"] body.chat-keyboard-open .chat-shell {
     position: relative;
     margin-left: auto;
     flex: 0 0 auto;
+    overflow: visible;
+    z-index: 40;
 }
 
 .chat-header-more {
@@ -2574,10 +2586,10 @@ html[data-page="chat"] body.chat-keyboard-open .chat-shell {
     position: absolute;
     top: calc(100% + 6px);
     right: 0;
-    z-index: 30;
+    z-index: 80;
     display: grid;
     gap: 6px;
-    min-width: 168px;
+    min-width: 188px;
     padding: 10px;
     border: 1px solid var(--line);
     border-radius: 16px;
@@ -2590,13 +2602,12 @@ html[data-page="chat"] body.chat-keyboard-open .chat-shell {
 }
 
 .chat-message-row {
-    content-visibility: auto;
-    contain-intrinsic-size: 1px 72px;
-    contain: layout style;
+    position: relative;
 }
 
 .chat-bubble {
     overflow: visible;
+    padding-top: 34px;
 }
 
 .chat-message-body--image {

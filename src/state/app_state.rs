@@ -26,10 +26,16 @@ pub struct ChatRealtimeEvent {
     pub user1_id: i64,
     #[serde(serialize_with = "serialize_realtime_user_id")]
     pub user2_id: i64,
+    pub group_id: i64,
+    pub member_ids: Vec<String>,
 }
 
 impl ChatRealtimeEvent {
     pub fn includes_user(&self, user_id: i64) -> bool {
+        if self.group_id > 0 {
+            let needle = user_id.to_string();
+            return self.member_ids.iter().any(|id| id == &needle);
+        }
         self.user1_id == user_id || self.user2_id == user_id
     }
 }
@@ -144,6 +150,36 @@ impl AppState {
             message_id,
             user1_id,
             user2_id,
+            group_id: 0,
+            member_ids: Vec::new(),
+        });
+    }
+
+    pub fn publish_group_chat_event(
+        &self,
+        kind: &str,
+        group_id: i64,
+        message_id: i64,
+        member_ids: &[i64],
+    ) {
+        if group_id <= 0 || message_id <= 0 || member_ids.is_empty() {
+            return;
+        }
+
+        let event_id = self
+            .chat_event_sequence
+            .fetch_add(1, Ordering::Relaxed)
+            .saturating_add(1);
+
+        let _ = self.chat_events.send(ChatRealtimeEvent {
+            event_id,
+            kind: kind.to_string(),
+            conversation_id: 0,
+            message_id,
+            user1_id: 0,
+            user2_id: 0,
+            group_id,
+            member_ids: member_ids.iter().map(|id| id.to_string()).collect(),
         });
     }
 
@@ -246,10 +282,25 @@ mod tests {
             message_id: 42,
             user1_id: 3,
             user2_id: 9,
+            group_id: 0,
+            member_ids: Vec::new(),
         };
 
         assert!(event.includes_user(3));
         assert!(event.includes_user(9));
         assert!(!event.includes_user(4));
+
+        let group = ChatRealtimeEvent {
+            event_id: 2,
+            kind: "message.created".to_string(),
+            conversation_id: 0,
+            message_id: 9,
+            user1_id: 0,
+            user2_id: 0,
+            group_id: 4,
+            member_ids: vec!["3".into(), "9".into(), "12".into()],
+        };
+        assert!(group.includes_user(12));
+        assert!(!group.includes_user(8));
     }
 }

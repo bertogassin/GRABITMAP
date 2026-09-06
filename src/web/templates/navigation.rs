@@ -1580,18 +1580,18 @@ pub fn render_menu(invite_public_id: &str) -> String {
         <div class="rm-pwa-compact-row">
             <div class="rm-pwa-compact-copy">
                 <div class="card-title rm-pwa-compact-title">
-                    Приложение
+                    {menu_app}
                 </div>
                 <div id="resursmap-install-hint"
                      class="card-meta rm-pwa-hint">
-                    На главный экран телефона
+                    {menu_install_hint}
                 </div>
             </div>
 
             <button id="resursmap-install-pwa"
                     type="button"
                     class="ui-button rm-pwa-install-btn">
-                Скачать
+                {menu_download}
             </button>
         </div>
     </section>
@@ -1603,8 +1603,8 @@ pub fn render_menu(invite_public_id: &str) -> String {
                     class="rm-menu-row rm-settings-toggle-btn">
                 <span class="rm-menu-row-icon">{volume_icon}</span>
                 <span class="rm-menu-row-copy">
-                    <strong>Звук</strong>
-                    <small class="rm-menu-row-state">Включён</small>
+                    <strong>{menu_sound}</strong>
+                    <small class="rm-menu-row-state">{menu_sound_on}</small>
                 </span>
             </button>
 
@@ -1613,8 +1613,8 @@ pub fn render_menu(invite_public_id: &str) -> String {
                     class="rm-menu-row rm-settings-toggle-btn">
                 <span class="rm-menu-row-icon">{phone_icon}</span>
                 <span class="rm-menu-row-copy">
-                    <strong>Вибрация</strong>
-                    <small class="rm-menu-row-state">Включена</small>
+                    <strong>{menu_haptics}</strong>
+                    <small class="rm-menu-row-state">{menu_haptics_on}</small>
                 </span>
             </button>
 
@@ -1622,36 +1622,58 @@ pub fn render_menu(invite_public_id: &str) -> String {
                     type="button">
                 <span class="rm-menu-row-icon">{play_icon}</span>
                 <span class="rm-menu-row-copy">
-                    <strong>Проверить звук</strong>
-                    <small class="rm-menu-row-state">Короткий сигнал</small>
+                    <strong>{menu_sound_test}</strong>
+                    <small class="rm-menu-row-state">{menu_sound_test_hint}</small>
                 </span>
             </button>
 
             <button class="theme-toggle-btn rm-menu-row rm-settings-theme-btn" type="button">
                 <span class="rm-menu-row-icon">{sun_icon}</span>
                 <span class="rm-menu-row-copy">
-                    <strong>День и ночь</strong>
-                    <small class="theme-toggle-label">Сейчас тёмная</small>
+                    <strong>{menu_theme}</strong>
+                    <small class="theme-toggle-label">{menu_theme_dark}</small>
                 </span>
             </button>
 
         </div>
+        {language_picker}
     </div>
 </section>"#,
-        section_head_settings = section_head("Меню", "Профиль, объявление и настройки", None),
-        profile_card = navigation_card("/app/me", "user", "Профиль", "Аккаунт и объявления"),
+        section_head_settings = section_head(
+            &crate::i18n::t("menu_title"),
+            &crate::i18n::t("menu_section_caption"),
+            None
+        ),
+        profile_card = navigation_card(
+            "/app/me",
+            "user",
+            &crate::i18n::t("menu_profile_card"),
+            &crate::i18n::t("menu_profile_meta")
+        ),
         steps_card = navigation_card(
             "/app/steps",
             "footprints",
-            "Шагомер",
-            "10 000 шагов за день"
+            &crate::i18n::t("menu_steps_card"),
+            &crate::i18n::t("menu_steps_meta")
         ),
         add_card = navigation_card(
             "/app/add",
             "plus",
-            "Добавить объявление",
-            "Город, рубрика и текст объявления"
+            &crate::i18n::t("menu_add_card"),
+            &crate::i18n::t("menu_add_meta")
         ),
+        language_picker = crate::i18n::language_picker_html("/app/menu"),
+        menu_app = crate::i18n::t("menu_app"),
+        menu_install_hint = crate::i18n::t("menu_install_hint"),
+        menu_download = crate::i18n::t("menu_download"),
+        menu_sound = crate::i18n::t("menu_sound"),
+        menu_sound_on = crate::i18n::t("menu_sound_on"),
+        menu_haptics = crate::i18n::t("menu_haptics"),
+        menu_haptics_on = crate::i18n::t("menu_haptics_on"),
+        menu_sound_test = crate::i18n::t("menu_sound_test"),
+        menu_sound_test_hint = crate::i18n::t("menu_sound_test_hint"),
+        menu_theme = crate::i18n::t("menu_theme"),
+        menu_theme_dark = crate::i18n::t("menu_theme_dark"),
         invite = super::invite::invite_share_block(invite_public_id),
         volume_icon = icon("volume"),
         phone_icon = icon("smartphone"),
@@ -1665,12 +1687,12 @@ pub fn render_menu(invite_public_id: &str) -> String {
 {hero}
 
 {content}"#,
-        topbar = topbar("Меню", "menu"),
+        topbar = topbar(&crate::i18n::t("menu_title"), "menu"),
         hero = simple_hero(
             "sliders",
             "GRABIT",
-            "Меню",
-            "Звук, день и ночь, ярлык на главном экране.",
+            &crate::i18n::t("menu_title"),
+            &crate::i18n::t("menu_lead"),
         ),
         content = content,
     );
@@ -1681,7 +1703,7 @@ pub fn render_menu(invite_public_id: &str) -> String {
     );
 
     page_document(
-        "Меню · GRABIT",
+        &format!("{} · GRABIT", crate::i18n::t("menu_title")),
         "",
         "",
         &main_html,
@@ -1818,5 +1840,9 @@ mod search_catalog_tests {
         assert!(html.contains("theme-toggle-btn"));
         assert!(html.contains("<strong>День и ночь</strong>"));
         assert!(html.contains("<strong>Звук</strong>"));
+        assert!(html.contains("rm-lang-picker"));
+        assert!(html.contains("name=\"locale\""));
+        assert!(html.contains("value=\"zh-TW\""));
+        assert!(html.contains("/app/locale"));
     }
 }

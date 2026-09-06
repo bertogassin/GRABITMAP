@@ -16,6 +16,7 @@
 
     var lastNotifications = 0;
     var lastMessages = 0;
+    var baselineReady = false;
 
     function notifyReady() {
         return "Notification" in window && Notification.permission === "granted";
@@ -161,25 +162,28 @@
                 var notifications = Number(data.notifications) || 0;
                 var menuCount = notifications;
 
-                if (notifications > lastNotifications && lastNotifications > 0) {
-                    notifySound();
-                    showSystemNotice(
-                        "GRABIT",
-                        "Есть новое уведомление.",
-                        "grabit-inbox",
-                        "/app/notifications"
-                    );
-                }
-                if (messages > lastMessages && lastMessages > 0) {
-                    notifySound();
-                    showSystemNotice(
-                        "Новое сообщение",
-                        "Откройте чат в GRABIT.",
-                        "grabit-chat",
-                        "/app/messages"
-                    );
+                if (baselineReady) {
+                    if (notifications > lastNotifications) {
+                        notifySound();
+                        showSystemNotice(
+                            "GRABIT",
+                            "Есть новое уведомление.",
+                            "grabit-inbox",
+                            "/app/notifications"
+                        );
+                    }
+                    if (messages > lastMessages) {
+                        notifySound();
+                        showSystemNotice(
+                            "Новое сообщение",
+                            "Откройте чат в GRABIT.",
+                            "grabit-chat",
+                            "/app/messages"
+                        );
+                    }
                 }
 
+                baselineReady = true;
                 lastNotifications = notifications;
                 lastMessages = messages;
                 setBadge(document.querySelector("[data-nav-chats-link]"), messages);

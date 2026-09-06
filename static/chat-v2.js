@@ -2118,11 +2118,36 @@
         var otherUserId = String(
             history.dataset.otherUserId || ""
         ).trim();
+        var groupId = String(
+            history.dataset.groupId || ""
+        ).trim();
+        var isGroup = /^[1-9][0-9]{0,18}$/.test(groupId);
 
         if (
+            !isGroup &&
             !/^[1-9][0-9]{0,18}$/.test(otherUserId)
         ) {
             return;
+        }
+
+        function chatApi(suffix) {
+            if (isGroup) {
+                return "/api/group/" + groupId + suffix;
+            }
+            return "/api/chat/" + otherUserId + suffix;
+        }
+
+        function t(key, fallback) {
+            if (window.m && typeof window.m[key] === "function") {
+                return window.m[key]();
+            }
+            if (typeof window.rmT === "function") {
+                var translated = window.rmT(key);
+                if (translated && translated !== key) {
+                    return translated;
+                }
+            }
+            return fallback;
         }
 
         var messageCache = new Map();
@@ -2180,24 +2205,24 @@
                     '</div>' +
                     '<button type="button" ' +
                         'data-chat-action="reply">' +
-                        '<span>↩</span>Ответить' +
+                        '<span>↩</span>' + t("chat_reply", "Ответить") +
                     '</button>' +
                     '<button type="button" ' +
                         'data-chat-action="copy">' +
-                        '<span>⧉</span>Копировать' +
+                        '<span>⧉</span>' + t("chat_copy", "Копировать") +
                     '</button>' +
                     '<button type="button" ' +
                         'data-chat-action="forward">' +
-                        '<span>↪</span>Переслать' +
+                        '<span>↪</span>' + t("chat_forward", "Переслать") +
                     '</button>' +
                     '<button type="button" ' +
                         'data-chat-action="edit">' +
-                        '<span>✎</span>Изменить' +
+                        '<span>✎</span>' + t("chat_edit", "Изменить") +
                     '</button>' +
                     '<button type="button" ' +
                         'class="is-danger" ' +
                         'data-chat-action="delete">' +
-                        '<span>⌫</span>Удалить' +
+                        '<span>⌫</span>' + t("chat_delete", "Удалить") +
                     '</button>' +
                 '</div>' +
             '</section>';
@@ -2298,7 +2323,7 @@
         var forwardList =
             document.getElementById("chat-forward-list");
         var forwardDraftKey =
-            "resursmap-chat-forward:" + otherUserId;
+            "resursmap-chat-forward:" + (isGroup ? "g" + groupId : otherUserId);
 
         function forwardPreviewLabel(message) {
             if (Number(message.deleted_at) > 0) {
@@ -3259,9 +3284,14 @@
 
         function closeSheet() {
             sheet.hidden = true;
-            document.body.classList.remove(
-                "chat-overlay-open"
-            );
+            if (
+                (!editor || editor.hidden) &&
+                (!confirmBox || confirmBox.hidden)
+            ) {
+                document.body.classList.remove(
+                    "chat-overlay-open"
+                );
+            }
         }
 
         function openSheet(message) {
@@ -3444,6 +3474,8 @@
                 );
 
                 if (more) {
+                    event.preventDefault();
+                    event.stopPropagation();
                     var moreRow = event.target.closest(
                         ".chat-message-row"
                     );
@@ -3496,10 +3528,33 @@
             }
         );
 
+        document.addEventListener("keydown", function (event) {
+            if (event.key !== "Escape") {
+                return;
+            }
+            if (sheet && !sheet.hidden) {
+                closeSheet();
+            }
+        });
+
+        document.addEventListener("pointerdown", function (event) {
+            if (!sheet || sheet.hidden) {
+                return;
+            }
+            if (event.target.closest(".chat-sheet-panel")) {
+                return;
+            }
+            if (event.target.closest(".chat-message-more")) {
+                return;
+            }
+            closeSheet();
+        });
+
         sheet.addEventListener(
             "click",
             function (event) {
                 if (
+                    event.target === sheet ||
                     event.target.closest(
                         "[data-close-sheet]"
                     )
@@ -3989,6 +4044,36 @@
 
                         if (
                             payload.type === "chat_event" &&
+                            payload.event
+                        ) {
+                            var eventGroupId = Number(
+                                payload.event.group_id || 0
+                            );
+                            var pageGroupId = Number(
+                                history.dataset.groupId || 0
+                            );
+                            if (eventGroupId > 0 && pageGroupId > 0 && eventGroupId !== pageGroupId) {
+                                if (typeof window.resursmapRefreshAttentionBadge === "function") {
+                                    window.resursmapRefreshAttentionBadge();
+                                }
+                                return;
+                            }
+                            if (eventGroupId > 0 && pageGroupId <= 0) {
+                                if (typeof window.resursmapRefreshAttentionBadge === "function") {
+                                    window.resursmapRefreshAttentionBadge();
+                                }
+                                return;
+                            }
+                            if (eventGroupId <= 0 && pageGroupId > 0) {
+                                if (typeof window.resursmapRefreshAttentionBadge === "function") {
+                                    window.resursmapRefreshAttentionBadge();
+                                }
+                                return;
+                            }
+                        }
+
+                        if (
+                            payload.type === "chat_event" &&
                             payload.event &&
                             payload.event.kind === "message.read"
                         ) {
@@ -4008,6 +4093,9 @@
                         }
 
                         requestSync();
+                        if (typeof window.resursmapRefreshAttentionBadge === "function") {
+                            window.resursmapRefreshAttentionBadge();
+                        }
                     }
 
                     if (

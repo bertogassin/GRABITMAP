@@ -1,0 +1,8 @@
+# Keep compiled Paraglide output in git so deploy works without Node.
+!.gitignore
+!messages.js
+!registry.js
+!runtime.js
+!server.js
+!messages/
+!messages/**

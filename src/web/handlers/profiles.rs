@@ -263,25 +263,13 @@ pub async fn app_me(State(state): State<AppState>, headers: HeaderMap) -> Html<S
              FROM user_notifications
              WHERE user_id = ?1
                AND is_read = 0
-               AND kind NOT IN ('chat_message', 'contact_request', 'contact_accepted', 'contact_rejected')",
+               AND kind NOT IN ('contact_rejected')",
             rusqlite::params![user_id],
             |row| row.get(0),
         )
         .unwrap_or(0);
 
-    let unread_messages_count: i64 = db
-        .query_row(
-            "SELECT COUNT(*)
-             FROM messages m
-             JOIN conversations c
-               ON c.id = m.conversation_id
-             WHERE (c.user1_id = ?1 OR c.user2_id = ?1)
-               AND m.sender_user_id <> ?1
-               AND m.is_read = 0",
-            rusqlite::params![user_id],
-            |row| row.get(0),
-        )
-        .unwrap_or(0);
+    let unread_messages_count: i64 = unread_message_count(&db, user_id);
 
     let current_session_public_id = current_session_public_id(&headers).unwrap_or_default();
     let user_sessions = load_user_sessions(&db, user_id, &current_session_public_id, unix_now());
@@ -372,19 +360,27 @@ pub async fn api_attention_count(State(state): State<AppState>, headers: HeaderM
 }
 
 fn query_attention_counts(db: &rusqlite::Connection, user_id: i64) -> (i64, i64, i64) {
+    // Chat/group message rows are already counted in unread messages —
+    // keep the menu badge for non-chat alerts only.
     let notifications: i64 = db
         .query_row(
             "SELECT COUNT(*)
              FROM user_notifications
              WHERE user_id = ?1
                AND is_read = 0
-               AND kind NOT IN ('chat_message', 'contact_request', 'contact_accepted', 'contact_rejected')",
+               AND kind NOT IN ('contact_rejected', 'chat_message', 'group_message')",
             rusqlite::params![user_id],
             |row| row.get(0),
         )
         .unwrap_or(0);
 
-    let messages: i64 = db
+    let messages = unread_message_count(db, user_id);
+
+    (messages + notifications, messages, notifications)
+}
+
+fn unread_message_count(db: &rusqlite::Connection, user_id: i64) -> i64 {
+    let direct: i64 = db
         .query_row(
             "SELECT COUNT(*)
              FROM messages m
@@ -397,8 +393,21 @@ fn query_attention_counts(db: &rusqlite::Connection, user_id: i64) -> (i64, i64,
             |row| row.get(0),
         )
         .unwrap_or(0);
-
-    (messages + notifications, messages, notifications)
+    let groups: i64 = db
+        .query_row(
+            "SELECT COUNT(*)
+             FROM group_messages m
+             JOIN chat_group_members mem
+               ON mem.group_id = m.group_id
+              AND mem.user_id = ?1
+             WHERE m.sender_user_id <> ?1
+               AND m.deleted_at = 0
+               AND m.id > COALESCE(mem.last_read_message_id, 0)",
+            rusqlite::params![user_id],
+            |row| row.get(0),
+        )
+        .unwrap_or(0);
+    direct.saturating_add(groups)
 }
 
 fn load_user_sessions(

@@ -975,13 +975,15 @@ body.light-theme .rm-command-icon {{
 
     <div class="rm-profile-settings-block">
         <div class="rm-profile-settings-kicker">
-            Настройки
+            {settings_kicker}
         </div>
 
         <a href="/app/menu"
            class="ui-button rm-profile-settings-link">
-            ⚙️ Звук и ярлык
+            {settings_link}
         </a>
+
+        {language_picker}
     </div>
 
 
@@ -1075,6 +1077,9 @@ body.light-theme .rm-command-icon {{
         invite = super::invite::invite_share_block(invite_public_id),
         statistics = statistics,
         settings_icon = icon("settings"),
+        settings_kicker = crate::i18n::t("profile_settings"),
+        settings_link = crate::i18n::t("profile_settings_sound"),
+        language_picker = crate::i18n::language_picker_html("/app/me"),
         intent_status_text = intent_status_text,
         status_avatar = if has_avatar {
             format!(

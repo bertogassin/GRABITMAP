@@ -28,6 +28,66 @@ fn json_error(status: StatusCode, error: &str) -> Response {
     (status, Json(json!({"ok": false, "error": error}))).into_response()
 }
 
+fn group_member_ids(db: &rusqlite::Connection, group_id: i64) -> Vec<i64> {
+    db.prepare("SELECT user_id FROM chat_group_members WHERE group_id = ?1")
+        .and_then(|mut stmt| {
+            stmt.query_map(rusqlite::params![group_id], |row| row.get(0))?
+                .collect::<Result<Vec<i64>, _>>()
+        })
+        .unwrap_or_default()
+}
+
+fn notify_group_members(
+    db: &rusqlite::Connection,
+    group_id: i64,
+    sender_id: i64,
+    title: &str,
+    preview: &str,
+) {
+    let now = unix_now();
+    let members = group_member_ids(db, group_id);
+    for member_id in members {
+        if member_id <= 0 || member_id == sender_id {
+            continue;
+        }
+        let updated = db
+            .execute(
+                "UPDATE user_notifications
+                 SET title = ?3, message = ?4, created_at = ?5, is_read = 0
+                 WHERE user_id = ?1
+                   AND kind = 'group_message'
+                   AND resource_id = ?2
+                   AND is_read = 0",
+                rusqlite::params![member_id, group_id, title, preview, now],
+            )
+            .unwrap_or(0);
+        if updated == 0 {
+            let _ = db.execute(
+                "INSERT INTO user_notifications (
+                    user_id, resource_id, kind, title, message, is_read, created_at
+                 ) VALUES (?1, ?2, 'group_message', ?3, ?4, 0, ?5)",
+                rusqlite::params![member_id, group_id, title, preview, now],
+            );
+        }
+    }
+}
+
+fn fanout_group_message(
+    state: &AppState,
+    db: &rusqlite::Connection,
+    kind: &str,
+    group_id: i64,
+    message_id: i64,
+    sender_id: i64,
+    preview: &str,
+) {
+    let members = group_member_ids(db, group_id);
+    if kind == "message.created" {
+        notify_group_members(db, group_id, sender_id, "Новое сообщение в группе", preview);
+    }
+    state.publish_group_chat_event(kind, group_id, message_id, &members);
+}
+
 fn is_member(db: &rusqlite::Connection, group_id: i64, user_id: i64) -> bool {
     db.query_row(
         "SELECT 1 FROM chat_group_members WHERE group_id = ?1 AND user_id = ?2",
@@ -199,16 +259,35 @@ fn decorate_group_messages(
     }
 }
 
+fn mark_group_notifications_read(db: &rusqlite::Connection, user_id: i64, group_id: i64) {
+    if user_id <= 0 || group_id <= 0 {
+        return;
+    }
+    let _ = db.execute(
+        "UPDATE user_notifications
+         SET is_read = 1
+         WHERE user_id = ?1
+           AND kind = 'group_message'
+           AND is_read = 0
+           AND resource_id = ?2",
+        rusqlite::params![user_id, group_id],
+    );
+}
+
 fn mark_group_read(db: &rusqlite::Connection, group_id: i64, user_id: i64, through_id: i64) {
     if group_id <= 0 || user_id <= 0 || through_id <= 0 {
         return;
     }
     let _ = db.execute(
         "UPDATE chat_group_members
-         SET last_read_message_id = MAX(last_read_message_id, ?3)
+         SET last_read_message_id = CASE
+                WHEN COALESCE(last_read_message_id, 0) > ?3 THEN last_read_message_id
+                ELSE ?3
+             END
          WHERE group_id = ?1 AND user_id = ?2",
         rusqlite::params![group_id, user_id, through_id],
     );
+    mark_group_notifications_read(db, user_id, group_id);
 }
 
 fn map_group_message_row(
@@ -412,6 +491,8 @@ pub async fn group_chat_page(
     let messages = load_group_messages(&db, group_id, user_id, 0, 0, 100);
     if let Some(last) = messages.last() {
         mark_group_read(&db, group_id, user_id, last.id);
+    } else {
+        mark_group_notifications_read(&db, user_id, group_id);
     }
     Html(templates::render_group_chat(
         true,
@@ -529,6 +610,15 @@ pub async fn api_group_send(
         return json_error(StatusCode::INTERNAL_SERVER_ERROR, "message_store_failed");
     }
     let message_id = db.last_insert_rowid();
+    fanout_group_message(
+        &state,
+        &db,
+        "message.created",
+        group_id,
+        message_id,
+        user_id,
+        message,
+    );
     let loaded = load_group_messages(&db, group_id, user_id, message_id - 1, 0, 1);
     let item = loaded
         .first()
@@ -637,6 +727,15 @@ pub async fn api_group_send_image(
         return json_error(StatusCode::INTERNAL_SERVER_ERROR, "message_store_failed");
     }
     let message_id = db.last_insert_rowid();
+    fanout_group_message(
+        &state,
+        &db,
+        "message.created",
+        group_id,
+        message_id,
+        user_id,
+        if caption.is_empty() { "Фото" } else { caption.as_str() },
+    );
     Json(json!({
         "ok": true,
         "message": {
@@ -789,6 +888,15 @@ pub async fn api_group_send_voice(
         return json_error(StatusCode::INTERNAL_SERVER_ERROR, "message_store_failed");
     }
     let message_id = db.last_insert_rowid();
+    fanout_group_message(
+        &state,
+        &db,
+        "message.created",
+        group_id,
+        message_id,
+        user_id,
+        "Голосовое",
+    );
     Json(json!({
         "ok": true,
         "message": {
@@ -855,6 +963,7 @@ pub async fn api_group_edit(
     {
         return json_error(StatusCode::CONFLICT, "message_changed");
     }
+    fanout_group_message(&state, &db, "message.updated", group_id, message_id, user_id, text);
     Json(json!({"ok": true, "message_id": message_id, "message": text, "edited_at": now}))
         .into_response()
 }
@@ -890,6 +999,15 @@ pub async fn api_group_delete(
     {
         return json_error(StatusCode::NOT_FOUND, "message_not_found");
     }
+    fanout_group_message(
+        &state,
+        &db,
+        "message.deleted",
+        group_id,
+        message_id,
+        user_id,
+        "Сообщение удалено",
+    );
     Json(json!({"ok": true, "deleted_at": now})).into_response()
 }
 
@@ -952,6 +1070,15 @@ pub async fn api_group_react(
         .pop()
         .map(|m| m.reactions)
         .unwrap_or_default();
+    fanout_group_message(
+        &state,
+        &db,
+        "message.updated",
+        group_id,
+        message_id,
+        user_id,
+        "",
+    );
     Json(json!({
         "ok": true,
         "reactions": reactions.iter().map(|r| json!({"emoji": r.emoji, "count": r.count, "mine": r.mine})).collect::<Vec<_>>()

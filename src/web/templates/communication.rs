@@ -232,17 +232,20 @@ pub fn render_messages(
         format!(
             r#"<div class="section-head" id="inbox-section-head">
     <div>
-        <h2 class="section-title">Диалоги</h2>
+        <h2 class="section-title">{dialogs}</h2>
         <p class="section-caption" id="inbox-unread-caption">{unread_caption}</p>
     </div>
     <div class="inbox-head-actions">
-        <a href="/app/groups/new" class="ui-button inbox-group-btn">Группа</a>
+        <a href="/app/groups/new" class="ui-button inbox-group-btn">{group}</a>
         <span class="inbox-live-badge" id="inbox-live-badge" hidden aria-hidden="true">связь</span>
     </div>
-</div>"#
+</div>"#,
+            dialogs = crate::i18n::t("chat_dialogs"),
+            unread_caption = unread_caption,
+            group = crate::i18n::t("chat_group"),
         )
     } else {
-        section_head("Диалоги", &unread_caption, None)
+        section_head(&crate::i18n::t("chat_dialogs"), &unread_caption, None)
     };
 
     let list_attributes = if authenticated {
@@ -282,13 +285,13 @@ pub fn render_messages(
     );
 
     page_shell(
-        "Чаты · GRABIT",
-        &topbar("Чаты", "message-circle"),
+        &format!("{} · GRABIT", crate::i18n::t("chat_title")),
+        &topbar(&crate::i18n::t("chat_title"), "message-circle"),
         &simple_hero(
             "message-circle",
-            "Чаты",
-            "Диалоги",
-            "Личные диалоги и группы.",
+            &crate::i18n::t("chat_title"),
+            &crate::i18n::t("chat_dialogs"),
+            &crate::i18n::t("chat_lead"),
         ),
         &content_html,
         &bottom_nav_with_badge("chats", total_unread),

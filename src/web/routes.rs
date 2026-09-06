@@ -6,7 +6,7 @@ mod resources;
 mod system;
 
 use crate::state::app_state::AppState;
-use axum::{extract::DefaultBodyLimit, Router};
+use axum::{extract::DefaultBodyLimit, middleware, Router};
 
 pub fn routes(state: AppState) -> Router {
     Router::new()
@@ -18,5 +18,6 @@ pub fn routes(state: AppState) -> Router {
         .merge(system::routes())
         .nest_service("/static", tower_http::services::ServeDir::new("static"))
         .layer(DefaultBodyLimit::max(15 * 1024 * 1024))
+        .layer(middleware::from_fn(crate::i18n::locale_middleware))
         .with_state(state)
 }

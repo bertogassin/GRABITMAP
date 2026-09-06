@@ -1,6 +1,7 @@
 use std::env;
 
 mod catalog;
+mod i18n;
 mod db;
 mod geography;
 mod resource_publisher;

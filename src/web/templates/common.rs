@@ -24,7 +24,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = "4.9.99";
+pub const STATIC_ASSET_VERSION: &str = "5.0.1";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -2402,9 +2402,14 @@ a.feature.rm-feature-add {
 }
 
 .rm-profile-settings-block {
+    display: grid;
+    gap: 12px;
     margin-top: 20px;
     padding-top: 18px;
     border-top: 1px solid var(--line);
+}
+.rm-profile-settings-block .rm-lang-picker {
+    margin-top: 0;
 }
 
 .rm-profile-settings-kicker {
@@ -3170,6 +3175,112 @@ a.feature.rm-feature-add {
 
 .rm-settings-toggle-btn.is-off {
     color: var(--muted);
+}
+
+.rm-lang-picker {
+    margin-top: 16px;
+    padding: 14px;
+    border: 1px solid rgba(232, 204, 150, .18);
+    border-radius: 18px;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(232, 204, 150, .10), transparent 46%),
+        rgba(255, 255, 255, .02);
+}
+
+.rm-lang-head {
+    display: grid;
+    gap: 3px;
+    margin-bottom: 12px;
+}
+
+.rm-lang-head strong {
+    font-size: 15px;
+    font-weight: 750;
+}
+
+.rm-lang-head small {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.rm-lang-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    max-height: 320px;
+    overflow: auto;
+    padding-right: 2px;
+}
+
+@media (min-width: 560px) {
+    .rm-lang-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        max-height: none;
+    }
+}
+
+.rm-lang-btn {
+    min-height: 58px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 3px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(232, 204, 150, .06);
+    color: var(--text);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    transition: border-color .16s ease, background .16s ease, transform .12s ease;
+}
+
+.rm-lang-btn:hover {
+    border-color: rgba(232, 204, 150, .38);
+    transform: translateY(-1px);
+}
+
+.rm-lang-btn:active {
+    transform: translateY(0);
+}
+
+.rm-lang-btn span {
+    font-size: 14px;
+    font-weight: 750;
+    line-height: 1.25;
+}
+
+.rm-lang-btn small {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+}
+
+.rm-lang-btn.is-selected,
+.rm-lang-btn[aria-pressed="true"] {
+    border-color: rgba(232, 204, 150, .62);
+    background: linear-gradient(145deg, rgba(232, 204, 150, .22), rgba(232, 204, 150, .08));
+    box-shadow:
+        inset 0 0 0 1px rgba(232, 204, 150, .20),
+        0 8px 20px rgba(0, 0, 0, .12);
+}
+
+html[dir="rtl"] .rm-lang-btn,
+html[dir="rtl"] .rm-lang-head {
+    text-align: right;
+    align-items: flex-end;
+}
+html[dir="rtl"] .rm-menu-row {
+    text-align: right;
+}
+
+.hero.chat-header-premium {
+    overflow: visible;
 }
 
 .rm-settings-sound-btn {
@@ -4094,12 +4205,13 @@ pub(crate) fn page_document(
 ) -> String {
     format!(
         r#"<!DOCTYPE html>
-<html lang="ru">
+<html lang="{html_lang}" dir="{html_dir}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="resursmap-asset-version" content="{asset_version}">
 <script>try{{if(localStorage.getItem('resursmap-theme')==='light'){{document.documentElement.classList.add('light-theme');document.documentElement.style.colorScheme='light';}}}}catch(e){{}}</script>
+<script>window.resursmapI18n={i18n_boot};</script>
 {site_head}
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
 <meta name="referrer" content="no-referrer">
@@ -4142,10 +4254,10 @@ pub(crate) fn page_document(
 </main>
 
 <footer class="rm-version-footer"
-        aria-label="Версия приложения">
-    <a href="/rules">Правила</a>
+        aria-label="{footer_aria}">
+    <a href="/rules">{footer_rules}</a>
     ·
-    <a href="/privacy">Политика</a>
+    <a href="/privacy">{footer_privacy}</a>
     ·
     GRABIT · v{asset_version}
 </footer>
@@ -4154,6 +4266,8 @@ pub(crate) fn page_document(
 
 {body_after}
 
+<script src="{i18n_boot_js}" defer></script>
+<script type="module" src="{paraglide_boot_js}"></script>
 <script src="{chat_sounds_js}" defer></script>
 <script src="{splash_js}" defer></script>
 <script src="{nav_badge_js}" defer></script>
@@ -4164,6 +4278,19 @@ pub(crate) fn page_document(
 
 </body>
 </html>"#,
+        html_lang = crate::i18n::locale(),
+        html_dir = crate::i18n::dir(),
+        i18n_boot = format!(
+            "{{\"locale\":{locale},\"dir\":{dir},\"messages\":{messages}}}",
+            locale = serde_json::to_string(crate::i18n::locale()).unwrap_or_else(|_| "\"ru\"".into()),
+            dir = serde_json::to_string(crate::i18n::dir()).unwrap_or_else(|_| "\"ltr\"".into()),
+            messages = crate::i18n::messages_json(),
+        ),
+        footer_aria = crate::i18n::t("footer_aria"),
+        footer_rules = crate::i18n::t("common_rules"),
+        footer_privacy = crate::i18n::t("common_privacy"),
+        i18n_boot_js = static_asset("i18n-boot.js"),
+        paraglide_boot_js = static_asset("i18n-runtime.js"),
         title = escape_html(title),
         asset_version = STATIC_ASSET_VERSION,
         site_head = site_head_links(),
@@ -4294,24 +4421,24 @@ pub(crate) fn bottom_nav_with_badges(
 
     <a class="{map_class}" href="/app" data-nav-map-link>
         {nav_map}
-        <span>Города</span>
+        <span>{label_cities}</span>
     </a>
 
     <a class="{search_class}" href="/app/search" data-nav-search-link>
         {nav_search}
-        <span>Поиск</span>
+        <span>{label_search}</span>
     </a>
 
     <a class="{chats_class}" href="/app/messages" data-nav-chats-link>
         {nav_chats}
         {unread_badge}
-        <span>Чаты</span>
+        <span>{label_chats}</span>
     </a>
 
     <a class="{menu_class}" href="/app/menu" data-nav-menu-link>
         {nav_menu}
         {menu_badge}
-        <span>Меню</span>
+        <span>{label_menu}</span>
     </a>
 
 </nav>
@@ -4326,6 +4453,10 @@ pub(crate) fn bottom_nav_with_badges(
         nav_menu = icon("sliders"),
         unread_badge = nav_count_badge(unread_messages),
         menu_badge = nav_count_badge(menu_count),
+        label_cities = crate::i18n::t("nav_cities"),
+        label_search = crate::i18n::t("nav_search"),
+        label_chats = crate::i18n::t("nav_chats"),
+        label_menu = crate::i18n::t("nav_menu"),
     )
 }
 
@@ -4340,12 +4471,12 @@ pub(crate) fn topbar(subtitle: &str, _icon_name: &str) -> String {
 
     <a class="topbar-account"
        href="/app/me"
-       aria-label="Открыть профиль">
+       aria-label="{profile_aria}">
         <span class="topbar-account-icon">
             {user_icon}
         </span>
         <span class="topbar-account-label">
-            Профиль
+            {profile_label}
         </span>
     </a>
 </header>
@@ -4353,6 +4484,8 @@ pub(crate) fn topbar(subtitle: &str, _icon_name: &str) -> String {
         logo_src = static_asset("brand-logo.png"),
         user_icon = icon("user"),
         subtitle = escape_html(subtitle),
+        profile_aria = crate::i18n::t("common_open_profile"),
+        profile_label = crate::i18n::t("common_profile"),
     )
 }
 
@@ -5798,7 +5931,12 @@ pub(crate) fn guest_mode_hint(next_path: &str) -> String {
     };
 
     format!(
-        r#"<p class="rm-guest-hint">Города и поиск без входа. <a href="{login_href}">Войти</a> · <a href="{register_href}">Регистрация</a></p>"#
+        r#"<p class="rm-guest-hint">{cities_search}. <a href="{login_href}">{login}</a> · <a href="{register_href}">{register}</a></p>"#,
+        cities_search = crate::i18n::t("nav_cities"),
+        login_href = login_href,
+        login = crate::i18n::t("common_login"),
+        register_href = register_href,
+        register = crate::i18n::t("common_register"),
     )
 }
 
@@ -5820,11 +5958,10 @@ pub(crate) fn guest_mode_panel(next_path: &str) -> String {
 <div class="rm-guest-panel card">
     <div class="card-content">
         <div class="card-title rm-guest-title">
-            Вы в гостевом режиме
+            {guest_mode}
         </div>
         <div class="card-meta rm-guest-copy">
-            Смотрите карту и объявления без регистрации.
-            Войдите, когда понадобятся сообщения, избранное или публикации.
+            {guest_copy}
         </div>
     </div>
 
@@ -5835,14 +5972,31 @@ pub(crate) fn guest_mode_panel(next_path: &str) -> String {
         {register_card}
     </div>
 </div>"#,
-        map_card = navigation_card("/app", "globe", "Города", "Страны и города"),
-        search_card = navigation_card("/app/search", "search", "Поиск", "Люди и объявления"),
-        login_card = navigation_card(&login_href, "user", "Войти", "Логин и пароль",),
+        guest_mode = crate::i18n::t("common_guest_mode"),
+        guest_copy = crate::i18n::t("common_guest_copy"),
+        map_card = navigation_card(
+            "/app",
+            "globe",
+            &crate::i18n::t("nav_cities"),
+            &crate::i18n::t("nav_cities"),
+        ),
+        search_card = navigation_card(
+            "/app/search",
+            "search",
+            &crate::i18n::t("nav_search"),
+            &crate::i18n::t("search_title"),
+        ),
+        login_card = navigation_card(
+            &login_href,
+            "user",
+            &crate::i18n::t("common_login"),
+            &crate::i18n::t("common_login_password"),
+        ),
         register_card = navigation_card(
             &register_href,
             "edit",
-            "Регистрация",
-            "Создать аккаунт на сайте",
+            &crate::i18n::t("common_register"),
+            &crate::i18n::t("common_create_account"),
         ),
     )
 }
@@ -5851,10 +6005,10 @@ pub(crate) fn guest_locked_section(feature: &str, next_path: &str) -> String {
     format!(
         "{note}{panel}",
         note = empty_state_card(
-            "Нужен аккаунт",
-            &format!(
-                "Раздел «{feature}» доступен после входа. Города и поиск работают без регистрации.",
-                feature = escape_html(feature),
+            &crate::i18n::t("common_account_needed"),
+            &crate::i18n::tf(
+                "common_account_needed_body",
+                &[("feature", &escape_html(feature))],
             ),
         ),
         panel = guest_mode_panel(next_path),

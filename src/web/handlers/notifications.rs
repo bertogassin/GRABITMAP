@@ -164,7 +164,7 @@ pub async fn notifications_page(State(state): State<AppState>, headers: HeaderMa
                 created_at
              FROM user_notifications
              WHERE user_id = ?1
-               AND kind NOT IN ('chat_message', 'contact_request', 'contact_accepted', 'contact_rejected')
+               AND kind NOT IN ('contact_rejected')
              ORDER BY
                 is_read ASC,
                 created_at DESC,
@@ -240,6 +240,8 @@ pub async fn open_notification(
     let target = if let Some(resource_id) = resource_id.filter(|id| *id > 0) {
         if kind == "chat_message" {
             format!("/app/chat/{resource_id}")
+        } else if kind == "group_message" {
+            format!("/app/group/{resource_id}")
         } else {
             format!("/app/resource/{resource_id}")
         }
@@ -269,8 +271,7 @@ pub async fn mark_all_notifications_read(
             "UPDATE user_notifications
              SET is_read = 1
              WHERE user_id = ?1
-               AND is_read = 0
-               AND kind NOT IN ('chat_message', 'contact_request', 'contact_accepted', 'contact_rejected')",
+               AND is_read = 0",
             rusqlite::params![user_id],
         );
     }
@@ -294,8 +295,9 @@ pub async fn unread_count(State(state): State<AppState>, headers: HeaderMap) -> 
         .get()
         .ok()
         .and_then(|conn| {
+            let _ = ensure_daily_nudges(&conn, user.user_id);
             conn.query_row(
-                "SELECT COUNT(*) FROM user_notifications WHERE user_id = ?1 AND is_read = 0 AND kind NOT IN ('chat_message', 'contact_request', 'contact_accepted', 'contact_rejected')",
+                "SELECT COUNT(*) FROM user_notifications WHERE user_id = ?1 AND is_read = 0 AND kind NOT IN ('contact_rejected')",
                 rusqlite::params![user.user_id],
                 |row| row.get::<_, i64>(0),
             )
