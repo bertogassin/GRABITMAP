@@ -1849,6 +1849,8 @@ a.feature.rm-feature-add {
     padding: 18px;
     margin-bottom: 14px;
     border-left: 3px solid var(--gold-light);
+    color: inherit;
+    text-decoration: none;
 }
 
 .rm-notif-card--approved,
@@ -3389,10 +3391,31 @@ a.feature.rm-feature-add {
     background: rgba(0, 0, 0, .03);
 }
 
+.rm-resource-report-inline {
+    margin-top: 14px;
+}
+
 .rm-resource-report-label {
     font-size: 13px;
     font-weight: 800;
     margin-bottom: 8px;
+}
+
+.rm-report-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.rm-report-chip {
+    min-height: 36px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(217, 119, 6, .28);
+    background: rgba(217, 119, 6, .08);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
 }
 
 .rm-resource-report-actions {

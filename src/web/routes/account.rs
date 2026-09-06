@@ -2,8 +2,8 @@ use super::super::handlers::{
     api_attention_count, api_open_count, api_profile_get, api_profile_set, app_logout, app_me,
     app_revoke_other_sessions, app_revoke_session, email_auth_request, email_auth_verify,
     favorites_page, forgot_password_page, forgot_password_request, login_code_page, login_email,
-    login_page, notifications_page, public_user_profile, register_email, register_page,
-    reset_password, unread_count,
+    login_page, notifications_page, open_notification, public_user_profile, register_email,
+    register_page, reset_password, unread_count,
 };
 use crate::state::app_state::AppState;
 use axum::{
@@ -34,6 +34,7 @@ pub(super) fn routes() -> Router<AppState> {
         .route("/app/me", get(app_me))
         .route("/app/favorites", get(favorites_page))
         .route("/app/notifications", get(notifications_page))
+        .route("/app/notifications/{id}/open", get(open_notification))
         .route("/app/user/{public_id}", get(public_user_profile))
         .route("/api/profile", get(api_profile_get).post(api_profile_set))
         .route("/api/open_count", get(api_open_count))

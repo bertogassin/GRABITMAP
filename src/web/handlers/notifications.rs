@@ -2,10 +2,10 @@ use super::auth::verify_authenticated_user;
 use super::auth::verify_user_session;
 use crate::state::app_state::AppState;
 use crate::web::templates;
-use axum::{extract::State, response::Html};
 use axum::{
+    extract::{Path, State},
     http::HeaderMap,
-    response::{IntoResponse, Response},
+    response::{Html, IntoResponse, Redirect, Response},
     Json,
 };
 use serde_json::json;
@@ -64,6 +64,66 @@ pub async fn notifications_page(State(state): State<AppState>, headers: HeaderMa
     drop(db);
 
     Html(templates::render_notifications(notifications, true))
+}
+
+pub async fn open_notification(
+    State(state): State<AppState>,
+    Path(notification_id): Path<i64>,
+    headers: HeaderMap,
+) -> Response {
+    let Some(user_id) = verify_user_session(&state, &headers) else {
+        return Redirect::temporary(&format!(
+            "/login?next={}",
+            urlencoding::encode(&format!("/app/notifications/{notification_id}/open"))
+        ))
+        .into_response();
+    };
+
+    let db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => {
+            return Redirect::temporary("/app/notifications").into_response();
+        }
+    };
+
+    let row: Option<(Option<i64>, String)> = db
+        .query_row(
+            "SELECT resource_id, kind
+             FROM user_notifications
+             WHERE id = ?1
+               AND user_id = ?2
+             LIMIT 1",
+            rusqlite::params![notification_id, user_id],
+            |row| Ok((row.get(0)?, row.get(1)?)),
+        )
+        .ok();
+
+    let Some((resource_id, kind)) = row else {
+        return Redirect::temporary("/app/notifications").into_response();
+    };
+
+    let _ = db.execute(
+        "UPDATE user_notifications
+         SET is_read = 1
+         WHERE id = ?1
+           AND user_id = ?2
+           AND is_read = 0",
+        rusqlite::params![notification_id, user_id],
+    );
+
+    let target = if let Some(resource_id) = resource_id.filter(|id| *id > 0) {
+        if kind == "chat_message" {
+            format!("/app/chat/{resource_id}")
+        } else {
+            format!("/app/resource/{resource_id}")
+        }
+    } else if kind == "admin_assignment" {
+        "/app/center".to_string()
+    } else {
+        "/app/notifications".to_string()
+    };
+
+    Redirect::temporary(&target).into_response()
 }
 
 pub async fn unread_count(State(state): State<AppState>, headers: HeaderMap) -> Response {

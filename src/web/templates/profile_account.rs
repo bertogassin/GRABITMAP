@@ -1336,7 +1336,7 @@ pub fn render_notifications(
         notifications
             .iter()
             .map(
-                |(_notification_id, resource_id, kind, title, message, is_read, _created_at)| {
+                |(notification_id, _resource_id, kind, title, message, is_read, _created_at)| {
                     let safe_title = escape_html(title);
 
                     let safe_message = escape_html(message);
@@ -1361,31 +1361,9 @@ pub fn render_notifications(
                         ""
                     };
 
-                    let open_link = if kind == "chat_message" {
-                        if let Some(id) = resource_id {
-                            format!(
-                                r#"<a href="/app/chat/{id}" class="rm-notif-action rm-notif-action--gold">Открыть чат</a>"#,
-                                id = id
-                            )
-                        } else {
-                            r#"<a href="/app/messages" class="rm-notif-action rm-notif-action--gold">Открыть сообщения</a>"#
-                                .to_string()
-                        }
-                    } else if kind == "contact_accepted" {
-                        r#"<a href="/app/messages" class="rm-notif-action rm-notif-action--gold">Открыть сообщения</a>"#
-                            .to_string()
-                    } else if let Some(id) = resource_id {
-                        format!(
-                            r#"<a href="/app/resource/{id}" class="rm-notif-action rm-notif-action--neutral">Открыть ресурс</a>"#,
-                            id = id
-                        )
-                    } else {
-                        String::new()
-                    };
-
                     format!(
                         r#"
-<article class="card rm-notif-card {card_class}">
+<a href="/app/notifications/{notification_id}/open" class="card rm-notif-card {card_class}">
     <div class="rm-notif-layout">
         <div class="rm-notif-icon {icon_class}">{icon_html}</div>
         <div class="rm-notif-body">
@@ -1394,18 +1372,18 @@ pub fn render_notifications(
                 {unread_badge}
             </div>
             <div class="card-meta rm-notif-message">{message}</div>
-            {open_link}
+            <span class="rm-notif-action rm-notif-action--gold">Открыть</span>
         </div>
     </div>
-</article>
+</a>
 "#,
+                        notification_id = notification_id,
                         card_class = card_class,
                         icon_class = icon_class,
                         icon_html = icon_html,
                         title = safe_title,
                         message = safe_message,
                         unread_badge = unread_badge,
-                        open_link = open_link,
                     )
                 },
             )

@@ -520,7 +520,8 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
     let public_actions_html = if owner_preview {
         String::new()
     } else {
-        r#"<button
+        format!(
+            r#"<button
         id="favorite-button"
         type="button"
         class="ui-button rm-resource-favorite-btn">
@@ -536,58 +537,21 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
         Поделиться
     </button>
     <div id="share-status" class="ui-status"></div>
+    <div id="favorite-status" class="ui-status rm-resource-favorite-status"></div>
 
-    <div id="favorite-status" class="ui-status rm-resource-favorite-status">
-    </div>
-
-    <button
-        id="report-button"
-        type="button"
-        class="ui-button rm-resource-report-btn">
-        Пожаловаться
-    </button>
-
-    <div id="report-panel" class="rm-resource-report-panel">
-
-        <div class="rm-resource-report-label">
-            Причина жалобы
+    <div class="rm-resource-report-inline">
+        <div class="rm-resource-report-label">Пожаловаться</div>
+        <div class="rm-report-chips">
+            <button type="button" class="rm-report-chip" data-reason="Спам">Спам</button>
+            <button type="button" class="rm-report-chip" data-reason="Обман">Обман</button>
+            <button type="button" class="rm-report-chip" data-reason="Оскорбление">Оскорбление</button>
+            <button type="button" class="rm-report-chip" data-reason="Другая причина">Другое</button>
         </div>
-
-        <textarea
-            id="report-reason"
-            maxlength="500"
-            rows="4"
-            placeholder="Коротко опишите проблему..."
-            class="ui-textarea"></textarea>
-
-        <div class="rm-resource-report-actions">
-
-            <button
-                id="report-submit"
-                type="button"
-                class="ui-button rm-resource-report-submit">
-                Отправить жалобу
-            </button>
-
-            <button
-                id="report-cancel"
-                type="button"
-                class="ui-button rm-resource-report-cancel">
-                Отмена
-            </button>
-
-        </div>
-
-        <div id="report-status" class="ui-status rm-resource-report-status">
-        </div>
-
+        <div id="report-status" class="ui-status rm-resource-report-status"></div>
     </div>
 
     <div class="rm-resource-rating-block">
-        <div class="rm-resource-rating-kicker">
-            ОЦЕНИТЬ РЕСУРС
-        </div>
-
+        <div class="rm-resource-rating-kicker">Оценить</div>
         <div id="rating-stars" class="rm-resource-stars">
             <button type="button" data-score="1" class="ui-button rm-resource-star-btn">☆</button>
             <button type="button" data-score="2" class="ui-button rm-resource-star-btn">☆</button>
@@ -595,10 +559,9 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
             <button type="button" data-score="4" class="ui-button rm-resource-star-btn">☆</button>
             <button type="button" data-score="5" class="ui-button rm-resource-star-btn">☆</button>
         </div>
-
         <div id="vote-status" class="ui-status rm-resource-vote-status"></div>
     </div>"#
-            .to_string()
+        )
     };
 
     let detail_section_class = resource_detail_section_class(premium != 0);
@@ -674,6 +637,46 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
 
     let safe_contact_href = escape_html(&contact_href);
     let safe_map_href = escape_html(&map_href);
+    let write_href = if owner_user_id > 0 && !owner_preview {
+        format!("/app/chat/{owner_user_id}")
+    } else {
+        String::new()
+    };
+    let external_label = if contact_clean.starts_with('@') {
+        "Telegram"
+    } else if contact_clean.starts_with("http://") || contact_clean.starts_with("https://") {
+        "Сайт"
+    } else if contact_clean
+        .chars()
+        .any(|c| c.is_ascii_digit() || c == '+')
+    {
+        "Позвонить"
+    } else {
+        "Связаться"
+    };
+    let primary_contact = if !write_href.is_empty() {
+        format!(
+            r#"<a href="{href}" class="rm-resource-contact-btn rm-resource-contact-btn--gold">Написать</a>"#,
+            href = escape_html(&write_href),
+        )
+    } else if !contact_clean.is_empty() {
+        format!(
+            r#"<a href="{href}" class="rm-resource-contact-btn rm-resource-contact-btn--gold">{label}</a>"#,
+            href = safe_contact_href,
+            label = external_label,
+        )
+    } else {
+        String::new()
+    };
+    let extra_contact = if !write_href.is_empty() && !contact_clean.is_empty() {
+        format!(
+            r#"<a href="{href}" class="rm-resource-contact-btn rm-resource-contact-btn--neutral">{label}</a>"#,
+            href = safe_contact_href,
+            label = external_label,
+        )
+    } else {
+        String::new()
+    };
 
     let main_html = format!(
         r####"{moderation_banner}
@@ -711,9 +714,8 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
 
     <div class="rm-resource-contact-actions">
 
-        <a href="{contact_href}" class="rm-resource-contact-btn rm-resource-contact-btn--gold">
-            Связаться
-        </a>
+        {primary_contact}
+        {extra_contact}
 
         <a href="{map_href}"
            target="_blank"
@@ -743,7 +745,8 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
         owner_profile_html = owner_profile_html,
         address = safe_address,
         contact = safe_contact,
-        contact_href = safe_contact_href,
+        primary_contact = primary_contact,
+        extra_contact = extra_contact,
         map_href = safe_map_href,
         detail_section_class = detail_section_class,
         id = id,
@@ -803,12 +806,8 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
                 );
 
                 if (response.status === 401) {{
-                    if (favoriteStatus) {{
-                        favoriteStatus.textContent =
-                            "Войдите в аккаунт GRABIT.";
-                    }}
-
-                    favoriteButton.disabled = false;
+                    window.location.href =
+                        "/login?next=" + encodeURIComponent("/app/resource/" + resourceId);
                     return;
                 }}
 
@@ -837,65 +836,22 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
 
     loadFavorite();
 
-    const reportButton =
-        document.getElementById("report-button");
-
-    const reportPanel =
-        document.getElementById("report-panel");
-
-    const reportReason =
-        document.getElementById("report-reason");
-
-    const reportSubmit =
-        document.getElementById("report-submit");
-
-    const reportCancel =
-        document.getElementById("report-cancel");
-
     const reportStatus =
         document.getElementById("report-status");
+    const reportChips = Array.from(
+        document.querySelectorAll(".rm-report-chip")
+    );
 
-    if (reportButton && reportPanel) {{
-        reportButton.addEventListener("click", () => {{
-            reportPanel.style.display = "block";
-
-            if (reportReason) {{
-                reportReason.focus();
-            }}
-        }});
-    }}
-
-    if (reportCancel && reportPanel) {{
-        reportCancel.addEventListener("click", () => {{
-            reportPanel.style.display = "none";
-
-            if (reportStatus) {{
-                reportStatus.textContent = "";
-            }}
-        }});
-    }}
-
-    if (reportSubmit) {{
-        reportSubmit.addEventListener("click", async () => {{
-            const reason =
-                reportReason
-                    ? reportReason.value.trim()
-                    : "";
-
+    reportChips.forEach((chip) => {{
+        chip.addEventListener("click", async () => {{
+            const reason = String(chip.dataset.reason || "").trim();
             if (reason.length < 3) {{
-                if (reportStatus) {{
-                    reportStatus.textContent =
-                        "Опишите причину жалобы.";
-                }}
-
                 return;
             }}
 
-            reportSubmit.disabled = true;
-
+            reportChips.forEach((item) => {{ item.disabled = true; }});
             if (reportStatus) {{
-                reportStatus.textContent =
-                    "Отправляем...";
+                reportStatus.textContent = "Отправляем...";
             }}
 
             try {{
@@ -906,58 +862,42 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
                         headers: {{
                             "Content-Type": "application/json"
                         }},
-                        body: JSON.stringify({{
-                            reason: reason
-                        }})
+                        body: JSON.stringify({{ reason: reason }})
                     }}
                 );
 
                 if (response.status === 401) {{
-                    if (reportStatus) {{
-                        reportStatus.textContent =
-                            "Войдите в аккаунт GRABIT.";
-                    }}
-
-                    reportSubmit.disabled = false;
+                    window.location.href =
+                        "/login?next=" + encodeURIComponent("/app/resource/" + resourceId);
                     return;
                 }}
 
                 const data = await response.json();
-
-                if (data.ok) {{
-                    if (reportStatus) {{
-                        reportStatus.textContent =
-                            "✓ Жалоба отправлена на проверку.";
-                    }}
-
-                    if (reportReason) {{
-                        reportReason.value = "";
-                    }}
-
-                    reportButton.textContent =
-                        "✓ Жалоба отправлена";
-                }} else {{
-                    if (reportStatus) {{
-                        reportStatus.textContent =
-                            "Не удалось отправить жалобу.";
-                    }}
+                if (reportStatus) {{
+                    reportStatus.textContent = data.ok
+                        ? "Жалоба отправлена"
+                        : "Не удалось отправить жалобу.";
                 }}
             }} catch (_) {{
                 if (reportStatus) {{
-                    reportStatus.textContent =
-                        "Ошибка соединения.";
+                    reportStatus.textContent = "Ошибка соединения.";
                 }}
             }}
 
-            reportSubmit.disabled = false;
+            reportChips.forEach((item) => {{ item.disabled = false; }});
         }});
-    }}
+    }});
     const stars = Array.from(
         document.querySelectorAll("#rating-stars button")
     );
 
     const status = document.getElementById("vote-status");
     const summary = document.getElementById("rating-summary");
+    if (!status) {{
+        return;
+    }}
+
+    let savedScore = 0;
 
     function paint(score) {{
         stars.forEach((star) => {{
@@ -972,13 +912,13 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
         }});
 
         star.addEventListener("mouseleave", () => {{
-            paint(0);
+            paint(savedScore);
         }});
 
         star.addEventListener("click", async () => {{
             const score = Number(star.dataset.score);
 
-            status.textContent = "Сохраняем оценку...";
+            status.textContent = "Сохраняем...";
 
             try {{
                 const response = await fetch(
@@ -988,18 +928,15 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
                         headers: {{
                             "Content-Type": "application/json"
                         }},
-                        body: JSON.stringify({{
-                            
-                            score: score
-                        }})
+                        body: JSON.stringify({{ score: score }})
                     }}
                 );
 
                 const data = await response.json();
 
                 if (response.status === 401) {{
-                    status.textContent =
-                        "Войдите в аккаунт GRABIT, чтобы поставить оценку.";
+                    window.location.href =
+                        "/login?next=" + encodeURIComponent("/app/resource/" + resourceId);
                     return;
                 }}
 
@@ -1008,12 +945,15 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
                     return;
                 }}
 
+                savedScore = score;
                 paint(score);
 
-                summary.innerHTML =
-                    `Оценка <strong>${{Number(data.rating).toFixed(1)}}</strong> · ${{data.votes}} голосов`;
+                if (summary) {{
+                    summary.innerHTML =
+                        `Оценка <strong>${{Number(data.rating).toFixed(1)}}</strong> · ${{data.votes}} голосов`;
+                }}
 
-                status.textContent = "✓ Ваша оценка сохранена";
+                status.textContent = "Оценка сохранена";
             }} catch (_) {{
                 status.textContent = "Ошибка соединения.";
             }}
