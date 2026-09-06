@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_VERSION = "resursmap-shell-v4.9.60";
+const CACHE_VERSION = "grabit-shell-v4.9.70";
 
 const STATIC_ASSETS = [
     "/static/manifest.webmanifest",
@@ -29,8 +29,9 @@ self.addEventListener("activate", function (event) {
                     keys
                         .filter(function (key) {
                             return (
-                                key.startsWith(
-                                    "resursmap-shell-"
+                                (
+                                    key.startsWith("resursmap-shell-") ||
+                                    key.startsWith("grabit-shell-")
                                 ) &&
                                 key !== CACHE_VERSION
                             );

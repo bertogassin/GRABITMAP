@@ -40,6 +40,30 @@ pub(super) fn users_are_blocked(
         == 1
 }
 
+fn conversation_id_for_pair(
+    connection: &Connection,
+    first_user_id: i64,
+    second_user_id: i64,
+) -> i64 {
+    let (user1_id, user2_id) = if first_user_id < second_user_id {
+        (first_user_id, second_user_id)
+    } else {
+        (second_user_id, first_user_id)
+    };
+
+    connection
+        .query_row(
+            "SELECT id
+             FROM conversations
+             WHERE user1_id = ?1
+               AND user2_id = ?2
+             LIMIT 1",
+            rusqlite::params![user1_id, user2_id],
+            |row| row.get(0),
+        )
+        .unwrap_or(1)
+}
+
 fn json_error(status: StatusCode, error: &str) -> Response {
     (
         status,
@@ -196,6 +220,15 @@ pub async fn api_chat_block(
         rusqlite::params![user_id, other_user_id],
     );
 
+    let conversation_id = conversation_id_for_pair(&connection, user_id, other_user_id);
+    state.publish_chat_event(
+        "user.blocked",
+        conversation_id,
+        1,
+        user_id,
+        other_user_id,
+    );
+
     (
         StatusCode::OK,
         Json(json!({
@@ -247,6 +280,14 @@ pub async fn api_chat_unblock(
     }
 
     let still_blocked = users_are_blocked(&connection, user_id, other_user_id);
+    let conversation_id = conversation_id_for_pair(&connection, user_id, other_user_id);
+    state.publish_chat_event(
+        "user.unblocked",
+        conversation_id,
+        1,
+        user_id,
+        other_user_id,
+    );
 
     (
         StatusCode::OK,

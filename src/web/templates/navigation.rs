@@ -1,5 +1,6 @@
 use super::common::{
-    back_navigation_card, bottom_nav, empty_state_card, escape_html, guest_mode_hint, icon,
+    back_navigation_card, bottom_nav, empty_state_action, empty_state_card_with_actions,
+    escape_html, guest_mode_hint, icon,
     intent_kind_chips, kind_chip, navigation_card, page_document, page_shell, premium_badge_html,
     profession_label, resource_listing_label, resource_result_card, search_form_hero,
     search_people_cards, section_head, simple_hero, static_asset, topbar, verified_badge_html,
@@ -1240,7 +1241,18 @@ pub fn render_search(
                 escape_html(empty_query)
             )
         };
-        empty_state_card("Ничего не найдено", &empty_copy)
+        empty_state_card_with_actions(
+            "Ничего не найдено",
+            &format!(
+                "{empty_copy} Можно сменить город или добавить объявление.",
+                empty_copy = empty_copy
+            ),
+            &format!(
+                "{}{}",
+                empty_state_action("/app", "Другой город"),
+                empty_state_action("/app/add", "Добавить объявление"),
+            ),
+        )
     } else if resources.is_empty() {
         String::new()
     } else {

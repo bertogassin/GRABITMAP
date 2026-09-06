@@ -187,7 +187,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
         rejected_count,
         favorites_count,
         unread_notifications_count,
-        pending_contact_requests_count,
+        pending_contact_requests_count: _,
         unread_messages_count,
         moderator_level,
         intent_text,
@@ -392,7 +392,6 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
         let attention_count = pending_count
             .saturating_add(rejected_count)
             .saturating_add(unread_notifications_count)
-            .saturating_add(pending_contact_requests_count)
             .saturating_add(unread_messages_count);
 
         let availability_class = "available";
@@ -813,23 +812,6 @@ body.light-theme .rm-command-icon {{
         </a>
 
         <a class="rm-command-card"
-           href="/app/contact-requests">
-            <span class="rm-command-icon">
-                {contacts_icon}
-            </span>
-            <span class="rm-command-copy">
-                <strong>Запросы на связь</strong>
-                <small>
-                    Старые запросы. Новые сообщения приходят сразу
-                </small>
-            </span>
-            {contacts_badge}
-            <span class="rm-command-arrow">
-                {arrow}
-            </span>
-        </a>
-
-        <a class="rm-command-card"
            href="/app/favorites">
             <span class="rm-command-icon">
                 {favorites_icon}
@@ -895,12 +877,10 @@ body.light-theme .rm-command-icon {{
             attention_count = attention_count,
             resources_icon = icon("map"),
             plus_icon = icon("plus"),
-            contacts_icon = icon("users"),
             favorites_icon = icon("heart"),
             notifications_icon = icon("bell"),
             search_icon = icon("search"),
             arrow = icon("chevron"),
-            contacts_badge = count_badge(pending_contact_requests_count),
             notifications_badge = count_badge(unread_notifications_count),
             admin_navigation = admin_navigation,
         )
@@ -1331,7 +1311,7 @@ body.light-theme .rm-command-icon {{
         &bottom_nav_with_badges(
             "menu",
             unread_messages_count,
-            unread_notifications_count.saturating_add(pending_contact_requests_count),
+            unread_notifications_count,
         ),
         &body_after_html,
     )
@@ -1862,14 +1842,14 @@ mod personal_center_tests {
 
         assert!(html.contains("Обзор"));
         assert!(html.contains("/app/my-resources"));
-        assert!(html.contains("/app/contact-requests"));
+        assert!(!html.contains("/app/contact-requests"));
         assert!(html.contains("/app/favorites"));
         assert!(html.contains("/app/notifications"));
         assert!(html.contains("Реальные разделы аккаунта"));
         assert!(html.contains("data-nav-chats-link"));
         assert!(html.contains(r#"<span class="nav-badge">6</span>"#));
         assert!(html.contains("data-nav-menu-link"));
-        assert!(html.contains(r#"<span class="nav-badge">7</span>"#));
+        assert!(html.contains(r#"<span class="nav-badge">5</span>"#));
     }
 
     #[test]

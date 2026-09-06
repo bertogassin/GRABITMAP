@@ -119,7 +119,8 @@ pub async fn app_cat(
                     p.open_contact,
                     p.intent_text,
                     p.intent_until,
-                    p.last_seen_at
+                    p.last_seen_at,
+                    p.user_id
                  FROM profiles p
                  JOIN users u
                    ON u.id = p.user_id
@@ -170,6 +171,7 @@ pub async fn app_cat(
                         row.get(6)?,
                         row.get(7)?,
                         row.get(8)?,
+                        row.get(9)?,
                     ))
                 },
             )?

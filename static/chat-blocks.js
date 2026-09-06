@@ -53,6 +53,14 @@
 
             input.disabled = state.blocked;
             send.disabled = state.blocked;
+            var imageBtn = document.getElementById("chat-image-btn");
+            var voiceBtn = document.getElementById("chat-voice-btn");
+            if (imageBtn) {
+                imageBtn.disabled = state.blocked;
+            }
+            if (voiceBtn) {
+                voiceBtn.disabled = state.blocked;
+            }
 
             toggle.hidden = false;
             toggle.disabled = state.busy;
@@ -161,6 +169,10 @@
 
             state.busy = false;
             applyState();
+        });
+
+        document.addEventListener("resursmap:chat-block-update", function () {
+            refresh();
         });
 
         refresh();

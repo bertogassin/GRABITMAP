@@ -1194,7 +1194,7 @@ pub fn render_resource_promotion(params: RenderResourcePromotionParams<'_>) -> S
 <section class="card rm-promo-preview">
 
     <div class="rm-promo-preview-head">
-        RESURSMAP · {city_name}
+        GRABIT · {city_name}
     </div>
 
     <div class="rm-promo-preview-body">

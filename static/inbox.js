@@ -122,7 +122,7 @@
 
         function renderEmptyState() {
             return (
-                '<div class="card empty-state-card"><div class="card-content"><div class="card-title">Диалогов пока нет</div><div class="card-meta">После принятия запроса на связь здесь появится внутренний чат.</div></div></div>'
+                '<div class="card empty-state-card"><div class="card-content"><div class="card-title">Диалогов пока нет</div><div class="card-meta">Откройте профиль участника и напишите сразу.</div></div></div>'
             );
         }
 

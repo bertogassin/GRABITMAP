@@ -246,7 +246,9 @@
                     peerState.classList.add("is-online");
                 } else {
                     peerState.textContent =
-                        "был(а) " + formatLastSeen(peerLastSeenAt);
+                        peerLastSeenAt > 0
+                            ? "был(а) " + formatLastSeen(peerLastSeenAt)
+                            : "не в сети";
                 }
             }
 
@@ -961,7 +963,7 @@
                 updateReadStatuses(
                     Number(data.peer_read_through_id || 0)
                 );
-                setConnection("В сети", "is-online");
+                setConnection("Связь есть", "is-online");
             } catch (error) {
                 if (error.status === 401) {
                     setConnection(
@@ -1010,7 +1012,7 @@
                     mayHaveOlder
                         ? "Загрузить предыдущие сообщения"
                         : "Начало переписки";
-                setConnection("В сети", "is-online");
+                setConnection("Связь есть", "is-online");
             } catch (_) {
                 loadOlder.textContent =
                     "Не удалось загрузить · Повторить";
@@ -1174,7 +1176,7 @@
                         window.playChatSend();
                     }
                     window.dispatchEvent(new CustomEvent("resursmap:chat-message-sent"));
-                    setConnection("\u0412 \u0441\u0435\u0442\u0438", "is-online");
+                    setConnection("Связь есть", "is-online");
                     index = 0;
                 } catch (error) {
                     var recoverable = isRecoverableError(error);
@@ -1372,8 +1374,12 @@
                 if (replyBarEl) {
                     replyBarEl.hidden = true;
                 }
-                setConnection("В сети", "is-online");
+                setConnection("Связь есть", "is-online");
                 sendState.textContent = "Отправлено · Enter — отправить";
+                window.dispatchEvent(new CustomEvent("resursmap:chat-message-sent"));
+                if (typeof window.resursmapRefreshAttentionBadge === "function") {
+                    window.resursmapRefreshAttentionBadge();
+                }
               }).catch(function () {
                 setConnection("Ошибка фото", "is-error");
                 sendState.textContent = "Фото не отправлено";
@@ -1476,8 +1482,12 @@
                 if (replyBarEl) {
                     replyBarEl.hidden = true;
                 }
-                setConnection("В сети", "is-online");
+                setConnection("Связь есть", "is-online");
                 sendState.textContent = "Отправлено · Enter — отправить";
+                window.dispatchEvent(new CustomEvent("resursmap:chat-message-sent"));
+                if (typeof window.resursmapRefreshAttentionBadge === "function") {
+                    window.resursmapRefreshAttentionBadge();
+                }
                 if (typeof window.playChatSend === "function") {
                     window.playChatSend();
                 }
@@ -1905,7 +1915,7 @@
         updateViewportHeight();
         updateComposer();
         scrollToBottom("auto");
-        setConnection("В сети", "is-online");
+        setConnection("Связь есть", "is-online");
 
         pollTimer = window.setInterval(
             pollMessages,
@@ -3830,6 +3840,25 @@
                         payload.type === "sync_required" ||
                         payload.type === "ready"
                     ) {
+                        if (
+                            payload.type === "chat_event" &&
+                            payload.event &&
+                            (
+                                payload.event.kind === "user.blocked" ||
+                                payload.event.kind === "user.unblocked"
+                            )
+                        ) {
+                            document.dispatchEvent(
+                                new CustomEvent(
+                                    "resursmap:chat-block-update",
+                                    {
+                                        detail: payload.event
+                                    }
+                                )
+                            );
+                            return;
+                        }
+
                         if (
                             payload.type === "chat_event" &&
                             payload.event &&

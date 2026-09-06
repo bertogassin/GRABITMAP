@@ -647,6 +647,7 @@ fn map_search_person_row(
         row.get(6)?,
         row.get(7)?,
         row.get(8)?,
+        row.get(9)?,
     ))
 }
 
@@ -854,7 +855,8 @@ pub async fn app_search(
                     p.open_contact,
                     p.intent_text,
                     p.intent_until,
-                    p.last_seen_at
+                    p.last_seen_at,
+                    p.user_id
                  FROM profiles p",
             );
 

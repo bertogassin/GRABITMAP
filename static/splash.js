@@ -1,4 +1,4 @@
-// Заставка ResursMap — только при первом заходе на /app
+// Заставка GRABIT — только при первом заходе на /app
 (function() {
     var path = window.location.pathname || "";
     if (path !== "/app" && !path.startsWith("/app/")) {

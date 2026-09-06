@@ -87,6 +87,6 @@
         }
     });
 
-    setInterval(refreshAttention, 30000);
-    setTimeout(refreshAttention, 1200);
+    setInterval(refreshAttention, 8000);
+    setTimeout(refreshAttention, 400);
 })();

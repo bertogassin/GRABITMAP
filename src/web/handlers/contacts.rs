@@ -1,83 +1,14 @@
 use super::auth::verify_user_session;
 use super::common::{csrf_rejected_response, rate_limit_retry_after, request_is_cross_site};
 use crate::state::app_state::AppState;
-use crate::web::templates;
 use axum::{
     extract::{Path, State},
     http::{header, HeaderMap, StatusCode},
-    response::{Html, IntoResponse, Response},
+    response::{IntoResponse, Redirect, Response},
 };
 
-pub async fn contact_requests_page(
-    State(state): State<AppState>,
-    headers: HeaderMap,
-) -> Html<String> {
-    let user_id = match verify_user_session(&state, &headers) {
-        Some(id) => id,
-
-        None => {
-            return Html(templates::render_contact_requests(vec![], false));
-        }
-    };
-
-    let db = match crate::db::pool::get_connection(&state.db_pool) {
-        Ok(db) => db,
-        Err(_) => {
-            return Html("<h1>503</h1><p>База данных временно недоступна.</p>".to_string());
-        }
-    };
-
-    let requests: Vec<crate::web::view_models::ContactRequestRow> = db
-        .prepare(
-            "SELECT
-                cr.id,
-                cr.sender_user_id,
-                cr.message,
-                cr.status,
-                COALESCE(p.public_id, ''),
-                COALESCE(p.username, ''),
-                COALESCE(p.first_name, ''),
-                cr.created_at,
-                CASE
-                    WHEN cr.status = 'pending' THEN 0
-                    WHEN cr.status = 'accepted' THEN 1
-                    ELSE 2
-                END
-             FROM contact_requests cr
-             LEFT JOIN profiles p
-               ON p.user_id = cr.sender_user_id
-             WHERE cr.receiver_user_id = ?1
-             ORDER BY
-                CASE cr.status
-                    WHEN 'pending' THEN 0
-                    WHEN 'accepted' THEN 1
-                    ELSE 2
-                END,
-                cr.updated_at DESC,
-                cr.id DESC
-             LIMIT 100",
-        )
-        .and_then(|mut stmt| {
-            stmt.query_map(rusqlite::params![user_id], |row| {
-                Ok((
-                    row.get(0)?,
-                    row.get(1)?,
-                    row.get(2)?,
-                    row.get(3)?,
-                    row.get(4)?,
-                    row.get(5)?,
-                    row.get(6)?,
-                    row.get(7)?,
-                    row.get(8)?,
-                ))
-            })?
-            .collect::<Result<Vec<_>, _>>()
-        })
-        .unwrap_or_default();
-
-    drop(db);
-
-    Html(templates::render_contact_requests(requests, true))
+pub async fn contact_requests_page() -> Response {
+    Redirect::to("/app/messages").into_response()
 }
 
 pub async fn accept_contact_request(
@@ -225,7 +156,7 @@ pub async fn accept_contact_request(
 
     (
         StatusCode::SEE_OTHER,
-        [(header::LOCATION, format!("/app/chat/{sender_user_id}"))],
+        [(header::LOCATION, format!("/app/messages"))],
     )
         .into_response()
 }
@@ -331,7 +262,7 @@ pub async fn reject_contact_request(
 
     (
         StatusCode::SEE_OTHER,
-        [(header::LOCATION, format!("/app/chat/{sender_user_id}"))],
+        [(header::LOCATION, format!("/app/messages"))],
     )
         .into_response()
 }

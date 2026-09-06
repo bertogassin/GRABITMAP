@@ -257,22 +257,13 @@ pub async fn app_me(State(state): State<AppState>, headers: HeaderMap) -> Html<S
              FROM user_notifications
              WHERE user_id = ?1
                AND is_read = 0
-               AND kind <> 'chat_message'",
+               AND kind NOT IN ('chat_message', 'contact_request', 'contact_accepted', 'contact_rejected')",
             rusqlite::params![user_id],
             |row| row.get(0),
         )
         .unwrap_or(0);
 
-    let pending_contact_requests_count: i64 = db
-        .query_row(
-            "SELECT COUNT(*)
-             FROM contact_requests
-             WHERE receiver_user_id = ?1
-               AND status = 'pending'",
-            rusqlite::params![user_id],
-            |row| row.get(0),
-        )
-        .unwrap_or(0);
+    let pending_contact_requests_count: i64 = 0;
 
     let unread_messages_count: i64 = db
         .query_row(
@@ -343,13 +334,20 @@ pub async fn api_attention_count(State(state): State<AppState>, headers: HeaderM
         }
     };
 
+    let _ = db.execute(
+        "UPDATE profiles
+         SET last_seen_at = strftime('%s','now')
+         WHERE user_id = ?1",
+        rusqlite::params![user_id],
+    );
+
     let counts = query_attention_counts(&db, user_id);
 
     Json(json!({
         "count": counts.0,
         "messages": counts.1,
         "notifications": counts.2,
-        "contacts": counts.3,
+        "contacts": 0,
     }))
     .into_response()
 }
@@ -361,18 +359,7 @@ fn query_attention_counts(db: &rusqlite::Connection, user_id: i64) -> (i64, i64,
              FROM user_notifications
              WHERE user_id = ?1
                AND is_read = 0
-               AND kind <> 'chat_message'",
-            rusqlite::params![user_id],
-            |row| row.get(0),
-        )
-        .unwrap_or(0);
-
-    let contacts: i64 = db
-        .query_row(
-            "SELECT COUNT(*)
-             FROM contact_requests
-             WHERE receiver_user_id = ?1
-               AND status = 'pending'",
+               AND kind NOT IN ('chat_message', 'contact_request', 'contact_accepted', 'contact_rejected')",
             rusqlite::params![user_id],
             |row| row.get(0),
         )
@@ -392,12 +379,7 @@ fn query_attention_counts(db: &rusqlite::Connection, user_id: i64) -> (i64, i64,
         )
         .unwrap_or(0);
 
-    (
-        messages + notifications + contacts,
-        messages,
-        notifications,
-        contacts,
-    )
+    (messages + notifications, messages, notifications, 0)
 }
 
 fn load_user_sessions(

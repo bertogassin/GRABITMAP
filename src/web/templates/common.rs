@@ -7,7 +7,7 @@ pub fn escape_html(value: &str) -> String {
         .replace('\'', "&#39;")
 }
 
-pub const STATIC_ASSET_VERSION: &str = "4.9.62";
+pub const STATIC_ASSET_VERSION: &str = "4.9.70";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -3860,6 +3860,60 @@ a.feature.rm-feature-add {
         height: 40px;
     }
 }
+
+.card--person {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.rm-person-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px 10px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.rm-person-write {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 14px 14px;
+    min-height: 40px;
+    border-radius: 12px;
+    background: rgba(232, 204, 150, .14);
+    color: var(--gold-light);
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.rm-person-write:hover {
+    background: rgba(232, 204, 150, .22);
+}
+
+.bottom-nav {
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+
+.nav-item {
+    min-height: 56px;
+}
+
+.chat-dialog-card {
+    border-radius: 18px;
+}
+
+.rm-empty-state-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+}
 "#
 }
 
@@ -4228,10 +4282,20 @@ pub(crate) fn people_result_card(
     intent_html: &str,
     contact_html: &str,
     is_ready: bool,
+    write_href: Option<&str>,
 ) -> String {
+    let write_html = match write_href.filter(|value| !value.is_empty()) {
+        Some(write_href) => format!(
+            r#"<a href="{href}" class="rm-person-write">Написать</a>"#,
+            href = escape_html(write_href),
+        ),
+        None => String::new(),
+    };
+
     format!(
         r#"
-<a href="{href}" class="card card--result">
+<div class="card card--result card--person">
+<a href="{href}" class="rm-person-main">
 
     <div class="card-icon">
         {user_icon}
@@ -4259,6 +4323,8 @@ pub(crate) fn people_result_card(
     </div>
 
 </a>
+{write_html}
+</div>
 "#,
         href = escape_html(href),
         user_icon = icon("user"),
@@ -4272,6 +4338,7 @@ pub(crate) fn people_result_card(
         intent_html = intent_html,
         contact_html = contact_html,
         arrow = icon("chevron"),
+        write_html = write_html,
     )
 }
 
@@ -4285,10 +4352,11 @@ pub(crate) fn search_people_cards(people: &[crate::web::view_models::SearchPerso
                 first_name,
                 last_name,
                 category,
-                open_contact,
+                _open_contact,
                 intent_text,
                 intent_until,
                 last_seen_at,
+                user_id,
             )| {
                 let safe_first_name = escape_html(first_name);
                 let safe_last_name = escape_html(last_name);
@@ -4334,10 +4402,16 @@ pub(crate) fn search_people_cards(people: &[crate::web::view_models::SearchPerso
 
                 let contact_html = if is_online {
                     r#"<span class="rm-presence-badge rm-presence-badge--online">Онлайн</span>"#
-                } else if *open_contact != 0 {
-                    r#"<span class="rm-presence-badge rm-presence-badge--open">Контакт открыт</span>"#
+                } else if *last_seen_at > 0 {
+                    r#"<span class="rm-presence-badge">Был недавно</span>"#
                 } else {
-                    r#"<span class="rm-presence-badge rm-presence-badge--closed">Контакт закрыт</span>"#
+                    r#"<span class="rm-presence-badge">Написать</span>"#
+                };
+
+                let write_href = if *user_id > 0 {
+                    Some(format!("/app/chat/{user_id}"))
+                } else {
+                    None
                 };
 
                 people_result_card(
@@ -4346,7 +4420,8 @@ pub(crate) fn search_people_cards(people: &[crate::web::view_models::SearchPerso
                     &profession_html,
                     &intent_html,
                     contact_html,
-                    is_online || *open_contact > 0 || intent_is_active,
+                    is_online || intent_is_active,
+                    write_href.as_deref(),
                 )
             },
         )
@@ -5825,12 +5900,15 @@ mod public_entry_tests {
             String::new(),
             0,
             0,
+            12,
         )]);
 
         let profession = html.find("Охрана").expect("profession title");
         let name = html.find("Иван").expect("person name");
         assert!(profession < name);
         assert!(html.contains("rm-search-person-name"));
+        assert!(html.contains("/app/chat/12"));
+        assert!(html.contains("Написать"));
     }
 
     #[test]

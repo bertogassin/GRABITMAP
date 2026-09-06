@@ -38,6 +38,7 @@ pub async fn notifications_page(State(state): State<AppState>, headers: HeaderMa
                 created_at
              FROM user_notifications
              WHERE user_id = ?1
+               AND kind NOT IN ('chat_message', 'contact_request', 'contact_accepted', 'contact_rejected')
              ORDER BY
                 is_read ASC,
                 created_at DESC,
@@ -59,14 +60,6 @@ pub async fn notifications_page(State(state): State<AppState>, headers: HeaderMa
             .collect::<Result<Vec<_>, _>>()
         })
         .unwrap_or_default();
-
-    let _ = db.execute(
-        "UPDATE user_notifications
-         SET is_read = 1
-         WHERE user_id = ?1
-           AND is_read = 0",
-        rusqlite::params![user_id],
-    );
 
     drop(db);
 
@@ -90,7 +83,7 @@ pub async fn unread_count(State(state): State<AppState>, headers: HeaderMap) -> 
         .ok()
         .and_then(|conn| {
             conn.query_row(
-                "SELECT COUNT(*) FROM user_notifications WHERE user_id = ?1 AND is_read = 0",
+                "SELECT COUNT(*) FROM user_notifications WHERE user_id = ?1 AND is_read = 0 AND kind NOT IN ('chat_message', 'contact_request', 'contact_accepted', 'contact_rejected')",
                 rusqlite::params![user.user_id],
                 |row| row.get::<_, i64>(0),
             )

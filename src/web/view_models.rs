@@ -129,4 +129,5 @@ pub type SearchPersonRow = (
     String,
     i64,
     i64,
+    i64,
 );

@@ -110,9 +110,10 @@ fn create_city_href(city_id: i64, kind: &str, intent: &str, rubric: Option<&str>
 }
 
 pub async fn resource_create_start(State(state): State<AppState>, headers: HeaderMap) -> Response {
-    if let Err(response) = authenticated_or_login(&state, &headers, "/app/add") {
-        return response;
-    }
+    let user = match authenticated_or_login(&state, &headers, "/app/add") {
+        Ok(user) => user,
+        Err(response) => return response,
+    };
 
     let db = match crate::db::pool::get_connection(&state.db_pool) {
         Ok(db) => db,
@@ -124,6 +125,43 @@ pub async fn resource_create_start(State(state): State<AppState>, headers: Heade
                 .into_response();
         }
     };
+
+    let known_city_id: Option<i64> = db
+        .query_row(
+            "SELECT city.id
+             FROM profiles AS profile
+             JOIN geo_cities AS city
+               ON city.legacy_continent_index = profile.home_continent_index
+              AND city.legacy_country_index = profile.home_country_index
+              AND city.legacy_city_index = profile.home_city_index
+              AND city.place_kind = 'city'
+              AND city.is_active = 1
+             WHERE profile.user_id = ?1
+               AND profile.home_continent_index >= 0
+               AND profile.home_country_index >= 0
+               AND profile.home_city_index >= 0
+             LIMIT 1",
+            rusqlite::params![user.user_id],
+            |row| row.get(0),
+        )
+        .ok()
+        .or_else(|| {
+            db.query_row(
+                "SELECT city_id
+                 FROM resources
+                 WHERE user_id = ?1
+                   AND city_id > 0
+                 ORDER BY updated_at DESC, id DESC
+                 LIMIT 1",
+                rusqlite::params![user.user_id],
+                |row| row.get(0),
+            )
+            .ok()
+        });
+
+    if let Some(city_id) = known_city_id.filter(|id| *id > 0) {
+        return Redirect::temporary(&format!("/app/add/city/{city_id}")).into_response();
+    }
 
     let continents = db
         .prepare(

@@ -5,6 +5,7 @@ use super::common::{
     topbar,
 };
 
+#[allow(dead_code)]
 pub fn render_contact_requests(
     requests: Vec<crate::web::view_models::ContactRequestRow>,
     authenticated: bool,
@@ -401,9 +402,9 @@ pub fn render_messages(
         &topbar("Сообщения", "message-circle"),
         &simple_hero(
             "message-circle",
-            "Внутренняя связь",
+            "Чаты",
             "Сообщения",
-            "Личные сообщения и активные диалоги.",
+            "Пишите сразу. Потом можно заблокировать или удалить.",
         ),
         &content_html,
         &bottom_nav_with_badge("chats", total_unread),
