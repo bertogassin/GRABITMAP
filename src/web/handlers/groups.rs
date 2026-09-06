@@ -15,7 +15,6 @@ use serde::Deserialize;
 use serde_json::json;
 use std::fs;
 use std::io::Write;
-use std::path::PathBuf;
 
 #[derive(Debug, Deserialize)]
 pub struct CreateGroupForm {

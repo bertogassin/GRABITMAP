@@ -6,6 +6,7 @@ window.rmGetLocale = getLocale;
 window.rmGetTextDirection = getTextDirection;
 document.documentElement.dir = getTextDirection();
 window.rmSetLocale = function (locale) {
+    document.documentElement.lang = locale;
     document.documentElement.dir = getTextDirection(locale);
     return setLocale(locale, { reload: true });
 };
