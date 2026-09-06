@@ -1,9 +1,12 @@
 import * as messages from "./paraglide/messages.js";
-import { getLocale, setLocale } from "./paraglide/runtime.js";
+import { getLocale, setLocale, getTextDirection } from "./paraglide/runtime.js";
 
 window.m = messages;
 window.rmGetLocale = getLocale;
+window.rmGetTextDirection = getTextDirection;
+document.documentElement.dir = getTextDirection();
 window.rmSetLocale = function (locale) {
+    document.documentElement.dir = getTextDirection(locale);
     return setLocale(locale, { reload: true });
 };
 

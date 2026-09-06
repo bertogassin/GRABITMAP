@@ -1,7 +1,7 @@
 use super::auth::verify_user_session;
 use super::chat::load_user_conversations;
 use super::chat_api::{message_can_be_edited, message_is_valid, reaction_emoji_is_allowed};
-use super::chat_media::{detect_audio, detect_image, extension_for_mime};
+use super::chat_media::{detect_audio, detect_image, extension_for_mime, media_root};
 use super::common::{input_text_is_valid, request_is_cross_site, unix_now};
 use crate::state::app_state::AppState;
 use crate::web::templates;
@@ -210,7 +210,7 @@ fn load_group_messages(
             })
             .unwrap_or_default()
     };
-    decorate_group_messages(db, viewer_user_id, &mut messages);
+    decorate_group_messages(db, group_id, viewer_user_id, &mut messages);
     apply_group_delivery_ticks(db, group_id, viewer_user_id, &mut messages);
     messages
 }
@@ -290,6 +290,7 @@ fn profile_display_name(db: &rusqlite::Connection, user_id: i64) -> String {
 
 fn decorate_group_messages(
     db: &rusqlite::Connection,
+    group_id: i64,
     viewer_user_id: i64,
     messages: &mut [crate::web::view_models::ChatMessageRow],
 ) {
@@ -304,8 +305,10 @@ fn decorate_group_messages(
         }
         if message.reply_to_message_id > 0 {
             if let Ok((sender, text, deleted)) = db.query_row(
-                "SELECT sender_user_id, message, deleted_at FROM group_messages WHERE id = ?1",
-                rusqlite::params![message.reply_to_message_id],
+                "SELECT sender_user_id, message, deleted_at
+                 FROM group_messages
+                 WHERE id = ?1 AND group_id = ?2",
+                rusqlite::params![message.reply_to_message_id, group_id],
                 |row| Ok((row.get::<_, i64>(0)?, row.get::<_, String>(1)?, row.get::<_, i64>(2)?)),
             ) {
                 message.reply_sender_user_id = sender;
@@ -726,6 +729,18 @@ pub async fn api_group_send(
     if group_id <= 0 || !is_member(&db, group_id, user_id) {
         return json_error(StatusCode::FORBIDDEN, "not_a_member");
     }
+    if payload.reply_to_message_id > 0
+        && db
+            .query_row(
+                "SELECT 1 FROM group_messages
+                 WHERE id = ?1 AND group_id = ?2 AND deleted_at = 0",
+                rusqlite::params![payload.reply_to_message_id, group_id],
+                |_| Ok(()),
+            )
+            .is_err()
+    {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_reply");
+    }
     let client_message_id = payload.client_message_id.trim().to_string();
     if !client_message_id.is_empty() && !client_message_id_ok(&client_message_id) {
         return json_error(StatusCode::BAD_REQUEST, "invalid_client_message_id");
@@ -847,6 +862,21 @@ pub async fn api_group_send_image(
     let Some(bytes) = file_bytes else {
         return json_error(StatusCode::BAD_REQUEST, "image_required");
     };
+    if !client_message_id.is_empty() && !client_message_id_ok(&client_message_id) {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_client_message_id");
+    }
+    if !client_message_id.is_empty() {
+        if let Some(existing) =
+            find_group_message_by_client_id(&db, group_id, user_id, &client_message_id)
+        {
+            return Json(json!({
+                "ok": true,
+                "message": message_json(&existing, user_id),
+                "deduped": true
+            }))
+            .into_response();
+        }
+    }
     if bytes.len() > 8 * 1024 * 1024 {
         return json_error(StatusCode::PAYLOAD_TOO_LARGE, "image_too_large");
     }
@@ -854,8 +884,16 @@ pub async fn api_group_send_image(
         return json_error(StatusCode::BAD_REQUEST, "unsupported_image");
     };
     let ext = extension_for_mime(mime);
-    let relative = format!("groups/{group_id}/{user_id}-{}.{}", unix_now(), ext);
-    let absolute = PathBuf::from("data/chat-media").join(&relative);
+    let unique = format!(
+        "{}-{}",
+        unix_now(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|duration| duration.as_nanos())
+            .unwrap_or_default()
+    );
+    let relative = format!("groups/{group_id}/{user_id}-{unique}.{ext}");
+    let absolute = media_root().join(&relative);
     if let Some(parent) = absolute.parent() {
         let _ = fs::create_dir_all(parent);
     }
@@ -947,7 +985,7 @@ pub async fn api_group_media(
     if path.is_empty() || path.contains("..") {
         return json_error(StatusCode::NOT_FOUND, "not_found");
     }
-    let absolute = PathBuf::from("data/chat-media").join(&path);
+    let absolute = media_root().join(&path);
     let bytes = match fs::read(&absolute) {
         Ok(bytes) => bytes,
         Err(_) => return json_error(StatusCode::NOT_FOUND, "not_found"),
@@ -1015,6 +1053,21 @@ pub async fn api_group_send_voice(
     let Some(bytes) = file_bytes else {
         return json_error(StatusCode::BAD_REQUEST, "voice_required");
     };
+    if !client_message_id.is_empty() && !client_message_id_ok(&client_message_id) {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_client_message_id");
+    }
+    if !client_message_id.is_empty() {
+        if let Some(existing) =
+            find_group_message_by_client_id(&db, group_id, user_id, &client_message_id)
+        {
+            return Json(json!({
+                "ok": true,
+                "message": message_json(&existing, user_id),
+                "deduped": true
+            }))
+            .into_response();
+        }
+    }
     if bytes.len() > 512 * 1024 {
         return json_error(StatusCode::BAD_REQUEST, "voice_too_large");
     }
@@ -1022,8 +1075,16 @@ pub async fn api_group_send_voice(
         return json_error(StatusCode::BAD_REQUEST, "unsupported_voice");
     };
     let ext = extension_for_mime(mime);
-    let relative = format!("groups/{group_id}/{user_id}-voice-{}.{}", unix_now(), ext);
-    let absolute = PathBuf::from("data/chat-media").join(&relative);
+    let unique = format!(
+        "{}-{}",
+        unix_now(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|duration| duration.as_nanos())
+            .unwrap_or_default()
+    );
+    let relative = format!("groups/{group_id}/{user_id}-voice-{unique}.{ext}");
+    let absolute = media_root().join(&relative);
     if let Some(parent) = absolute.parent() {
         let _ = fs::create_dir_all(parent);
     }

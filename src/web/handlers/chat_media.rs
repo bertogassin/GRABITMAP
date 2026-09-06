@@ -65,7 +65,7 @@ fn client_message_id_is_valid(value: &str) -> bool {
             .all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_')
 }
 
-fn media_root() -> PathBuf {
+pub(crate) fn media_root() -> PathBuf {
     PathBuf::from("data/chat-media")
 }
 
