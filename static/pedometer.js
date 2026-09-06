@@ -27,15 +27,9 @@
     const dayMeta = document.getElementById("rm-step-day-meta");
     const goalForm = document.getElementById("rm-step-goal-form");
     const goalInput = document.getElementById("rm-step-goal");
-    const monthPrev = document.getElementById("rm-step-month-prev");
-    const monthNext = document.getElementById("rm-step-month-next");
-    const monthLabel = document.getElementById("rm-step-month-label");
-    const monthMeta = document.getElementById("rm-step-month-meta");
-    const monthGrid = document.getElementById("rm-step-month-grid");
 
     let snapshot = null;
     let localToday = localDate();
-    let viewMonth = localToday.slice(0, 7);
     let localCount = 0;
     let listening = false;
     let lastMag = 0;
@@ -51,13 +45,6 @@
         return now.getFullYear() + "-" +
             String(now.getMonth() + 1).padStart(2, "0") + "-" +
             String(now.getDate()).padStart(2, "0");
-    }
-
-    function shiftMonth(key, delta) {
-        const year = Number(key.slice(0, 4));
-        const month = Number(key.slice(5, 7)) + delta;
-        const date = new Date(year, month - 1, 1);
-        return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0");
     }
 
     function ruCount(n, one, few, many) {
@@ -139,31 +126,6 @@
         return snapshot.today === localToday ? (snapshot.today_steps || 0) : 0;
     }
 
-    function monthHasSteps(key) {
-        if (!snapshot || !Array.isArray(snapshot.days)) return false;
-        return snapshot.days.some(function (day) {
-            return day.steps > 0 && String(day.date).slice(0, 7) === key;
-        });
-    }
-
-    function canOpenMonth(key) {
-        const thisMonth = localToday.slice(0, 7);
-        const yearStart = localToday.slice(0, 4) + "-01";
-        if (key > thisMonth) return false;
-        if (key >= yearStart) return true;
-        return monthHasSteps(key);
-    }
-
-    function previousOpenMonth(key) {
-        let cursor = shiftMonth(key, -1);
-        for (let i = 0; i < 48; i++) {
-            if (canOpenMonth(cursor)) return cursor;
-            if (monthHasSteps(cursor)) return cursor;
-            cursor = shiftMonth(cursor, -1);
-        }
-        return "";
-    }
-
     function applySnapshot(data) {
         if (!data || !data.ok) return;
         snapshot = data;
@@ -184,73 +146,29 @@
         button.textContent = String(Number(date.slice(8, 10)));
     }
 
-    function renderMonth(key) {
-        if (!monthGrid || !monthLabel || !monthMeta) return;
+    function updateYearCalendar() {
+        if (!monthsEl) return;
         const goal = snapshot ? snapshot.goal : DEFAULT_GOAL;
-        const year = Number(key.slice(0, 4));
-        const month = Number(key.slice(5, 7));
-        const first = new Date(year, month - 1, 1);
-        const pad = (first.getDay() + 6) % 7;
-        const lastDay = new Date(year, month, 0).getDate();
-        let walked = 0;
-        let total = 0;
-        let html = "";
-        for (let i = 0; i < pad; i++) {
-            html += "<span class=\"rm-step-cell is-pad\" aria-hidden=\"true\"></span>";
-        }
-        for (let day = 1; day <= lastDay; day++) {
-            const date = key + "-" + String(day).padStart(2, "0");
-            const steps = dayStepsFor(date);
-            if (steps > 0) {
-                walked += 1;
-                total += steps;
+        monthsEl.querySelectorAll(".rm-step-month").forEach(function (article) {
+            const key = article.getAttribute("data-month") || "";
+            let walked = 0;
+            let total = 0;
+            article.querySelectorAll("button[data-date]").forEach(function (button) {
+                const date = button.getAttribute("data-date");
+                const steps = dayStepsFor(date);
+                if (steps > 0) {
+                    walked += 1;
+                    total += steps;
+                }
+                fillCell(button, date, steps, goal);
+            });
+            const meta = article.querySelector("[data-month-meta]");
+            if (meta) {
+                meta.textContent = ruCount(walked, "день", "дня", "дней") + " · " +
+                    ruCount(total, "шаг", "шага", "шагов");
             }
-            html += "<button type=\"button\" class=\"rm-step-cell\"></button>";
-        }
-        monthGrid.innerHTML = html;
-        const buttons = monthGrid.querySelectorAll("button");
-        buttons.forEach(function (button, index) {
-            const day = index + 1;
-            const date = key + "-" + String(day).padStart(2, "0");
-            fillCell(button, date, dayStepsFor(date), goal);
+            void key;
         });
-        monthLabel.textContent = (MONTHS[month - 1] || "") + " " + year;
-        monthMeta.textContent = ruCount(walked, "день", "дня", "дней") + " · " +
-            ruCount(total, "шаг", "шага", "шагов");
-        if (monthsEl) {
-            const article = monthsEl.querySelector(".rm-step-month");
-            if (article) article.setAttribute("data-month", key);
-        }
-        if (monthPrev) monthPrev.disabled = !previousOpenMonth(key);
-        if (monthNext) monthNext.disabled = key >= localToday.slice(0, 7);
-    }
-
-    function updateOpenMonth() {
-        if (!monthGrid) return;
-        const article = monthsEl && monthsEl.querySelector(".rm-step-month");
-        const key = (article && article.getAttribute("data-month")) || viewMonth;
-        if (key !== viewMonth) {
-            renderMonth(viewMonth);
-            return;
-        }
-        const goal = snapshot ? snapshot.goal : DEFAULT_GOAL;
-        let walked = 0;
-        let total = 0;
-        monthGrid.querySelectorAll("button[data-date]").forEach(function (button) {
-            const date = button.getAttribute("data-date");
-            const steps = dayStepsFor(date);
-            if (steps > 0) {
-                walked += 1;
-                total += steps;
-            }
-            fillCell(button, date, steps, goal);
-        });
-        if (monthMeta) {
-            monthMeta.textContent = ruCount(walked, "день", "дня", "дней") + " · " +
-                ruCount(total, "шаг", "шага", "шагов");
-        }
-        if (monthPrev) monthPrev.disabled = !previousOpenMonth(viewMonth);
-        if (monthNext) monthNext.disabled = viewMonth >= localToday.slice(0, 7);
     }
 
     function weekDates() {
@@ -315,11 +233,8 @@
             lifeEl.textContent = ruCount((snapshot.lifetime || 0) + extra, "шаг", "шага", "шагов");
         }
         if (goalInput && snapshot) goalInput.value = String(snapshot.goal);
-        if (fullCalendar || !monthGrid || !monthGrid.querySelector("button[data-date]")) {
-            renderMonth(viewMonth);
-        } else {
-            updateOpenMonth();
-        }
+        updateYearCalendar();
+        void fullCalendar;
         renderWeek();
         if (!logEl) return;
         if (!snapshot || !snapshot.log.length) {
@@ -458,24 +373,6 @@
 
     function bindClicks() {
         root.addEventListener("click", function (event) {
-            const nav = event.target.closest(".rm-step-month-nav");
-            if (nav) {
-                event.preventDefault();
-                if (nav.id === "rm-step-month-prev") {
-                    const prev = previousOpenMonth(viewMonth);
-                    if (prev) {
-                        viewMonth = prev;
-                        renderMonth(viewMonth);
-                    }
-                } else if (nav.id === "rm-step-month-next") {
-                    const next = shiftMonth(viewMonth, 1);
-                    if (canOpenMonth(next)) {
-                        viewMonth = next;
-                        renderMonth(viewMonth);
-                    }
-                }
-                return;
-            }
             const day = event.target.closest("[data-date]");
             if (day) openDay(day.getAttribute("data-date"));
         });

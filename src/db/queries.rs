@@ -752,6 +752,8 @@ pub fn init_db() -> Result<Connection> {
     crate::db::search_fts::ensure_resource_rubric_column(&conn)?;
     crate::db::search_fts::init_search_fts(&conn)?;
     crate::db::steps::initialize(&conn)?;
+    crate::db::chat_groups::initialize(&conn)?;
+    crate::db::chat_groups::ensure_profile_avatar_column(&conn)?;
 
     Ok(conn)
 }

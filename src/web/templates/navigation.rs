@@ -308,10 +308,7 @@ pub fn render_geo_continent(
         back = back_navigation_card("/app", "Все континенты", "Назад к карте"),
         head = section_head(
             "Страны",
-            &format!(
-                "{} · по алфавиту",
-                ru_count(countries.len() as i64, "страна", "страны", "стран")
-            ),
+            &ru_count(countries.len() as i64, "страна", "страны", "стран"),
             Some(22)
         ),
         search = country_search,
@@ -363,7 +360,7 @@ pub fn render_geo_country(
             continent,
             "Назад к странам",
         ),
-        head = section_head("Города", &format!("{total} · по алфавиту"), Some(22)),
+        head = section_head("Города", &ru_count(total, "город", "города", "городов"), Some(22)),
         search = city_search,
         script = static_asset("map-cities.js"),
     );
@@ -527,7 +524,7 @@ pub fn render_geo_professions(
         ),
         head = section_head(
             "Профессии",
-            &format!("{} · по алфавиту", professions.len()),
+            &ru_count(professions.len() as i64, "профессия", "профессии", "профессий"),
             Some(22)
         ),
     );
@@ -880,7 +877,7 @@ pub fn render_continents(
                    autocomplete="off"
                    autocapitalize="off"
                    spellcheck="false"
-                   placeholder="Ницца, электрик, вакансия…"
+                   placeholder="город, электрик, вакансия…"
                    aria-label="Поиск работы, работников и бизнеса">
             <button id="rm-home-explorer-clear"
                     class="rm-home-explorer-clear"
@@ -1552,7 +1549,7 @@ pub fn render_search(
                 "Работа, работники, бизнес, город или профессия."
             },
             q,
-            "Например: электрик, Ницца, вакансия...",
+            "Например: электрик, город, вакансия...",
             kind,
             city_id,
             &hero_extra,
@@ -1630,6 +1627,14 @@ pub fn render_menu(invite_public_id: &str) -> String {
                 </span>
             </button>
 
+            <button class="theme-toggle-btn rm-menu-row rm-settings-theme-btn" type="button">
+                <span class="rm-menu-row-icon">{sun_icon}</span>
+                <span class="rm-menu-row-copy">
+                    <strong>День и ночь</strong>
+                    <small class="theme-toggle-label">Сейчас тёмная</small>
+                </span>
+            </button>
+
         </div>
     </div>
 </section>"#,
@@ -1651,6 +1656,7 @@ pub fn render_menu(invite_public_id: &str) -> String {
         volume_icon = icon("volume"),
         phone_icon = icon("smartphone"),
         play_icon = icon("play"),
+        sun_icon = icon("sun"),
     );
 
     let main_html = format!(
@@ -1664,7 +1670,7 @@ pub fn render_menu(invite_public_id: &str) -> String {
             "sliders",
             "GRABIT",
             "Меню",
-            "Звук, вибрация и ярлык на главном экране.",
+            "Звук, день и ночь, ярлык на главном экране.",
         ),
         content = content,
     );
@@ -1735,13 +1741,13 @@ mod search_catalog_tests {
             Vec::new(),
             false,
             Some(7),
-            Some("Ницца"),
+            Some("Лион"),
             &BTreeMap::new(),
         );
 
         assert!(html.contains("aria-label=\"Город\""));
-        assert!(html.contains("Ницца · сбросить"));
-        assert!(html.contains("В городе «Ницца» пока нет объявлений."));
+        assert!(html.contains("Лион · сбросить"));
+        assert!(html.contains("В городе «Лион» пока нет объявлений."));
         assert!(html.contains("href=\"/app/add/city/7\""));
         assert!(html.contains("name=\"city_id\""));
         assert!(html.contains("value=\"7\""));
@@ -1783,7 +1789,7 @@ mod search_catalog_tests {
         let menu = render_menu("abc123");
         assert!(menu.contains("id=\"rm-continue-menu\""));
         assert!(menu.contains("/app/join/abc123?to=steps"));
-        assert!(!menu.contains("<strong>Тема</strong>"));
+        assert!(menu.contains("theme-toggle-btn"));
         assert!(menu.contains("data-nav-map-link"));
         assert!(menu.contains("data-nav-search-link"));
 
@@ -1807,9 +1813,10 @@ mod search_catalog_tests {
     }
 
     #[test]
-    fn menu_has_no_theme_toggle() {
+    fn menu_has_working_theme_toggle() {
         let html = render_menu("");
-        assert!(!html.contains("<strong>Тема</strong>"));
+        assert!(html.contains("theme-toggle-btn"));
+        assert!(html.contains("<strong>День и ночь</strong>"));
         assert!(html.contains("<strong>Звук</strong>"));
     }
 }

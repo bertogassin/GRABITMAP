@@ -385,7 +385,7 @@ pub async fn resource_create_country(
                name="q"
                maxlength="80"
                value="{value}"
-               placeholder="Например: Ницца">
+               placeholder="Например: ваш город">
     </label>
     <button class="ui-button" type="submit">Найти</button>
 </form>

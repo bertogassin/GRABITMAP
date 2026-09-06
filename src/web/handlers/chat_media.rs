@@ -69,7 +69,7 @@ fn media_root() -> PathBuf {
     PathBuf::from("data/chat-media")
 }
 
-fn detect_image(bytes: &[u8]) -> Option<(&'static str, &'static str)> {
+pub(crate) fn detect_image(bytes: &[u8]) -> Option<(&'static str, &'static str)> {
     if bytes.len() >= 3 && bytes[0] == 0xff && bytes[1] == 0xd8 && bytes[2] == 0xff {
         return Some(("image", "image/jpeg"));
     }
@@ -87,7 +87,7 @@ fn detect_image(bytes: &[u8]) -> Option<(&'static str, &'static str)> {
     None
 }
 
-fn detect_audio(bytes: &[u8]) -> Option<(&'static str, &'static str)> {
+pub(crate) fn detect_audio(bytes: &[u8]) -> Option<(&'static str, &'static str)> {
     if bytes.len() >= 4 && &bytes[0..4] == b"OggS" {
         return Some(("voice", "audio/ogg"));
     }
@@ -105,7 +105,7 @@ fn detect_audio(bytes: &[u8]) -> Option<(&'static str, &'static str)> {
     None
 }
 
-fn extension_for_mime(mime: &str) -> &'static str {
+pub(crate) fn extension_for_mime(mime: &str) -> &'static str {
     match mime {
         "image/jpeg" => "jpg",
         "image/png" => "png",

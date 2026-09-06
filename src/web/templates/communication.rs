@@ -92,8 +92,12 @@ pub fn render_messages(
     } else if conversations.is_empty() {
         empty_state_card_with_actions(
             "Нет диалогов",
-            "Откройте профиль участника, чтобы начать диалог.",
-            &empty_state_action("/app/search", "Найти участников"),
+            "Откройте профиль участника, чтобы начать диалог, или создайте группу.",
+            &format!(
+                "{}{}",
+                empty_state_action("/app/search", "Найти участников"),
+                empty_state_action("/app/groups/new", "Создать группу"),
+            ),
         )
     } else {
         conversations
@@ -108,8 +112,19 @@ pub fn render_messages(
                 let updated_at = conversation.updated_at;
                 let safe_username = escape_html(username);
 
-                let display_name =
-                    conversation_display_name(other_user_id, username, first_name, last_name);
+                let is_group = conversation.is_group;
+                let group_id = conversation.group_id;
+                let href = if is_group && group_id > 0 {
+                    format!("/app/group/{group_id}")
+                } else {
+                    format!("/app/chat/{other_user_id}")
+                };
+                let kind = if is_group { "group" } else { "dm" };
+                let display_name = if is_group && !first_name.trim().is_empty() {
+                    escape_html(first_name)
+                } else {
+                    conversation_display_name(other_user_id, username, first_name, last_name)
+                };
 
                 let safe_last_message = escape_html(last_message);
 
@@ -132,6 +147,8 @@ pub fn render_messages(
 
                 let last_message_html = if has_last_message {
                     safe_last_message
+                } else if is_group {
+                    "Новая группа".to_string()
                 } else {
                     "Новый диалог".to_string()
                 };
@@ -147,12 +164,14 @@ pub fn render_messages(
 
                 format!(
                     r#"
-<a href="/app/chat/{other_user_id}#chat-end"
+<a href="{href}#chat-end"
    class="card chat-dialog-card"
-   data-other-user-id="{other_user_id}">
+   data-other-user-id="{other_user_id}"
+   data-group-id="{group_id}"
+   data-kind="{kind}">
 
     <div class="card-icon chat-dialog-avatar">
-        {chat_icon}
+        {avatar_html}
     </div>
 
     <div class="card-content">
@@ -185,8 +204,17 @@ pub fn render_messages(
 
 </a>
 "#,
+                    href = href,
                     other_user_id = other_user_id,
-                    chat_icon = icon("message-circle"),
+                    group_id = if group_id > 0 { group_id.to_string() } else { String::new() },
+                    kind = kind,
+                    avatar_html = if !is_group && conversation.has_avatar && other_user_id > 0 {
+                        format!(
+                            r#"<img class="rm-me-avatar-img" src="/api/avatars/{other_user_id}" alt="" onerror="this.remove()">"#
+                        )
+                    } else {
+                        icon(if is_group { "users" } else { "message-circle" }).to_string()
+                    },
                     display_name = display_name,
                     username_html = username_html,
                     last_message = last_message_html,
@@ -207,7 +235,10 @@ pub fn render_messages(
         <h2 class="section-title">Диалоги</h2>
         <p class="section-caption" id="inbox-unread-caption">{unread_caption}</p>
     </div>
-    <span class="inbox-live-badge" id="inbox-live-badge" hidden aria-hidden="true">связь</span>
+    <div class="inbox-head-actions">
+        <a href="/app/groups/new" class="ui-button inbox-group-btn">Группа</a>
+        <span class="inbox-live-badge" id="inbox-live-badge" hidden aria-hidden="true">связь</span>
+    </div>
 </div>"#
         )
     } else {
@@ -257,7 +288,7 @@ pub fn render_messages(
             "message-circle",
             "Чаты",
             "Диалоги",
-            "Личные диалоги.",
+            "Личные диалоги и группы.",
         ),
         &content_html,
         &bottom_nav_with_badge("chats", total_unread),
@@ -291,7 +322,7 @@ fn chat_message_body_html(message: &crate::web::view_models::ChatMessageRow) -> 
         };
 
         return format!(
-            r#"<div class="chat-message-body"><img class="chat-message-image" src="{url}" alt="Фото" loading="lazy" role="button" tabindex="0">{caption}</div>"#,
+            r#"<div class="chat-message-body chat-message-body--image"><img class="chat-message-image" src="{url}" alt="Фото" loading="lazy" decoding="async" role="button" tabindex="0">{caption}</div>"#,
             url = escape_html(&message.attachment_url),
             caption = caption_html,
         );
@@ -327,9 +358,18 @@ fn render_chat_message_row(
     other_user_id: i64,
     last_date_key: &mut String,
 ) -> String {
-    let mine = message.sender_user_id != other_user_id;
+    let mine = message.sender_user_id == viewer_user_id;
     let mine_attribute = if mine { "1" } else { "0" };
     let deleted = message.deleted_at > 0;
+    let show_author = other_user_id <= 0 && !mine && !message.sender_name.trim().is_empty();
+    let author_html = if show_author {
+        format!(
+            r#"<div class="chat-message-author">{}</div>"#,
+            escape_html(&message.sender_name)
+        )
+    } else {
+        String::new()
+    };
 
     let status = if mine {
         if message.read_at > 0 {
@@ -478,6 +518,8 @@ fn render_chat_message_row(
      data-attachment-url="{attachment_url}">
 
     <div class="{bubble_class}">
+        <button type="button" class="chat-message-more" aria-label="Действия с сообщением">⋮</button>
+        {author_html}
         {reply_html}
         {display_body}
         {reactions_html}
@@ -503,6 +545,7 @@ fn render_chat_message_row(
         created_at = message.created_at,
         message_text = safe_message_text,
         bubble_class = bubble_class,
+        author_html = author_html,
         reply_html = reply_html,
         display_body = display_body,
         reactions_html = reactions_html,
@@ -526,6 +569,48 @@ pub fn render_chat(
     last_name: &str,
     messages: Vec<crate::web::view_models::ChatMessageRow>,
 ) -> String {
+    render_chat_thread(
+        authenticated,
+        viewer_user_id,
+        other_user_id,
+        0,
+        username,
+        first_name,
+        last_name,
+        messages,
+    )
+}
+
+pub fn render_group_chat(
+    authenticated: bool,
+    viewer_user_id: i64,
+    group_id: i64,
+    group_name: &str,
+    member_count: i64,
+    messages: Vec<crate::web::view_models::ChatMessageRow>,
+) -> String {
+    render_chat_thread(
+        authenticated,
+        viewer_user_id,
+        0,
+        group_id,
+        "",
+        group_name,
+        &ru_count(member_count, "участник", "участника", "участников"),
+        messages,
+    )
+}
+
+fn render_chat_thread(
+    authenticated: bool,
+    viewer_user_id: i64,
+    other_user_id: i64,
+    group_id: i64,
+    username: &str,
+    first_name: &str,
+    last_name: &str,
+    messages: Vec<crate::web::view_models::ChatMessageRow>,
+) -> String {
     let safe_username = escape_html(username);
     let safe_first_name = escape_html(first_name);
     let safe_last_name = escape_html(last_name);
@@ -534,25 +619,36 @@ pub fn render_chat(
         .trim()
         .to_string();
 
-    let display_name = if !full_name.is_empty() {
+    let display_name = if group_id > 0 && !safe_first_name.is_empty() {
+        safe_first_name.clone()
+    } else if !full_name.is_empty() {
         full_name
     } else if !safe_username.is_empty() {
         format!("@{}", safe_username)
     } else if other_user_id > 0 {
         format!("Участник · {:06}", other_user_id.rem_euclid(1_000_000))
     } else {
-        "Чат".to_string()
+        "Группа".to_string()
     };
 
-    let subtitle = if !safe_username.is_empty() {
+    let subtitle = if group_id > 0 && !safe_last_name.is_empty() {
+        safe_last_name.clone()
+    } else if !safe_username.is_empty() {
         format!("@{}", safe_username)
     } else {
         "Личный диалог".to_string()
     };
 
     let content = if !authenticated {
-        guest_locked_section("Чат", &format!("/app/chat/{other_user_id}"))
-    } else if other_user_id <= 0 || other_user_id == viewer_user_id {
+        guest_locked_section(
+            "Чат",
+            &if group_id > 0 {
+                format!("/app/group/{group_id}")
+            } else {
+                format!("/app/chat/{other_user_id}")
+            },
+        )
+    } else if group_id <= 0 && (other_user_id <= 0 || other_user_id == viewer_user_id) {
         empty_state_card("Чат недоступен", "Диалог недоступен.")
     } else {
         let first_message_id = messages.first().map(|message| message.id).unwrap_or(0);
@@ -623,9 +719,8 @@ pub fn render_chat(
 
     <div class="chat-composer-main">
         <textarea id="chat-input" name="message" rows="1" maxlength="2000" required autocomplete="off" enterkeyhint="send" aria-label="Текст сообщения" placeholder="Сообщение…" class="ui-textarea chat-input"></textarea>
-        <button id="chat-clear" type="button" class="chat-clear-button" aria-label="Очистить сообщение" hidden>×</button>
     </div>
-    <input type="file" id="chat-image-input" accept="image/jpeg,image/png,image/webp" hidden>
+    <input type="file" id="chat-image-input" accept="image/jpeg,image/png,image/webp" class="chat-file-input">
     <button id="chat-voice-btn" type="button" class="chat-voice-btn">Голос</button>
     <button id="chat-image-btn" type="button" class="chat-image-btn">Фото</button>
     <button id="chat-send" type="submit" class="ui-button chat-send-button">Отправить</button>
@@ -657,36 +752,12 @@ pub fn render_chat(
             <span id="chat-peer-state"
                   class="chat-peer-state"
                   hidden></span>
-
-            <button id="chat-sound-toggle"
-                    type="button"
-                    class="chat-sound-toggle"
-                    aria-label="Звуки чата"
-                    aria-pressed="true"
-                    title="Звуки чата">
-                Звук
-            </button>
-
-            <button id="chat-haptic-toggle"
-                    type="button"
-                    class="chat-sound-toggle chat-haptic-toggle"
-                    aria-label="Вибрация чата"
-                    aria-pressed="true"
-                    title="Вибрация чата">
-                Вибро
-            </button>
-
-            <button id="chat-block-toggle"
-                    type="button"
-                    class="chat-block-toggle"
-                    hidden>
-                Заблокировать
-            </button>
         </div>
     </div>
 
     <div id="chat-messages"
          data-other-user-id="{other_user_id}"
+         data-group-id="{group_id_attr}"
          data-first-message-id="{first_message_id}"
          data-last-message-id="{last_message_id}"
          data-may-have-older="{may_have_older}"
@@ -720,6 +791,7 @@ pub fn render_chat(
             chat_js = static_asset("chat-v2.js"),
             chat_blocks_js = static_asset("chat-blocks.js"),
             other_user_id = other_user_id,
+            group_id_attr = if group_id > 0 { group_id.to_string() } else { String::new() },
             first_message_id = first_message_id,
             last_message_id = last_message_id,
             may_have_older = may_have_older,
@@ -737,7 +809,7 @@ pub fn render_chat(
 
         <div class="chat-avatar-ring" aria-hidden="true">
             <div class="card-icon chat-header-avatar">
-                {user_icon}
+                {header_avatar}
             </div>
             <span id="chat-header-presence-dot"
                   class="chat-header-presence-dot"
@@ -758,13 +830,66 @@ pub fn render_chat(
 
         </div>
 
+        <div class="chat-header-actions">
+            <button id="chat-header-more"
+                    type="button"
+                    class="chat-header-more"
+                    aria-label="Меню чата"
+                    aria-expanded="false"
+                    aria-controls="chat-header-menu">
+                ⋮
+            </button>
+            <div id="chat-header-menu" class="chat-header-menu" hidden>
+                <button id="chat-sound-toggle"
+                        type="button"
+                        class="chat-sound-toggle"
+                        aria-label="Звуки чата"
+                        aria-pressed="true">
+                    Звук
+                </button>
+                <button id="chat-haptic-toggle"
+                        type="button"
+                        class="chat-sound-toggle chat-haptic-toggle"
+                        aria-label="Вибрация чата"
+                        aria-pressed="true">
+                    Вибро
+                </button>
+                <button id="chat-block-toggle"
+                        type="button"
+                        class="chat-block-toggle"
+                        hidden>
+                    Заблокировать
+                </button>
+                {group_menu}
+            </div>
+        </div>
+
     </div>
 
 </section>
 
 {content}"####,
         back_link = back_link("/app/messages", "Назад", "arrow-left"),
-        user_icon = icon("user"),
+        header_avatar = if other_user_id > 0 {
+            format!(
+                r#"<img class="rm-me-avatar-img" src="/api/avatars/{other_user_id}" alt="" onerror="this.remove()">{icon}"#,
+                icon = icon("user")
+            )
+        } else if group_id > 0 {
+            icon("users").to_string()
+        } else {
+            icon("user").to_string()
+        },
+        group_menu = if group_id > 0 {
+            format!(
+                r#"<a href="/app/group/{group_id}/members" class="chat-sound-toggle">Участники</a>
+                <form method="post" action="/app/group/{group_id}/leave">
+                    <button type="submit" class="chat-block-toggle">Выйти</button>
+                </form>"#
+            )
+        } else {
+            String::new()
+        },
         display_name = display_name,
         subtitle = subtitle,
         content = content,
@@ -781,6 +906,174 @@ pub fn render_chat(
         ),
         &bottom_nav("chats"),
         "",
+    )
+}
+
+pub fn render_new_group(
+    authenticated: bool,
+    partners: Vec<(i64, String)>,
+    error: &str,
+) -> String {
+    let content = if !authenticated {
+        guest_locked_section("Группа", "/app/groups/new")
+    } else {
+        let people = if partners.is_empty() {
+            r#"<p class="card-meta">Сначала напишите кому-нибудь в личный чат — потом их можно добавить в группу.</p>"#.to_string()
+        } else {
+            partners
+                .iter()
+                .map(|(id, name)| {
+                    format!(
+                        r#"<label class="rm-group-member">
+    <input type="checkbox" name="member" value="{id}">
+    <span>{name}</span>
+</label>"#,
+                        id = id,
+                        name = escape_html(name),
+                    )
+                })
+                .collect::<Vec<_>>()
+                .join("")
+        };
+        let error_html = if error.is_empty() {
+            String::new()
+        } else {
+            format!(
+                r#"<p class="ui-status is-error">{}</p>"#,
+                escape_html(error)
+            )
+        };
+        format!(
+            r#"<form method="post" action="/app/groups" class="card rm-group-create" id="rm-group-create">
+    <label class="rm-profile-field">
+        <div class="rm-profile-field-label">Название группы</div>
+        <input class="ui-input" name="name" maxlength="80" required placeholder="Например: соседи по двору">
+    </label>
+    <div class="rm-profile-field rm-profile-field--spaced">
+        <div class="rm-profile-field-label">Участники</div>
+        <div class="rm-group-members">{people}</div>
+    </div>
+    <input type="hidden" name="member_ids" id="rm-group-member-ids" value="">
+    {error_html}
+    <button type="submit" class="ui-button">Создать группу</button>
+</form>
+<script>
+(function () {{
+    var form = document.getElementById("rm-group-create");
+    if (!form) return;
+    form.addEventListener("submit", function () {{
+        var ids = Array.prototype.map.call(
+            form.querySelectorAll("input[name='member']:checked"),
+            function (box) {{ return box.value; }}
+        );
+        var hidden = document.getElementById("rm-group-member-ids");
+        if (hidden) hidden.value = ids.join(",");
+    }});
+}})();
+</script>"#,
+            people = people,
+            error_html = error_html,
+        )
+    };
+
+    page_shell(
+        "Новая группа · GRABIT",
+        &topbar("Группа", "users"),
+        &back_hero(
+            &back_link("/app/messages", "Чаты", "arrow-left"),
+            "users",
+            "Группа",
+            "Новая группа",
+            "Название и участники. Чат сразу общий.",
+        ),
+        &content,
+        &bottom_nav("chats"),
+    )
+}
+
+pub fn render_group_members(
+    authenticated: bool,
+    group_id: i64,
+    name: &str,
+    members: Vec<(i64, String)>,
+    candidates: Vec<(i64, String)>,
+    error: &str,
+) -> String {
+    let content = if !authenticated {
+        guest_locked_section("Группа", &format!("/app/group/{group_id}/members"))
+    } else if error == "Нет доступа" {
+        empty_state_card("Нет доступа", "Этой группы для вас нет.")
+    } else {
+        let list = members
+            .iter()
+            .map(|(_id, member)| {
+                format!(
+                    r#"<div class="rm-group-member"><span>{}</span></div>"#,
+                    escape_html(member)
+                )
+            })
+            .collect::<Vec<_>>()
+            .join("");
+        let add = if candidates.is_empty() {
+            String::new()
+        } else {
+            let boxes = candidates
+                .iter()
+                .map(|(id, member)| {
+                    format!(
+                        r#"<label class="rm-group-member"><input type="checkbox" name="member" value="{id}"><span>{}</span></label>"#,
+                        escape_html(member)
+                    )
+                })
+                .collect::<Vec<_>>()
+                .join("");
+            format!(
+                r#"<form method="post" action="/app/group/{group_id}/members" class="card rm-group-create" id="rm-group-add">
+    <div class="rm-profile-field-label">Добавить</div>
+    <div class="rm-group-members">{boxes}</div>
+    <input type="hidden" name="member_ids" id="rm-group-member-ids" value="">
+    <button type="submit" class="ui-button">Добавить в группу</button>
+</form>
+<script>
+(function () {{
+    var form = document.getElementById("rm-group-add");
+    if (!form) return;
+    form.addEventListener("submit", function () {{
+        var ids = Array.prototype.map.call(form.querySelectorAll("input[name='member']:checked"), function (box) {{ return box.value; }});
+        var hidden = document.getElementById("rm-group-member-ids");
+        if (hidden) hidden.value = ids.join(",");
+    }});
+}})();
+</script>"#,
+                boxes = boxes,
+            )
+        };
+        format!(
+            r#"<section class="card rm-group-create">
+    <div class="rm-profile-field-label">Сейчас в группе</div>
+    <div class="rm-group-members">{list}</div>
+</section>
+{add}
+<form method="post" action="/app/group/{group_id}/leave" class="card rm-group-create">
+    <button type="submit" class="ui-button">Выйти из группы</button>
+</form>"#,
+            list = list,
+            add = add,
+        )
+    };
+
+    page_shell(
+        "Участники · GRABIT",
+        &topbar("Группа", "users"),
+        &back_hero(
+            &back_link(&format!("/app/group/{group_id}"), "Чат", "arrow-left"),
+            "users",
+            "Группа",
+            name,
+            "Кто в группе и кого добавить.",
+        ),
+        &content,
+        &bottom_nav("chats"),
     )
 }
 

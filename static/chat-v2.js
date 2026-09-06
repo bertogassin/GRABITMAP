@@ -1,6 +1,45 @@
 (function () {
     "use strict";
 
+    function compressImageFile(file, maxEdge, quality) {
+        return new Promise(function (resolve) {
+            if (!file || !file.type || file.type.indexOf("image/") !== 0) {
+                resolve(file);
+                return;
+            }
+            var url = URL.createObjectURL(file);
+            var img = new Image();
+            img.onload = function () {
+                URL.revokeObjectURL(url);
+                var width = img.naturalWidth || img.width || 0;
+                var height = img.naturalHeight || img.height || 0;
+                var edge = Math.max(width, height);
+                var scale = edge > maxEdge ? maxEdge / edge : 1;
+                var canvas = document.createElement("canvas");
+                canvas.width = Math.max(1, Math.round(width * scale));
+                canvas.height = Math.max(1, Math.round(height * scale));
+                var ctx = canvas.getContext("2d");
+                if (!ctx) {
+                    resolve(file);
+                    return;
+                }
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob(function (blob) {
+                    if (!blob) {
+                        resolve(file);
+                        return;
+                    }
+                    resolve(new File([blob], "photo.jpg", { type: "image/jpeg" }));
+                }, "image/jpeg", quality);
+            };
+            img.onerror = function () {
+                URL.revokeObjectURL(url);
+                resolve(file);
+            };
+            img.src = url;
+        });
+    }
+
     function ready(callback) {
         if (document.readyState === "loading") {
             document.addEventListener(
@@ -20,7 +59,6 @@
         var form = document.getElementById("chat-form");
         var input = document.getElementById("chat-input");
         var send = document.getElementById("chat-send");
-        var clear = document.getElementById("chat-clear");
         var counter = document.getElementById(
             "chat-counter"
         );
@@ -57,7 +95,6 @@
             !form ||
             !input ||
             !send ||
-            !clear ||
             !counter ||
             !connectionState ||
             !loadOlder
@@ -68,11 +105,23 @@
         var otherUserId = String(
             history.dataset.otherUserId || ""
         ).trim();
+        var groupId = String(
+            history.dataset.groupId || ""
+        ).trim();
+        var isGroup = /^[1-9][0-9]{0,18}$/.test(groupId);
 
         if (
+            !isGroup &&
             !/^[1-9][0-9]{0,18}$/.test(otherUserId)
         ) {
             return;
+        }
+
+        function chatApi(suffix) {
+            if (isGroup) {
+                return "/api/group/" + groupId + suffix;
+            }
+            return "/api/chat/" + otherUserId + suffix;
         }
 
         var firstMessageId = Number(
@@ -87,12 +136,12 @@
         var sending = false;
         var loadingOlder = false;
         var pollTimer = null;
-        var draftKey =
-            "resursmap-chat-draft:" + otherUserId;
+        var             draftKey =
+            "resursmap-chat-draft:" + (isGroup ? "g" + groupId : otherUserId);
         var pendingSendKey =
-            "resursmap-chat-outbox:" + otherUserId;
+            "resursmap-chat-outbox:" + (isGroup ? "g" + groupId : otherUserId);
         var legacyPendingSendKey =
-            "resursmap-chat-pending:" + otherUserId;
+            "resursmap-chat-pending:" + (isGroup ? "g" + groupId : otherUserId);
         var pendingQueue = [];
         var peerOnline = false;
         var peerLastSeenAt = 0;
@@ -291,6 +340,9 @@
         }
 
         function emitTypingSignal(kind) {
+            if (isGroup) {
+                return;
+            }
             document.dispatchEvent(
                 new CustomEvent(
                     "resursmap:chat-realtime-send",
@@ -324,8 +376,11 @@
 
         async function refreshPeerPresence() {
             try {
+                if (isGroup) {
+                    return;
+                }
                 var data = await fetchJson(
-                    "/api/chat/" + otherUserId + "/peer"
+                    chatApi("/peer")
                 );
 
                 peerOnline = Boolean(data.online);
@@ -440,7 +495,6 @@
                 length >= 2000
             );
 
-            clear.hidden = length === 0;
             send.disabled =
                 input.value.trim().length === 0 ||
                 length > 2000;
@@ -482,10 +536,10 @@
 
             markReadTimer = window.setTimeout(function () {
                 fetchJson(
-                    "/api/chat/" +
-                    otherUserId +
-                    "/messages?limit=1&mark_read=1&read_through_id=" +
-                    lastMessageId
+                    chatApi(
+                        "/messages?limit=1&mark_read=1&read_through_id=" +
+                        lastMessageId
+                    )
                 )
                     .then(function (data) {
                         updateReadStatuses(
@@ -570,9 +624,11 @@
                 img.src = String(message.attachment_url);
                 img.alt = "Фото";
                 img.loading = "lazy";
+                img.decoding = "async";
                 img.setAttribute("role", "button");
                 img.tabIndex = 0;
                 body.textContent = "";
+                body.classList.add("chat-message-body--image");
                 body.appendChild(img);
                 if (message.message) {
                     var cap = document.createElement("div");
@@ -603,6 +659,21 @@
 
             meta.appendChild(time);
             meta.appendChild(status);
+            var more = document.createElement("button");
+            more.type = "button";
+            more.className = "chat-message-more";
+            more.setAttribute("aria-label", "Действия с сообщением");
+            more.textContent = "⋮";
+            bubble.appendChild(more);
+            if (isGroup && !mine) {
+                var authorName = String(message.sender_name || "").trim();
+                if (authorName) {
+                    var author = document.createElement("div");
+                    author.className = "chat-message-author";
+                    author.textContent = authorName;
+                    bubble.appendChild(author);
+                }
+            }
             bubble.appendChild(body);
             bubble.appendChild(meta);
             row.appendChild(bubble);
@@ -955,12 +1026,12 @@
                     : "&mark_read=0";
 
                 var data = await fetchJson(
-                    "/api/chat/" +
-                    otherUserId +
-                    "/messages?after_id=" +
-                    Math.max(lastMessageId, 0) +
-                    "&limit=100" +
-                    markReadQuery
+                    chatApi(
+                        "/messages?after_id=" +
+                        Math.max(lastMessageId, 0) +
+                        "&limit=100" +
+                        markReadQuery
+                    )
                 );
 
                 appendMessages(data.messages || []);
@@ -1001,11 +1072,11 @@
 
             try {
                 var data = await fetchJson(
-                    "/api/chat/" +
-                    otherUserId +
-                    "/messages?before_id=" +
-                    firstMessageId +
-                    "&limit=50"
+                    chatApi(
+                        "/messages?before_id=" +
+                        firstMessageId +
+                        "&limit=50"
+                    )
                 );
 
                 prependMessages(data.messages || []);
@@ -1124,7 +1195,7 @@
                         : "Отправка\u2026";
                 try {
                     var data = await fetchJson(
-                        "/api/chat/" + otherUserId + "/send",
+                        chatApi("/send"),
                         {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
@@ -1290,12 +1361,6 @@
             }
         });
 
-        clear.addEventListener("click", function () {
-            input.value = "";
-            updateComposer();
-            input.focus();
-        });
-
         form.dataset.chatCoreReady = "1";
 
         var imageInput = document.getElementById("chat-image-input");
@@ -1306,7 +1371,7 @@
             imageInput.type = "file";
             imageInput.accept = "image/jpeg,image/png,image/webp";
             imageInput.id = "chat-image-input";
-            imageInput.hidden = true;
+            imageInput.className = "chat-file-input";
             form.appendChild(imageInput);
         }
 
@@ -1329,8 +1394,8 @@
             var file = imageInput.files && imageInput.files[0];
             imageInput.value = "";
             if (!file) return;
-            if (file.size > 8 * 1024 * 1024) {
-                setConnection("Фото больше 8 МБ", "is-error");
+            if (file.size > 20 * 1024 * 1024) {
+                setConnection("Фото слишком большое", "is-error");
                 return;
             }
             if (navigator.onLine === false) {
@@ -1338,46 +1403,54 @@
                 sendState.textContent = "Нет сети";
                 return;
             }
-            var clientMessageId = createClientMessageId();
-            var formData = new FormData();
-            formData.append("image", file);
-            formData.append("client_message_id", clientMessageId);
-            formData.append("caption", input.value.trim());
-            var reply = window.ResursMapChatReply || null;
-            if (reply && reply.id) {
-                formData.append("reply_to_message_id", String(reply.id));
-            }
-            sendState.textContent = "Отправка фото…";
-            fetch("/api/chat/" + otherUserId + "/send-image", {
-                method: "POST",
-                body: formData,
-                credentials: "same-origin"
-            }).then(function (res) { return res.json().then(function (data) { return { res: res, data: data }; }); })
-              .then(function (pack) {
-                if (!pack.res.ok || !pack.data || !pack.data.ok) {
-                    throw new Error((pack.data && pack.data.error) || "send_failed");
+            sendState.textContent = "Сжимаем фото…";
+            compressImageFile(file, 1600, 0.82).then(function (readyFile) {
+                if (readyFile.size > 8 * 1024 * 1024) {
+                    setConnection("Фото больше 8 МБ", "is-error");
+                    sendState.textContent = "Фото не отправлено";
+                    return;
                 }
-                input.value = "";
-                updateComposer();
-                if (pack.data.message) {
-                    appendMessages([pack.data.message]);
+                var clientMessageId = createClientMessageId();
+                var formData = new FormData();
+                formData.append("image", readyFile, "photo.jpg");
+                formData.append("client_message_id", clientMessageId);
+                formData.append("caption", input.value.trim());
+                var reply = window.ResursMapChatReply || null;
+                if (reply && reply.id) {
+                    formData.append("reply_to_message_id", String(reply.id));
                 }
-                window.ResursMapChatReply = null;
-                var replyBarEl =
-                    document.getElementById("chat-reply-bar");
-                if (replyBarEl) {
-                    replyBarEl.hidden = true;
-                }
-                setConnection("Связь есть", "is-online");
-                sendState.textContent = "Отправлено · Enter — отправить";
-                window.dispatchEvent(new CustomEvent("resursmap:chat-message-sent"));
-                if (typeof window.resursmapRefreshAttentionBadge === "function") {
-                    window.resursmapRefreshAttentionBadge();
-                }
-              }).catch(function () {
+                sendState.textContent = "Отправка фото…";
+                return fetch(chatApi("/send-image"), {
+                    method: "POST",
+                    body: formData,
+                    credentials: "same-origin"
+                }).then(function (res) { return res.json().then(function (data) { return { res: res, data: data }; }); })
+                  .then(function (pack) {
+                    if (!pack.res.ok || !pack.data || !pack.data.ok) {
+                        throw new Error((pack.data && pack.data.error) || "send_failed");
+                    }
+                    input.value = "";
+                    updateComposer();
+                    if (pack.data.message) {
+                        appendMessages([pack.data.message]);
+                    }
+                    window.ResursMapChatReply = null;
+                    var replyBarEl =
+                        document.getElementById("chat-reply-bar");
+                    if (replyBarEl) {
+                        replyBarEl.hidden = true;
+                    }
+                    setConnection("Связь есть", "is-online");
+                    sendState.textContent = "Отправлено · Enter — отправить";
+                    window.dispatchEvent(new CustomEvent("resursmap:chat-message-sent"));
+                    if (typeof window.resursmapRefreshAttentionBadge === "function") {
+                        window.resursmapRefreshAttentionBadge();
+                    }
+                  });
+            }).catch(function () {
                 setConnection("Ошибка фото", "is-error");
                 sendState.textContent = "Фото не отправлено";
-              });
+            });
         });
 
         var voiceBtn = document.getElementById("chat-voice-btn");
@@ -1453,7 +1526,7 @@
                 formData.append("reply_to_message_id", String(reply.id));
             }
             sendState.textContent = "Отправка голосового…";
-            fetch("/api/chat/" + otherUserId + "/send-voice", {
+            fetch(chatApi("/send-voice"), {
                 method: "POST",
                 body: formData,
                 credentials: "same-origin"
@@ -1726,6 +1799,33 @@
             });
         }
 
+        var headerMore = document.getElementById("chat-header-more");
+        var headerMenu = document.getElementById("chat-header-menu");
+        if (headerMore && headerMenu) {
+            headerMore.addEventListener("click", function (event) {
+                event.stopPropagation();
+                var open = headerMenu.hidden;
+                headerMenu.hidden = !open;
+                headerMore.setAttribute("aria-expanded", open ? "true" : "false");
+            });
+            document.addEventListener("click", function (event) {
+                if (headerMenu.hidden) {
+                    return;
+                }
+                if (event.target.closest("#chat-header-menu, #chat-header-more")) {
+                    return;
+                }
+                headerMenu.hidden = true;
+                headerMore.setAttribute("aria-expanded", "false");
+            });
+            if (isGroup) {
+                var blockToggle = document.getElementById("chat-block-toggle");
+                if (blockToggle) {
+                    blockToggle.hidden = true;
+                }
+            }
+        }
+
         loadOlder.addEventListener(
             "click",
             loadOlderMessages
@@ -1839,7 +1939,7 @@
             window.scrollTo(0, 0);
         });
 
-        ["chat-send", "chat-image-btn", "chat-clear"].forEach(function (id) {
+        ["chat-send", "chat-image-btn"].forEach(function (id) {
             var button = document.getElementById(id);
             if (!button) {
                 return;
@@ -2454,7 +2554,7 @@
                         );
 
                         return fetch(
-                            "/api/chat/" + otherUserId + "/send-voice",
+                            chatApi("/send-voice"),
                             {
                                 method: "POST",
                                 body: formData,
@@ -2488,7 +2588,7 @@
 
                         if (comment) {
                             return requestJson(
-                                "/api/chat/" + otherUserId + "/send",
+                                chatApi("/send"),
                                 {
                                     method: "POST",
                                     headers: {
@@ -2553,7 +2653,7 @@
                         formData.append("caption", caption);
 
                         return fetch(
-                            "/api/chat/" + otherUserId + "/send-image",
+                            chatApi("/send-image"),
                             {
                                 method: "POST",
                                 body: formData,
@@ -2596,7 +2696,7 @@
 
             setSendState("Пересылка…");
 
-            requestJson("/api/chat/" + otherUserId + "/send", {
+            requestJson(chatApi("/send"), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -2827,8 +2927,10 @@
                 img.src = String(message.attachment_url);
                 img.alt = "Фото";
                 img.loading = "lazy";
+                img.decoding = "async";
                 img.setAttribute("role", "button");
                 img.tabIndex = 0;
+                body.classList.add("chat-message-body--image");
                 body.appendChild(img);
 
                 if (message.message) {
@@ -2867,11 +2969,7 @@
             }
 
             return requestJson(
-                "/api/chat/" +
-                otherUserId +
-                "/messages/" +
-                message.id +
-                "/react",
+                chatApi("/messages/" + message.id + "/react"),
                 {
                     method: "POST",
                     headers: {
@@ -3132,9 +3230,7 @@
 
         function refreshRecent() {
             return requestJson(
-                "/api/chat/" +
-                otherUserId +
-                "/messages?limit=100&mark_read=0"
+                chatApi("/messages?limit=100&mark_read=0")
             )
                 .then(function (data) {
                     document.dispatchEvent(
@@ -3330,6 +3426,36 @@
                     return;
                 }
 
+                var image = event.target.closest(
+                    ".chat-message-image"
+                );
+
+                if (image && image.src) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (typeof window.resursmapOpenChatImage === "function") {
+                        window.resursmapOpenChatImage(image.src);
+                    }
+                    return;
+                }
+
+                var more = event.target.closest(
+                    ".chat-message-more"
+                );
+
+                if (more) {
+                    var moreRow = event.target.closest(
+                        ".chat-message-row"
+                    );
+                    var moreMessage = moreRow
+                        ? messageFromRow(moreRow)
+                        : null;
+                    if (moreMessage) {
+                        openSheet(moreMessage);
+                    }
+                    return;
+                }
+
                 var row = event.target.closest(
                     ".chat-message-row"
                 );
@@ -3340,7 +3466,7 @@
 
                 if (
                     event.target.closest(
-                        ".chat-message-meta, .chat-message-status, .chat-message-reactions, .chat-voice-player, .chat-voice-play, .chat-voice-progress, audio, .chat-message-image"
+                        ".chat-message-meta, .chat-message-status, .chat-message-reactions, .chat-voice-player, .chat-voice-play, .chat-voice-progress, audio"
                     )
                 ) {
                     return;
@@ -3367,7 +3493,6 @@
 
                 lastTapAt = now;
                 lastTapMessageId = id;
-                openSheet(message);
             }
         );
 
@@ -3492,11 +3617,7 @@
                 editorSave.textContent = "Сохранение…";
 
                 requestJson(
-                    "/api/chat/" +
-                    otherUserId +
-                    "/messages/" +
-                    selectedMessage.id +
-                    "/edit",
+                    chatApi("/messages/" + selectedMessage.id + "/edit"),
                     {
                         method: "POST",
                         headers: {
@@ -3540,11 +3661,7 @@
                 deleteApply.textContent = "Удаление…";
 
                 requestJson(
-                    "/api/chat/" +
-                    otherUserId +
-                    "/messages/" +
-                    selectedMessage.id +
-                    "/delete",
+                    chatApi("/messages/" + selectedMessage.id + "/delete"),
                     { method: "POST" }
                 )
                     .then(function (data) {
@@ -4041,6 +4158,8 @@
         lightbox.hidden = false;
         document.body.classList.add("chat-lightbox-open");
     }
+
+    window.resursmapOpenChatImage = openLightbox;
 
     document.addEventListener("click", function (event) {
         var thumb = event.target.closest(".chat-message-image");

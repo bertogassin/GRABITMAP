@@ -29,6 +29,7 @@ pub struct RenderMeParams<'a> {
     pub home_city_index: i64,
     pub user_sessions: Vec<crate::web::view_models::UserSessionRow>,
     pub invite_public_id: &'a str,
+    pub has_avatar: bool,
 }
 
 fn home_city_select_html(continent: i64, country: i64, city: i64) -> String {
@@ -198,6 +199,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
         home_city_index,
         user_sessions,
         invite_public_id,
+        has_avatar,
     } = params;
     let safe_username = escape_html(username);
     let safe_first_name = escape_html(first_name);
@@ -260,7 +262,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     <div class="rm-me-account-row">
 
         <div class="rm-me-avatar">
-            {user_icon}
+            {avatar_html}
         </div>
 
         <div class="rm-me-name-wrap">
@@ -280,7 +282,13 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
 
 </div>
 "#,
-            user_icon = icon("user"),
+            avatar_html = if has_avatar {
+                format!(
+                    r#"<img class="rm-me-avatar-img" src="/api/avatars/{user_id}" alt="">"#
+                )
+            } else {
+                icon("user").to_string()
+            },
             display_name = display_name,
             username_html = username_html,
             telegram_id_html = telegram_id_html,
@@ -942,12 +950,21 @@ body.light-theme .rm-command-icon {{
 
     <div class="rm-profile-intent-box">
 
-        <div class="rm-profile-intent-kicker">
-            Сейчас
-        </div>
-
-        <div id="intent-current" class="rm-profile-intent-text">
-            {intent_status_text}
+        <div class="rm-profile-avatar-status">
+            <label class="rm-me-avatar rm-me-avatar--upload" title="Фото профиля">
+                {status_avatar}
+                <input id="rm-avatar-input" type="file" accept="image/jpeg,image/png,image/webp" class="chat-file-input">
+            </label>
+            <div>
+                <div class="rm-profile-intent-kicker">
+                    Сейчас
+                </div>
+                <div id="intent-current" class="rm-profile-intent-text">
+                    {intent_status_text}
+                </div>
+                <button type="button" id="rm-avatar-btn" class="ui-button rm-avatar-btn">Фото на аватар</button>
+                <div id="rm-avatar-status" class="card-meta"></div>
+            </div>
         </div>
 
     </div>
@@ -978,7 +995,7 @@ body.light-theme .rm-command-icon {{
             id="profile-intent"
             maxlength="300"
             rows="4"
-            placeholder="Например: ищу электрика в Ницце или предлагаю грузоперевозки..."
+            placeholder="Например: ищу электрика в своём городе или предлагаю перевозки..."
          class="ui-textarea">{safe_intent_text}</textarea>
 
     </label>
@@ -1059,6 +1076,13 @@ body.light-theme .rm-command-icon {{
         statistics = statistics,
         settings_icon = icon("settings"),
         intent_status_text = intent_status_text,
+        status_avatar = if has_avatar {
+            format!(
+                r#"<img class="rm-me-avatar-img" src="/api/avatars/{user_id}" alt="">"#
+            )
+        } else {
+            icon("user").to_string()
+        },
         safe_intent_text = safe_intent_text,
         safe_category = safe_category,
         home_city_select =
@@ -1306,6 +1330,91 @@ body.light-theme .rm-command-icon {{
             }
         }
     );
+
+    var avatarInput = document.getElementById("rm-avatar-input");
+    var avatarBtn = document.getElementById("rm-avatar-btn");
+    var avatarStatus = document.getElementById("rm-avatar-status");
+    if (avatarBtn && avatarInput) {
+        avatarBtn.addEventListener("click", function () {
+            avatarInput.click();
+        });
+        avatarInput.addEventListener("change", function () {
+            var file = avatarInput.files && avatarInput.files[0];
+            avatarInput.value = "";
+            if (!file) return;
+            if (file.size > 20 * 1024 * 1024) {
+                if (avatarStatus) avatarStatus.textContent = "Фото слишком большое";
+                return;
+            }
+            function compressAvatar(source) {
+                return new Promise(function (resolve) {
+                    var url = URL.createObjectURL(source);
+                    var img = new Image();
+                    img.onload = function () {
+                        URL.revokeObjectURL(url);
+                        var w = img.naturalWidth || img.width || 0;
+                        var h = img.naturalHeight || img.height || 0;
+                        var edge = Math.max(w, h);
+                        var scale = edge > 720 ? 720 / edge : 1;
+                        var canvas = document.createElement("canvas");
+                        canvas.width = Math.max(1, Math.round(w * scale));
+                        canvas.height = Math.max(1, Math.round(h * scale));
+                        var ctx = canvas.getContext("2d");
+                        if (!ctx) { resolve(source); return; }
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        canvas.toBlob(function (blob) {
+                            resolve(blob ? new File([blob], "avatar.jpg", { type: "image/jpeg" }) : source);
+                        }, "image/jpeg", 0.84);
+                    };
+                    img.onerror = function () { URL.revokeObjectURL(url); resolve(source); };
+                    img.src = url;
+                });
+            }
+            if (avatarStatus) avatarStatus.textContent = "Сжимаем фото…";
+            compressAvatar(file).then(function (ready) {
+            if (ready.size > 8 * 1024 * 1024) {
+                if (avatarStatus) avatarStatus.textContent = "Фото больше 8 МБ";
+                return;
+            }
+            var data = new FormData();
+            data.append("image", ready, "avatar.jpg");
+            if (avatarStatus) avatarStatus.textContent = "Сохраняем фото…";
+            return fetch("/api/profile/avatar", {
+                method: "POST",
+                body: data,
+                credentials: "same-origin"
+            }).then(function (res) {
+                return res.json().then(function (body) {
+                    return { res: res, body: body };
+                });
+            }).then(function (pack) {
+                if (!pack.res.ok || !pack.body || !pack.body.ok) {
+                    throw new Error("avatar_failed");
+                }
+                document.querySelectorAll(".rm-me-avatar-img, .rm-me-avatar svg, .rm-me-avatar .icon").forEach(function () {});
+                var imgs = document.querySelectorAll(".rm-me-avatar");
+                imgs.forEach(function (box) {
+                    var img = box.querySelector("img.rm-me-avatar-img");
+                    if (!img) {
+                        img = document.createElement("img");
+                        img.className = "rm-me-avatar-img";
+                        img.alt = "";
+                        box.insertBefore(img, box.firstChild);
+                        Array.prototype.slice.call(box.querySelectorAll("svg")).forEach(function (svg) {
+                            if (!svg.closest("label") || svg.parentElement === box) {
+                                svg.remove();
+                            }
+                        });
+                    }
+                    img.src = pack.body.url + "?t=" + Date.now();
+                });
+                if (avatarStatus) avatarStatus.textContent = "Фото обновлено";
+            });
+            }).catch(function () {
+                if (avatarStatus) avatarStatus.textContent = "Не удалось сохранить фото";
+            });
+        });
+    }
 })();
 </script>"####
         .to_string();
@@ -1464,6 +1573,8 @@ pub struct RenderPublicUserProfileParams<'a> {
     pub category: &'a str,
     pub chat_user_id: Option<i64>,
     pub resources: Vec<crate::web::view_models::PublicProfileResourceRow>,
+    pub has_avatar: bool,
+    pub profile_user_id: i64,
 }
 
 pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> String {
@@ -1476,6 +1587,8 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
         category,
         chat_user_id,
         resources,
+        has_avatar,
+        profile_user_id,
     } = params;
     let profession = {
         let label = profession_label(category);
@@ -1646,7 +1759,7 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
     <div class="rm-public-profile-row">
 
         <div class="rm-me-avatar">
-            {profile_icon}
+            {profile_avatar}
         </div>
 
         <div class="rm-me-name-wrap">
@@ -1683,7 +1796,13 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
 <section>
     {cards}
 </section>"####,
-        profile_icon = icon("user"),
+        profile_avatar = if has_avatar && profile_user_id > 0 {
+            format!(
+                r#"<img class="rm-me-avatar-img" src="/api/avatars/{profile_user_id}" alt="">"#
+            )
+        } else {
+            icon("user").to_string()
+        },
         display_name = display_name,
         person_line = if person_line.is_empty() {
             String::new()
@@ -1851,6 +1970,7 @@ mod personal_center_tests {
             home_city_index: -1,
             user_sessions: vec![],
             invite_public_id: "abc123",
+            has_avatar: false,
         }
     }
 
@@ -1904,6 +2024,8 @@ mod personal_center_tests {
             category: "security",
             chat_user_id: None,
             resources: vec![],
+            has_avatar: false,
+            profile_user_id: 7,
         });
 
         let profession = html.find("Охрана").expect("profession");

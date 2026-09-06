@@ -6,7 +6,7 @@ use super::common::{
 use crate::state::app_state::AppState;
 use crate::web::templates;
 use axum::{
-    extract::{Path, State},
+    extract::{Multipart, Path, State},
     http::{header, HeaderMap, HeaderValue, StatusCode},
     response::{Html, IntoResponse, Response},
     Json,
@@ -110,6 +110,7 @@ pub async fn app_me(State(state): State<AppState>, headers: HeaderMap) -> Html<S
                 home_city_index: -1,
                 user_sessions: vec![],
                 invite_public_id: "",
+                has_avatar: false,
             }));
         }
     };
@@ -284,6 +285,15 @@ pub async fn app_me(State(state): State<AppState>, headers: HeaderMap) -> Html<S
 
     let current_session_public_id = current_session_public_id(&headers).unwrap_or_default();
     let user_sessions = load_user_sessions(&db, user_id, &current_session_public_id, unix_now());
+    let has_avatar: bool = db
+        .query_row(
+            "SELECT CASE WHEN trim(COALESCE(avatar_path, '')) <> '' THEN 1 ELSE 0 END
+             FROM profiles WHERE user_id = ?1",
+            rusqlite::params![user_id],
+            |row| row.get::<_, i64>(0),
+        )
+        .unwrap_or(0)
+        != 0;
 
     drop(db);
 
@@ -309,6 +319,7 @@ pub async fn app_me(State(state): State<AppState>, headers: HeaderMap) -> Html<S
         home_city_index,
         user_sessions,
         invite_public_id: &invite_public_id,
+        has_avatar,
     }))
 }
 
@@ -546,6 +557,16 @@ pub async fn public_user_profile(
     // Определяем, кто сейчас смотрит публичный профиль.
     let viewer_user_id = verify_user_session(&state, &headers);
 
+    let has_avatar: bool = db
+        .query_row(
+            "SELECT CASE WHEN trim(COALESCE(avatar_path, '')) <> '' THEN 1 ELSE 0 END
+             FROM profiles WHERE user_id = ?1",
+            rusqlite::params![profile_user_id],
+            |row| row.get::<_, i64>(0),
+        )
+        .unwrap_or(0)
+        != 0;
+
     let chat_user_id: Option<i64> = viewer_user_id.and_then(|viewer_id| {
         if viewer_id <= 0 || profile_user_id <= 0 || viewer_id == profile_user_id {
             return None;
@@ -573,6 +594,8 @@ pub async fn public_user_profile(
             category: &category,
             chat_user_id,
             resources,
+            has_avatar,
+            profile_user_id,
         },
     ))
 }
@@ -901,4 +924,143 @@ pub async fn api_open_count(State(state): State<AppState>) -> Json<serde_json::V
     Json(json!({
         "count": count
     }))
+}
+
+fn avatar_root() -> std::path::PathBuf {
+    std::path::PathBuf::from("data/avatars")
+}
+
+pub async fn api_profile_avatar_set(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    mut multipart: Multipart,
+) -> Response {
+    if request_is_cross_site(&headers) {
+        return csrf_rejected_response();
+    }
+    let user_id = match verify_user_session(&state, &headers) {
+        Some(id) => id,
+        None => {
+            return (
+                StatusCode::UNAUTHORIZED,
+                Json(json!({"ok": false, "error": "login_required"})),
+            )
+                .into_response();
+        }
+    };
+    let mut file_bytes: Option<Vec<u8>> = None;
+    while let Ok(Some(field)) = multipart.next_field().await {
+        let name = field.name().unwrap_or("").to_string();
+        if matches!(name.as_str(), "image" | "file" | "avatar") {
+            if let Ok(bytes) = field.bytes().await {
+                file_bytes = Some(bytes.to_vec());
+            }
+        }
+    }
+    let Some(bytes) = file_bytes else {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({"ok": false, "error": "image_required"})),
+        )
+            .into_response();
+    };
+    if bytes.len() > 8 * 1024 * 1024 {
+        return (
+            StatusCode::PAYLOAD_TOO_LARGE,
+            Json(json!({"ok": false, "error": "image_too_large"})),
+        )
+            .into_response();
+    }
+    let Some((_, mime)) = super::chat_media::detect_image(&bytes) else {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({"ok": false, "error": "unsupported_image"})),
+        )
+            .into_response();
+    };
+    let ext = super::chat_media::extension_for_mime(mime);
+    let relative = format!("{user_id}.{ext}");
+    let absolute = avatar_root().join(&relative);
+    if std::fs::create_dir_all(avatar_root()).is_err() {
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({"ok": false, "error": "store_failed"})),
+        )
+            .into_response();
+    }
+    if std::fs::write(&absolute, &bytes).is_err() {
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({"ok": false, "error": "store_failed"})),
+        )
+            .into_response();
+    }
+    let db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => {
+            return (
+                StatusCode::SERVICE_UNAVAILABLE,
+                Json(json!({"ok": false, "error": "database_unavailable"})),
+            )
+                .into_response();
+        }
+    };
+    let _ = db.execute(
+        "UPDATE profiles SET avatar_path = ?1, updated_at = ?2 WHERE user_id = ?3",
+        rusqlite::params![relative, unix_now(), user_id],
+    );
+    Json(json!({
+        "ok": true,
+        "url": format!("/api/avatars/{user_id}"),
+    }))
+    .into_response()
+}
+
+pub async fn api_profile_avatar_get(
+    State(state): State<AppState>,
+    Path(user_id): Path<i64>,
+) -> Response {
+    if user_id <= 0 {
+        return StatusCode::NOT_FOUND.into_response();
+    }
+    let db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => return StatusCode::SERVICE_UNAVAILABLE.into_response(),
+    };
+    let path: String = db
+        .query_row(
+            "SELECT COALESCE(avatar_path, '') FROM profiles WHERE user_id = ?1",
+            rusqlite::params![user_id],
+            |row| row.get(0),
+        )
+        .unwrap_or_default();
+    if path.is_empty() || path.contains("..") || path.contains('/') || path.contains('\\') {
+        return StatusCode::NOT_FOUND.into_response();
+    }
+    let absolute = avatar_root().join(&path);
+    let bytes = match std::fs::read(&absolute) {
+        Ok(bytes) => bytes,
+        Err(_) => return StatusCode::NOT_FOUND.into_response(),
+    };
+    let mime = if path.ends_with(".png") {
+        "image/png"
+    } else if path.ends_with(".webp") {
+        "image/webp"
+    } else {
+        "image/jpeg"
+    };
+    (
+        [
+            (
+                header::CONTENT_TYPE,
+                HeaderValue::from_static(mime),
+            ),
+            (
+                header::CACHE_CONTROL,
+                HeaderValue::from_static("public, max-age=3600"),
+            ),
+        ],
+        bytes,
+    )
+        .into_response()
 }

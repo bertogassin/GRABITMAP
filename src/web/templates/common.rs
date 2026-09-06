@@ -24,7 +24,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = "4.9.97";
+pub const STATIC_ASSET_VERSION: &str = "4.9.99";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -2196,6 +2196,55 @@ a.feature.rm-feature-add {
     flex: 0 0 auto;
     background: rgba(214, 183, 122, .08);
     border: 1px solid rgba(214, 183, 122, .28);
+    overflow: hidden;
+}
+.rm-me-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.rm-me-avatar--upload {
+    cursor: pointer;
+    width: 72px;
+    height: 72px;
+}
+.chat-file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+.rm-profile-avatar-status {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+.rm-avatar-btn {
+    margin-top: 8px;
+    min-height: 36px;
+    padding: 0 12px;
+    font-size: 13px;
+}
+.rm-group-create {
+    padding: 18px;
+    display: grid;
+    gap: 14px;
+}
+.rm-group-members {
+    display: grid;
+    gap: 8px;
+}
+.rm-group-member {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 40px;
 }
 
 .rm-me-name-wrap {
@@ -3859,6 +3908,8 @@ a.feature.rm-feature-add {
 
 .chat-dialog-card {
     border-radius: 18px;
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 88px;
 }
 
 .rm-empty-state-actions {

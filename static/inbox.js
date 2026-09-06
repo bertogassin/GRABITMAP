@@ -60,23 +60,33 @@
 
         function conversationKey(conversation) {
             return [
-                conversation.other_user_id,
+                conversation.is_group ? "g" : "d",
+                conversation.group_id || conversation.other_user_id,
                 conversation.updated_at,
                 conversation.unread_count,
                 conversation.last_message,
                 conversation.last_time,
+                conversation.has_avatar ? "1" : "0",
             ].join("|");
         }
 
         var MESSAGE_ICON =
             '<svg class="icon" viewBox="0 0 24 24"><path d="M21 11.5c0 4.7-4 8.5-9 8.5-1 0-2-.2-2.9-.5L4 21l1.5-4.5C4.5 15.4 3 13.6 3 11.5 3 6.8 7 3 12 3s9 3.8 9 8.5Z"/></svg>';
+        var USERS_ICON =
+            '<svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
         var CHEVRON_ICON =
             '<svg class="icon small-icon" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>';
 
         function renderConversation(conversation) {
             var userId = String(conversation.other_user_id || "").trim();
+            var groupId = String(conversation.group_id || "").trim();
+            var isGroup = Boolean(conversation.is_group);
+            var href = String(conversation.href || "").trim() ||
+                (isGroup && groupId
+                    ? "/app/group/" + encodeURIComponent(groupId)
+                    : "/app/chat/" + encodeURIComponent(userId));
             var username = String(conversation.username || "").trim();
-            var usernameHtml = username
+            var usernameHtml = !isGroup && username
                 ? '<div class="card-meta rm-dialog-username">@'
                   + escapeHtml(username)
                   + "</div>"
@@ -92,19 +102,28 @@
                   + escapeHtml(conversation.last_time)
                   + "</div>"
                 : '<div class="chat-dialog-time"></div>';
-            var previewText = activeTyping[userId]
+            var previewText = !isGroup && activeTyping[userId]
                 ? typingPreviewHtml()
                 : escapeHtml(
-                    conversation.last_message || "Новый диалог"
+                    conversation.last_message || (isGroup ? "Новая группа" : "Новый диалог")
                 );
+            var avatarHtml = !isGroup && conversation.has_avatar && userId
+                ? '<img class="rm-me-avatar-img" src="/api/avatars/'
+                  + encodeURIComponent(userId)
+                  + '" alt="" onerror="this.remove()">'
+                : (isGroup ? USERS_ICON : MESSAGE_ICON);
 
             return (
-                '<a href="/app/chat/'
-                + encodeURIComponent(userId)
+                '<a href="'
+                + href
                 + '#chat-end" class="card chat-dialog-card" data-other-user-id="'
                 + escapeHtml(userId)
-                + '"><div class="card-icon">'
-                + MESSAGE_ICON
+                + '" data-group-id="'
+                + escapeHtml(groupId)
+                + '" data-kind="'
+                + (isGroup ? "group" : "dm")
+                + '"><div class="card-icon chat-dialog-avatar">'
+                + avatarHtml
                 + '</div><div class="card-content"><div class="card-title">'
                 + escapeHtml(conversation.display_name)
                 + "</div>"
@@ -133,7 +152,7 @@
 
         function renderEmptyState() {
             return (
-                '<div class="card rm-empty-state"><div class="card-content"><div class="card-title">Нет диалогов</div><div class="card-meta">Откройте профиль участника, чтобы начать диалог.</div><div class="rm-empty-state-actions"><a class="rm-empty-action ui-button" href="/app/search">Найти участников</a></div></div></div>'
+                '<div class="card rm-empty-state"><div class="card-content"><div class="card-title">Нет диалогов</div><div class="card-meta">Откройте профиль участника, чтобы начать диалог, или создайте группу.</div><div class="rm-empty-state-actions"><a class="rm-empty-action ui-button" href="/app/search">Найти участников</a><a class="rm-empty-action ui-button" href="/app/groups/new">Создать группу</a></div></div></div>'
             );
         }
 

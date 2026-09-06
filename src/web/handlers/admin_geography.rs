@@ -319,7 +319,7 @@ fn render_page(
                value="{query}"
                maxlength="80"
                autocomplete="off"
-               placeholder="Ницца, France, FR-NICE…"
+               placeholder="город, страна, код…"
                aria-label="Поиск города">
         <button type="submit">Найти</button>
     </form>

@@ -13,3 +13,4 @@ pub mod search_fts;
 pub mod security;
 pub mod services;
 pub mod steps;
+pub mod chat_groups;

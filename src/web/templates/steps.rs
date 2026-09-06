@@ -109,18 +109,16 @@ fn month_card(year: i32, month: u32, today: &str, goal: i64, by_date: &HashMap<&
     format!(
         r#"<article class="card rm-step-month" data-month="{month_key}">
     <header class="rm-step-month-head">
-        <button type="button" class="rm-step-month-nav" id="rm-step-month-prev" aria-label="Предыдущий месяц">‹</button>
         <div class="rm-step-month-title">
-            <strong id="rm-step-month-label">{title}</strong>
-            <small id="rm-step-month-meta">{walked} · {total}</small>
+            <strong>{title}</strong>
+            <small data-month-meta="{month_key}">{walked} · {total}</small>
         </div>
-        <button type="button" class="rm-step-month-nav" id="rm-step-month-next" aria-label="Следующий месяц" disabled>›</button>
     </header>
     <div class="rm-step-weekdays">{weekdays}</div>
-    <div class="rm-step-grid" id="rm-step-month-grid">{cells}</div>
+    <div class="rm-step-grid" data-month-grid="{month_key}">{cells}</div>
 </article>"#,
         month_key = escape_html(&month_key),
-        title = escape_html(&format!("{} {}", MONTHS[(month as usize - 1).min(11)], year)),
+        title = escape_html(MONTHS[(month as usize - 1).min(11)]),
         walked = ru_count(walked, "день", "дня", "дней"),
         total = ru_count(month_total, "шаг", "шага", "шагов"),
         weekdays = weekday_row,
@@ -138,13 +136,22 @@ fn render_months(snapshot: &StepSnapshot) -> String {
         .iter()
         .map(|day| (day.date.as_str(), day.steps))
         .collect();
+    let year = today.year();
+    let months = (1..=12)
+        .map(|month| month_card(year, month, &snapshot.today, snapshot.goal, &by_date))
+        .collect::<Vec<_>>()
+        .join("");
 
-    month_card(
-        today.year(),
-        today.month(),
-        &snapshot.today,
-        snapshot.goal,
-        &by_date,
+    format!(
+        r#"<div class="rm-step-year" data-year="{year}">
+    <header class="rm-step-year-head">
+        <strong>{year}</strong>
+        <small>Все месяцы. Цвет дня — сколько прошли.</small>
+    </header>
+    <div class="rm-step-year-grid">{months}</div>
+</div>"#,
+        year = year,
+        months = months,
     )
 }
 
@@ -213,6 +220,8 @@ fn render_log(entries: &[StepLogEntry]) -> String {
 fn steps_style() -> &'static str {
     r#"<style>
 .rm-steps { display:grid; gap:16px; }
+.rm-step-install { margin: 0; }
+.rm-step-install .rm-pwa-install-btn { width: 100%; }
 .rm-step-today {
     display:grid;
     gap:16px;
@@ -339,52 +348,56 @@ fn steps_style() -> &'static str {
     font:inherit;
 }
 .rm-step-months { display:grid; gap:14px; }
-.rm-step-month { padding:16px; }
+.rm-step-year { display:grid; gap:14px; }
+.rm-step-year-head {
+    display:grid;
+    gap:4px;
+    padding:0 2px;
+}
+.rm-step-year-head strong { font-size:20px; letter-spacing:-.03em; }
+.rm-step-year-head small { color:var(--muted); }
+.rm-step-year-grid {
+    display:grid;
+    gap:12px;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+}
+@media (max-width: 640px) {
+    .rm-step-year-grid { grid-template-columns:1fr; }
+}
+.rm-step-month { padding:12px; contain:layout style; }
 .rm-step-month-head {
     display:grid;
-    grid-template-columns:36px 1fr 36px;
-    gap:8px;
-    align-items:center;
-    margin-bottom:12px;
+    gap:2px;
+    margin-bottom:8px;
 }
-.rm-step-month-title { display:grid; gap:2px; text-align:center; }
+.rm-step-month-title { display:grid; gap:2px; }
 .rm-step-month-head small { color:var(--muted); }
-.rm-step-month-nav {
-    width:36px;
-    height:36px;
-    border:1px solid var(--line);
-    border-radius:12px;
-    background:var(--bg-soft);
-    color:var(--text);
-    font:inherit;
-    font-size:22px;
-    line-height:1;
-}
-.rm-step-month-nav:disabled { opacity:.35; }
 .rm-step-weekdays,
 .rm-step-grid {
     display:grid;
     grid-template-columns:repeat(7,1fr);
-    gap:6px;
+    gap:3px;
 }
 .rm-step-weekdays {
-    margin-bottom:6px;
+    margin-bottom:4px;
     color:var(--muted);
-    font-size:11px;
+    font-size:10px;
     text-align:center;
 }
 .rm-step-cell {
-    min-height:40px;
+    min-height:28px;
     aspect-ratio:1;
     display:grid;
     place-content:center;
     border:1px solid var(--line);
-    border-radius:10px;
+    border-radius:7px;
     background:transparent;
     color:var(--text);
     font:inherit;
-    font-size:13px;
+    font-size:11px;
     font-weight:700;
+    content-visibility:auto;
+    contain-intrinsic-size:28px;
 }
 .rm-step-cell.is-future { opacity:.38; }
 .rm-step-cell.is-pad { border:0; }
@@ -497,7 +510,7 @@ fn authenticated_body(snapshot: &StepSnapshot) -> String {
         week = render_week(&snapshot.days, &snapshot.today, snapshot.goal),
         path_head = super::common::section_head(
             "Календарь",
-            "Текущий год. Цвет дня — сколько прошли.",
+            "Весь текущий год. Цвет дня — сколько прошли.",
             Some(24),
         ),
         months = render_months(snapshot),
@@ -512,20 +525,19 @@ fn authenticated_body(snapshot: &StepSnapshot) -> String {
 
 pub fn render_steps(snapshot: Option<&StepSnapshot>, invite_public_id: &str) -> String {
     let content = match snapshot {
-        Some(snapshot) => format!(
-            "{}{}",
-            authenticated_body(snapshot),
-            super::invite::invite_share_block(invite_public_id)
-        ),
+        Some(snapshot) => authenticated_body(snapshot),
         None => guest_locked_section("Шагомер", "/app/steps"),
     };
+    let _ = invite_public_id;
 
     let main_html = format!(
         r#"{topbar}
 
 {hero}
 
-{content}"#,
+{content}
+
+{install}"#,
         topbar = topbar("Шагомер", "footprints"),
         hero = back_hero(
             &back_link("/app/me", "Профиль", "arrow-left"),
@@ -535,6 +547,7 @@ pub fn render_steps(snapshot: Option<&StepSnapshot>, invite_public_id: &str) -> 
             "Цель дня — 10 000 шагов.",
         ),
         content = content,
+        install = r#"<p class="rm-step-install"><button id="resursmap-install-pwa" type="button" class="ui-button rm-pwa-install-btn rm-pwa-home-btn">На экран телефона</button></p>"#,
     );
 
     let body_after = if snapshot.is_some() {
@@ -590,17 +603,23 @@ mod tests {
     #[test]
     fn album_and_controls_render() {
         let html = render_steps(Some(&empty_snapshot()), "abc123");
-        assert!(html.contains("/app/join/abc123?to=steps"));
+        assert!(!html.contains("/app/join/"));
         assert!(html.contains("Календарь"));
         assert!(html.contains("Считаем шаги с телефона"));
-        assert!(html.contains("rm-step-month-prev"));
+        assert!(!html.contains("rm-step-month-prev"));
+        assert!(html.contains("data-year=\"2026\""));
+        assert!(html.contains("data-month=\"2026-01\""));
         assert!(html.contains("data-month=\"2026-09\""));
+        assert!(html.contains("data-month=\"2026-12\""));
         assert!(!html.contains("Считать шаги"));
         assert!(!html.contains("data-add"));
         assert!(!html.contains("Свои шаги"));
         assert!(html.contains("сентябр"));
-        assert!(!html.contains("август"));
+        assert!(html.contains("январ"));
+        assert!(html.contains("август"));
         assert!(!html.contains("2025"));
         assert!(html.contains("/static/pedometer.js"));
+        assert!(html.contains("resursmap-install-pwa"));
+        assert!(html.contains("На экран телефона"));
     }
 }

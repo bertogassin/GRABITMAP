@@ -26,7 +26,7 @@
                 if (match) shown += 1;
             });
             if (!query) {
-                status.textContent = "Страны по алфавиту · начните вводить для поиска";
+                status.textContent = "";
             } else if (shown) {
                 status.textContent = "Найдено: " + shown;
             } else {

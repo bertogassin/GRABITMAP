@@ -26,6 +26,9 @@ pub struct ConversationRow {
     pub last_message: String,
     pub unread_count: i64,
     pub updated_at: i64,
+    pub is_group: bool,
+    pub group_id: i64,
+    pub has_avatar: bool,
 }
 
 pub struct UserSessionRow {
@@ -60,6 +63,7 @@ pub struct ChatMessageRow {
     pub attachment_kind: String,
     pub attachment_url: String,
     pub reactions: Vec<ChatReactionRow>,
+    pub sender_name: String,
 }
 
 pub type PublicProfileResourceRow = (i64, String, String, String, f64, i64, i64, i64);

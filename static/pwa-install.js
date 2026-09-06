@@ -99,25 +99,23 @@
     });
 
     ready(function () {
-        var button = document.getElementById("resursmap-install-pwa");
+        var buttons = document.querySelectorAll("#resursmap-install-pwa");
         var panel = document.getElementById("resursmap-install-panel");
 
         if (isStandaloneMode()) {
-            if (button) {
+            buttons.forEach(function (button) {
                 button.hidden = true;
-            }
+            });
             if (panel) {
                 panel.hidden = true;
             }
             return;
         }
 
-        if (!button) {
-            return;
-        }
-
-        button.addEventListener("click", function () {
-            promptInstall();
+        buttons.forEach(function (button) {
+            button.addEventListener("click", function () {
+                promptInstall();
+            });
         });
     });
 })();

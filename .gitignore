@@ -2,6 +2,7 @@
 /data/*.db
 /data/*.db-*
 /data/chat-media/
+/data/avatars/
 .env
 .env.*
 !.env.example

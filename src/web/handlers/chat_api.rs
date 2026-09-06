@@ -33,10 +33,10 @@ pub struct ChatSendPayload {
 
 #[derive(Debug, Deserialize)]
 pub struct ChatEditPayload {
-    message: String,
+    pub message: String,
 }
 
-fn message_can_be_edited(created_at: i64, deleted_at: i64, now: i64) -> bool {
+pub(crate) fn message_can_be_edited(created_at: i64, deleted_at: i64, now: i64) -> bool {
     deleted_at == 0
         && created_at > 0
         && now >= created_at
@@ -111,7 +111,7 @@ where
 
 const CHAT_REACTION_EMOJIS: &[&str] = &["❤️", "👍", "😂", "😮", "😢", "🙏"];
 
-fn reaction_emoji_is_allowed(value: &str) -> bool {
+pub(crate) fn reaction_emoji_is_allowed(value: &str) -> bool {
     CHAT_REACTION_EMOJIS.contains(&value)
 }
 
@@ -238,7 +238,7 @@ fn normalized_limit(value: Option<i64>) -> i64 {
     value.unwrap_or(DEFAULT_PAGE_SIZE).clamp(1, MAX_PAGE_SIZE)
 }
 
-fn message_is_valid(message: &str) -> bool {
+pub(crate) fn message_is_valid(message: &str) -> bool {
     input_text_is_valid(message, 1, 2000)
 }
 
@@ -1413,20 +1413,30 @@ pub async fn api_chat_conversations(State(state): State<AppState>, headers: Head
     };
 
     super::chat::mark_user_messages_delivered(&db, user_id);
-    let conversations = load_user_conversations(&db, user_id);
+    let mut conversations = load_user_conversations(&db, user_id);
+    conversations.extend(super::groups::load_user_groups(&db, user_id));
+    conversations.sort_by(|a, b| b.updated_at.cmp(&a.updated_at).then(b._id.cmp(&a._id)));
     let total_unread: i64 = conversations.iter().map(|row| row.unread_count).sum();
 
     let items: Vec<serde_json::Value> = conversations
         .iter()
         .map(|conversation| {
-            let display_name = crate::web::templates::conversation_display_name(
-                conversation.other_user_id,
-                &conversation.username,
-                &conversation.first_name,
-                &conversation.last_name,
-            );
+            let display_name = if conversation.is_group {
+                conversation.first_name.clone()
+            } else {
+                crate::web::templates::conversation_display_name(
+                    conversation.other_user_id,
+                    &conversation.username,
+                    &conversation.first_name,
+                    &conversation.last_name,
+                )
+            };
             let last_message = if conversation.last_message.is_empty() {
-                "Новый диалог".to_string()
+                if conversation.is_group {
+                    "Новая группа".to_string()
+                } else {
+                    "Новый диалог".to_string()
+                }
             } else {
                 conversation.last_message.clone()
             };
@@ -1444,6 +1454,14 @@ pub async fn api_chat_conversations(State(state): State<AppState>, headers: Head
                 "last_time": last_time,
                 "unread_count": conversation.unread_count,
                 "updated_at": conversation.updated_at,
+                "is_group": conversation.is_group,
+                "group_id": conversation.group_id,
+                "has_avatar": conversation.has_avatar,
+                "href": if conversation.is_group && conversation.group_id > 0 {
+                    format!("/app/group/{}", conversation.group_id)
+                } else {
+                    format!("/app/chat/{}", conversation.other_user_id)
+                },
             })
         })
         .collect();
@@ -1461,7 +1479,7 @@ pub async fn api_chat_conversations(State(state): State<AppState>, headers: Head
 
 #[derive(Debug, Deserialize)]
 pub struct ChatReactPayload {
-    emoji: String,
+    pub emoji: String,
 }
 
 pub async fn api_chat_react(

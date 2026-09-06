@@ -1,5 +1,6 @@
 use super::super::handlers::{
-    api_attention_count, api_open_count, api_profile_get, api_profile_set, app_logout, app_me,
+    api_attention_count, api_open_count, api_profile_avatar_get, api_profile_avatar_set,
+    api_profile_get, api_profile_set, app_logout, app_me,
     app_revoke_other_sessions, app_revoke_session, email_auth_request, email_auth_verify,
     favorites_page, forgot_password_page, forgot_password_request, login_code_page, login_email,
     login_page, mark_all_notifications_read, notifications_page, open_notification,
@@ -45,6 +46,8 @@ pub(super) fn routes() -> Router<AppState> {
         .route("/app/notifications/{id}/open", get(open_notification))
         .route("/app/user/{public_id}", get(public_user_profile))
         .route("/api/profile", get(api_profile_get).post(api_profile_set))
+        .route("/api/profile/avatar", post(api_profile_avatar_set))
+        .route("/api/avatars/{user_id}", get(api_profile_avatar_get))
         .route("/api/open_count", get(api_open_count))
         .route("/api/account/attention-count", get(api_attention_count))
         .route("/api/notifications/unread-count", get(unread_count))

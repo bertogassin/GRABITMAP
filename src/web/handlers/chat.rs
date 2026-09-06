@@ -95,6 +95,7 @@ fn load_recent_chat_messages(
                         String::new()
                     },
                     reactions: Vec::new(),
+                    sender_name: String::new(),
                 })
             })?
             .collect::<Result<Vec<_>, _>>()
@@ -167,7 +168,8 @@ pub(super) fn load_user_conversations(
                   AND m.is_read = 0
             ) AS unread_count,
 
-            c.updated_at
+            c.updated_at,
+            CASE WHEN trim(COALESCE(p.avatar_path, '')) <> '' THEN 1 ELSE 0 END
 
          FROM conversations c
 
@@ -198,6 +200,9 @@ pub(super) fn load_user_conversations(
                 last_message: row.get(5)?,
                 unread_count: row.get(6)?,
                 updated_at: row.get(7)?,
+                is_group: false,
+                group_id: 0,
+                has_avatar: row.get::<_, i64>(8)? != 0,
             })
         })?
         .collect::<Result<Vec<_>, _>>()
@@ -222,7 +227,9 @@ pub async fn messages_page(State(state): State<AppState>, headers: HeaderMap) ->
     };
 
     mark_user_messages_delivered(&db, user_id);
-    let conversations = load_user_conversations(&db, user_id);
+    let mut conversations = load_user_conversations(&db, user_id);
+    conversations.extend(super::groups::load_user_groups(&db, user_id));
+    conversations.sort_by(|a, b| b.updated_at.cmp(&a.updated_at).then(b._id.cmp(&a._id)));
 
     drop(db);
 

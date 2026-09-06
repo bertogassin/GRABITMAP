@@ -41,7 +41,7 @@
                 button.disabled = false;
                 button.textContent = "Показать следующие города";
             }
-            status.textContent = data.items.length ? "Города расположены по алфавиту" : "Город не найден в базе этой страны";
+            status.textContent = data.items.length ? "" : "Город не найден в этой стране";
         }
 
         async function refresh(append) {
@@ -49,7 +49,7 @@
             var query = input.value.trim();
             var offset = append && button ? Number(button.dataset.offset || 0) : 0;
             if (button) button.disabled = true;
-            status.textContent = "Ищем в базе городов…";
+            status.textContent = "";
             try {
                 var data = await requestCities(countryId, query, offset);
                 if (current === requestId) render(data, append);
@@ -67,7 +67,7 @@
         if (clear) clear.addEventListener("click", function () { input.value = ""; input.focus(); refresh(false); });
         if (button) button.addEventListener("click", function () { refresh(true); });
         if (!input.value.trim()) {
-            status.textContent = "Города по алфавиту · начните вводить для поиска";
+            status.textContent = "";
         }
     }, { once: true });
 })();
