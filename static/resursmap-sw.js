@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_VERSION = "grabit-shell-v5.0.1";
+const CACHE_VERSION = "grabit-shell-v5.0.2";
 
 const STATIC_ASSETS = [
     "/static/manifest.webmanifest",
@@ -25,9 +25,58 @@ self.addEventListener("install", function (event) {
     );
 });
 
+function swT(key) {
+    var dict = {
+        ru: {
+            notify_new_message: "Новое сообщение",
+            notify_open_chat: "Откройте чат в GRABIT.",
+            notify_generic: "Есть новое уведомление.",
+            pwa_updated: "GRABIT обновлён",
+            pwa_open_app_steps: "Откройте приложение. Шагомер на панели — сразу считать шаги."
+        },
+        en: {
+            notify_new_message: "New message",
+            notify_open_chat: "Open the chat in GRABIT.",
+            notify_generic: "You have a new notification.",
+            pwa_updated: "GRABIT updated",
+            pwa_open_app_steps: "Open the app. Pedometer is on the panel — start counting steps."
+        },
+        uk: {
+            notify_new_message: "Нове повідомлення",
+            notify_open_chat: "Відкрийте чат у GRABIT.",
+            notify_generic: "Є нове сповіщення.",
+            pwa_updated: "GRABIT оновлено",
+            pwa_open_app_steps: "Відкрийте застосунок. Крокомір на панелі — одразу рахувати кроки."
+        }
+    };
+    var locale = "ru";
+    try {
+        var match = (self.__grabitLang || "").toString();
+        if (match) {
+            locale = match;
+        }
+    } catch (_) {}
+    var table = dict[locale] || dict.en;
+    return table[key] || dict.en[key] || key;
+}
+
+function refreshSwLang() {
+    if (!self.cookieStore || typeof self.cookieStore.get !== "function") {
+        return Promise.resolve();
+    }
+    return self.cookieStore.get("resursmap_lang").then(function (cookie) {
+        self.__grabitLang = cookie && cookie.value ? cookie.value : "ru";
+    }).catch(function () {
+        self.__grabitLang = "ru";
+    });
+}
+
+refreshSwLang();
+
 self.addEventListener("activate", function (event) {
     event.waitUntil(
-        caches.keys()
+        refreshSwLang().then(function () {
+            return caches.keys()
             .then(function (keys) {
                 var stale = keys.filter(function (key) {
                     return (
@@ -53,13 +102,14 @@ self.addEventListener("activate", function (event) {
                 if (!replaced) {
                     return;
                 }
-                return self.registration.showNotification("GRABIT обновлён", {
-                    body: "Откройте приложение. Шагомер на панели — сразу считать шаги.",
+                return self.registration.showNotification(swT("pwa_updated"), {
+                    body: swT("pwa_open_app_steps"),
                     icon: "/static/app-icon-192.png",
                     tag: "grabit-update",
                     data: { url: "/app" }
                 }).catch(function () {});
-            })
+            });
+        })
     );
 });
 
@@ -128,9 +178,11 @@ self.addEventListener("notificationclick", function (event) {
 });
 
 function remindIfNeeded() {
-    return fetch("/api/account/attention-count", {
-        credentials: "include",
-        headers: { Accept: "application/json" }
+    return refreshSwLang().then(function () {
+        return fetch("/api/account/attention-count", {
+            credentials: "include",
+            headers: { Accept: "application/json" }
+        });
     }).then(function (response) {
         if (!response.ok) {
             return;
@@ -144,15 +196,15 @@ function remindIfNeeded() {
         var messages = Number(data.messages) || 0;
         var notifications = Number(data.notifications) || 0;
         if (messages > 0) {
-            tasks.push(self.registration.showNotification("Новое сообщение", {
-                body: "Откройте чат в GRABIT.",
+            tasks.push(self.registration.showNotification(swT("notify_new_message"), {
+                body: swT("notify_open_chat"),
                 icon: "/static/app-icon-192.png",
                 tag: "grabit-chat",
                 data: { url: "/app/messages" }
             }));
         } else if (notifications > 0) {
             tasks.push(self.registration.showNotification("GRABIT", {
-                body: "Есть новое уведомление.",
+                body: swT("notify_generic"),
                 icon: "/static/app-icon-192.png",
                 tag: "grabit-inbox",
                 data: { url: "/app/notifications" }

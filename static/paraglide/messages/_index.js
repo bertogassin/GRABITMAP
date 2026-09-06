@@ -2,37 +2,115 @@
 import { getLocale, experimentalStaticLocale } from "../runtime.js"
 
 /** @typedef {import('../runtime.js').LocalizedString} LocalizedString */
+/** @typedef {{}} Auth_EmailInputs */
+/** @typedef {{}} Auth_ForgotInputs */
+/** @typedef {{}} Auth_LoginInputs */
+/** @typedef {{}} Auth_PasswordInputs */
+/** @typedef {{}} Auth_RegisterInputs */
+/** @typedef {{}} Back_To_CitiesInputs */
+/** @typedef {{}} Chat_Actions_AriaInputs */
 /** @typedef {{}} Chat_All_ReadInputs */
+/** @typedef {{}} Chat_Cancel_ReplyInputs */
+/** @typedef {{}} Chat_CloseInputs */
+/** @typedef {{}} Chat_Compressing_PhotoInputs */
+/** @typedef {{}} Chat_Conn_OkInputs */
+/** @typedef {{}} Chat_ConnectingInputs */
 /** @typedef {{}} Chat_CopyInputs */
 /** @typedef {{}} Chat_DeleteInputs */
+/** @typedef {{}} Chat_DeletedInputs */
+/** @typedef {{}} Chat_DeletingInputs */
 /** @typedef {{}} Chat_DialogsInputs */
 /** @typedef {{}} Chat_EditInputs */
+/** @typedef {{}} Chat_EditedInputs */
 /** @typedef {{}} Chat_EmptyInputs */
 /** @typedef {{}} Chat_ForwardInputs */
+/** @typedef {{}} Chat_Forward_OfflineInputs */
+/** @typedef {{}} Chat_Forward_TitleInputs */
+/** @typedef {{}} Chat_ForwardedInputs */
+/** @typedef {{}} Chat_ForwardingInputs */
+/** @typedef {{}} Chat_Forwarding_PhotoInputs */
+/** @typedef {{}} Chat_Forwarding_VoiceInputs */
 /** @typedef {{}} Chat_GroupInputs */
+/** @typedef {{}} Chat_History_ErrorInputs */
+/** @typedef {{}} Chat_History_RetryInputs */
+/** @typedef {{}} Chat_History_StartInputs */
+/** @typedef {{}} Chat_Just_NowInputs */
+/** @typedef {{ when: NonNullable<unknown> }} Chat_Last_SeenInputs */
 /** @typedef {{}} Chat_LeadInputs */
 /** @typedef {{}} Chat_LeaveInputs */
+/** @typedef {{}} Chat_Link_OffInputs */
+/** @typedef {{}} Chat_Link_OkInputs */
+/** @typedef {{}} Chat_Load_OlderInputs */
+/** @typedef {{}} Chat_LoadingInputs */
+/** @typedef {{}} Chat_Long_AgoInputs */
 /** @typedef {{}} Chat_MembersInputs */
+/** @typedef {{}} Chat_MessageInputs */
+/** @typedef {{}} Chat_Mic_DeniedInputs */
+/** @typedef {{}} Chat_New_DialogInputs */
 /** @typedef {{}} Chat_New_GroupInputs */
+/** @typedef {{}} Chat_New_Group_PreviewInputs */
+/** @typedef {{}} Chat_No_NetworkInputs */
 /** @typedef {{}} Chat_OnlineInputs */
+/** @typedef {{}} Chat_OriginalInputs */
+/** @typedef {{}} Chat_PeerInputs */
 /** @typedef {{}} Chat_PhotoInputs */
+/** @typedef {{}} Chat_Photo_ErrorInputs */
+/** @typedef {{}} Chat_Photo_FailedInputs */
+/** @typedef {{}} Chat_Photo_LabelInputs */
+/** @typedef {{}} Chat_Photo_OfflineInputs */
+/** @typedef {{}} Chat_Photo_Over_8mbInputs */
+/** @typedef {{}} Chat_Photo_Too_BigInputs */
+/** @typedef {{}} Chat_Profile_MissingInputs */
+/** @typedef {{}} Chat_Rate_LimitedInputs */
+/** @typedef {{}} Chat_RecordingInputs */
+/** @typedef {{}} Chat_Recording_ReleaseInputs */
 /** @typedef {{}} Chat_ReplyInputs */
+/** @typedef {{}} Chat_Reply_LabelInputs */
+/** @typedef {{}} Chat_SaveInputs */
+/** @typedef {{}} Chat_SavingInputs */
+/** @typedef {{}} Chat_Send_UnavailableInputs */
+/** @typedef {{}} Chat_SendingInputs */
+/** @typedef {{ n: NonNullable<unknown> }} Chat_Sending_LeftInputs */
+/** @typedef {{}} Chat_Sending_PhotoInputs */
+/** @typedef {{}} Chat_Sending_VoiceInputs */
+/** @typedef {{}} Chat_Sent_HintInputs */
+/** @typedef {{}} Chat_Session_ExpiredInputs */
+/** @typedef {{}} Chat_Status_SendingInputs */
 /** @typedef {{}} Chat_TitleInputs */
 /** @typedef {{}} Chat_TypingInputs */
+/** @typedef {{}} Chat_User_UnavailableInputs */
+/** @typedef {{}} Chat_VoiceInputs */
+/** @typedef {{}} Chat_Voice_ErrorInputs */
+/** @typedef {{}} Chat_Voice_FailedInputs */
+/** @typedef {{}} Chat_Voice_OfflineInputs */
+/** @typedef {{}} Chat_Voice_Too_ShortInputs */
+/** @typedef {{}} Chat_Voice_UnsupportedInputs */
 /** @typedef {{}} Common_Account_NeededInputs */
 /** @typedef {{ feature: NonNullable<unknown> }} Common_Account_Needed_BodyInputs */
+/** @typedef {{}} Common_AllInputs */
 /** @typedef {{}} Common_BackInputs */
+/** @typedef {{}} Common_BusinessInputs */
 /** @typedef {{}} Common_Create_AccountInputs */
 /** @typedef {{}} Common_Guest_CopyInputs */
 /** @typedef {{}} Common_Guest_ModeInputs */
+/** @typedef {{}} Common_ListingInputs */
 /** @typedef {{}} Common_LoginInputs */
 /** @typedef {{}} Common_Login_PasswordInputs */
+/** @typedef {{}} Common_OfferInputs */
+/** @typedef {{}} Common_OnlineInputs */
 /** @typedef {{}} Common_Open_ProfileInputs */
+/** @typedef {{}} Common_PremiumInputs */
 /** @typedef {{}} Common_PrivacyInputs */
 /** @typedef {{}} Common_ProfileInputs */
 /** @typedef {{}} Common_RegisterInputs */
 /** @typedef {{}} Common_RulesInputs */
+/** @typedef {{}} Common_SeekerInputs */
 /** @typedef {{}} Common_To_MapInputs */
+/** @typedef {{}} Common_VerifiedInputs */
+/** @typedef {{}} Common_Was_RecentlyInputs */
+/** @typedef {{}} Common_WorkInputs */
+/** @typedef {{}} Common_WorkersInputs */
+/** @typedef {{}} Common_WriteInputs */
 /** @typedef {{}} Footer_AriaInputs */
 /** @typedef {{}} Lang_ArInputs */
 /** @typedef {{}} Lang_BnInputs */
@@ -68,6 +146,7 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Lang_Zh_Tw2Inputs */
 /** @typedef {{}} Legal_PrivacyInputs */
 /** @typedef {{}} Legal_RulesInputs */
+/** @typedef {{}} Map_TitleInputs */
 /** @typedef {{}} Menu_Add_CardInputs */
 /** @typedef {{}} Menu_Add_MetaInputs */
 /** @typedef {{}} Menu_AppInputs */
@@ -99,11 +178,21 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Nav_MenuInputs */
 /** @typedef {{}} Nav_SearchInputs */
 /** @typedef {{}} Notifications_TitleInputs */
+/** @typedef {{}} Notify_GenericInputs */
+/** @typedef {{}} Notify_New_MessageInputs */
+/** @typedef {{}} Notify_Open_ChatInputs */
+/** @typedef {{}} Notify_Steps_ActionInputs */
+/** @typedef {{}} Notify_Steps_BodyInputs */
+/** @typedef {{}} Notify_Steps_TitleInputs */
 /** @typedef {{}} Profile_SettingsInputs */
 /** @typedef {{}} Profile_Settings_SoundInputs */
 /** @typedef {{}} Profile_TitleInputs */
 /** @typedef {{}} Pwa_InstalledInputs */
+/** @typedef {{}} Pwa_Open_App_StepsInputs */
+/** @typedef {{ rating: NonNullable<unknown>, votes: NonNullable<unknown> }} Rating_VotesInputs */
 /** @typedef {{}} Search_TitleInputs */
+/** @typedef {{}} Search_WhatInputs */
+/** @typedef {{}} SpecialistInputs */
 /** @typedef {{}} Steps_InstallInputs */
 /** @typedef {{}} Steps_LeadInputs */
 /** @typedef {{}} Steps_TitleInputs */
@@ -139,6 +228,314 @@ import * as __ro from "./ro.js"
 import * as __hu from "./hu.js"
 import * as __sv from "./sv.js"
 import * as __he from "./he.js"
+/**
+* | output |
+* | --- |
+* | "Email" |
+*
+* @param {Auth_EmailInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const auth_email = /** @type {((inputs?: Auth_EmailInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Auth_EmailInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.auth_email(inputs)
+	if (locale === "fr") return __fr.auth_email(inputs)
+	if (locale === "es") return __es.auth_email(inputs)
+	if (locale === "zh") return __zh.auth_email(inputs)
+	if (locale === "zh-TW") return __zh_tw2.auth_email(inputs)
+	if (locale === "hi") return __hi.auth_email(inputs)
+	if (locale === "ar") return __ar.auth_email(inputs)
+	if (locale === "pt") return __pt.auth_email(inputs)
+	if (locale === "de") return __de.auth_email(inputs)
+	if (locale === "ja") return __ja.auth_email(inputs)
+	if (locale === "ko") return __ko.auth_email(inputs)
+	if (locale === "it") return __it.auth_email(inputs)
+	if (locale === "tr") return __tr.auth_email(inputs)
+	if (locale === "pl") return __pl.auth_email(inputs)
+	if (locale === "uk") return __uk.auth_email(inputs)
+	if (locale === "nl") return __nl.auth_email(inputs)
+	if (locale === "vi") return __vi.auth_email(inputs)
+	if (locale === "id") return __id.auth_email(inputs)
+	if (locale === "ms") return __ms.auth_email(inputs)
+	if (locale === "th") return __th.auth_email(inputs)
+	if (locale === "fa") return __fa.auth_email(inputs)
+	if (locale === "ur") return __ur.auth_email(inputs)
+	if (locale === "bn") return __bn.auth_email(inputs)
+	if (locale === "pa") return __pa.auth_email(inputs)
+	if (locale === "sw") return __sw.auth_email(inputs)
+	if (locale === "el") return __el.auth_email(inputs)
+	if (locale === "cs") return __cs.auth_email(inputs)
+	if (locale === "ro") return __ro.auth_email(inputs)
+	if (locale === "hu") return __hu.auth_email(inputs)
+	if (locale === "sv") return __sv.auth_email(inputs)
+	if (locale === "he") return __he.auth_email(inputs)
+	return __ru.auth_email(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Forgot password?" |
+*
+* @param {Auth_ForgotInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const auth_forgot = /** @type {((inputs?: Auth_ForgotInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Auth_ForgotInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.auth_forgot(inputs)
+	if (locale === "fr") return __fr.auth_forgot(inputs)
+	if (locale === "es") return __es.auth_forgot(inputs)
+	if (locale === "zh") return __zh.auth_forgot(inputs)
+	if (locale === "zh-TW") return __zh_tw2.auth_forgot(inputs)
+	if (locale === "hi") return __hi.auth_forgot(inputs)
+	if (locale === "ar") return __ar.auth_forgot(inputs)
+	if (locale === "pt") return __pt.auth_forgot(inputs)
+	if (locale === "de") return __de.auth_forgot(inputs)
+	if (locale === "ja") return __ja.auth_forgot(inputs)
+	if (locale === "ko") return __ko.auth_forgot(inputs)
+	if (locale === "it") return __it.auth_forgot(inputs)
+	if (locale === "tr") return __tr.auth_forgot(inputs)
+	if (locale === "pl") return __pl.auth_forgot(inputs)
+	if (locale === "uk") return __uk.auth_forgot(inputs)
+	if (locale === "nl") return __nl.auth_forgot(inputs)
+	if (locale === "vi") return __vi.auth_forgot(inputs)
+	if (locale === "id") return __id.auth_forgot(inputs)
+	if (locale === "ms") return __ms.auth_forgot(inputs)
+	if (locale === "th") return __th.auth_forgot(inputs)
+	if (locale === "fa") return __fa.auth_forgot(inputs)
+	if (locale === "ur") return __ur.auth_forgot(inputs)
+	if (locale === "bn") return __bn.auth_forgot(inputs)
+	if (locale === "pa") return __pa.auth_forgot(inputs)
+	if (locale === "sw") return __sw.auth_forgot(inputs)
+	if (locale === "el") return __el.auth_forgot(inputs)
+	if (locale === "cs") return __cs.auth_forgot(inputs)
+	if (locale === "ro") return __ro.auth_forgot(inputs)
+	if (locale === "hu") return __hu.auth_forgot(inputs)
+	if (locale === "sv") return __sv.auth_forgot(inputs)
+	if (locale === "he") return __he.auth_forgot(inputs)
+	return __ru.auth_forgot(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Log in" |
+*
+* @param {Auth_LoginInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const auth_login = /** @type {((inputs?: Auth_LoginInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Auth_LoginInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.auth_login(inputs)
+	if (locale === "fr") return __fr.auth_login(inputs)
+	if (locale === "es") return __es.auth_login(inputs)
+	if (locale === "zh") return __zh.auth_login(inputs)
+	if (locale === "zh-TW") return __zh_tw2.auth_login(inputs)
+	if (locale === "hi") return __hi.auth_login(inputs)
+	if (locale === "ar") return __ar.auth_login(inputs)
+	if (locale === "pt") return __pt.auth_login(inputs)
+	if (locale === "de") return __de.auth_login(inputs)
+	if (locale === "ja") return __ja.auth_login(inputs)
+	if (locale === "ko") return __ko.auth_login(inputs)
+	if (locale === "it") return __it.auth_login(inputs)
+	if (locale === "tr") return __tr.auth_login(inputs)
+	if (locale === "pl") return __pl.auth_login(inputs)
+	if (locale === "uk") return __uk.auth_login(inputs)
+	if (locale === "nl") return __nl.auth_login(inputs)
+	if (locale === "vi") return __vi.auth_login(inputs)
+	if (locale === "id") return __id.auth_login(inputs)
+	if (locale === "ms") return __ms.auth_login(inputs)
+	if (locale === "th") return __th.auth_login(inputs)
+	if (locale === "fa") return __fa.auth_login(inputs)
+	if (locale === "ur") return __ur.auth_login(inputs)
+	if (locale === "bn") return __bn.auth_login(inputs)
+	if (locale === "pa") return __pa.auth_login(inputs)
+	if (locale === "sw") return __sw.auth_login(inputs)
+	if (locale === "el") return __el.auth_login(inputs)
+	if (locale === "cs") return __cs.auth_login(inputs)
+	if (locale === "ro") return __ro.auth_login(inputs)
+	if (locale === "hu") return __hu.auth_login(inputs)
+	if (locale === "sv") return __sv.auth_login(inputs)
+	if (locale === "he") return __he.auth_login(inputs)
+	return __ru.auth_login(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Password" |
+*
+* @param {Auth_PasswordInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const auth_password = /** @type {((inputs?: Auth_PasswordInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Auth_PasswordInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.auth_password(inputs)
+	if (locale === "fr") return __fr.auth_password(inputs)
+	if (locale === "es") return __es.auth_password(inputs)
+	if (locale === "zh") return __zh.auth_password(inputs)
+	if (locale === "zh-TW") return __zh_tw2.auth_password(inputs)
+	if (locale === "hi") return __hi.auth_password(inputs)
+	if (locale === "ar") return __ar.auth_password(inputs)
+	if (locale === "pt") return __pt.auth_password(inputs)
+	if (locale === "de") return __de.auth_password(inputs)
+	if (locale === "ja") return __ja.auth_password(inputs)
+	if (locale === "ko") return __ko.auth_password(inputs)
+	if (locale === "it") return __it.auth_password(inputs)
+	if (locale === "tr") return __tr.auth_password(inputs)
+	if (locale === "pl") return __pl.auth_password(inputs)
+	if (locale === "uk") return __uk.auth_password(inputs)
+	if (locale === "nl") return __nl.auth_password(inputs)
+	if (locale === "vi") return __vi.auth_password(inputs)
+	if (locale === "id") return __id.auth_password(inputs)
+	if (locale === "ms") return __ms.auth_password(inputs)
+	if (locale === "th") return __th.auth_password(inputs)
+	if (locale === "fa") return __fa.auth_password(inputs)
+	if (locale === "ur") return __ur.auth_password(inputs)
+	if (locale === "bn") return __bn.auth_password(inputs)
+	if (locale === "pa") return __pa.auth_password(inputs)
+	if (locale === "sw") return __sw.auth_password(inputs)
+	if (locale === "el") return __el.auth_password(inputs)
+	if (locale === "cs") return __cs.auth_password(inputs)
+	if (locale === "ro") return __ro.auth_password(inputs)
+	if (locale === "hu") return __hu.auth_password(inputs)
+	if (locale === "sv") return __sv.auth_password(inputs)
+	if (locale === "he") return __he.auth_password(inputs)
+	return __ru.auth_password(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Sign up" |
+*
+* @param {Auth_RegisterInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const auth_register = /** @type {((inputs?: Auth_RegisterInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Auth_RegisterInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.auth_register(inputs)
+	if (locale === "fr") return __fr.auth_register(inputs)
+	if (locale === "es") return __es.auth_register(inputs)
+	if (locale === "zh") return __zh.auth_register(inputs)
+	if (locale === "zh-TW") return __zh_tw2.auth_register(inputs)
+	if (locale === "hi") return __hi.auth_register(inputs)
+	if (locale === "ar") return __ar.auth_register(inputs)
+	if (locale === "pt") return __pt.auth_register(inputs)
+	if (locale === "de") return __de.auth_register(inputs)
+	if (locale === "ja") return __ja.auth_register(inputs)
+	if (locale === "ko") return __ko.auth_register(inputs)
+	if (locale === "it") return __it.auth_register(inputs)
+	if (locale === "tr") return __tr.auth_register(inputs)
+	if (locale === "pl") return __pl.auth_register(inputs)
+	if (locale === "uk") return __uk.auth_register(inputs)
+	if (locale === "nl") return __nl.auth_register(inputs)
+	if (locale === "vi") return __vi.auth_register(inputs)
+	if (locale === "id") return __id.auth_register(inputs)
+	if (locale === "ms") return __ms.auth_register(inputs)
+	if (locale === "th") return __th.auth_register(inputs)
+	if (locale === "fa") return __fa.auth_register(inputs)
+	if (locale === "ur") return __ur.auth_register(inputs)
+	if (locale === "bn") return __bn.auth_register(inputs)
+	if (locale === "pa") return __pa.auth_register(inputs)
+	if (locale === "sw") return __sw.auth_register(inputs)
+	if (locale === "el") return __el.auth_register(inputs)
+	if (locale === "cs") return __cs.auth_register(inputs)
+	if (locale === "ro") return __ro.auth_register(inputs)
+	if (locale === "hu") return __hu.auth_register(inputs)
+	if (locale === "sv") return __sv.auth_register(inputs)
+	if (locale === "he") return __he.auth_register(inputs)
+	return __ru.auth_register(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Back to cities" |
+*
+* @param {Back_To_CitiesInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const back_to_cities = /** @type {((inputs?: Back_To_CitiesInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Back_To_CitiesInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.back_to_cities(inputs)
+	if (locale === "fr") return __fr.back_to_cities(inputs)
+	if (locale === "es") return __es.back_to_cities(inputs)
+	if (locale === "zh") return __zh.back_to_cities(inputs)
+	if (locale === "zh-TW") return __zh_tw2.back_to_cities(inputs)
+	if (locale === "hi") return __hi.back_to_cities(inputs)
+	if (locale === "ar") return __ar.back_to_cities(inputs)
+	if (locale === "pt") return __pt.back_to_cities(inputs)
+	if (locale === "de") return __de.back_to_cities(inputs)
+	if (locale === "ja") return __ja.back_to_cities(inputs)
+	if (locale === "ko") return __ko.back_to_cities(inputs)
+	if (locale === "it") return __it.back_to_cities(inputs)
+	if (locale === "tr") return __tr.back_to_cities(inputs)
+	if (locale === "pl") return __pl.back_to_cities(inputs)
+	if (locale === "uk") return __uk.back_to_cities(inputs)
+	if (locale === "nl") return __nl.back_to_cities(inputs)
+	if (locale === "vi") return __vi.back_to_cities(inputs)
+	if (locale === "id") return __id.back_to_cities(inputs)
+	if (locale === "ms") return __ms.back_to_cities(inputs)
+	if (locale === "th") return __th.back_to_cities(inputs)
+	if (locale === "fa") return __fa.back_to_cities(inputs)
+	if (locale === "ur") return __ur.back_to_cities(inputs)
+	if (locale === "bn") return __bn.back_to_cities(inputs)
+	if (locale === "pa") return __pa.back_to_cities(inputs)
+	if (locale === "sw") return __sw.back_to_cities(inputs)
+	if (locale === "el") return __el.back_to_cities(inputs)
+	if (locale === "cs") return __cs.back_to_cities(inputs)
+	if (locale === "ro") return __ro.back_to_cities(inputs)
+	if (locale === "hu") return __hu.back_to_cities(inputs)
+	if (locale === "sv") return __sv.back_to_cities(inputs)
+	if (locale === "he") return __he.back_to_cities(inputs)
+	return __ru.back_to_cities(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Message actions" |
+*
+* @param {Chat_Actions_AriaInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_actions_aria = /** @type {((inputs?: Chat_Actions_AriaInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Actions_AriaInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_actions_aria(inputs)
+	if (locale === "fr") return __fr.chat_actions_aria(inputs)
+	if (locale === "es") return __es.chat_actions_aria(inputs)
+	if (locale === "zh") return __zh.chat_actions_aria(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_actions_aria(inputs)
+	if (locale === "hi") return __hi.chat_actions_aria(inputs)
+	if (locale === "ar") return __ar.chat_actions_aria(inputs)
+	if (locale === "pt") return __pt.chat_actions_aria(inputs)
+	if (locale === "de") return __de.chat_actions_aria(inputs)
+	if (locale === "ja") return __ja.chat_actions_aria(inputs)
+	if (locale === "ko") return __ko.chat_actions_aria(inputs)
+	if (locale === "it") return __it.chat_actions_aria(inputs)
+	if (locale === "tr") return __tr.chat_actions_aria(inputs)
+	if (locale === "pl") return __pl.chat_actions_aria(inputs)
+	if (locale === "uk") return __uk.chat_actions_aria(inputs)
+	if (locale === "nl") return __nl.chat_actions_aria(inputs)
+	if (locale === "vi") return __vi.chat_actions_aria(inputs)
+	if (locale === "id") return __id.chat_actions_aria(inputs)
+	if (locale === "ms") return __ms.chat_actions_aria(inputs)
+	if (locale === "th") return __th.chat_actions_aria(inputs)
+	if (locale === "fa") return __fa.chat_actions_aria(inputs)
+	if (locale === "ur") return __ur.chat_actions_aria(inputs)
+	if (locale === "bn") return __bn.chat_actions_aria(inputs)
+	if (locale === "pa") return __pa.chat_actions_aria(inputs)
+	if (locale === "sw") return __sw.chat_actions_aria(inputs)
+	if (locale === "el") return __el.chat_actions_aria(inputs)
+	if (locale === "cs") return __cs.chat_actions_aria(inputs)
+	if (locale === "ro") return __ro.chat_actions_aria(inputs)
+	if (locale === "hu") return __hu.chat_actions_aria(inputs)
+	if (locale === "sv") return __sv.chat_actions_aria(inputs)
+	if (locale === "he") return __he.chat_actions_aria(inputs)
+	return __ru.chat_actions_aria(inputs)
+});
 /**
 * | output |
 * | --- |
@@ -182,6 +579,226 @@ export const chat_all_read = /** @type {((inputs?: Chat_All_ReadInputs, options?
 	if (locale === "sv") return __sv.chat_all_read(inputs)
 	if (locale === "he") return __he.chat_all_read(inputs)
 	return __ru.chat_all_read(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Cancel reply" |
+*
+* @param {Chat_Cancel_ReplyInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_cancel_reply = /** @type {((inputs?: Chat_Cancel_ReplyInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Cancel_ReplyInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_cancel_reply(inputs)
+	if (locale === "fr") return __fr.chat_cancel_reply(inputs)
+	if (locale === "es") return __es.chat_cancel_reply(inputs)
+	if (locale === "zh") return __zh.chat_cancel_reply(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_cancel_reply(inputs)
+	if (locale === "hi") return __hi.chat_cancel_reply(inputs)
+	if (locale === "ar") return __ar.chat_cancel_reply(inputs)
+	if (locale === "pt") return __pt.chat_cancel_reply(inputs)
+	if (locale === "de") return __de.chat_cancel_reply(inputs)
+	if (locale === "ja") return __ja.chat_cancel_reply(inputs)
+	if (locale === "ko") return __ko.chat_cancel_reply(inputs)
+	if (locale === "it") return __it.chat_cancel_reply(inputs)
+	if (locale === "tr") return __tr.chat_cancel_reply(inputs)
+	if (locale === "pl") return __pl.chat_cancel_reply(inputs)
+	if (locale === "uk") return __uk.chat_cancel_reply(inputs)
+	if (locale === "nl") return __nl.chat_cancel_reply(inputs)
+	if (locale === "vi") return __vi.chat_cancel_reply(inputs)
+	if (locale === "id") return __id.chat_cancel_reply(inputs)
+	if (locale === "ms") return __ms.chat_cancel_reply(inputs)
+	if (locale === "th") return __th.chat_cancel_reply(inputs)
+	if (locale === "fa") return __fa.chat_cancel_reply(inputs)
+	if (locale === "ur") return __ur.chat_cancel_reply(inputs)
+	if (locale === "bn") return __bn.chat_cancel_reply(inputs)
+	if (locale === "pa") return __pa.chat_cancel_reply(inputs)
+	if (locale === "sw") return __sw.chat_cancel_reply(inputs)
+	if (locale === "el") return __el.chat_cancel_reply(inputs)
+	if (locale === "cs") return __cs.chat_cancel_reply(inputs)
+	if (locale === "ro") return __ro.chat_cancel_reply(inputs)
+	if (locale === "hu") return __hu.chat_cancel_reply(inputs)
+	if (locale === "sv") return __sv.chat_cancel_reply(inputs)
+	if (locale === "he") return __he.chat_cancel_reply(inputs)
+	return __ru.chat_cancel_reply(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Close" |
+*
+* @param {Chat_CloseInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_close = /** @type {((inputs?: Chat_CloseInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_CloseInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_close(inputs)
+	if (locale === "fr") return __fr.chat_close(inputs)
+	if (locale === "es") return __es.chat_close(inputs)
+	if (locale === "zh") return __zh.chat_close(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_close(inputs)
+	if (locale === "hi") return __hi.chat_close(inputs)
+	if (locale === "ar") return __ar.chat_close(inputs)
+	if (locale === "pt") return __pt.chat_close(inputs)
+	if (locale === "de") return __de.chat_close(inputs)
+	if (locale === "ja") return __ja.chat_close(inputs)
+	if (locale === "ko") return __ko.chat_close(inputs)
+	if (locale === "it") return __it.chat_close(inputs)
+	if (locale === "tr") return __tr.chat_close(inputs)
+	if (locale === "pl") return __pl.chat_close(inputs)
+	if (locale === "uk") return __uk.chat_close(inputs)
+	if (locale === "nl") return __nl.chat_close(inputs)
+	if (locale === "vi") return __vi.chat_close(inputs)
+	if (locale === "id") return __id.chat_close(inputs)
+	if (locale === "ms") return __ms.chat_close(inputs)
+	if (locale === "th") return __th.chat_close(inputs)
+	if (locale === "fa") return __fa.chat_close(inputs)
+	if (locale === "ur") return __ur.chat_close(inputs)
+	if (locale === "bn") return __bn.chat_close(inputs)
+	if (locale === "pa") return __pa.chat_close(inputs)
+	if (locale === "sw") return __sw.chat_close(inputs)
+	if (locale === "el") return __el.chat_close(inputs)
+	if (locale === "cs") return __cs.chat_close(inputs)
+	if (locale === "ro") return __ro.chat_close(inputs)
+	if (locale === "hu") return __hu.chat_close(inputs)
+	if (locale === "sv") return __sv.chat_close(inputs)
+	if (locale === "he") return __he.chat_close(inputs)
+	return __ru.chat_close(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Compressing photo…" |
+*
+* @param {Chat_Compressing_PhotoInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_compressing_photo = /** @type {((inputs?: Chat_Compressing_PhotoInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Compressing_PhotoInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_compressing_photo(inputs)
+	if (locale === "fr") return __fr.chat_compressing_photo(inputs)
+	if (locale === "es") return __es.chat_compressing_photo(inputs)
+	if (locale === "zh") return __zh.chat_compressing_photo(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_compressing_photo(inputs)
+	if (locale === "hi") return __hi.chat_compressing_photo(inputs)
+	if (locale === "ar") return __ar.chat_compressing_photo(inputs)
+	if (locale === "pt") return __pt.chat_compressing_photo(inputs)
+	if (locale === "de") return __de.chat_compressing_photo(inputs)
+	if (locale === "ja") return __ja.chat_compressing_photo(inputs)
+	if (locale === "ko") return __ko.chat_compressing_photo(inputs)
+	if (locale === "it") return __it.chat_compressing_photo(inputs)
+	if (locale === "tr") return __tr.chat_compressing_photo(inputs)
+	if (locale === "pl") return __pl.chat_compressing_photo(inputs)
+	if (locale === "uk") return __uk.chat_compressing_photo(inputs)
+	if (locale === "nl") return __nl.chat_compressing_photo(inputs)
+	if (locale === "vi") return __vi.chat_compressing_photo(inputs)
+	if (locale === "id") return __id.chat_compressing_photo(inputs)
+	if (locale === "ms") return __ms.chat_compressing_photo(inputs)
+	if (locale === "th") return __th.chat_compressing_photo(inputs)
+	if (locale === "fa") return __fa.chat_compressing_photo(inputs)
+	if (locale === "ur") return __ur.chat_compressing_photo(inputs)
+	if (locale === "bn") return __bn.chat_compressing_photo(inputs)
+	if (locale === "pa") return __pa.chat_compressing_photo(inputs)
+	if (locale === "sw") return __sw.chat_compressing_photo(inputs)
+	if (locale === "el") return __el.chat_compressing_photo(inputs)
+	if (locale === "cs") return __cs.chat_compressing_photo(inputs)
+	if (locale === "ro") return __ro.chat_compressing_photo(inputs)
+	if (locale === "hu") return __hu.chat_compressing_photo(inputs)
+	if (locale === "sv") return __sv.chat_compressing_photo(inputs)
+	if (locale === "he") return __he.chat_compressing_photo(inputs)
+	return __ru.chat_compressing_photo(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Connected" |
+*
+* @param {Chat_Conn_OkInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_conn_ok = /** @type {((inputs?: Chat_Conn_OkInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Conn_OkInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_conn_ok(inputs)
+	if (locale === "fr") return __fr.chat_conn_ok(inputs)
+	if (locale === "es") return __es.chat_conn_ok(inputs)
+	if (locale === "zh") return __zh.chat_conn_ok(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_conn_ok(inputs)
+	if (locale === "hi") return __hi.chat_conn_ok(inputs)
+	if (locale === "ar") return __ar.chat_conn_ok(inputs)
+	if (locale === "pt") return __pt.chat_conn_ok(inputs)
+	if (locale === "de") return __de.chat_conn_ok(inputs)
+	if (locale === "ja") return __ja.chat_conn_ok(inputs)
+	if (locale === "ko") return __ko.chat_conn_ok(inputs)
+	if (locale === "it") return __it.chat_conn_ok(inputs)
+	if (locale === "tr") return __tr.chat_conn_ok(inputs)
+	if (locale === "pl") return __pl.chat_conn_ok(inputs)
+	if (locale === "uk") return __uk.chat_conn_ok(inputs)
+	if (locale === "nl") return __nl.chat_conn_ok(inputs)
+	if (locale === "vi") return __vi.chat_conn_ok(inputs)
+	if (locale === "id") return __id.chat_conn_ok(inputs)
+	if (locale === "ms") return __ms.chat_conn_ok(inputs)
+	if (locale === "th") return __th.chat_conn_ok(inputs)
+	if (locale === "fa") return __fa.chat_conn_ok(inputs)
+	if (locale === "ur") return __ur.chat_conn_ok(inputs)
+	if (locale === "bn") return __bn.chat_conn_ok(inputs)
+	if (locale === "pa") return __pa.chat_conn_ok(inputs)
+	if (locale === "sw") return __sw.chat_conn_ok(inputs)
+	if (locale === "el") return __el.chat_conn_ok(inputs)
+	if (locale === "cs") return __cs.chat_conn_ok(inputs)
+	if (locale === "ro") return __ro.chat_conn_ok(inputs)
+	if (locale === "hu") return __hu.chat_conn_ok(inputs)
+	if (locale === "sv") return __sv.chat_conn_ok(inputs)
+	if (locale === "he") return __he.chat_conn_ok(inputs)
+	return __ru.chat_conn_ok(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Reconnecting…" |
+*
+* @param {Chat_ConnectingInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_connecting = /** @type {((inputs?: Chat_ConnectingInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_ConnectingInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_connecting(inputs)
+	if (locale === "fr") return __fr.chat_connecting(inputs)
+	if (locale === "es") return __es.chat_connecting(inputs)
+	if (locale === "zh") return __zh.chat_connecting(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_connecting(inputs)
+	if (locale === "hi") return __hi.chat_connecting(inputs)
+	if (locale === "ar") return __ar.chat_connecting(inputs)
+	if (locale === "pt") return __pt.chat_connecting(inputs)
+	if (locale === "de") return __de.chat_connecting(inputs)
+	if (locale === "ja") return __ja.chat_connecting(inputs)
+	if (locale === "ko") return __ko.chat_connecting(inputs)
+	if (locale === "it") return __it.chat_connecting(inputs)
+	if (locale === "tr") return __tr.chat_connecting(inputs)
+	if (locale === "pl") return __pl.chat_connecting(inputs)
+	if (locale === "uk") return __uk.chat_connecting(inputs)
+	if (locale === "nl") return __nl.chat_connecting(inputs)
+	if (locale === "vi") return __vi.chat_connecting(inputs)
+	if (locale === "id") return __id.chat_connecting(inputs)
+	if (locale === "ms") return __ms.chat_connecting(inputs)
+	if (locale === "th") return __th.chat_connecting(inputs)
+	if (locale === "fa") return __fa.chat_connecting(inputs)
+	if (locale === "ur") return __ur.chat_connecting(inputs)
+	if (locale === "bn") return __bn.chat_connecting(inputs)
+	if (locale === "pa") return __pa.chat_connecting(inputs)
+	if (locale === "sw") return __sw.chat_connecting(inputs)
+	if (locale === "el") return __el.chat_connecting(inputs)
+	if (locale === "cs") return __cs.chat_connecting(inputs)
+	if (locale === "ro") return __ro.chat_connecting(inputs)
+	if (locale === "hu") return __hu.chat_connecting(inputs)
+	if (locale === "sv") return __sv.chat_connecting(inputs)
+	if (locale === "he") return __he.chat_connecting(inputs)
+	return __ru.chat_connecting(inputs)
 });
 /**
 * | output |
@@ -274,6 +891,94 @@ export const chat_delete = /** @type {((inputs?: Chat_DeleteInputs, options?: { 
 /**
 * | output |
 * | --- |
+* | "Message deleted" |
+*
+* @param {Chat_DeletedInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_deleted = /** @type {((inputs?: Chat_DeletedInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_DeletedInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_deleted(inputs)
+	if (locale === "fr") return __fr.chat_deleted(inputs)
+	if (locale === "es") return __es.chat_deleted(inputs)
+	if (locale === "zh") return __zh.chat_deleted(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_deleted(inputs)
+	if (locale === "hi") return __hi.chat_deleted(inputs)
+	if (locale === "ar") return __ar.chat_deleted(inputs)
+	if (locale === "pt") return __pt.chat_deleted(inputs)
+	if (locale === "de") return __de.chat_deleted(inputs)
+	if (locale === "ja") return __ja.chat_deleted(inputs)
+	if (locale === "ko") return __ko.chat_deleted(inputs)
+	if (locale === "it") return __it.chat_deleted(inputs)
+	if (locale === "tr") return __tr.chat_deleted(inputs)
+	if (locale === "pl") return __pl.chat_deleted(inputs)
+	if (locale === "uk") return __uk.chat_deleted(inputs)
+	if (locale === "nl") return __nl.chat_deleted(inputs)
+	if (locale === "vi") return __vi.chat_deleted(inputs)
+	if (locale === "id") return __id.chat_deleted(inputs)
+	if (locale === "ms") return __ms.chat_deleted(inputs)
+	if (locale === "th") return __th.chat_deleted(inputs)
+	if (locale === "fa") return __fa.chat_deleted(inputs)
+	if (locale === "ur") return __ur.chat_deleted(inputs)
+	if (locale === "bn") return __bn.chat_deleted(inputs)
+	if (locale === "pa") return __pa.chat_deleted(inputs)
+	if (locale === "sw") return __sw.chat_deleted(inputs)
+	if (locale === "el") return __el.chat_deleted(inputs)
+	if (locale === "cs") return __cs.chat_deleted(inputs)
+	if (locale === "ro") return __ro.chat_deleted(inputs)
+	if (locale === "hu") return __hu.chat_deleted(inputs)
+	if (locale === "sv") return __sv.chat_deleted(inputs)
+	if (locale === "he") return __he.chat_deleted(inputs)
+	return __ru.chat_deleted(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Deleting…" |
+*
+* @param {Chat_DeletingInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_deleting = /** @type {((inputs?: Chat_DeletingInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_DeletingInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_deleting(inputs)
+	if (locale === "fr") return __fr.chat_deleting(inputs)
+	if (locale === "es") return __es.chat_deleting(inputs)
+	if (locale === "zh") return __zh.chat_deleting(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_deleting(inputs)
+	if (locale === "hi") return __hi.chat_deleting(inputs)
+	if (locale === "ar") return __ar.chat_deleting(inputs)
+	if (locale === "pt") return __pt.chat_deleting(inputs)
+	if (locale === "de") return __de.chat_deleting(inputs)
+	if (locale === "ja") return __ja.chat_deleting(inputs)
+	if (locale === "ko") return __ko.chat_deleting(inputs)
+	if (locale === "it") return __it.chat_deleting(inputs)
+	if (locale === "tr") return __tr.chat_deleting(inputs)
+	if (locale === "pl") return __pl.chat_deleting(inputs)
+	if (locale === "uk") return __uk.chat_deleting(inputs)
+	if (locale === "nl") return __nl.chat_deleting(inputs)
+	if (locale === "vi") return __vi.chat_deleting(inputs)
+	if (locale === "id") return __id.chat_deleting(inputs)
+	if (locale === "ms") return __ms.chat_deleting(inputs)
+	if (locale === "th") return __th.chat_deleting(inputs)
+	if (locale === "fa") return __fa.chat_deleting(inputs)
+	if (locale === "ur") return __ur.chat_deleting(inputs)
+	if (locale === "bn") return __bn.chat_deleting(inputs)
+	if (locale === "pa") return __pa.chat_deleting(inputs)
+	if (locale === "sw") return __sw.chat_deleting(inputs)
+	if (locale === "el") return __el.chat_deleting(inputs)
+	if (locale === "cs") return __cs.chat_deleting(inputs)
+	if (locale === "ro") return __ro.chat_deleting(inputs)
+	if (locale === "hu") return __hu.chat_deleting(inputs)
+	if (locale === "sv") return __sv.chat_deleting(inputs)
+	if (locale === "he") return __he.chat_deleting(inputs)
+	return __ru.chat_deleting(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "Conversations" |
 *
 * @param {Chat_DialogsInputs} inputs
@@ -358,6 +1063,50 @@ export const chat_edit = /** @type {((inputs?: Chat_EditInputs, options?: { loca
 	if (locale === "sv") return __sv.chat_edit(inputs)
 	if (locale === "he") return __he.chat_edit(inputs)
 	return __ru.chat_edit(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "edited" |
+*
+* @param {Chat_EditedInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_edited = /** @type {((inputs?: Chat_EditedInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_EditedInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_edited(inputs)
+	if (locale === "fr") return __fr.chat_edited(inputs)
+	if (locale === "es") return __es.chat_edited(inputs)
+	if (locale === "zh") return __zh.chat_edited(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_edited(inputs)
+	if (locale === "hi") return __hi.chat_edited(inputs)
+	if (locale === "ar") return __ar.chat_edited(inputs)
+	if (locale === "pt") return __pt.chat_edited(inputs)
+	if (locale === "de") return __de.chat_edited(inputs)
+	if (locale === "ja") return __ja.chat_edited(inputs)
+	if (locale === "ko") return __ko.chat_edited(inputs)
+	if (locale === "it") return __it.chat_edited(inputs)
+	if (locale === "tr") return __tr.chat_edited(inputs)
+	if (locale === "pl") return __pl.chat_edited(inputs)
+	if (locale === "uk") return __uk.chat_edited(inputs)
+	if (locale === "nl") return __nl.chat_edited(inputs)
+	if (locale === "vi") return __vi.chat_edited(inputs)
+	if (locale === "id") return __id.chat_edited(inputs)
+	if (locale === "ms") return __ms.chat_edited(inputs)
+	if (locale === "th") return __th.chat_edited(inputs)
+	if (locale === "fa") return __fa.chat_edited(inputs)
+	if (locale === "ur") return __ur.chat_edited(inputs)
+	if (locale === "bn") return __bn.chat_edited(inputs)
+	if (locale === "pa") return __pa.chat_edited(inputs)
+	if (locale === "sw") return __sw.chat_edited(inputs)
+	if (locale === "el") return __el.chat_edited(inputs)
+	if (locale === "cs") return __cs.chat_edited(inputs)
+	if (locale === "ro") return __ro.chat_edited(inputs)
+	if (locale === "hu") return __hu.chat_edited(inputs)
+	if (locale === "sv") return __sv.chat_edited(inputs)
+	if (locale === "he") return __he.chat_edited(inputs)
+	return __ru.chat_edited(inputs)
 });
 /**
 * | output |
@@ -450,6 +1199,270 @@ export const chat_forward = /** @type {((inputs?: Chat_ForwardInputs, options?: 
 /**
 * | output |
 * | --- |
+* | "No network — forwarding unavailable" |
+*
+* @param {Chat_Forward_OfflineInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_forward_offline = /** @type {((inputs?: Chat_Forward_OfflineInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Forward_OfflineInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_forward_offline(inputs)
+	if (locale === "fr") return __fr.chat_forward_offline(inputs)
+	if (locale === "es") return __es.chat_forward_offline(inputs)
+	if (locale === "zh") return __zh.chat_forward_offline(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_forward_offline(inputs)
+	if (locale === "hi") return __hi.chat_forward_offline(inputs)
+	if (locale === "ar") return __ar.chat_forward_offline(inputs)
+	if (locale === "pt") return __pt.chat_forward_offline(inputs)
+	if (locale === "de") return __de.chat_forward_offline(inputs)
+	if (locale === "ja") return __ja.chat_forward_offline(inputs)
+	if (locale === "ko") return __ko.chat_forward_offline(inputs)
+	if (locale === "it") return __it.chat_forward_offline(inputs)
+	if (locale === "tr") return __tr.chat_forward_offline(inputs)
+	if (locale === "pl") return __pl.chat_forward_offline(inputs)
+	if (locale === "uk") return __uk.chat_forward_offline(inputs)
+	if (locale === "nl") return __nl.chat_forward_offline(inputs)
+	if (locale === "vi") return __vi.chat_forward_offline(inputs)
+	if (locale === "id") return __id.chat_forward_offline(inputs)
+	if (locale === "ms") return __ms.chat_forward_offline(inputs)
+	if (locale === "th") return __th.chat_forward_offline(inputs)
+	if (locale === "fa") return __fa.chat_forward_offline(inputs)
+	if (locale === "ur") return __ur.chat_forward_offline(inputs)
+	if (locale === "bn") return __bn.chat_forward_offline(inputs)
+	if (locale === "pa") return __pa.chat_forward_offline(inputs)
+	if (locale === "sw") return __sw.chat_forward_offline(inputs)
+	if (locale === "el") return __el.chat_forward_offline(inputs)
+	if (locale === "cs") return __cs.chat_forward_offline(inputs)
+	if (locale === "ro") return __ro.chat_forward_offline(inputs)
+	if (locale === "hu") return __hu.chat_forward_offline(inputs)
+	if (locale === "sv") return __sv.chat_forward_offline(inputs)
+	if (locale === "he") return __he.chat_forward_offline(inputs)
+	return __ru.chat_forward_offline(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Forward message" |
+*
+* @param {Chat_Forward_TitleInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_forward_title = /** @type {((inputs?: Chat_Forward_TitleInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Forward_TitleInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_forward_title(inputs)
+	if (locale === "fr") return __fr.chat_forward_title(inputs)
+	if (locale === "es") return __es.chat_forward_title(inputs)
+	if (locale === "zh") return __zh.chat_forward_title(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_forward_title(inputs)
+	if (locale === "hi") return __hi.chat_forward_title(inputs)
+	if (locale === "ar") return __ar.chat_forward_title(inputs)
+	if (locale === "pt") return __pt.chat_forward_title(inputs)
+	if (locale === "de") return __de.chat_forward_title(inputs)
+	if (locale === "ja") return __ja.chat_forward_title(inputs)
+	if (locale === "ko") return __ko.chat_forward_title(inputs)
+	if (locale === "it") return __it.chat_forward_title(inputs)
+	if (locale === "tr") return __tr.chat_forward_title(inputs)
+	if (locale === "pl") return __pl.chat_forward_title(inputs)
+	if (locale === "uk") return __uk.chat_forward_title(inputs)
+	if (locale === "nl") return __nl.chat_forward_title(inputs)
+	if (locale === "vi") return __vi.chat_forward_title(inputs)
+	if (locale === "id") return __id.chat_forward_title(inputs)
+	if (locale === "ms") return __ms.chat_forward_title(inputs)
+	if (locale === "th") return __th.chat_forward_title(inputs)
+	if (locale === "fa") return __fa.chat_forward_title(inputs)
+	if (locale === "ur") return __ur.chat_forward_title(inputs)
+	if (locale === "bn") return __bn.chat_forward_title(inputs)
+	if (locale === "pa") return __pa.chat_forward_title(inputs)
+	if (locale === "sw") return __sw.chat_forward_title(inputs)
+	if (locale === "el") return __el.chat_forward_title(inputs)
+	if (locale === "cs") return __cs.chat_forward_title(inputs)
+	if (locale === "ro") return __ro.chat_forward_title(inputs)
+	if (locale === "hu") return __hu.chat_forward_title(inputs)
+	if (locale === "sv") return __sv.chat_forward_title(inputs)
+	if (locale === "he") return __he.chat_forward_title(inputs)
+	return __ru.chat_forward_title(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Forwarded · Enter to send" |
+*
+* @param {Chat_ForwardedInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_forwarded = /** @type {((inputs?: Chat_ForwardedInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_ForwardedInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_forwarded(inputs)
+	if (locale === "fr") return __fr.chat_forwarded(inputs)
+	if (locale === "es") return __es.chat_forwarded(inputs)
+	if (locale === "zh") return __zh.chat_forwarded(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_forwarded(inputs)
+	if (locale === "hi") return __hi.chat_forwarded(inputs)
+	if (locale === "ar") return __ar.chat_forwarded(inputs)
+	if (locale === "pt") return __pt.chat_forwarded(inputs)
+	if (locale === "de") return __de.chat_forwarded(inputs)
+	if (locale === "ja") return __ja.chat_forwarded(inputs)
+	if (locale === "ko") return __ko.chat_forwarded(inputs)
+	if (locale === "it") return __it.chat_forwarded(inputs)
+	if (locale === "tr") return __tr.chat_forwarded(inputs)
+	if (locale === "pl") return __pl.chat_forwarded(inputs)
+	if (locale === "uk") return __uk.chat_forwarded(inputs)
+	if (locale === "nl") return __nl.chat_forwarded(inputs)
+	if (locale === "vi") return __vi.chat_forwarded(inputs)
+	if (locale === "id") return __id.chat_forwarded(inputs)
+	if (locale === "ms") return __ms.chat_forwarded(inputs)
+	if (locale === "th") return __th.chat_forwarded(inputs)
+	if (locale === "fa") return __fa.chat_forwarded(inputs)
+	if (locale === "ur") return __ur.chat_forwarded(inputs)
+	if (locale === "bn") return __bn.chat_forwarded(inputs)
+	if (locale === "pa") return __pa.chat_forwarded(inputs)
+	if (locale === "sw") return __sw.chat_forwarded(inputs)
+	if (locale === "el") return __el.chat_forwarded(inputs)
+	if (locale === "cs") return __cs.chat_forwarded(inputs)
+	if (locale === "ro") return __ro.chat_forwarded(inputs)
+	if (locale === "hu") return __hu.chat_forwarded(inputs)
+	if (locale === "sv") return __sv.chat_forwarded(inputs)
+	if (locale === "he") return __he.chat_forwarded(inputs)
+	return __ru.chat_forwarded(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Forwarding…" |
+*
+* @param {Chat_ForwardingInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_forwarding = /** @type {((inputs?: Chat_ForwardingInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_ForwardingInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_forwarding(inputs)
+	if (locale === "fr") return __fr.chat_forwarding(inputs)
+	if (locale === "es") return __es.chat_forwarding(inputs)
+	if (locale === "zh") return __zh.chat_forwarding(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_forwarding(inputs)
+	if (locale === "hi") return __hi.chat_forwarding(inputs)
+	if (locale === "ar") return __ar.chat_forwarding(inputs)
+	if (locale === "pt") return __pt.chat_forwarding(inputs)
+	if (locale === "de") return __de.chat_forwarding(inputs)
+	if (locale === "ja") return __ja.chat_forwarding(inputs)
+	if (locale === "ko") return __ko.chat_forwarding(inputs)
+	if (locale === "it") return __it.chat_forwarding(inputs)
+	if (locale === "tr") return __tr.chat_forwarding(inputs)
+	if (locale === "pl") return __pl.chat_forwarding(inputs)
+	if (locale === "uk") return __uk.chat_forwarding(inputs)
+	if (locale === "nl") return __nl.chat_forwarding(inputs)
+	if (locale === "vi") return __vi.chat_forwarding(inputs)
+	if (locale === "id") return __id.chat_forwarding(inputs)
+	if (locale === "ms") return __ms.chat_forwarding(inputs)
+	if (locale === "th") return __th.chat_forwarding(inputs)
+	if (locale === "fa") return __fa.chat_forwarding(inputs)
+	if (locale === "ur") return __ur.chat_forwarding(inputs)
+	if (locale === "bn") return __bn.chat_forwarding(inputs)
+	if (locale === "pa") return __pa.chat_forwarding(inputs)
+	if (locale === "sw") return __sw.chat_forwarding(inputs)
+	if (locale === "el") return __el.chat_forwarding(inputs)
+	if (locale === "cs") return __cs.chat_forwarding(inputs)
+	if (locale === "ro") return __ro.chat_forwarding(inputs)
+	if (locale === "hu") return __hu.chat_forwarding(inputs)
+	if (locale === "sv") return __sv.chat_forwarding(inputs)
+	if (locale === "he") return __he.chat_forwarding(inputs)
+	return __ru.chat_forwarding(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Forwarding photo…" |
+*
+* @param {Chat_Forwarding_PhotoInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_forwarding_photo = /** @type {((inputs?: Chat_Forwarding_PhotoInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Forwarding_PhotoInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_forwarding_photo(inputs)
+	if (locale === "fr") return __fr.chat_forwarding_photo(inputs)
+	if (locale === "es") return __es.chat_forwarding_photo(inputs)
+	if (locale === "zh") return __zh.chat_forwarding_photo(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_forwarding_photo(inputs)
+	if (locale === "hi") return __hi.chat_forwarding_photo(inputs)
+	if (locale === "ar") return __ar.chat_forwarding_photo(inputs)
+	if (locale === "pt") return __pt.chat_forwarding_photo(inputs)
+	if (locale === "de") return __de.chat_forwarding_photo(inputs)
+	if (locale === "ja") return __ja.chat_forwarding_photo(inputs)
+	if (locale === "ko") return __ko.chat_forwarding_photo(inputs)
+	if (locale === "it") return __it.chat_forwarding_photo(inputs)
+	if (locale === "tr") return __tr.chat_forwarding_photo(inputs)
+	if (locale === "pl") return __pl.chat_forwarding_photo(inputs)
+	if (locale === "uk") return __uk.chat_forwarding_photo(inputs)
+	if (locale === "nl") return __nl.chat_forwarding_photo(inputs)
+	if (locale === "vi") return __vi.chat_forwarding_photo(inputs)
+	if (locale === "id") return __id.chat_forwarding_photo(inputs)
+	if (locale === "ms") return __ms.chat_forwarding_photo(inputs)
+	if (locale === "th") return __th.chat_forwarding_photo(inputs)
+	if (locale === "fa") return __fa.chat_forwarding_photo(inputs)
+	if (locale === "ur") return __ur.chat_forwarding_photo(inputs)
+	if (locale === "bn") return __bn.chat_forwarding_photo(inputs)
+	if (locale === "pa") return __pa.chat_forwarding_photo(inputs)
+	if (locale === "sw") return __sw.chat_forwarding_photo(inputs)
+	if (locale === "el") return __el.chat_forwarding_photo(inputs)
+	if (locale === "cs") return __cs.chat_forwarding_photo(inputs)
+	if (locale === "ro") return __ro.chat_forwarding_photo(inputs)
+	if (locale === "hu") return __hu.chat_forwarding_photo(inputs)
+	if (locale === "sv") return __sv.chat_forwarding_photo(inputs)
+	if (locale === "he") return __he.chat_forwarding_photo(inputs)
+	return __ru.chat_forwarding_photo(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Forwarding voice…" |
+*
+* @param {Chat_Forwarding_VoiceInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_forwarding_voice = /** @type {((inputs?: Chat_Forwarding_VoiceInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Forwarding_VoiceInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_forwarding_voice(inputs)
+	if (locale === "fr") return __fr.chat_forwarding_voice(inputs)
+	if (locale === "es") return __es.chat_forwarding_voice(inputs)
+	if (locale === "zh") return __zh.chat_forwarding_voice(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_forwarding_voice(inputs)
+	if (locale === "hi") return __hi.chat_forwarding_voice(inputs)
+	if (locale === "ar") return __ar.chat_forwarding_voice(inputs)
+	if (locale === "pt") return __pt.chat_forwarding_voice(inputs)
+	if (locale === "de") return __de.chat_forwarding_voice(inputs)
+	if (locale === "ja") return __ja.chat_forwarding_voice(inputs)
+	if (locale === "ko") return __ko.chat_forwarding_voice(inputs)
+	if (locale === "it") return __it.chat_forwarding_voice(inputs)
+	if (locale === "tr") return __tr.chat_forwarding_voice(inputs)
+	if (locale === "pl") return __pl.chat_forwarding_voice(inputs)
+	if (locale === "uk") return __uk.chat_forwarding_voice(inputs)
+	if (locale === "nl") return __nl.chat_forwarding_voice(inputs)
+	if (locale === "vi") return __vi.chat_forwarding_voice(inputs)
+	if (locale === "id") return __id.chat_forwarding_voice(inputs)
+	if (locale === "ms") return __ms.chat_forwarding_voice(inputs)
+	if (locale === "th") return __th.chat_forwarding_voice(inputs)
+	if (locale === "fa") return __fa.chat_forwarding_voice(inputs)
+	if (locale === "ur") return __ur.chat_forwarding_voice(inputs)
+	if (locale === "bn") return __bn.chat_forwarding_voice(inputs)
+	if (locale === "pa") return __pa.chat_forwarding_voice(inputs)
+	if (locale === "sw") return __sw.chat_forwarding_voice(inputs)
+	if (locale === "el") return __el.chat_forwarding_voice(inputs)
+	if (locale === "cs") return __cs.chat_forwarding_voice(inputs)
+	if (locale === "ro") return __ro.chat_forwarding_voice(inputs)
+	if (locale === "hu") return __hu.chat_forwarding_voice(inputs)
+	if (locale === "sv") return __sv.chat_forwarding_voice(inputs)
+	if (locale === "he") return __he.chat_forwarding_voice(inputs)
+	return __ru.chat_forwarding_voice(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "Group" |
 *
 * @param {Chat_GroupInputs} inputs
@@ -490,6 +1503,226 @@ export const chat_group = /** @type {((inputs?: Chat_GroupInputs, options?: { lo
 	if (locale === "sv") return __sv.chat_group(inputs)
 	if (locale === "he") return __he.chat_group(inputs)
 	return __ru.chat_group(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Couldn’t load history" |
+*
+* @param {Chat_History_ErrorInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_history_error = /** @type {((inputs?: Chat_History_ErrorInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_History_ErrorInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_history_error(inputs)
+	if (locale === "fr") return __fr.chat_history_error(inputs)
+	if (locale === "es") return __es.chat_history_error(inputs)
+	if (locale === "zh") return __zh.chat_history_error(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_history_error(inputs)
+	if (locale === "hi") return __hi.chat_history_error(inputs)
+	if (locale === "ar") return __ar.chat_history_error(inputs)
+	if (locale === "pt") return __pt.chat_history_error(inputs)
+	if (locale === "de") return __de.chat_history_error(inputs)
+	if (locale === "ja") return __ja.chat_history_error(inputs)
+	if (locale === "ko") return __ko.chat_history_error(inputs)
+	if (locale === "it") return __it.chat_history_error(inputs)
+	if (locale === "tr") return __tr.chat_history_error(inputs)
+	if (locale === "pl") return __pl.chat_history_error(inputs)
+	if (locale === "uk") return __uk.chat_history_error(inputs)
+	if (locale === "nl") return __nl.chat_history_error(inputs)
+	if (locale === "vi") return __vi.chat_history_error(inputs)
+	if (locale === "id") return __id.chat_history_error(inputs)
+	if (locale === "ms") return __ms.chat_history_error(inputs)
+	if (locale === "th") return __th.chat_history_error(inputs)
+	if (locale === "fa") return __fa.chat_history_error(inputs)
+	if (locale === "ur") return __ur.chat_history_error(inputs)
+	if (locale === "bn") return __bn.chat_history_error(inputs)
+	if (locale === "pa") return __pa.chat_history_error(inputs)
+	if (locale === "sw") return __sw.chat_history_error(inputs)
+	if (locale === "el") return __el.chat_history_error(inputs)
+	if (locale === "cs") return __cs.chat_history_error(inputs)
+	if (locale === "ro") return __ro.chat_history_error(inputs)
+	if (locale === "hu") return __hu.chat_history_error(inputs)
+	if (locale === "sv") return __sv.chat_history_error(inputs)
+	if (locale === "he") return __he.chat_history_error(inputs)
+	return __ru.chat_history_error(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Load failed · Retry" |
+*
+* @param {Chat_History_RetryInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_history_retry = /** @type {((inputs?: Chat_History_RetryInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_History_RetryInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_history_retry(inputs)
+	if (locale === "fr") return __fr.chat_history_retry(inputs)
+	if (locale === "es") return __es.chat_history_retry(inputs)
+	if (locale === "zh") return __zh.chat_history_retry(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_history_retry(inputs)
+	if (locale === "hi") return __hi.chat_history_retry(inputs)
+	if (locale === "ar") return __ar.chat_history_retry(inputs)
+	if (locale === "pt") return __pt.chat_history_retry(inputs)
+	if (locale === "de") return __de.chat_history_retry(inputs)
+	if (locale === "ja") return __ja.chat_history_retry(inputs)
+	if (locale === "ko") return __ko.chat_history_retry(inputs)
+	if (locale === "it") return __it.chat_history_retry(inputs)
+	if (locale === "tr") return __tr.chat_history_retry(inputs)
+	if (locale === "pl") return __pl.chat_history_retry(inputs)
+	if (locale === "uk") return __uk.chat_history_retry(inputs)
+	if (locale === "nl") return __nl.chat_history_retry(inputs)
+	if (locale === "vi") return __vi.chat_history_retry(inputs)
+	if (locale === "id") return __id.chat_history_retry(inputs)
+	if (locale === "ms") return __ms.chat_history_retry(inputs)
+	if (locale === "th") return __th.chat_history_retry(inputs)
+	if (locale === "fa") return __fa.chat_history_retry(inputs)
+	if (locale === "ur") return __ur.chat_history_retry(inputs)
+	if (locale === "bn") return __bn.chat_history_retry(inputs)
+	if (locale === "pa") return __pa.chat_history_retry(inputs)
+	if (locale === "sw") return __sw.chat_history_retry(inputs)
+	if (locale === "el") return __el.chat_history_retry(inputs)
+	if (locale === "cs") return __cs.chat_history_retry(inputs)
+	if (locale === "ro") return __ro.chat_history_retry(inputs)
+	if (locale === "hu") return __hu.chat_history_retry(inputs)
+	if (locale === "sv") return __sv.chat_history_retry(inputs)
+	if (locale === "he") return __he.chat_history_retry(inputs)
+	return __ru.chat_history_retry(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Start of conversation" |
+*
+* @param {Chat_History_StartInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_history_start = /** @type {((inputs?: Chat_History_StartInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_History_StartInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_history_start(inputs)
+	if (locale === "fr") return __fr.chat_history_start(inputs)
+	if (locale === "es") return __es.chat_history_start(inputs)
+	if (locale === "zh") return __zh.chat_history_start(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_history_start(inputs)
+	if (locale === "hi") return __hi.chat_history_start(inputs)
+	if (locale === "ar") return __ar.chat_history_start(inputs)
+	if (locale === "pt") return __pt.chat_history_start(inputs)
+	if (locale === "de") return __de.chat_history_start(inputs)
+	if (locale === "ja") return __ja.chat_history_start(inputs)
+	if (locale === "ko") return __ko.chat_history_start(inputs)
+	if (locale === "it") return __it.chat_history_start(inputs)
+	if (locale === "tr") return __tr.chat_history_start(inputs)
+	if (locale === "pl") return __pl.chat_history_start(inputs)
+	if (locale === "uk") return __uk.chat_history_start(inputs)
+	if (locale === "nl") return __nl.chat_history_start(inputs)
+	if (locale === "vi") return __vi.chat_history_start(inputs)
+	if (locale === "id") return __id.chat_history_start(inputs)
+	if (locale === "ms") return __ms.chat_history_start(inputs)
+	if (locale === "th") return __th.chat_history_start(inputs)
+	if (locale === "fa") return __fa.chat_history_start(inputs)
+	if (locale === "ur") return __ur.chat_history_start(inputs)
+	if (locale === "bn") return __bn.chat_history_start(inputs)
+	if (locale === "pa") return __pa.chat_history_start(inputs)
+	if (locale === "sw") return __sw.chat_history_start(inputs)
+	if (locale === "el") return __el.chat_history_start(inputs)
+	if (locale === "cs") return __cs.chat_history_start(inputs)
+	if (locale === "ro") return __ro.chat_history_start(inputs)
+	if (locale === "hu") return __hu.chat_history_start(inputs)
+	if (locale === "sv") return __sv.chat_history_start(inputs)
+	if (locale === "he") return __he.chat_history_start(inputs)
+	return __ru.chat_history_start(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "just now" |
+*
+* @param {Chat_Just_NowInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_just_now = /** @type {((inputs?: Chat_Just_NowInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Just_NowInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_just_now(inputs)
+	if (locale === "fr") return __fr.chat_just_now(inputs)
+	if (locale === "es") return __es.chat_just_now(inputs)
+	if (locale === "zh") return __zh.chat_just_now(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_just_now(inputs)
+	if (locale === "hi") return __hi.chat_just_now(inputs)
+	if (locale === "ar") return __ar.chat_just_now(inputs)
+	if (locale === "pt") return __pt.chat_just_now(inputs)
+	if (locale === "de") return __de.chat_just_now(inputs)
+	if (locale === "ja") return __ja.chat_just_now(inputs)
+	if (locale === "ko") return __ko.chat_just_now(inputs)
+	if (locale === "it") return __it.chat_just_now(inputs)
+	if (locale === "tr") return __tr.chat_just_now(inputs)
+	if (locale === "pl") return __pl.chat_just_now(inputs)
+	if (locale === "uk") return __uk.chat_just_now(inputs)
+	if (locale === "nl") return __nl.chat_just_now(inputs)
+	if (locale === "vi") return __vi.chat_just_now(inputs)
+	if (locale === "id") return __id.chat_just_now(inputs)
+	if (locale === "ms") return __ms.chat_just_now(inputs)
+	if (locale === "th") return __th.chat_just_now(inputs)
+	if (locale === "fa") return __fa.chat_just_now(inputs)
+	if (locale === "ur") return __ur.chat_just_now(inputs)
+	if (locale === "bn") return __bn.chat_just_now(inputs)
+	if (locale === "pa") return __pa.chat_just_now(inputs)
+	if (locale === "sw") return __sw.chat_just_now(inputs)
+	if (locale === "el") return __el.chat_just_now(inputs)
+	if (locale === "cs") return __cs.chat_just_now(inputs)
+	if (locale === "ro") return __ro.chat_just_now(inputs)
+	if (locale === "hu") return __hu.chat_just_now(inputs)
+	if (locale === "sv") return __sv.chat_just_now(inputs)
+	if (locale === "he") return __he.chat_just_now(inputs)
+	return __ru.chat_just_now(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "last seen {when}" |
+*
+* @param {Chat_Last_SeenInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_last_seen = /** @type {((inputs: Chat_Last_SeenInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Last_SeenInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_last_seen(inputs)
+	if (locale === "fr") return __fr.chat_last_seen(inputs)
+	if (locale === "es") return __es.chat_last_seen(inputs)
+	if (locale === "zh") return __zh.chat_last_seen(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_last_seen(inputs)
+	if (locale === "hi") return __hi.chat_last_seen(inputs)
+	if (locale === "ar") return __ar.chat_last_seen(inputs)
+	if (locale === "pt") return __pt.chat_last_seen(inputs)
+	if (locale === "de") return __de.chat_last_seen(inputs)
+	if (locale === "ja") return __ja.chat_last_seen(inputs)
+	if (locale === "ko") return __ko.chat_last_seen(inputs)
+	if (locale === "it") return __it.chat_last_seen(inputs)
+	if (locale === "tr") return __tr.chat_last_seen(inputs)
+	if (locale === "pl") return __pl.chat_last_seen(inputs)
+	if (locale === "uk") return __uk.chat_last_seen(inputs)
+	if (locale === "nl") return __nl.chat_last_seen(inputs)
+	if (locale === "vi") return __vi.chat_last_seen(inputs)
+	if (locale === "id") return __id.chat_last_seen(inputs)
+	if (locale === "ms") return __ms.chat_last_seen(inputs)
+	if (locale === "th") return __th.chat_last_seen(inputs)
+	if (locale === "fa") return __fa.chat_last_seen(inputs)
+	if (locale === "ur") return __ur.chat_last_seen(inputs)
+	if (locale === "bn") return __bn.chat_last_seen(inputs)
+	if (locale === "pa") return __pa.chat_last_seen(inputs)
+	if (locale === "sw") return __sw.chat_last_seen(inputs)
+	if (locale === "el") return __el.chat_last_seen(inputs)
+	if (locale === "cs") return __cs.chat_last_seen(inputs)
+	if (locale === "ro") return __ro.chat_last_seen(inputs)
+	if (locale === "hu") return __hu.chat_last_seen(inputs)
+	if (locale === "sv") return __sv.chat_last_seen(inputs)
+	if (locale === "he") return __he.chat_last_seen(inputs)
+	return __ru.chat_last_seen(inputs)
 });
 /**
 * | output |
@@ -582,6 +1815,226 @@ export const chat_leave = /** @type {((inputs?: Chat_LeaveInputs, options?: { lo
 /**
 * | output |
 * | --- |
+* | "off" |
+*
+* @param {Chat_Link_OffInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_link_off = /** @type {((inputs?: Chat_Link_OffInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Link_OffInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_link_off(inputs)
+	if (locale === "fr") return __fr.chat_link_off(inputs)
+	if (locale === "es") return __es.chat_link_off(inputs)
+	if (locale === "zh") return __zh.chat_link_off(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_link_off(inputs)
+	if (locale === "hi") return __hi.chat_link_off(inputs)
+	if (locale === "ar") return __ar.chat_link_off(inputs)
+	if (locale === "pt") return __pt.chat_link_off(inputs)
+	if (locale === "de") return __de.chat_link_off(inputs)
+	if (locale === "ja") return __ja.chat_link_off(inputs)
+	if (locale === "ko") return __ko.chat_link_off(inputs)
+	if (locale === "it") return __it.chat_link_off(inputs)
+	if (locale === "tr") return __tr.chat_link_off(inputs)
+	if (locale === "pl") return __pl.chat_link_off(inputs)
+	if (locale === "uk") return __uk.chat_link_off(inputs)
+	if (locale === "nl") return __nl.chat_link_off(inputs)
+	if (locale === "vi") return __vi.chat_link_off(inputs)
+	if (locale === "id") return __id.chat_link_off(inputs)
+	if (locale === "ms") return __ms.chat_link_off(inputs)
+	if (locale === "th") return __th.chat_link_off(inputs)
+	if (locale === "fa") return __fa.chat_link_off(inputs)
+	if (locale === "ur") return __ur.chat_link_off(inputs)
+	if (locale === "bn") return __bn.chat_link_off(inputs)
+	if (locale === "pa") return __pa.chat_link_off(inputs)
+	if (locale === "sw") return __sw.chat_link_off(inputs)
+	if (locale === "el") return __el.chat_link_off(inputs)
+	if (locale === "cs") return __cs.chat_link_off(inputs)
+	if (locale === "ro") return __ro.chat_link_off(inputs)
+	if (locale === "hu") return __hu.chat_link_off(inputs)
+	if (locale === "sv") return __sv.chat_link_off(inputs)
+	if (locale === "he") return __he.chat_link_off(inputs)
+	return __ru.chat_link_off(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "live" |
+*
+* @param {Chat_Link_OkInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_link_ok = /** @type {((inputs?: Chat_Link_OkInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Link_OkInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_link_ok(inputs)
+	if (locale === "fr") return __fr.chat_link_ok(inputs)
+	if (locale === "es") return __es.chat_link_ok(inputs)
+	if (locale === "zh") return __zh.chat_link_ok(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_link_ok(inputs)
+	if (locale === "hi") return __hi.chat_link_ok(inputs)
+	if (locale === "ar") return __ar.chat_link_ok(inputs)
+	if (locale === "pt") return __pt.chat_link_ok(inputs)
+	if (locale === "de") return __de.chat_link_ok(inputs)
+	if (locale === "ja") return __ja.chat_link_ok(inputs)
+	if (locale === "ko") return __ko.chat_link_ok(inputs)
+	if (locale === "it") return __it.chat_link_ok(inputs)
+	if (locale === "tr") return __tr.chat_link_ok(inputs)
+	if (locale === "pl") return __pl.chat_link_ok(inputs)
+	if (locale === "uk") return __uk.chat_link_ok(inputs)
+	if (locale === "nl") return __nl.chat_link_ok(inputs)
+	if (locale === "vi") return __vi.chat_link_ok(inputs)
+	if (locale === "id") return __id.chat_link_ok(inputs)
+	if (locale === "ms") return __ms.chat_link_ok(inputs)
+	if (locale === "th") return __th.chat_link_ok(inputs)
+	if (locale === "fa") return __fa.chat_link_ok(inputs)
+	if (locale === "ur") return __ur.chat_link_ok(inputs)
+	if (locale === "bn") return __bn.chat_link_ok(inputs)
+	if (locale === "pa") return __pa.chat_link_ok(inputs)
+	if (locale === "sw") return __sw.chat_link_ok(inputs)
+	if (locale === "el") return __el.chat_link_ok(inputs)
+	if (locale === "cs") return __cs.chat_link_ok(inputs)
+	if (locale === "ro") return __ro.chat_link_ok(inputs)
+	if (locale === "hu") return __hu.chat_link_ok(inputs)
+	if (locale === "sv") return __sv.chat_link_ok(inputs)
+	if (locale === "he") return __he.chat_link_ok(inputs)
+	return __ru.chat_link_ok(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Load earlier messages" |
+*
+* @param {Chat_Load_OlderInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_load_older = /** @type {((inputs?: Chat_Load_OlderInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Load_OlderInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_load_older(inputs)
+	if (locale === "fr") return __fr.chat_load_older(inputs)
+	if (locale === "es") return __es.chat_load_older(inputs)
+	if (locale === "zh") return __zh.chat_load_older(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_load_older(inputs)
+	if (locale === "hi") return __hi.chat_load_older(inputs)
+	if (locale === "ar") return __ar.chat_load_older(inputs)
+	if (locale === "pt") return __pt.chat_load_older(inputs)
+	if (locale === "de") return __de.chat_load_older(inputs)
+	if (locale === "ja") return __ja.chat_load_older(inputs)
+	if (locale === "ko") return __ko.chat_load_older(inputs)
+	if (locale === "it") return __it.chat_load_older(inputs)
+	if (locale === "tr") return __tr.chat_load_older(inputs)
+	if (locale === "pl") return __pl.chat_load_older(inputs)
+	if (locale === "uk") return __uk.chat_load_older(inputs)
+	if (locale === "nl") return __nl.chat_load_older(inputs)
+	if (locale === "vi") return __vi.chat_load_older(inputs)
+	if (locale === "id") return __id.chat_load_older(inputs)
+	if (locale === "ms") return __ms.chat_load_older(inputs)
+	if (locale === "th") return __th.chat_load_older(inputs)
+	if (locale === "fa") return __fa.chat_load_older(inputs)
+	if (locale === "ur") return __ur.chat_load_older(inputs)
+	if (locale === "bn") return __bn.chat_load_older(inputs)
+	if (locale === "pa") return __pa.chat_load_older(inputs)
+	if (locale === "sw") return __sw.chat_load_older(inputs)
+	if (locale === "el") return __el.chat_load_older(inputs)
+	if (locale === "cs") return __cs.chat_load_older(inputs)
+	if (locale === "ro") return __ro.chat_load_older(inputs)
+	if (locale === "hu") return __hu.chat_load_older(inputs)
+	if (locale === "sv") return __sv.chat_load_older(inputs)
+	if (locale === "he") return __he.chat_load_older(inputs)
+	return __ru.chat_load_older(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Loading…" |
+*
+* @param {Chat_LoadingInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_loading = /** @type {((inputs?: Chat_LoadingInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_LoadingInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_loading(inputs)
+	if (locale === "fr") return __fr.chat_loading(inputs)
+	if (locale === "es") return __es.chat_loading(inputs)
+	if (locale === "zh") return __zh.chat_loading(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_loading(inputs)
+	if (locale === "hi") return __hi.chat_loading(inputs)
+	if (locale === "ar") return __ar.chat_loading(inputs)
+	if (locale === "pt") return __pt.chat_loading(inputs)
+	if (locale === "de") return __de.chat_loading(inputs)
+	if (locale === "ja") return __ja.chat_loading(inputs)
+	if (locale === "ko") return __ko.chat_loading(inputs)
+	if (locale === "it") return __it.chat_loading(inputs)
+	if (locale === "tr") return __tr.chat_loading(inputs)
+	if (locale === "pl") return __pl.chat_loading(inputs)
+	if (locale === "uk") return __uk.chat_loading(inputs)
+	if (locale === "nl") return __nl.chat_loading(inputs)
+	if (locale === "vi") return __vi.chat_loading(inputs)
+	if (locale === "id") return __id.chat_loading(inputs)
+	if (locale === "ms") return __ms.chat_loading(inputs)
+	if (locale === "th") return __th.chat_loading(inputs)
+	if (locale === "fa") return __fa.chat_loading(inputs)
+	if (locale === "ur") return __ur.chat_loading(inputs)
+	if (locale === "bn") return __bn.chat_loading(inputs)
+	if (locale === "pa") return __pa.chat_loading(inputs)
+	if (locale === "sw") return __sw.chat_loading(inputs)
+	if (locale === "el") return __el.chat_loading(inputs)
+	if (locale === "cs") return __cs.chat_loading(inputs)
+	if (locale === "ro") return __ro.chat_loading(inputs)
+	if (locale === "hu") return __hu.chat_loading(inputs)
+	if (locale === "sv") return __sv.chat_loading(inputs)
+	if (locale === "he") return __he.chat_loading(inputs)
+	return __ru.chat_loading(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "a while ago" |
+*
+* @param {Chat_Long_AgoInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_long_ago = /** @type {((inputs?: Chat_Long_AgoInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Long_AgoInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_long_ago(inputs)
+	if (locale === "fr") return __fr.chat_long_ago(inputs)
+	if (locale === "es") return __es.chat_long_ago(inputs)
+	if (locale === "zh") return __zh.chat_long_ago(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_long_ago(inputs)
+	if (locale === "hi") return __hi.chat_long_ago(inputs)
+	if (locale === "ar") return __ar.chat_long_ago(inputs)
+	if (locale === "pt") return __pt.chat_long_ago(inputs)
+	if (locale === "de") return __de.chat_long_ago(inputs)
+	if (locale === "ja") return __ja.chat_long_ago(inputs)
+	if (locale === "ko") return __ko.chat_long_ago(inputs)
+	if (locale === "it") return __it.chat_long_ago(inputs)
+	if (locale === "tr") return __tr.chat_long_ago(inputs)
+	if (locale === "pl") return __pl.chat_long_ago(inputs)
+	if (locale === "uk") return __uk.chat_long_ago(inputs)
+	if (locale === "nl") return __nl.chat_long_ago(inputs)
+	if (locale === "vi") return __vi.chat_long_ago(inputs)
+	if (locale === "id") return __id.chat_long_ago(inputs)
+	if (locale === "ms") return __ms.chat_long_ago(inputs)
+	if (locale === "th") return __th.chat_long_ago(inputs)
+	if (locale === "fa") return __fa.chat_long_ago(inputs)
+	if (locale === "ur") return __ur.chat_long_ago(inputs)
+	if (locale === "bn") return __bn.chat_long_ago(inputs)
+	if (locale === "pa") return __pa.chat_long_ago(inputs)
+	if (locale === "sw") return __sw.chat_long_ago(inputs)
+	if (locale === "el") return __el.chat_long_ago(inputs)
+	if (locale === "cs") return __cs.chat_long_ago(inputs)
+	if (locale === "ro") return __ro.chat_long_ago(inputs)
+	if (locale === "hu") return __hu.chat_long_ago(inputs)
+	if (locale === "sv") return __sv.chat_long_ago(inputs)
+	if (locale === "he") return __he.chat_long_ago(inputs)
+	return __ru.chat_long_ago(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "Members" |
 *
 * @param {Chat_MembersInputs} inputs
@@ -622,6 +2075,138 @@ export const chat_members = /** @type {((inputs?: Chat_MembersInputs, options?: 
 	if (locale === "sv") return __sv.chat_members(inputs)
 	if (locale === "he") return __he.chat_members(inputs)
 	return __ru.chat_members(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Message" |
+*
+* @param {Chat_MessageInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_message = /** @type {((inputs?: Chat_MessageInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_MessageInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_message(inputs)
+	if (locale === "fr") return __fr.chat_message(inputs)
+	if (locale === "es") return __es.chat_message(inputs)
+	if (locale === "zh") return __zh.chat_message(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_message(inputs)
+	if (locale === "hi") return __hi.chat_message(inputs)
+	if (locale === "ar") return __ar.chat_message(inputs)
+	if (locale === "pt") return __pt.chat_message(inputs)
+	if (locale === "de") return __de.chat_message(inputs)
+	if (locale === "ja") return __ja.chat_message(inputs)
+	if (locale === "ko") return __ko.chat_message(inputs)
+	if (locale === "it") return __it.chat_message(inputs)
+	if (locale === "tr") return __tr.chat_message(inputs)
+	if (locale === "pl") return __pl.chat_message(inputs)
+	if (locale === "uk") return __uk.chat_message(inputs)
+	if (locale === "nl") return __nl.chat_message(inputs)
+	if (locale === "vi") return __vi.chat_message(inputs)
+	if (locale === "id") return __id.chat_message(inputs)
+	if (locale === "ms") return __ms.chat_message(inputs)
+	if (locale === "th") return __th.chat_message(inputs)
+	if (locale === "fa") return __fa.chat_message(inputs)
+	if (locale === "ur") return __ur.chat_message(inputs)
+	if (locale === "bn") return __bn.chat_message(inputs)
+	if (locale === "pa") return __pa.chat_message(inputs)
+	if (locale === "sw") return __sw.chat_message(inputs)
+	if (locale === "el") return __el.chat_message(inputs)
+	if (locale === "cs") return __cs.chat_message(inputs)
+	if (locale === "ro") return __ro.chat_message(inputs)
+	if (locale === "hu") return __hu.chat_message(inputs)
+	if (locale === "sv") return __sv.chat_message(inputs)
+	if (locale === "he") return __he.chat_message(inputs)
+	return __ru.chat_message(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Microphone access denied" |
+*
+* @param {Chat_Mic_DeniedInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_mic_denied = /** @type {((inputs?: Chat_Mic_DeniedInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Mic_DeniedInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_mic_denied(inputs)
+	if (locale === "fr") return __fr.chat_mic_denied(inputs)
+	if (locale === "es") return __es.chat_mic_denied(inputs)
+	if (locale === "zh") return __zh.chat_mic_denied(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_mic_denied(inputs)
+	if (locale === "hi") return __hi.chat_mic_denied(inputs)
+	if (locale === "ar") return __ar.chat_mic_denied(inputs)
+	if (locale === "pt") return __pt.chat_mic_denied(inputs)
+	if (locale === "de") return __de.chat_mic_denied(inputs)
+	if (locale === "ja") return __ja.chat_mic_denied(inputs)
+	if (locale === "ko") return __ko.chat_mic_denied(inputs)
+	if (locale === "it") return __it.chat_mic_denied(inputs)
+	if (locale === "tr") return __tr.chat_mic_denied(inputs)
+	if (locale === "pl") return __pl.chat_mic_denied(inputs)
+	if (locale === "uk") return __uk.chat_mic_denied(inputs)
+	if (locale === "nl") return __nl.chat_mic_denied(inputs)
+	if (locale === "vi") return __vi.chat_mic_denied(inputs)
+	if (locale === "id") return __id.chat_mic_denied(inputs)
+	if (locale === "ms") return __ms.chat_mic_denied(inputs)
+	if (locale === "th") return __th.chat_mic_denied(inputs)
+	if (locale === "fa") return __fa.chat_mic_denied(inputs)
+	if (locale === "ur") return __ur.chat_mic_denied(inputs)
+	if (locale === "bn") return __bn.chat_mic_denied(inputs)
+	if (locale === "pa") return __pa.chat_mic_denied(inputs)
+	if (locale === "sw") return __sw.chat_mic_denied(inputs)
+	if (locale === "el") return __el.chat_mic_denied(inputs)
+	if (locale === "cs") return __cs.chat_mic_denied(inputs)
+	if (locale === "ro") return __ro.chat_mic_denied(inputs)
+	if (locale === "hu") return __hu.chat_mic_denied(inputs)
+	if (locale === "sv") return __sv.chat_mic_denied(inputs)
+	if (locale === "he") return __he.chat_mic_denied(inputs)
+	return __ru.chat_mic_denied(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "New chat" |
+*
+* @param {Chat_New_DialogInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_new_dialog = /** @type {((inputs?: Chat_New_DialogInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_New_DialogInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_new_dialog(inputs)
+	if (locale === "fr") return __fr.chat_new_dialog(inputs)
+	if (locale === "es") return __es.chat_new_dialog(inputs)
+	if (locale === "zh") return __zh.chat_new_dialog(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_new_dialog(inputs)
+	if (locale === "hi") return __hi.chat_new_dialog(inputs)
+	if (locale === "ar") return __ar.chat_new_dialog(inputs)
+	if (locale === "pt") return __pt.chat_new_dialog(inputs)
+	if (locale === "de") return __de.chat_new_dialog(inputs)
+	if (locale === "ja") return __ja.chat_new_dialog(inputs)
+	if (locale === "ko") return __ko.chat_new_dialog(inputs)
+	if (locale === "it") return __it.chat_new_dialog(inputs)
+	if (locale === "tr") return __tr.chat_new_dialog(inputs)
+	if (locale === "pl") return __pl.chat_new_dialog(inputs)
+	if (locale === "uk") return __uk.chat_new_dialog(inputs)
+	if (locale === "nl") return __nl.chat_new_dialog(inputs)
+	if (locale === "vi") return __vi.chat_new_dialog(inputs)
+	if (locale === "id") return __id.chat_new_dialog(inputs)
+	if (locale === "ms") return __ms.chat_new_dialog(inputs)
+	if (locale === "th") return __th.chat_new_dialog(inputs)
+	if (locale === "fa") return __fa.chat_new_dialog(inputs)
+	if (locale === "ur") return __ur.chat_new_dialog(inputs)
+	if (locale === "bn") return __bn.chat_new_dialog(inputs)
+	if (locale === "pa") return __pa.chat_new_dialog(inputs)
+	if (locale === "sw") return __sw.chat_new_dialog(inputs)
+	if (locale === "el") return __el.chat_new_dialog(inputs)
+	if (locale === "cs") return __cs.chat_new_dialog(inputs)
+	if (locale === "ro") return __ro.chat_new_dialog(inputs)
+	if (locale === "hu") return __hu.chat_new_dialog(inputs)
+	if (locale === "sv") return __sv.chat_new_dialog(inputs)
+	if (locale === "he") return __he.chat_new_dialog(inputs)
+	return __ru.chat_new_dialog(inputs)
 });
 /**
 * | output |
@@ -670,6 +2255,94 @@ export const chat_new_group = /** @type {((inputs?: Chat_New_GroupInputs, option
 /**
 * | output |
 * | --- |
+* | "New group" |
+*
+* @param {Chat_New_Group_PreviewInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_new_group_preview = /** @type {((inputs?: Chat_New_Group_PreviewInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_New_Group_PreviewInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_new_group_preview(inputs)
+	if (locale === "fr") return __fr.chat_new_group_preview(inputs)
+	if (locale === "es") return __es.chat_new_group_preview(inputs)
+	if (locale === "zh") return __zh.chat_new_group_preview(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_new_group_preview(inputs)
+	if (locale === "hi") return __hi.chat_new_group_preview(inputs)
+	if (locale === "ar") return __ar.chat_new_group_preview(inputs)
+	if (locale === "pt") return __pt.chat_new_group_preview(inputs)
+	if (locale === "de") return __de.chat_new_group_preview(inputs)
+	if (locale === "ja") return __ja.chat_new_group_preview(inputs)
+	if (locale === "ko") return __ko.chat_new_group_preview(inputs)
+	if (locale === "it") return __it.chat_new_group_preview(inputs)
+	if (locale === "tr") return __tr.chat_new_group_preview(inputs)
+	if (locale === "pl") return __pl.chat_new_group_preview(inputs)
+	if (locale === "uk") return __uk.chat_new_group_preview(inputs)
+	if (locale === "nl") return __nl.chat_new_group_preview(inputs)
+	if (locale === "vi") return __vi.chat_new_group_preview(inputs)
+	if (locale === "id") return __id.chat_new_group_preview(inputs)
+	if (locale === "ms") return __ms.chat_new_group_preview(inputs)
+	if (locale === "th") return __th.chat_new_group_preview(inputs)
+	if (locale === "fa") return __fa.chat_new_group_preview(inputs)
+	if (locale === "ur") return __ur.chat_new_group_preview(inputs)
+	if (locale === "bn") return __bn.chat_new_group_preview(inputs)
+	if (locale === "pa") return __pa.chat_new_group_preview(inputs)
+	if (locale === "sw") return __sw.chat_new_group_preview(inputs)
+	if (locale === "el") return __el.chat_new_group_preview(inputs)
+	if (locale === "cs") return __cs.chat_new_group_preview(inputs)
+	if (locale === "ro") return __ro.chat_new_group_preview(inputs)
+	if (locale === "hu") return __hu.chat_new_group_preview(inputs)
+	if (locale === "sv") return __sv.chat_new_group_preview(inputs)
+	if (locale === "he") return __he.chat_new_group_preview(inputs)
+	return __ru.chat_new_group_preview(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "No network" |
+*
+* @param {Chat_No_NetworkInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_no_network = /** @type {((inputs?: Chat_No_NetworkInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_No_NetworkInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_no_network(inputs)
+	if (locale === "fr") return __fr.chat_no_network(inputs)
+	if (locale === "es") return __es.chat_no_network(inputs)
+	if (locale === "zh") return __zh.chat_no_network(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_no_network(inputs)
+	if (locale === "hi") return __hi.chat_no_network(inputs)
+	if (locale === "ar") return __ar.chat_no_network(inputs)
+	if (locale === "pt") return __pt.chat_no_network(inputs)
+	if (locale === "de") return __de.chat_no_network(inputs)
+	if (locale === "ja") return __ja.chat_no_network(inputs)
+	if (locale === "ko") return __ko.chat_no_network(inputs)
+	if (locale === "it") return __it.chat_no_network(inputs)
+	if (locale === "tr") return __tr.chat_no_network(inputs)
+	if (locale === "pl") return __pl.chat_no_network(inputs)
+	if (locale === "uk") return __uk.chat_no_network(inputs)
+	if (locale === "nl") return __nl.chat_no_network(inputs)
+	if (locale === "vi") return __vi.chat_no_network(inputs)
+	if (locale === "id") return __id.chat_no_network(inputs)
+	if (locale === "ms") return __ms.chat_no_network(inputs)
+	if (locale === "th") return __th.chat_no_network(inputs)
+	if (locale === "fa") return __fa.chat_no_network(inputs)
+	if (locale === "ur") return __ur.chat_no_network(inputs)
+	if (locale === "bn") return __bn.chat_no_network(inputs)
+	if (locale === "pa") return __pa.chat_no_network(inputs)
+	if (locale === "sw") return __sw.chat_no_network(inputs)
+	if (locale === "el") return __el.chat_no_network(inputs)
+	if (locale === "cs") return __cs.chat_no_network(inputs)
+	if (locale === "ro") return __ro.chat_no_network(inputs)
+	if (locale === "hu") return __hu.chat_no_network(inputs)
+	if (locale === "sv") return __sv.chat_no_network(inputs)
+	if (locale === "he") return __he.chat_no_network(inputs)
+	return __ru.chat_no_network(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "online" |
 *
 * @param {Chat_OnlineInputs} inputs
@@ -710,6 +2383,94 @@ export const chat_online = /** @type {((inputs?: Chat_OnlineInputs, options?: { 
 	if (locale === "sv") return __sv.chat_online(inputs)
 	if (locale === "he") return __he.chat_online(inputs)
 	return __ru.chat_online(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Original message" |
+*
+* @param {Chat_OriginalInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_original = /** @type {((inputs?: Chat_OriginalInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_OriginalInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_original(inputs)
+	if (locale === "fr") return __fr.chat_original(inputs)
+	if (locale === "es") return __es.chat_original(inputs)
+	if (locale === "zh") return __zh.chat_original(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_original(inputs)
+	if (locale === "hi") return __hi.chat_original(inputs)
+	if (locale === "ar") return __ar.chat_original(inputs)
+	if (locale === "pt") return __pt.chat_original(inputs)
+	if (locale === "de") return __de.chat_original(inputs)
+	if (locale === "ja") return __ja.chat_original(inputs)
+	if (locale === "ko") return __ko.chat_original(inputs)
+	if (locale === "it") return __it.chat_original(inputs)
+	if (locale === "tr") return __tr.chat_original(inputs)
+	if (locale === "pl") return __pl.chat_original(inputs)
+	if (locale === "uk") return __uk.chat_original(inputs)
+	if (locale === "nl") return __nl.chat_original(inputs)
+	if (locale === "vi") return __vi.chat_original(inputs)
+	if (locale === "id") return __id.chat_original(inputs)
+	if (locale === "ms") return __ms.chat_original(inputs)
+	if (locale === "th") return __th.chat_original(inputs)
+	if (locale === "fa") return __fa.chat_original(inputs)
+	if (locale === "ur") return __ur.chat_original(inputs)
+	if (locale === "bn") return __bn.chat_original(inputs)
+	if (locale === "pa") return __pa.chat_original(inputs)
+	if (locale === "sw") return __sw.chat_original(inputs)
+	if (locale === "el") return __el.chat_original(inputs)
+	if (locale === "cs") return __cs.chat_original(inputs)
+	if (locale === "ro") return __ro.chat_original(inputs)
+	if (locale === "hu") return __hu.chat_original(inputs)
+	if (locale === "sv") return __sv.chat_original(inputs)
+	if (locale === "he") return __he.chat_original(inputs)
+	return __ru.chat_original(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Contact" |
+*
+* @param {Chat_PeerInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_peer = /** @type {((inputs?: Chat_PeerInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_PeerInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_peer(inputs)
+	if (locale === "fr") return __fr.chat_peer(inputs)
+	if (locale === "es") return __es.chat_peer(inputs)
+	if (locale === "zh") return __zh.chat_peer(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_peer(inputs)
+	if (locale === "hi") return __hi.chat_peer(inputs)
+	if (locale === "ar") return __ar.chat_peer(inputs)
+	if (locale === "pt") return __pt.chat_peer(inputs)
+	if (locale === "de") return __de.chat_peer(inputs)
+	if (locale === "ja") return __ja.chat_peer(inputs)
+	if (locale === "ko") return __ko.chat_peer(inputs)
+	if (locale === "it") return __it.chat_peer(inputs)
+	if (locale === "tr") return __tr.chat_peer(inputs)
+	if (locale === "pl") return __pl.chat_peer(inputs)
+	if (locale === "uk") return __uk.chat_peer(inputs)
+	if (locale === "nl") return __nl.chat_peer(inputs)
+	if (locale === "vi") return __vi.chat_peer(inputs)
+	if (locale === "id") return __id.chat_peer(inputs)
+	if (locale === "ms") return __ms.chat_peer(inputs)
+	if (locale === "th") return __th.chat_peer(inputs)
+	if (locale === "fa") return __fa.chat_peer(inputs)
+	if (locale === "ur") return __ur.chat_peer(inputs)
+	if (locale === "bn") return __bn.chat_peer(inputs)
+	if (locale === "pa") return __pa.chat_peer(inputs)
+	if (locale === "sw") return __sw.chat_peer(inputs)
+	if (locale === "el") return __el.chat_peer(inputs)
+	if (locale === "cs") return __cs.chat_peer(inputs)
+	if (locale === "ro") return __ro.chat_peer(inputs)
+	if (locale === "hu") return __hu.chat_peer(inputs)
+	if (locale === "sv") return __sv.chat_peer(inputs)
+	if (locale === "he") return __he.chat_peer(inputs)
+	return __ru.chat_peer(inputs)
 });
 /**
 * | output |
@@ -758,6 +2519,446 @@ export const chat_photo = /** @type {((inputs?: Chat_PhotoInputs, options?: { lo
 /**
 * | output |
 * | --- |
+* | "Photo error" |
+*
+* @param {Chat_Photo_ErrorInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_photo_error = /** @type {((inputs?: Chat_Photo_ErrorInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Photo_ErrorInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_photo_error(inputs)
+	if (locale === "fr") return __fr.chat_photo_error(inputs)
+	if (locale === "es") return __es.chat_photo_error(inputs)
+	if (locale === "zh") return __zh.chat_photo_error(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_photo_error(inputs)
+	if (locale === "hi") return __hi.chat_photo_error(inputs)
+	if (locale === "ar") return __ar.chat_photo_error(inputs)
+	if (locale === "pt") return __pt.chat_photo_error(inputs)
+	if (locale === "de") return __de.chat_photo_error(inputs)
+	if (locale === "ja") return __ja.chat_photo_error(inputs)
+	if (locale === "ko") return __ko.chat_photo_error(inputs)
+	if (locale === "it") return __it.chat_photo_error(inputs)
+	if (locale === "tr") return __tr.chat_photo_error(inputs)
+	if (locale === "pl") return __pl.chat_photo_error(inputs)
+	if (locale === "uk") return __uk.chat_photo_error(inputs)
+	if (locale === "nl") return __nl.chat_photo_error(inputs)
+	if (locale === "vi") return __vi.chat_photo_error(inputs)
+	if (locale === "id") return __id.chat_photo_error(inputs)
+	if (locale === "ms") return __ms.chat_photo_error(inputs)
+	if (locale === "th") return __th.chat_photo_error(inputs)
+	if (locale === "fa") return __fa.chat_photo_error(inputs)
+	if (locale === "ur") return __ur.chat_photo_error(inputs)
+	if (locale === "bn") return __bn.chat_photo_error(inputs)
+	if (locale === "pa") return __pa.chat_photo_error(inputs)
+	if (locale === "sw") return __sw.chat_photo_error(inputs)
+	if (locale === "el") return __el.chat_photo_error(inputs)
+	if (locale === "cs") return __cs.chat_photo_error(inputs)
+	if (locale === "ro") return __ro.chat_photo_error(inputs)
+	if (locale === "hu") return __hu.chat_photo_error(inputs)
+	if (locale === "sv") return __sv.chat_photo_error(inputs)
+	if (locale === "he") return __he.chat_photo_error(inputs)
+	return __ru.chat_photo_error(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Photo not sent" |
+*
+* @param {Chat_Photo_FailedInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_photo_failed = /** @type {((inputs?: Chat_Photo_FailedInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Photo_FailedInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_photo_failed(inputs)
+	if (locale === "fr") return __fr.chat_photo_failed(inputs)
+	if (locale === "es") return __es.chat_photo_failed(inputs)
+	if (locale === "zh") return __zh.chat_photo_failed(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_photo_failed(inputs)
+	if (locale === "hi") return __hi.chat_photo_failed(inputs)
+	if (locale === "ar") return __ar.chat_photo_failed(inputs)
+	if (locale === "pt") return __pt.chat_photo_failed(inputs)
+	if (locale === "de") return __de.chat_photo_failed(inputs)
+	if (locale === "ja") return __ja.chat_photo_failed(inputs)
+	if (locale === "ko") return __ko.chat_photo_failed(inputs)
+	if (locale === "it") return __it.chat_photo_failed(inputs)
+	if (locale === "tr") return __tr.chat_photo_failed(inputs)
+	if (locale === "pl") return __pl.chat_photo_failed(inputs)
+	if (locale === "uk") return __uk.chat_photo_failed(inputs)
+	if (locale === "nl") return __nl.chat_photo_failed(inputs)
+	if (locale === "vi") return __vi.chat_photo_failed(inputs)
+	if (locale === "id") return __id.chat_photo_failed(inputs)
+	if (locale === "ms") return __ms.chat_photo_failed(inputs)
+	if (locale === "th") return __th.chat_photo_failed(inputs)
+	if (locale === "fa") return __fa.chat_photo_failed(inputs)
+	if (locale === "ur") return __ur.chat_photo_failed(inputs)
+	if (locale === "bn") return __bn.chat_photo_failed(inputs)
+	if (locale === "pa") return __pa.chat_photo_failed(inputs)
+	if (locale === "sw") return __sw.chat_photo_failed(inputs)
+	if (locale === "el") return __el.chat_photo_failed(inputs)
+	if (locale === "cs") return __cs.chat_photo_failed(inputs)
+	if (locale === "ro") return __ro.chat_photo_failed(inputs)
+	if (locale === "hu") return __hu.chat_photo_failed(inputs)
+	if (locale === "sv") return __sv.chat_photo_failed(inputs)
+	if (locale === "he") return __he.chat_photo_failed(inputs)
+	return __ru.chat_photo_failed(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Photo" |
+*
+* @param {Chat_Photo_LabelInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_photo_label = /** @type {((inputs?: Chat_Photo_LabelInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Photo_LabelInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_photo_label(inputs)
+	if (locale === "fr") return __fr.chat_photo_label(inputs)
+	if (locale === "es") return __es.chat_photo_label(inputs)
+	if (locale === "zh") return __zh.chat_photo_label(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_photo_label(inputs)
+	if (locale === "hi") return __hi.chat_photo_label(inputs)
+	if (locale === "ar") return __ar.chat_photo_label(inputs)
+	if (locale === "pt") return __pt.chat_photo_label(inputs)
+	if (locale === "de") return __de.chat_photo_label(inputs)
+	if (locale === "ja") return __ja.chat_photo_label(inputs)
+	if (locale === "ko") return __ko.chat_photo_label(inputs)
+	if (locale === "it") return __it.chat_photo_label(inputs)
+	if (locale === "tr") return __tr.chat_photo_label(inputs)
+	if (locale === "pl") return __pl.chat_photo_label(inputs)
+	if (locale === "uk") return __uk.chat_photo_label(inputs)
+	if (locale === "nl") return __nl.chat_photo_label(inputs)
+	if (locale === "vi") return __vi.chat_photo_label(inputs)
+	if (locale === "id") return __id.chat_photo_label(inputs)
+	if (locale === "ms") return __ms.chat_photo_label(inputs)
+	if (locale === "th") return __th.chat_photo_label(inputs)
+	if (locale === "fa") return __fa.chat_photo_label(inputs)
+	if (locale === "ur") return __ur.chat_photo_label(inputs)
+	if (locale === "bn") return __bn.chat_photo_label(inputs)
+	if (locale === "pa") return __pa.chat_photo_label(inputs)
+	if (locale === "sw") return __sw.chat_photo_label(inputs)
+	if (locale === "el") return __el.chat_photo_label(inputs)
+	if (locale === "cs") return __cs.chat_photo_label(inputs)
+	if (locale === "ro") return __ro.chat_photo_label(inputs)
+	if (locale === "hu") return __hu.chat_photo_label(inputs)
+	if (locale === "sv") return __sv.chat_photo_label(inputs)
+	if (locale === "he") return __he.chat_photo_label(inputs)
+	return __ru.chat_photo_label(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "No network — can’t send photo offline" |
+*
+* @param {Chat_Photo_OfflineInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_photo_offline = /** @type {((inputs?: Chat_Photo_OfflineInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Photo_OfflineInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_photo_offline(inputs)
+	if (locale === "fr") return __fr.chat_photo_offline(inputs)
+	if (locale === "es") return __es.chat_photo_offline(inputs)
+	if (locale === "zh") return __zh.chat_photo_offline(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_photo_offline(inputs)
+	if (locale === "hi") return __hi.chat_photo_offline(inputs)
+	if (locale === "ar") return __ar.chat_photo_offline(inputs)
+	if (locale === "pt") return __pt.chat_photo_offline(inputs)
+	if (locale === "de") return __de.chat_photo_offline(inputs)
+	if (locale === "ja") return __ja.chat_photo_offline(inputs)
+	if (locale === "ko") return __ko.chat_photo_offline(inputs)
+	if (locale === "it") return __it.chat_photo_offline(inputs)
+	if (locale === "tr") return __tr.chat_photo_offline(inputs)
+	if (locale === "pl") return __pl.chat_photo_offline(inputs)
+	if (locale === "uk") return __uk.chat_photo_offline(inputs)
+	if (locale === "nl") return __nl.chat_photo_offline(inputs)
+	if (locale === "vi") return __vi.chat_photo_offline(inputs)
+	if (locale === "id") return __id.chat_photo_offline(inputs)
+	if (locale === "ms") return __ms.chat_photo_offline(inputs)
+	if (locale === "th") return __th.chat_photo_offline(inputs)
+	if (locale === "fa") return __fa.chat_photo_offline(inputs)
+	if (locale === "ur") return __ur.chat_photo_offline(inputs)
+	if (locale === "bn") return __bn.chat_photo_offline(inputs)
+	if (locale === "pa") return __pa.chat_photo_offline(inputs)
+	if (locale === "sw") return __sw.chat_photo_offline(inputs)
+	if (locale === "el") return __el.chat_photo_offline(inputs)
+	if (locale === "cs") return __cs.chat_photo_offline(inputs)
+	if (locale === "ro") return __ro.chat_photo_offline(inputs)
+	if (locale === "hu") return __hu.chat_photo_offline(inputs)
+	if (locale === "sv") return __sv.chat_photo_offline(inputs)
+	if (locale === "he") return __he.chat_photo_offline(inputs)
+	return __ru.chat_photo_offline(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Photo over 8 MB" |
+*
+* @param {Chat_Photo_Over_8mbInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_photo_over_8mb = /** @type {((inputs?: Chat_Photo_Over_8mbInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Photo_Over_8mbInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_photo_over_8mb(inputs)
+	if (locale === "fr") return __fr.chat_photo_over_8mb(inputs)
+	if (locale === "es") return __es.chat_photo_over_8mb(inputs)
+	if (locale === "zh") return __zh.chat_photo_over_8mb(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_photo_over_8mb(inputs)
+	if (locale === "hi") return __hi.chat_photo_over_8mb(inputs)
+	if (locale === "ar") return __ar.chat_photo_over_8mb(inputs)
+	if (locale === "pt") return __pt.chat_photo_over_8mb(inputs)
+	if (locale === "de") return __de.chat_photo_over_8mb(inputs)
+	if (locale === "ja") return __ja.chat_photo_over_8mb(inputs)
+	if (locale === "ko") return __ko.chat_photo_over_8mb(inputs)
+	if (locale === "it") return __it.chat_photo_over_8mb(inputs)
+	if (locale === "tr") return __tr.chat_photo_over_8mb(inputs)
+	if (locale === "pl") return __pl.chat_photo_over_8mb(inputs)
+	if (locale === "uk") return __uk.chat_photo_over_8mb(inputs)
+	if (locale === "nl") return __nl.chat_photo_over_8mb(inputs)
+	if (locale === "vi") return __vi.chat_photo_over_8mb(inputs)
+	if (locale === "id") return __id.chat_photo_over_8mb(inputs)
+	if (locale === "ms") return __ms.chat_photo_over_8mb(inputs)
+	if (locale === "th") return __th.chat_photo_over_8mb(inputs)
+	if (locale === "fa") return __fa.chat_photo_over_8mb(inputs)
+	if (locale === "ur") return __ur.chat_photo_over_8mb(inputs)
+	if (locale === "bn") return __bn.chat_photo_over_8mb(inputs)
+	if (locale === "pa") return __pa.chat_photo_over_8mb(inputs)
+	if (locale === "sw") return __sw.chat_photo_over_8mb(inputs)
+	if (locale === "el") return __el.chat_photo_over_8mb(inputs)
+	if (locale === "cs") return __cs.chat_photo_over_8mb(inputs)
+	if (locale === "ro") return __ro.chat_photo_over_8mb(inputs)
+	if (locale === "hu") return __hu.chat_photo_over_8mb(inputs)
+	if (locale === "sv") return __sv.chat_photo_over_8mb(inputs)
+	if (locale === "he") return __he.chat_photo_over_8mb(inputs)
+	return __ru.chat_photo_over_8mb(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Photo too large" |
+*
+* @param {Chat_Photo_Too_BigInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_photo_too_big = /** @type {((inputs?: Chat_Photo_Too_BigInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Photo_Too_BigInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_photo_too_big(inputs)
+	if (locale === "fr") return __fr.chat_photo_too_big(inputs)
+	if (locale === "es") return __es.chat_photo_too_big(inputs)
+	if (locale === "zh") return __zh.chat_photo_too_big(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_photo_too_big(inputs)
+	if (locale === "hi") return __hi.chat_photo_too_big(inputs)
+	if (locale === "ar") return __ar.chat_photo_too_big(inputs)
+	if (locale === "pt") return __pt.chat_photo_too_big(inputs)
+	if (locale === "de") return __de.chat_photo_too_big(inputs)
+	if (locale === "ja") return __ja.chat_photo_too_big(inputs)
+	if (locale === "ko") return __ko.chat_photo_too_big(inputs)
+	if (locale === "it") return __it.chat_photo_too_big(inputs)
+	if (locale === "tr") return __tr.chat_photo_too_big(inputs)
+	if (locale === "pl") return __pl.chat_photo_too_big(inputs)
+	if (locale === "uk") return __uk.chat_photo_too_big(inputs)
+	if (locale === "nl") return __nl.chat_photo_too_big(inputs)
+	if (locale === "vi") return __vi.chat_photo_too_big(inputs)
+	if (locale === "id") return __id.chat_photo_too_big(inputs)
+	if (locale === "ms") return __ms.chat_photo_too_big(inputs)
+	if (locale === "th") return __th.chat_photo_too_big(inputs)
+	if (locale === "fa") return __fa.chat_photo_too_big(inputs)
+	if (locale === "ur") return __ur.chat_photo_too_big(inputs)
+	if (locale === "bn") return __bn.chat_photo_too_big(inputs)
+	if (locale === "pa") return __pa.chat_photo_too_big(inputs)
+	if (locale === "sw") return __sw.chat_photo_too_big(inputs)
+	if (locale === "el") return __el.chat_photo_too_big(inputs)
+	if (locale === "cs") return __cs.chat_photo_too_big(inputs)
+	if (locale === "ro") return __ro.chat_photo_too_big(inputs)
+	if (locale === "hu") return __hu.chat_photo_too_big(inputs)
+	if (locale === "sv") return __sv.chat_photo_too_big(inputs)
+	if (locale === "he") return __he.chat_photo_too_big(inputs)
+	return __ru.chat_photo_too_big(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Profile not found" |
+*
+* @param {Chat_Profile_MissingInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_profile_missing = /** @type {((inputs?: Chat_Profile_MissingInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Profile_MissingInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_profile_missing(inputs)
+	if (locale === "fr") return __fr.chat_profile_missing(inputs)
+	if (locale === "es") return __es.chat_profile_missing(inputs)
+	if (locale === "zh") return __zh.chat_profile_missing(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_profile_missing(inputs)
+	if (locale === "hi") return __hi.chat_profile_missing(inputs)
+	if (locale === "ar") return __ar.chat_profile_missing(inputs)
+	if (locale === "pt") return __pt.chat_profile_missing(inputs)
+	if (locale === "de") return __de.chat_profile_missing(inputs)
+	if (locale === "ja") return __ja.chat_profile_missing(inputs)
+	if (locale === "ko") return __ko.chat_profile_missing(inputs)
+	if (locale === "it") return __it.chat_profile_missing(inputs)
+	if (locale === "tr") return __tr.chat_profile_missing(inputs)
+	if (locale === "pl") return __pl.chat_profile_missing(inputs)
+	if (locale === "uk") return __uk.chat_profile_missing(inputs)
+	if (locale === "nl") return __nl.chat_profile_missing(inputs)
+	if (locale === "vi") return __vi.chat_profile_missing(inputs)
+	if (locale === "id") return __id.chat_profile_missing(inputs)
+	if (locale === "ms") return __ms.chat_profile_missing(inputs)
+	if (locale === "th") return __th.chat_profile_missing(inputs)
+	if (locale === "fa") return __fa.chat_profile_missing(inputs)
+	if (locale === "ur") return __ur.chat_profile_missing(inputs)
+	if (locale === "bn") return __bn.chat_profile_missing(inputs)
+	if (locale === "pa") return __pa.chat_profile_missing(inputs)
+	if (locale === "sw") return __sw.chat_profile_missing(inputs)
+	if (locale === "el") return __el.chat_profile_missing(inputs)
+	if (locale === "cs") return __cs.chat_profile_missing(inputs)
+	if (locale === "ro") return __ro.chat_profile_missing(inputs)
+	if (locale === "hu") return __hu.chat_profile_missing(inputs)
+	if (locale === "sv") return __sv.chat_profile_missing(inputs)
+	if (locale === "he") return __he.chat_profile_missing(inputs)
+	return __ru.chat_profile_missing(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Too fast · wait a bit" |
+*
+* @param {Chat_Rate_LimitedInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_rate_limited = /** @type {((inputs?: Chat_Rate_LimitedInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Rate_LimitedInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_rate_limited(inputs)
+	if (locale === "fr") return __fr.chat_rate_limited(inputs)
+	if (locale === "es") return __es.chat_rate_limited(inputs)
+	if (locale === "zh") return __zh.chat_rate_limited(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_rate_limited(inputs)
+	if (locale === "hi") return __hi.chat_rate_limited(inputs)
+	if (locale === "ar") return __ar.chat_rate_limited(inputs)
+	if (locale === "pt") return __pt.chat_rate_limited(inputs)
+	if (locale === "de") return __de.chat_rate_limited(inputs)
+	if (locale === "ja") return __ja.chat_rate_limited(inputs)
+	if (locale === "ko") return __ko.chat_rate_limited(inputs)
+	if (locale === "it") return __it.chat_rate_limited(inputs)
+	if (locale === "tr") return __tr.chat_rate_limited(inputs)
+	if (locale === "pl") return __pl.chat_rate_limited(inputs)
+	if (locale === "uk") return __uk.chat_rate_limited(inputs)
+	if (locale === "nl") return __nl.chat_rate_limited(inputs)
+	if (locale === "vi") return __vi.chat_rate_limited(inputs)
+	if (locale === "id") return __id.chat_rate_limited(inputs)
+	if (locale === "ms") return __ms.chat_rate_limited(inputs)
+	if (locale === "th") return __th.chat_rate_limited(inputs)
+	if (locale === "fa") return __fa.chat_rate_limited(inputs)
+	if (locale === "ur") return __ur.chat_rate_limited(inputs)
+	if (locale === "bn") return __bn.chat_rate_limited(inputs)
+	if (locale === "pa") return __pa.chat_rate_limited(inputs)
+	if (locale === "sw") return __sw.chat_rate_limited(inputs)
+	if (locale === "el") return __el.chat_rate_limited(inputs)
+	if (locale === "cs") return __cs.chat_rate_limited(inputs)
+	if (locale === "ro") return __ro.chat_rate_limited(inputs)
+	if (locale === "hu") return __hu.chat_rate_limited(inputs)
+	if (locale === "sv") return __sv.chat_rate_limited(inputs)
+	if (locale === "he") return __he.chat_rate_limited(inputs)
+	return __ru.chat_rate_limited(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Recording…" |
+*
+* @param {Chat_RecordingInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_recording = /** @type {((inputs?: Chat_RecordingInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_RecordingInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_recording(inputs)
+	if (locale === "fr") return __fr.chat_recording(inputs)
+	if (locale === "es") return __es.chat_recording(inputs)
+	if (locale === "zh") return __zh.chat_recording(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_recording(inputs)
+	if (locale === "hi") return __hi.chat_recording(inputs)
+	if (locale === "ar") return __ar.chat_recording(inputs)
+	if (locale === "pt") return __pt.chat_recording(inputs)
+	if (locale === "de") return __de.chat_recording(inputs)
+	if (locale === "ja") return __ja.chat_recording(inputs)
+	if (locale === "ko") return __ko.chat_recording(inputs)
+	if (locale === "it") return __it.chat_recording(inputs)
+	if (locale === "tr") return __tr.chat_recording(inputs)
+	if (locale === "pl") return __pl.chat_recording(inputs)
+	if (locale === "uk") return __uk.chat_recording(inputs)
+	if (locale === "nl") return __nl.chat_recording(inputs)
+	if (locale === "vi") return __vi.chat_recording(inputs)
+	if (locale === "id") return __id.chat_recording(inputs)
+	if (locale === "ms") return __ms.chat_recording(inputs)
+	if (locale === "th") return __th.chat_recording(inputs)
+	if (locale === "fa") return __fa.chat_recording(inputs)
+	if (locale === "ur") return __ur.chat_recording(inputs)
+	if (locale === "bn") return __bn.chat_recording(inputs)
+	if (locale === "pa") return __pa.chat_recording(inputs)
+	if (locale === "sw") return __sw.chat_recording(inputs)
+	if (locale === "el") return __el.chat_recording(inputs)
+	if (locale === "cs") return __cs.chat_recording(inputs)
+	if (locale === "ro") return __ro.chat_recording(inputs)
+	if (locale === "hu") return __hu.chat_recording(inputs)
+	if (locale === "sv") return __sv.chat_recording(inputs)
+	if (locale === "he") return __he.chat_recording(inputs)
+	return __ru.chat_recording(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Recording… release to send" |
+*
+* @param {Chat_Recording_ReleaseInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_recording_release = /** @type {((inputs?: Chat_Recording_ReleaseInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Recording_ReleaseInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_recording_release(inputs)
+	if (locale === "fr") return __fr.chat_recording_release(inputs)
+	if (locale === "es") return __es.chat_recording_release(inputs)
+	if (locale === "zh") return __zh.chat_recording_release(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_recording_release(inputs)
+	if (locale === "hi") return __hi.chat_recording_release(inputs)
+	if (locale === "ar") return __ar.chat_recording_release(inputs)
+	if (locale === "pt") return __pt.chat_recording_release(inputs)
+	if (locale === "de") return __de.chat_recording_release(inputs)
+	if (locale === "ja") return __ja.chat_recording_release(inputs)
+	if (locale === "ko") return __ko.chat_recording_release(inputs)
+	if (locale === "it") return __it.chat_recording_release(inputs)
+	if (locale === "tr") return __tr.chat_recording_release(inputs)
+	if (locale === "pl") return __pl.chat_recording_release(inputs)
+	if (locale === "uk") return __uk.chat_recording_release(inputs)
+	if (locale === "nl") return __nl.chat_recording_release(inputs)
+	if (locale === "vi") return __vi.chat_recording_release(inputs)
+	if (locale === "id") return __id.chat_recording_release(inputs)
+	if (locale === "ms") return __ms.chat_recording_release(inputs)
+	if (locale === "th") return __th.chat_recording_release(inputs)
+	if (locale === "fa") return __fa.chat_recording_release(inputs)
+	if (locale === "ur") return __ur.chat_recording_release(inputs)
+	if (locale === "bn") return __bn.chat_recording_release(inputs)
+	if (locale === "pa") return __pa.chat_recording_release(inputs)
+	if (locale === "sw") return __sw.chat_recording_release(inputs)
+	if (locale === "el") return __el.chat_recording_release(inputs)
+	if (locale === "cs") return __cs.chat_recording_release(inputs)
+	if (locale === "ro") return __ro.chat_recording_release(inputs)
+	if (locale === "hu") return __hu.chat_recording_release(inputs)
+	if (locale === "sv") return __sv.chat_recording_release(inputs)
+	if (locale === "he") return __he.chat_recording_release(inputs)
+	return __ru.chat_recording_release(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "Reply" |
 *
 * @param {Chat_ReplyInputs} inputs
@@ -798,6 +2999,490 @@ export const chat_reply = /** @type {((inputs?: Chat_ReplyInputs, options?: { lo
 	if (locale === "sv") return __sv.chat_reply(inputs)
 	if (locale === "he") return __he.chat_reply(inputs)
 	return __ru.chat_reply(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Reply" |
+*
+* @param {Chat_Reply_LabelInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_reply_label = /** @type {((inputs?: Chat_Reply_LabelInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Reply_LabelInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_reply_label(inputs)
+	if (locale === "fr") return __fr.chat_reply_label(inputs)
+	if (locale === "es") return __es.chat_reply_label(inputs)
+	if (locale === "zh") return __zh.chat_reply_label(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_reply_label(inputs)
+	if (locale === "hi") return __hi.chat_reply_label(inputs)
+	if (locale === "ar") return __ar.chat_reply_label(inputs)
+	if (locale === "pt") return __pt.chat_reply_label(inputs)
+	if (locale === "de") return __de.chat_reply_label(inputs)
+	if (locale === "ja") return __ja.chat_reply_label(inputs)
+	if (locale === "ko") return __ko.chat_reply_label(inputs)
+	if (locale === "it") return __it.chat_reply_label(inputs)
+	if (locale === "tr") return __tr.chat_reply_label(inputs)
+	if (locale === "pl") return __pl.chat_reply_label(inputs)
+	if (locale === "uk") return __uk.chat_reply_label(inputs)
+	if (locale === "nl") return __nl.chat_reply_label(inputs)
+	if (locale === "vi") return __vi.chat_reply_label(inputs)
+	if (locale === "id") return __id.chat_reply_label(inputs)
+	if (locale === "ms") return __ms.chat_reply_label(inputs)
+	if (locale === "th") return __th.chat_reply_label(inputs)
+	if (locale === "fa") return __fa.chat_reply_label(inputs)
+	if (locale === "ur") return __ur.chat_reply_label(inputs)
+	if (locale === "bn") return __bn.chat_reply_label(inputs)
+	if (locale === "pa") return __pa.chat_reply_label(inputs)
+	if (locale === "sw") return __sw.chat_reply_label(inputs)
+	if (locale === "el") return __el.chat_reply_label(inputs)
+	if (locale === "cs") return __cs.chat_reply_label(inputs)
+	if (locale === "ro") return __ro.chat_reply_label(inputs)
+	if (locale === "hu") return __hu.chat_reply_label(inputs)
+	if (locale === "sv") return __sv.chat_reply_label(inputs)
+	if (locale === "he") return __he.chat_reply_label(inputs)
+	return __ru.chat_reply_label(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Save" |
+*
+* @param {Chat_SaveInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_save = /** @type {((inputs?: Chat_SaveInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_SaveInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_save(inputs)
+	if (locale === "fr") return __fr.chat_save(inputs)
+	if (locale === "es") return __es.chat_save(inputs)
+	if (locale === "zh") return __zh.chat_save(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_save(inputs)
+	if (locale === "hi") return __hi.chat_save(inputs)
+	if (locale === "ar") return __ar.chat_save(inputs)
+	if (locale === "pt") return __pt.chat_save(inputs)
+	if (locale === "de") return __de.chat_save(inputs)
+	if (locale === "ja") return __ja.chat_save(inputs)
+	if (locale === "ko") return __ko.chat_save(inputs)
+	if (locale === "it") return __it.chat_save(inputs)
+	if (locale === "tr") return __tr.chat_save(inputs)
+	if (locale === "pl") return __pl.chat_save(inputs)
+	if (locale === "uk") return __uk.chat_save(inputs)
+	if (locale === "nl") return __nl.chat_save(inputs)
+	if (locale === "vi") return __vi.chat_save(inputs)
+	if (locale === "id") return __id.chat_save(inputs)
+	if (locale === "ms") return __ms.chat_save(inputs)
+	if (locale === "th") return __th.chat_save(inputs)
+	if (locale === "fa") return __fa.chat_save(inputs)
+	if (locale === "ur") return __ur.chat_save(inputs)
+	if (locale === "bn") return __bn.chat_save(inputs)
+	if (locale === "pa") return __pa.chat_save(inputs)
+	if (locale === "sw") return __sw.chat_save(inputs)
+	if (locale === "el") return __el.chat_save(inputs)
+	if (locale === "cs") return __cs.chat_save(inputs)
+	if (locale === "ro") return __ro.chat_save(inputs)
+	if (locale === "hu") return __hu.chat_save(inputs)
+	if (locale === "sv") return __sv.chat_save(inputs)
+	if (locale === "he") return __he.chat_save(inputs)
+	return __ru.chat_save(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Saving…" |
+*
+* @param {Chat_SavingInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_saving = /** @type {((inputs?: Chat_SavingInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_SavingInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_saving(inputs)
+	if (locale === "fr") return __fr.chat_saving(inputs)
+	if (locale === "es") return __es.chat_saving(inputs)
+	if (locale === "zh") return __zh.chat_saving(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_saving(inputs)
+	if (locale === "hi") return __hi.chat_saving(inputs)
+	if (locale === "ar") return __ar.chat_saving(inputs)
+	if (locale === "pt") return __pt.chat_saving(inputs)
+	if (locale === "de") return __de.chat_saving(inputs)
+	if (locale === "ja") return __ja.chat_saving(inputs)
+	if (locale === "ko") return __ko.chat_saving(inputs)
+	if (locale === "it") return __it.chat_saving(inputs)
+	if (locale === "tr") return __tr.chat_saving(inputs)
+	if (locale === "pl") return __pl.chat_saving(inputs)
+	if (locale === "uk") return __uk.chat_saving(inputs)
+	if (locale === "nl") return __nl.chat_saving(inputs)
+	if (locale === "vi") return __vi.chat_saving(inputs)
+	if (locale === "id") return __id.chat_saving(inputs)
+	if (locale === "ms") return __ms.chat_saving(inputs)
+	if (locale === "th") return __th.chat_saving(inputs)
+	if (locale === "fa") return __fa.chat_saving(inputs)
+	if (locale === "ur") return __ur.chat_saving(inputs)
+	if (locale === "bn") return __bn.chat_saving(inputs)
+	if (locale === "pa") return __pa.chat_saving(inputs)
+	if (locale === "sw") return __sw.chat_saving(inputs)
+	if (locale === "el") return __el.chat_saving(inputs)
+	if (locale === "cs") return __cs.chat_saving(inputs)
+	if (locale === "ro") return __ro.chat_saving(inputs)
+	if (locale === "hu") return __hu.chat_saving(inputs)
+	if (locale === "sv") return __sv.chat_saving(inputs)
+	if (locale === "he") return __he.chat_saving(inputs)
+	return __ru.chat_saving(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Sending unavailable" |
+*
+* @param {Chat_Send_UnavailableInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_send_unavailable = /** @type {((inputs?: Chat_Send_UnavailableInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Send_UnavailableInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_send_unavailable(inputs)
+	if (locale === "fr") return __fr.chat_send_unavailable(inputs)
+	if (locale === "es") return __es.chat_send_unavailable(inputs)
+	if (locale === "zh") return __zh.chat_send_unavailable(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_send_unavailable(inputs)
+	if (locale === "hi") return __hi.chat_send_unavailable(inputs)
+	if (locale === "ar") return __ar.chat_send_unavailable(inputs)
+	if (locale === "pt") return __pt.chat_send_unavailable(inputs)
+	if (locale === "de") return __de.chat_send_unavailable(inputs)
+	if (locale === "ja") return __ja.chat_send_unavailable(inputs)
+	if (locale === "ko") return __ko.chat_send_unavailable(inputs)
+	if (locale === "it") return __it.chat_send_unavailable(inputs)
+	if (locale === "tr") return __tr.chat_send_unavailable(inputs)
+	if (locale === "pl") return __pl.chat_send_unavailable(inputs)
+	if (locale === "uk") return __uk.chat_send_unavailable(inputs)
+	if (locale === "nl") return __nl.chat_send_unavailable(inputs)
+	if (locale === "vi") return __vi.chat_send_unavailable(inputs)
+	if (locale === "id") return __id.chat_send_unavailable(inputs)
+	if (locale === "ms") return __ms.chat_send_unavailable(inputs)
+	if (locale === "th") return __th.chat_send_unavailable(inputs)
+	if (locale === "fa") return __fa.chat_send_unavailable(inputs)
+	if (locale === "ur") return __ur.chat_send_unavailable(inputs)
+	if (locale === "bn") return __bn.chat_send_unavailable(inputs)
+	if (locale === "pa") return __pa.chat_send_unavailable(inputs)
+	if (locale === "sw") return __sw.chat_send_unavailable(inputs)
+	if (locale === "el") return __el.chat_send_unavailable(inputs)
+	if (locale === "cs") return __cs.chat_send_unavailable(inputs)
+	if (locale === "ro") return __ro.chat_send_unavailable(inputs)
+	if (locale === "hu") return __hu.chat_send_unavailable(inputs)
+	if (locale === "sv") return __sv.chat_send_unavailable(inputs)
+	if (locale === "he") return __he.chat_send_unavailable(inputs)
+	return __ru.chat_send_unavailable(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Sending…" |
+*
+* @param {Chat_SendingInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_sending = /** @type {((inputs?: Chat_SendingInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_SendingInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_sending(inputs)
+	if (locale === "fr") return __fr.chat_sending(inputs)
+	if (locale === "es") return __es.chat_sending(inputs)
+	if (locale === "zh") return __zh.chat_sending(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_sending(inputs)
+	if (locale === "hi") return __hi.chat_sending(inputs)
+	if (locale === "ar") return __ar.chat_sending(inputs)
+	if (locale === "pt") return __pt.chat_sending(inputs)
+	if (locale === "de") return __de.chat_sending(inputs)
+	if (locale === "ja") return __ja.chat_sending(inputs)
+	if (locale === "ko") return __ko.chat_sending(inputs)
+	if (locale === "it") return __it.chat_sending(inputs)
+	if (locale === "tr") return __tr.chat_sending(inputs)
+	if (locale === "pl") return __pl.chat_sending(inputs)
+	if (locale === "uk") return __uk.chat_sending(inputs)
+	if (locale === "nl") return __nl.chat_sending(inputs)
+	if (locale === "vi") return __vi.chat_sending(inputs)
+	if (locale === "id") return __id.chat_sending(inputs)
+	if (locale === "ms") return __ms.chat_sending(inputs)
+	if (locale === "th") return __th.chat_sending(inputs)
+	if (locale === "fa") return __fa.chat_sending(inputs)
+	if (locale === "ur") return __ur.chat_sending(inputs)
+	if (locale === "bn") return __bn.chat_sending(inputs)
+	if (locale === "pa") return __pa.chat_sending(inputs)
+	if (locale === "sw") return __sw.chat_sending(inputs)
+	if (locale === "el") return __el.chat_sending(inputs)
+	if (locale === "cs") return __cs.chat_sending(inputs)
+	if (locale === "ro") return __ro.chat_sending(inputs)
+	if (locale === "hu") return __hu.chat_sending(inputs)
+	if (locale === "sv") return __sv.chat_sending(inputs)
+	if (locale === "he") return __he.chat_sending(inputs)
+	return __ru.chat_sending(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Sending · {n} left" |
+*
+* @param {Chat_Sending_LeftInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_sending_left = /** @type {((inputs: Chat_Sending_LeftInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Sending_LeftInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_sending_left(inputs)
+	if (locale === "fr") return __fr.chat_sending_left(inputs)
+	if (locale === "es") return __es.chat_sending_left(inputs)
+	if (locale === "zh") return __zh.chat_sending_left(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_sending_left(inputs)
+	if (locale === "hi") return __hi.chat_sending_left(inputs)
+	if (locale === "ar") return __ar.chat_sending_left(inputs)
+	if (locale === "pt") return __pt.chat_sending_left(inputs)
+	if (locale === "de") return __de.chat_sending_left(inputs)
+	if (locale === "ja") return __ja.chat_sending_left(inputs)
+	if (locale === "ko") return __ko.chat_sending_left(inputs)
+	if (locale === "it") return __it.chat_sending_left(inputs)
+	if (locale === "tr") return __tr.chat_sending_left(inputs)
+	if (locale === "pl") return __pl.chat_sending_left(inputs)
+	if (locale === "uk") return __uk.chat_sending_left(inputs)
+	if (locale === "nl") return __nl.chat_sending_left(inputs)
+	if (locale === "vi") return __vi.chat_sending_left(inputs)
+	if (locale === "id") return __id.chat_sending_left(inputs)
+	if (locale === "ms") return __ms.chat_sending_left(inputs)
+	if (locale === "th") return __th.chat_sending_left(inputs)
+	if (locale === "fa") return __fa.chat_sending_left(inputs)
+	if (locale === "ur") return __ur.chat_sending_left(inputs)
+	if (locale === "bn") return __bn.chat_sending_left(inputs)
+	if (locale === "pa") return __pa.chat_sending_left(inputs)
+	if (locale === "sw") return __sw.chat_sending_left(inputs)
+	if (locale === "el") return __el.chat_sending_left(inputs)
+	if (locale === "cs") return __cs.chat_sending_left(inputs)
+	if (locale === "ro") return __ro.chat_sending_left(inputs)
+	if (locale === "hu") return __hu.chat_sending_left(inputs)
+	if (locale === "sv") return __sv.chat_sending_left(inputs)
+	if (locale === "he") return __he.chat_sending_left(inputs)
+	return __ru.chat_sending_left(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Sending photo…" |
+*
+* @param {Chat_Sending_PhotoInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_sending_photo = /** @type {((inputs?: Chat_Sending_PhotoInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Sending_PhotoInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_sending_photo(inputs)
+	if (locale === "fr") return __fr.chat_sending_photo(inputs)
+	if (locale === "es") return __es.chat_sending_photo(inputs)
+	if (locale === "zh") return __zh.chat_sending_photo(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_sending_photo(inputs)
+	if (locale === "hi") return __hi.chat_sending_photo(inputs)
+	if (locale === "ar") return __ar.chat_sending_photo(inputs)
+	if (locale === "pt") return __pt.chat_sending_photo(inputs)
+	if (locale === "de") return __de.chat_sending_photo(inputs)
+	if (locale === "ja") return __ja.chat_sending_photo(inputs)
+	if (locale === "ko") return __ko.chat_sending_photo(inputs)
+	if (locale === "it") return __it.chat_sending_photo(inputs)
+	if (locale === "tr") return __tr.chat_sending_photo(inputs)
+	if (locale === "pl") return __pl.chat_sending_photo(inputs)
+	if (locale === "uk") return __uk.chat_sending_photo(inputs)
+	if (locale === "nl") return __nl.chat_sending_photo(inputs)
+	if (locale === "vi") return __vi.chat_sending_photo(inputs)
+	if (locale === "id") return __id.chat_sending_photo(inputs)
+	if (locale === "ms") return __ms.chat_sending_photo(inputs)
+	if (locale === "th") return __th.chat_sending_photo(inputs)
+	if (locale === "fa") return __fa.chat_sending_photo(inputs)
+	if (locale === "ur") return __ur.chat_sending_photo(inputs)
+	if (locale === "bn") return __bn.chat_sending_photo(inputs)
+	if (locale === "pa") return __pa.chat_sending_photo(inputs)
+	if (locale === "sw") return __sw.chat_sending_photo(inputs)
+	if (locale === "el") return __el.chat_sending_photo(inputs)
+	if (locale === "cs") return __cs.chat_sending_photo(inputs)
+	if (locale === "ro") return __ro.chat_sending_photo(inputs)
+	if (locale === "hu") return __hu.chat_sending_photo(inputs)
+	if (locale === "sv") return __sv.chat_sending_photo(inputs)
+	if (locale === "he") return __he.chat_sending_photo(inputs)
+	return __ru.chat_sending_photo(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Sending voice…" |
+*
+* @param {Chat_Sending_VoiceInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_sending_voice = /** @type {((inputs?: Chat_Sending_VoiceInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Sending_VoiceInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_sending_voice(inputs)
+	if (locale === "fr") return __fr.chat_sending_voice(inputs)
+	if (locale === "es") return __es.chat_sending_voice(inputs)
+	if (locale === "zh") return __zh.chat_sending_voice(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_sending_voice(inputs)
+	if (locale === "hi") return __hi.chat_sending_voice(inputs)
+	if (locale === "ar") return __ar.chat_sending_voice(inputs)
+	if (locale === "pt") return __pt.chat_sending_voice(inputs)
+	if (locale === "de") return __de.chat_sending_voice(inputs)
+	if (locale === "ja") return __ja.chat_sending_voice(inputs)
+	if (locale === "ko") return __ko.chat_sending_voice(inputs)
+	if (locale === "it") return __it.chat_sending_voice(inputs)
+	if (locale === "tr") return __tr.chat_sending_voice(inputs)
+	if (locale === "pl") return __pl.chat_sending_voice(inputs)
+	if (locale === "uk") return __uk.chat_sending_voice(inputs)
+	if (locale === "nl") return __nl.chat_sending_voice(inputs)
+	if (locale === "vi") return __vi.chat_sending_voice(inputs)
+	if (locale === "id") return __id.chat_sending_voice(inputs)
+	if (locale === "ms") return __ms.chat_sending_voice(inputs)
+	if (locale === "th") return __th.chat_sending_voice(inputs)
+	if (locale === "fa") return __fa.chat_sending_voice(inputs)
+	if (locale === "ur") return __ur.chat_sending_voice(inputs)
+	if (locale === "bn") return __bn.chat_sending_voice(inputs)
+	if (locale === "pa") return __pa.chat_sending_voice(inputs)
+	if (locale === "sw") return __sw.chat_sending_voice(inputs)
+	if (locale === "el") return __el.chat_sending_voice(inputs)
+	if (locale === "cs") return __cs.chat_sending_voice(inputs)
+	if (locale === "ro") return __ro.chat_sending_voice(inputs)
+	if (locale === "hu") return __hu.chat_sending_voice(inputs)
+	if (locale === "sv") return __sv.chat_sending_voice(inputs)
+	if (locale === "he") return __he.chat_sending_voice(inputs)
+	return __ru.chat_sending_voice(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Sent · Enter to send" |
+*
+* @param {Chat_Sent_HintInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_sent_hint = /** @type {((inputs?: Chat_Sent_HintInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Sent_HintInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_sent_hint(inputs)
+	if (locale === "fr") return __fr.chat_sent_hint(inputs)
+	if (locale === "es") return __es.chat_sent_hint(inputs)
+	if (locale === "zh") return __zh.chat_sent_hint(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_sent_hint(inputs)
+	if (locale === "hi") return __hi.chat_sent_hint(inputs)
+	if (locale === "ar") return __ar.chat_sent_hint(inputs)
+	if (locale === "pt") return __pt.chat_sent_hint(inputs)
+	if (locale === "de") return __de.chat_sent_hint(inputs)
+	if (locale === "ja") return __ja.chat_sent_hint(inputs)
+	if (locale === "ko") return __ko.chat_sent_hint(inputs)
+	if (locale === "it") return __it.chat_sent_hint(inputs)
+	if (locale === "tr") return __tr.chat_sent_hint(inputs)
+	if (locale === "pl") return __pl.chat_sent_hint(inputs)
+	if (locale === "uk") return __uk.chat_sent_hint(inputs)
+	if (locale === "nl") return __nl.chat_sent_hint(inputs)
+	if (locale === "vi") return __vi.chat_sent_hint(inputs)
+	if (locale === "id") return __id.chat_sent_hint(inputs)
+	if (locale === "ms") return __ms.chat_sent_hint(inputs)
+	if (locale === "th") return __th.chat_sent_hint(inputs)
+	if (locale === "fa") return __fa.chat_sent_hint(inputs)
+	if (locale === "ur") return __ur.chat_sent_hint(inputs)
+	if (locale === "bn") return __bn.chat_sent_hint(inputs)
+	if (locale === "pa") return __pa.chat_sent_hint(inputs)
+	if (locale === "sw") return __sw.chat_sent_hint(inputs)
+	if (locale === "el") return __el.chat_sent_hint(inputs)
+	if (locale === "cs") return __cs.chat_sent_hint(inputs)
+	if (locale === "ro") return __ro.chat_sent_hint(inputs)
+	if (locale === "hu") return __hu.chat_sent_hint(inputs)
+	if (locale === "sv") return __sv.chat_sent_hint(inputs)
+	if (locale === "he") return __he.chat_sent_hint(inputs)
+	return __ru.chat_sent_hint(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Session expired" |
+*
+* @param {Chat_Session_ExpiredInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_session_expired = /** @type {((inputs?: Chat_Session_ExpiredInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Session_ExpiredInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_session_expired(inputs)
+	if (locale === "fr") return __fr.chat_session_expired(inputs)
+	if (locale === "es") return __es.chat_session_expired(inputs)
+	if (locale === "zh") return __zh.chat_session_expired(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_session_expired(inputs)
+	if (locale === "hi") return __hi.chat_session_expired(inputs)
+	if (locale === "ar") return __ar.chat_session_expired(inputs)
+	if (locale === "pt") return __pt.chat_session_expired(inputs)
+	if (locale === "de") return __de.chat_session_expired(inputs)
+	if (locale === "ja") return __ja.chat_session_expired(inputs)
+	if (locale === "ko") return __ko.chat_session_expired(inputs)
+	if (locale === "it") return __it.chat_session_expired(inputs)
+	if (locale === "tr") return __tr.chat_session_expired(inputs)
+	if (locale === "pl") return __pl.chat_session_expired(inputs)
+	if (locale === "uk") return __uk.chat_session_expired(inputs)
+	if (locale === "nl") return __nl.chat_session_expired(inputs)
+	if (locale === "vi") return __vi.chat_session_expired(inputs)
+	if (locale === "id") return __id.chat_session_expired(inputs)
+	if (locale === "ms") return __ms.chat_session_expired(inputs)
+	if (locale === "th") return __th.chat_session_expired(inputs)
+	if (locale === "fa") return __fa.chat_session_expired(inputs)
+	if (locale === "ur") return __ur.chat_session_expired(inputs)
+	if (locale === "bn") return __bn.chat_session_expired(inputs)
+	if (locale === "pa") return __pa.chat_session_expired(inputs)
+	if (locale === "sw") return __sw.chat_session_expired(inputs)
+	if (locale === "el") return __el.chat_session_expired(inputs)
+	if (locale === "cs") return __cs.chat_session_expired(inputs)
+	if (locale === "ro") return __ro.chat_session_expired(inputs)
+	if (locale === "hu") return __hu.chat_session_expired(inputs)
+	if (locale === "sv") return __sv.chat_session_expired(inputs)
+	if (locale === "he") return __he.chat_session_expired(inputs)
+	return __ru.chat_session_expired(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Sending" |
+*
+* @param {Chat_Status_SendingInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_status_sending = /** @type {((inputs?: Chat_Status_SendingInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Status_SendingInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_status_sending(inputs)
+	if (locale === "fr") return __fr.chat_status_sending(inputs)
+	if (locale === "es") return __es.chat_status_sending(inputs)
+	if (locale === "zh") return __zh.chat_status_sending(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_status_sending(inputs)
+	if (locale === "hi") return __hi.chat_status_sending(inputs)
+	if (locale === "ar") return __ar.chat_status_sending(inputs)
+	if (locale === "pt") return __pt.chat_status_sending(inputs)
+	if (locale === "de") return __de.chat_status_sending(inputs)
+	if (locale === "ja") return __ja.chat_status_sending(inputs)
+	if (locale === "ko") return __ko.chat_status_sending(inputs)
+	if (locale === "it") return __it.chat_status_sending(inputs)
+	if (locale === "tr") return __tr.chat_status_sending(inputs)
+	if (locale === "pl") return __pl.chat_status_sending(inputs)
+	if (locale === "uk") return __uk.chat_status_sending(inputs)
+	if (locale === "nl") return __nl.chat_status_sending(inputs)
+	if (locale === "vi") return __vi.chat_status_sending(inputs)
+	if (locale === "id") return __id.chat_status_sending(inputs)
+	if (locale === "ms") return __ms.chat_status_sending(inputs)
+	if (locale === "th") return __th.chat_status_sending(inputs)
+	if (locale === "fa") return __fa.chat_status_sending(inputs)
+	if (locale === "ur") return __ur.chat_status_sending(inputs)
+	if (locale === "bn") return __bn.chat_status_sending(inputs)
+	if (locale === "pa") return __pa.chat_status_sending(inputs)
+	if (locale === "sw") return __sw.chat_status_sending(inputs)
+	if (locale === "el") return __el.chat_status_sending(inputs)
+	if (locale === "cs") return __cs.chat_status_sending(inputs)
+	if (locale === "ro") return __ro.chat_status_sending(inputs)
+	if (locale === "hu") return __hu.chat_status_sending(inputs)
+	if (locale === "sv") return __sv.chat_status_sending(inputs)
+	if (locale === "he") return __he.chat_status_sending(inputs)
+	return __ru.chat_status_sending(inputs)
 });
 /**
 * | output |
@@ -890,6 +3575,314 @@ export const chat_typing = /** @type {((inputs?: Chat_TypingInputs, options?: { 
 /**
 * | output |
 * | --- |
+* | "User unavailable" |
+*
+* @param {Chat_User_UnavailableInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_user_unavailable = /** @type {((inputs?: Chat_User_UnavailableInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_User_UnavailableInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_user_unavailable(inputs)
+	if (locale === "fr") return __fr.chat_user_unavailable(inputs)
+	if (locale === "es") return __es.chat_user_unavailable(inputs)
+	if (locale === "zh") return __zh.chat_user_unavailable(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_user_unavailable(inputs)
+	if (locale === "hi") return __hi.chat_user_unavailable(inputs)
+	if (locale === "ar") return __ar.chat_user_unavailable(inputs)
+	if (locale === "pt") return __pt.chat_user_unavailable(inputs)
+	if (locale === "de") return __de.chat_user_unavailable(inputs)
+	if (locale === "ja") return __ja.chat_user_unavailable(inputs)
+	if (locale === "ko") return __ko.chat_user_unavailable(inputs)
+	if (locale === "it") return __it.chat_user_unavailable(inputs)
+	if (locale === "tr") return __tr.chat_user_unavailable(inputs)
+	if (locale === "pl") return __pl.chat_user_unavailable(inputs)
+	if (locale === "uk") return __uk.chat_user_unavailable(inputs)
+	if (locale === "nl") return __nl.chat_user_unavailable(inputs)
+	if (locale === "vi") return __vi.chat_user_unavailable(inputs)
+	if (locale === "id") return __id.chat_user_unavailable(inputs)
+	if (locale === "ms") return __ms.chat_user_unavailable(inputs)
+	if (locale === "th") return __th.chat_user_unavailable(inputs)
+	if (locale === "fa") return __fa.chat_user_unavailable(inputs)
+	if (locale === "ur") return __ur.chat_user_unavailable(inputs)
+	if (locale === "bn") return __bn.chat_user_unavailable(inputs)
+	if (locale === "pa") return __pa.chat_user_unavailable(inputs)
+	if (locale === "sw") return __sw.chat_user_unavailable(inputs)
+	if (locale === "el") return __el.chat_user_unavailable(inputs)
+	if (locale === "cs") return __cs.chat_user_unavailable(inputs)
+	if (locale === "ro") return __ro.chat_user_unavailable(inputs)
+	if (locale === "hu") return __hu.chat_user_unavailable(inputs)
+	if (locale === "sv") return __sv.chat_user_unavailable(inputs)
+	if (locale === "he") return __he.chat_user_unavailable(inputs)
+	return __ru.chat_user_unavailable(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Voice message" |
+*
+* @param {Chat_VoiceInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_voice = /** @type {((inputs?: Chat_VoiceInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_VoiceInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_voice(inputs)
+	if (locale === "fr") return __fr.chat_voice(inputs)
+	if (locale === "es") return __es.chat_voice(inputs)
+	if (locale === "zh") return __zh.chat_voice(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_voice(inputs)
+	if (locale === "hi") return __hi.chat_voice(inputs)
+	if (locale === "ar") return __ar.chat_voice(inputs)
+	if (locale === "pt") return __pt.chat_voice(inputs)
+	if (locale === "de") return __de.chat_voice(inputs)
+	if (locale === "ja") return __ja.chat_voice(inputs)
+	if (locale === "ko") return __ko.chat_voice(inputs)
+	if (locale === "it") return __it.chat_voice(inputs)
+	if (locale === "tr") return __tr.chat_voice(inputs)
+	if (locale === "pl") return __pl.chat_voice(inputs)
+	if (locale === "uk") return __uk.chat_voice(inputs)
+	if (locale === "nl") return __nl.chat_voice(inputs)
+	if (locale === "vi") return __vi.chat_voice(inputs)
+	if (locale === "id") return __id.chat_voice(inputs)
+	if (locale === "ms") return __ms.chat_voice(inputs)
+	if (locale === "th") return __th.chat_voice(inputs)
+	if (locale === "fa") return __fa.chat_voice(inputs)
+	if (locale === "ur") return __ur.chat_voice(inputs)
+	if (locale === "bn") return __bn.chat_voice(inputs)
+	if (locale === "pa") return __pa.chat_voice(inputs)
+	if (locale === "sw") return __sw.chat_voice(inputs)
+	if (locale === "el") return __el.chat_voice(inputs)
+	if (locale === "cs") return __cs.chat_voice(inputs)
+	if (locale === "ro") return __ro.chat_voice(inputs)
+	if (locale === "hu") return __hu.chat_voice(inputs)
+	if (locale === "sv") return __sv.chat_voice(inputs)
+	if (locale === "he") return __he.chat_voice(inputs)
+	return __ru.chat_voice(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Voice error" |
+*
+* @param {Chat_Voice_ErrorInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_voice_error = /** @type {((inputs?: Chat_Voice_ErrorInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Voice_ErrorInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_voice_error(inputs)
+	if (locale === "fr") return __fr.chat_voice_error(inputs)
+	if (locale === "es") return __es.chat_voice_error(inputs)
+	if (locale === "zh") return __zh.chat_voice_error(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_voice_error(inputs)
+	if (locale === "hi") return __hi.chat_voice_error(inputs)
+	if (locale === "ar") return __ar.chat_voice_error(inputs)
+	if (locale === "pt") return __pt.chat_voice_error(inputs)
+	if (locale === "de") return __de.chat_voice_error(inputs)
+	if (locale === "ja") return __ja.chat_voice_error(inputs)
+	if (locale === "ko") return __ko.chat_voice_error(inputs)
+	if (locale === "it") return __it.chat_voice_error(inputs)
+	if (locale === "tr") return __tr.chat_voice_error(inputs)
+	if (locale === "pl") return __pl.chat_voice_error(inputs)
+	if (locale === "uk") return __uk.chat_voice_error(inputs)
+	if (locale === "nl") return __nl.chat_voice_error(inputs)
+	if (locale === "vi") return __vi.chat_voice_error(inputs)
+	if (locale === "id") return __id.chat_voice_error(inputs)
+	if (locale === "ms") return __ms.chat_voice_error(inputs)
+	if (locale === "th") return __th.chat_voice_error(inputs)
+	if (locale === "fa") return __fa.chat_voice_error(inputs)
+	if (locale === "ur") return __ur.chat_voice_error(inputs)
+	if (locale === "bn") return __bn.chat_voice_error(inputs)
+	if (locale === "pa") return __pa.chat_voice_error(inputs)
+	if (locale === "sw") return __sw.chat_voice_error(inputs)
+	if (locale === "el") return __el.chat_voice_error(inputs)
+	if (locale === "cs") return __cs.chat_voice_error(inputs)
+	if (locale === "ro") return __ro.chat_voice_error(inputs)
+	if (locale === "hu") return __hu.chat_voice_error(inputs)
+	if (locale === "sv") return __sv.chat_voice_error(inputs)
+	if (locale === "he") return __he.chat_voice_error(inputs)
+	return __ru.chat_voice_error(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Voice not sent" |
+*
+* @param {Chat_Voice_FailedInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_voice_failed = /** @type {((inputs?: Chat_Voice_FailedInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Voice_FailedInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_voice_failed(inputs)
+	if (locale === "fr") return __fr.chat_voice_failed(inputs)
+	if (locale === "es") return __es.chat_voice_failed(inputs)
+	if (locale === "zh") return __zh.chat_voice_failed(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_voice_failed(inputs)
+	if (locale === "hi") return __hi.chat_voice_failed(inputs)
+	if (locale === "ar") return __ar.chat_voice_failed(inputs)
+	if (locale === "pt") return __pt.chat_voice_failed(inputs)
+	if (locale === "de") return __de.chat_voice_failed(inputs)
+	if (locale === "ja") return __ja.chat_voice_failed(inputs)
+	if (locale === "ko") return __ko.chat_voice_failed(inputs)
+	if (locale === "it") return __it.chat_voice_failed(inputs)
+	if (locale === "tr") return __tr.chat_voice_failed(inputs)
+	if (locale === "pl") return __pl.chat_voice_failed(inputs)
+	if (locale === "uk") return __uk.chat_voice_failed(inputs)
+	if (locale === "nl") return __nl.chat_voice_failed(inputs)
+	if (locale === "vi") return __vi.chat_voice_failed(inputs)
+	if (locale === "id") return __id.chat_voice_failed(inputs)
+	if (locale === "ms") return __ms.chat_voice_failed(inputs)
+	if (locale === "th") return __th.chat_voice_failed(inputs)
+	if (locale === "fa") return __fa.chat_voice_failed(inputs)
+	if (locale === "ur") return __ur.chat_voice_failed(inputs)
+	if (locale === "bn") return __bn.chat_voice_failed(inputs)
+	if (locale === "pa") return __pa.chat_voice_failed(inputs)
+	if (locale === "sw") return __sw.chat_voice_failed(inputs)
+	if (locale === "el") return __el.chat_voice_failed(inputs)
+	if (locale === "cs") return __cs.chat_voice_failed(inputs)
+	if (locale === "ro") return __ro.chat_voice_failed(inputs)
+	if (locale === "hu") return __hu.chat_voice_failed(inputs)
+	if (locale === "sv") return __sv.chat_voice_failed(inputs)
+	if (locale === "he") return __he.chat_voice_failed(inputs)
+	return __ru.chat_voice_failed(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "No network — can’t send voice offline" |
+*
+* @param {Chat_Voice_OfflineInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_voice_offline = /** @type {((inputs?: Chat_Voice_OfflineInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Voice_OfflineInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_voice_offline(inputs)
+	if (locale === "fr") return __fr.chat_voice_offline(inputs)
+	if (locale === "es") return __es.chat_voice_offline(inputs)
+	if (locale === "zh") return __zh.chat_voice_offline(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_voice_offline(inputs)
+	if (locale === "hi") return __hi.chat_voice_offline(inputs)
+	if (locale === "ar") return __ar.chat_voice_offline(inputs)
+	if (locale === "pt") return __pt.chat_voice_offline(inputs)
+	if (locale === "de") return __de.chat_voice_offline(inputs)
+	if (locale === "ja") return __ja.chat_voice_offline(inputs)
+	if (locale === "ko") return __ko.chat_voice_offline(inputs)
+	if (locale === "it") return __it.chat_voice_offline(inputs)
+	if (locale === "tr") return __tr.chat_voice_offline(inputs)
+	if (locale === "pl") return __pl.chat_voice_offline(inputs)
+	if (locale === "uk") return __uk.chat_voice_offline(inputs)
+	if (locale === "nl") return __nl.chat_voice_offline(inputs)
+	if (locale === "vi") return __vi.chat_voice_offline(inputs)
+	if (locale === "id") return __id.chat_voice_offline(inputs)
+	if (locale === "ms") return __ms.chat_voice_offline(inputs)
+	if (locale === "th") return __th.chat_voice_offline(inputs)
+	if (locale === "fa") return __fa.chat_voice_offline(inputs)
+	if (locale === "ur") return __ur.chat_voice_offline(inputs)
+	if (locale === "bn") return __bn.chat_voice_offline(inputs)
+	if (locale === "pa") return __pa.chat_voice_offline(inputs)
+	if (locale === "sw") return __sw.chat_voice_offline(inputs)
+	if (locale === "el") return __el.chat_voice_offline(inputs)
+	if (locale === "cs") return __cs.chat_voice_offline(inputs)
+	if (locale === "ro") return __ro.chat_voice_offline(inputs)
+	if (locale === "hu") return __hu.chat_voice_offline(inputs)
+	if (locale === "sv") return __sv.chat_voice_offline(inputs)
+	if (locale === "he") return __he.chat_voice_offline(inputs)
+	return __ru.chat_voice_offline(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Recording too short" |
+*
+* @param {Chat_Voice_Too_ShortInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_voice_too_short = /** @type {((inputs?: Chat_Voice_Too_ShortInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Voice_Too_ShortInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_voice_too_short(inputs)
+	if (locale === "fr") return __fr.chat_voice_too_short(inputs)
+	if (locale === "es") return __es.chat_voice_too_short(inputs)
+	if (locale === "zh") return __zh.chat_voice_too_short(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_voice_too_short(inputs)
+	if (locale === "hi") return __hi.chat_voice_too_short(inputs)
+	if (locale === "ar") return __ar.chat_voice_too_short(inputs)
+	if (locale === "pt") return __pt.chat_voice_too_short(inputs)
+	if (locale === "de") return __de.chat_voice_too_short(inputs)
+	if (locale === "ja") return __ja.chat_voice_too_short(inputs)
+	if (locale === "ko") return __ko.chat_voice_too_short(inputs)
+	if (locale === "it") return __it.chat_voice_too_short(inputs)
+	if (locale === "tr") return __tr.chat_voice_too_short(inputs)
+	if (locale === "pl") return __pl.chat_voice_too_short(inputs)
+	if (locale === "uk") return __uk.chat_voice_too_short(inputs)
+	if (locale === "nl") return __nl.chat_voice_too_short(inputs)
+	if (locale === "vi") return __vi.chat_voice_too_short(inputs)
+	if (locale === "id") return __id.chat_voice_too_short(inputs)
+	if (locale === "ms") return __ms.chat_voice_too_short(inputs)
+	if (locale === "th") return __th.chat_voice_too_short(inputs)
+	if (locale === "fa") return __fa.chat_voice_too_short(inputs)
+	if (locale === "ur") return __ur.chat_voice_too_short(inputs)
+	if (locale === "bn") return __bn.chat_voice_too_short(inputs)
+	if (locale === "pa") return __pa.chat_voice_too_short(inputs)
+	if (locale === "sw") return __sw.chat_voice_too_short(inputs)
+	if (locale === "el") return __el.chat_voice_too_short(inputs)
+	if (locale === "cs") return __cs.chat_voice_too_short(inputs)
+	if (locale === "ro") return __ro.chat_voice_too_short(inputs)
+	if (locale === "hu") return __hu.chat_voice_too_short(inputs)
+	if (locale === "sv") return __sv.chat_voice_too_short(inputs)
+	if (locale === "he") return __he.chat_voice_too_short(inputs)
+	return __ru.chat_voice_too_short(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Voice recording isn’t supported in this browser" |
+*
+* @param {Chat_Voice_UnsupportedInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_voice_unsupported = /** @type {((inputs?: Chat_Voice_UnsupportedInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Voice_UnsupportedInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_voice_unsupported(inputs)
+	if (locale === "fr") return __fr.chat_voice_unsupported(inputs)
+	if (locale === "es") return __es.chat_voice_unsupported(inputs)
+	if (locale === "zh") return __zh.chat_voice_unsupported(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_voice_unsupported(inputs)
+	if (locale === "hi") return __hi.chat_voice_unsupported(inputs)
+	if (locale === "ar") return __ar.chat_voice_unsupported(inputs)
+	if (locale === "pt") return __pt.chat_voice_unsupported(inputs)
+	if (locale === "de") return __de.chat_voice_unsupported(inputs)
+	if (locale === "ja") return __ja.chat_voice_unsupported(inputs)
+	if (locale === "ko") return __ko.chat_voice_unsupported(inputs)
+	if (locale === "it") return __it.chat_voice_unsupported(inputs)
+	if (locale === "tr") return __tr.chat_voice_unsupported(inputs)
+	if (locale === "pl") return __pl.chat_voice_unsupported(inputs)
+	if (locale === "uk") return __uk.chat_voice_unsupported(inputs)
+	if (locale === "nl") return __nl.chat_voice_unsupported(inputs)
+	if (locale === "vi") return __vi.chat_voice_unsupported(inputs)
+	if (locale === "id") return __id.chat_voice_unsupported(inputs)
+	if (locale === "ms") return __ms.chat_voice_unsupported(inputs)
+	if (locale === "th") return __th.chat_voice_unsupported(inputs)
+	if (locale === "fa") return __fa.chat_voice_unsupported(inputs)
+	if (locale === "ur") return __ur.chat_voice_unsupported(inputs)
+	if (locale === "bn") return __bn.chat_voice_unsupported(inputs)
+	if (locale === "pa") return __pa.chat_voice_unsupported(inputs)
+	if (locale === "sw") return __sw.chat_voice_unsupported(inputs)
+	if (locale === "el") return __el.chat_voice_unsupported(inputs)
+	if (locale === "cs") return __cs.chat_voice_unsupported(inputs)
+	if (locale === "ro") return __ro.chat_voice_unsupported(inputs)
+	if (locale === "hu") return __hu.chat_voice_unsupported(inputs)
+	if (locale === "sv") return __sv.chat_voice_unsupported(inputs)
+	if (locale === "he") return __he.chat_voice_unsupported(inputs)
+	return __ru.chat_voice_unsupported(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "Account required" |
 *
 * @param {Common_Account_NeededInputs} inputs
@@ -978,6 +3971,50 @@ export const common_account_needed_body = /** @type {((inputs: Common_Account_Ne
 /**
 * | output |
 * | --- |
+* | "All" |
+*
+* @param {Common_AllInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const common_all = /** @type {((inputs?: Common_AllInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Common_AllInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.common_all(inputs)
+	if (locale === "fr") return __fr.common_all(inputs)
+	if (locale === "es") return __es.common_all(inputs)
+	if (locale === "zh") return __zh.common_all(inputs)
+	if (locale === "zh-TW") return __zh_tw2.common_all(inputs)
+	if (locale === "hi") return __hi.common_all(inputs)
+	if (locale === "ar") return __ar.common_all(inputs)
+	if (locale === "pt") return __pt.common_all(inputs)
+	if (locale === "de") return __de.common_all(inputs)
+	if (locale === "ja") return __ja.common_all(inputs)
+	if (locale === "ko") return __ko.common_all(inputs)
+	if (locale === "it") return __it.common_all(inputs)
+	if (locale === "tr") return __tr.common_all(inputs)
+	if (locale === "pl") return __pl.common_all(inputs)
+	if (locale === "uk") return __uk.common_all(inputs)
+	if (locale === "nl") return __nl.common_all(inputs)
+	if (locale === "vi") return __vi.common_all(inputs)
+	if (locale === "id") return __id.common_all(inputs)
+	if (locale === "ms") return __ms.common_all(inputs)
+	if (locale === "th") return __th.common_all(inputs)
+	if (locale === "fa") return __fa.common_all(inputs)
+	if (locale === "ur") return __ur.common_all(inputs)
+	if (locale === "bn") return __bn.common_all(inputs)
+	if (locale === "pa") return __pa.common_all(inputs)
+	if (locale === "sw") return __sw.common_all(inputs)
+	if (locale === "el") return __el.common_all(inputs)
+	if (locale === "cs") return __cs.common_all(inputs)
+	if (locale === "ro") return __ro.common_all(inputs)
+	if (locale === "hu") return __hu.common_all(inputs)
+	if (locale === "sv") return __sv.common_all(inputs)
+	if (locale === "he") return __he.common_all(inputs)
+	return __ru.common_all(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "Back" |
 *
 * @param {Common_BackInputs} inputs
@@ -1018,6 +4055,50 @@ export const common_back = /** @type {((inputs?: Common_BackInputs, options?: { 
 	if (locale === "sv") return __sv.common_back(inputs)
 	if (locale === "he") return __he.common_back(inputs)
 	return __ru.common_back(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Business" |
+*
+* @param {Common_BusinessInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const common_business = /** @type {((inputs?: Common_BusinessInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Common_BusinessInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.common_business(inputs)
+	if (locale === "fr") return __fr.common_business(inputs)
+	if (locale === "es") return __es.common_business(inputs)
+	if (locale === "zh") return __zh.common_business(inputs)
+	if (locale === "zh-TW") return __zh_tw2.common_business(inputs)
+	if (locale === "hi") return __hi.common_business(inputs)
+	if (locale === "ar") return __ar.common_business(inputs)
+	if (locale === "pt") return __pt.common_business(inputs)
+	if (locale === "de") return __de.common_business(inputs)
+	if (locale === "ja") return __ja.common_business(inputs)
+	if (locale === "ko") return __ko.common_business(inputs)
+	if (locale === "it") return __it.common_business(inputs)
+	if (locale === "tr") return __tr.common_business(inputs)
+	if (locale === "pl") return __pl.common_business(inputs)
+	if (locale === "uk") return __uk.common_business(inputs)
+	if (locale === "nl") return __nl.common_business(inputs)
+	if (locale === "vi") return __vi.common_business(inputs)
+	if (locale === "id") return __id.common_business(inputs)
+	if (locale === "ms") return __ms.common_business(inputs)
+	if (locale === "th") return __th.common_business(inputs)
+	if (locale === "fa") return __fa.common_business(inputs)
+	if (locale === "ur") return __ur.common_business(inputs)
+	if (locale === "bn") return __bn.common_business(inputs)
+	if (locale === "pa") return __pa.common_business(inputs)
+	if (locale === "sw") return __sw.common_business(inputs)
+	if (locale === "el") return __el.common_business(inputs)
+	if (locale === "cs") return __cs.common_business(inputs)
+	if (locale === "ro") return __ro.common_business(inputs)
+	if (locale === "hu") return __hu.common_business(inputs)
+	if (locale === "sv") return __sv.common_business(inputs)
+	if (locale === "he") return __he.common_business(inputs)
+	return __ru.common_business(inputs)
 });
 /**
 * | output |
@@ -1154,6 +4235,50 @@ export const common_guest_mode = /** @type {((inputs?: Common_Guest_ModeInputs, 
 /**
 * | output |
 * | --- |
+* | "Listing" |
+*
+* @param {Common_ListingInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const common_listing = /** @type {((inputs?: Common_ListingInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Common_ListingInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.common_listing(inputs)
+	if (locale === "fr") return __fr.common_listing(inputs)
+	if (locale === "es") return __es.common_listing(inputs)
+	if (locale === "zh") return __zh.common_listing(inputs)
+	if (locale === "zh-TW") return __zh_tw2.common_listing(inputs)
+	if (locale === "hi") return __hi.common_listing(inputs)
+	if (locale === "ar") return __ar.common_listing(inputs)
+	if (locale === "pt") return __pt.common_listing(inputs)
+	if (locale === "de") return __de.common_listing(inputs)
+	if (locale === "ja") return __ja.common_listing(inputs)
+	if (locale === "ko") return __ko.common_listing(inputs)
+	if (locale === "it") return __it.common_listing(inputs)
+	if (locale === "tr") return __tr.common_listing(inputs)
+	if (locale === "pl") return __pl.common_listing(inputs)
+	if (locale === "uk") return __uk.common_listing(inputs)
+	if (locale === "nl") return __nl.common_listing(inputs)
+	if (locale === "vi") return __vi.common_listing(inputs)
+	if (locale === "id") return __id.common_listing(inputs)
+	if (locale === "ms") return __ms.common_listing(inputs)
+	if (locale === "th") return __th.common_listing(inputs)
+	if (locale === "fa") return __fa.common_listing(inputs)
+	if (locale === "ur") return __ur.common_listing(inputs)
+	if (locale === "bn") return __bn.common_listing(inputs)
+	if (locale === "pa") return __pa.common_listing(inputs)
+	if (locale === "sw") return __sw.common_listing(inputs)
+	if (locale === "el") return __el.common_listing(inputs)
+	if (locale === "cs") return __cs.common_listing(inputs)
+	if (locale === "ro") return __ro.common_listing(inputs)
+	if (locale === "hu") return __hu.common_listing(inputs)
+	if (locale === "sv") return __sv.common_listing(inputs)
+	if (locale === "he") return __he.common_listing(inputs)
+	return __ru.common_listing(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "Log in" |
 *
 * @param {Common_LoginInputs} inputs
@@ -1242,6 +4367,94 @@ export const common_login_password = /** @type {((inputs?: Common_Login_Password
 /**
 * | output |
 * | --- |
+* | "Job offer" |
+*
+* @param {Common_OfferInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const common_offer = /** @type {((inputs?: Common_OfferInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Common_OfferInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.common_offer(inputs)
+	if (locale === "fr") return __fr.common_offer(inputs)
+	if (locale === "es") return __es.common_offer(inputs)
+	if (locale === "zh") return __zh.common_offer(inputs)
+	if (locale === "zh-TW") return __zh_tw2.common_offer(inputs)
+	if (locale === "hi") return __hi.common_offer(inputs)
+	if (locale === "ar") return __ar.common_offer(inputs)
+	if (locale === "pt") return __pt.common_offer(inputs)
+	if (locale === "de") return __de.common_offer(inputs)
+	if (locale === "ja") return __ja.common_offer(inputs)
+	if (locale === "ko") return __ko.common_offer(inputs)
+	if (locale === "it") return __it.common_offer(inputs)
+	if (locale === "tr") return __tr.common_offer(inputs)
+	if (locale === "pl") return __pl.common_offer(inputs)
+	if (locale === "uk") return __uk.common_offer(inputs)
+	if (locale === "nl") return __nl.common_offer(inputs)
+	if (locale === "vi") return __vi.common_offer(inputs)
+	if (locale === "id") return __id.common_offer(inputs)
+	if (locale === "ms") return __ms.common_offer(inputs)
+	if (locale === "th") return __th.common_offer(inputs)
+	if (locale === "fa") return __fa.common_offer(inputs)
+	if (locale === "ur") return __ur.common_offer(inputs)
+	if (locale === "bn") return __bn.common_offer(inputs)
+	if (locale === "pa") return __pa.common_offer(inputs)
+	if (locale === "sw") return __sw.common_offer(inputs)
+	if (locale === "el") return __el.common_offer(inputs)
+	if (locale === "cs") return __cs.common_offer(inputs)
+	if (locale === "ro") return __ro.common_offer(inputs)
+	if (locale === "hu") return __hu.common_offer(inputs)
+	if (locale === "sv") return __sv.common_offer(inputs)
+	if (locale === "he") return __he.common_offer(inputs)
+	return __ru.common_offer(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Online" |
+*
+* @param {Common_OnlineInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const common_online = /** @type {((inputs?: Common_OnlineInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Common_OnlineInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.common_online(inputs)
+	if (locale === "fr") return __fr.common_online(inputs)
+	if (locale === "es") return __es.common_online(inputs)
+	if (locale === "zh") return __zh.common_online(inputs)
+	if (locale === "zh-TW") return __zh_tw2.common_online(inputs)
+	if (locale === "hi") return __hi.common_online(inputs)
+	if (locale === "ar") return __ar.common_online(inputs)
+	if (locale === "pt") return __pt.common_online(inputs)
+	if (locale === "de") return __de.common_online(inputs)
+	if (locale === "ja") return __ja.common_online(inputs)
+	if (locale === "ko") return __ko.common_online(inputs)
+	if (locale === "it") return __it.common_online(inputs)
+	if (locale === "tr") return __tr.common_online(inputs)
+	if (locale === "pl") return __pl.common_online(inputs)
+	if (locale === "uk") return __uk.common_online(inputs)
+	if (locale === "nl") return __nl.common_online(inputs)
+	if (locale === "vi") return __vi.common_online(inputs)
+	if (locale === "id") return __id.common_online(inputs)
+	if (locale === "ms") return __ms.common_online(inputs)
+	if (locale === "th") return __th.common_online(inputs)
+	if (locale === "fa") return __fa.common_online(inputs)
+	if (locale === "ur") return __ur.common_online(inputs)
+	if (locale === "bn") return __bn.common_online(inputs)
+	if (locale === "pa") return __pa.common_online(inputs)
+	if (locale === "sw") return __sw.common_online(inputs)
+	if (locale === "el") return __el.common_online(inputs)
+	if (locale === "cs") return __cs.common_online(inputs)
+	if (locale === "ro") return __ro.common_online(inputs)
+	if (locale === "hu") return __hu.common_online(inputs)
+	if (locale === "sv") return __sv.common_online(inputs)
+	if (locale === "he") return __he.common_online(inputs)
+	return __ru.common_online(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "Open profile" |
 *
 * @param {Common_Open_ProfileInputs} inputs
@@ -1282,6 +4495,50 @@ export const common_open_profile = /** @type {((inputs?: Common_Open_ProfileInpu
 	if (locale === "sv") return __sv.common_open_profile(inputs)
 	if (locale === "he") return __he.common_open_profile(inputs)
 	return __ru.common_open_profile(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Premium" |
+*
+* @param {Common_PremiumInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const common_premium = /** @type {((inputs?: Common_PremiumInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Common_PremiumInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.common_premium(inputs)
+	if (locale === "fr") return __fr.common_premium(inputs)
+	if (locale === "es") return __es.common_premium(inputs)
+	if (locale === "zh") return __zh.common_premium(inputs)
+	if (locale === "zh-TW") return __zh_tw2.common_premium(inputs)
+	if (locale === "hi") return __hi.common_premium(inputs)
+	if (locale === "ar") return __ar.common_premium(inputs)
+	if (locale === "pt") return __pt.common_premium(inputs)
+	if (locale === "de") return __de.common_premium(inputs)
+	if (locale === "ja") return __ja.common_premium(inputs)
+	if (locale === "ko") return __ko.common_premium(inputs)
+	if (locale === "it") return __it.common_premium(inputs)
+	if (locale === "tr") return __tr.common_premium(inputs)
+	if (locale === "pl") return __pl.common_premium(inputs)
+	if (locale === "uk") return __uk.common_premium(inputs)
+	if (locale === "nl") return __nl.common_premium(inputs)
+	if (locale === "vi") return __vi.common_premium(inputs)
+	if (locale === "id") return __id.common_premium(inputs)
+	if (locale === "ms") return __ms.common_premium(inputs)
+	if (locale === "th") return __th.common_premium(inputs)
+	if (locale === "fa") return __fa.common_premium(inputs)
+	if (locale === "ur") return __ur.common_premium(inputs)
+	if (locale === "bn") return __bn.common_premium(inputs)
+	if (locale === "pa") return __pa.common_premium(inputs)
+	if (locale === "sw") return __sw.common_premium(inputs)
+	if (locale === "el") return __el.common_premium(inputs)
+	if (locale === "cs") return __cs.common_premium(inputs)
+	if (locale === "ro") return __ro.common_premium(inputs)
+	if (locale === "hu") return __hu.common_premium(inputs)
+	if (locale === "sv") return __sv.common_premium(inputs)
+	if (locale === "he") return __he.common_premium(inputs)
+	return __ru.common_premium(inputs)
 });
 /**
 * | output |
@@ -1462,6 +4719,50 @@ export const common_rules = /** @type {((inputs?: Common_RulesInputs, options?: 
 /**
 * | output |
 * | --- |
+* | "Looking for work" |
+*
+* @param {Common_SeekerInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const common_seeker = /** @type {((inputs?: Common_SeekerInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Common_SeekerInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.common_seeker(inputs)
+	if (locale === "fr") return __fr.common_seeker(inputs)
+	if (locale === "es") return __es.common_seeker(inputs)
+	if (locale === "zh") return __zh.common_seeker(inputs)
+	if (locale === "zh-TW") return __zh_tw2.common_seeker(inputs)
+	if (locale === "hi") return __hi.common_seeker(inputs)
+	if (locale === "ar") return __ar.common_seeker(inputs)
+	if (locale === "pt") return __pt.common_seeker(inputs)
+	if (locale === "de") return __de.common_seeker(inputs)
+	if (locale === "ja") return __ja.common_seeker(inputs)
+	if (locale === "ko") return __ko.common_seeker(inputs)
+	if (locale === "it") return __it.common_seeker(inputs)
+	if (locale === "tr") return __tr.common_seeker(inputs)
+	if (locale === "pl") return __pl.common_seeker(inputs)
+	if (locale === "uk") return __uk.common_seeker(inputs)
+	if (locale === "nl") return __nl.common_seeker(inputs)
+	if (locale === "vi") return __vi.common_seeker(inputs)
+	if (locale === "id") return __id.common_seeker(inputs)
+	if (locale === "ms") return __ms.common_seeker(inputs)
+	if (locale === "th") return __th.common_seeker(inputs)
+	if (locale === "fa") return __fa.common_seeker(inputs)
+	if (locale === "ur") return __ur.common_seeker(inputs)
+	if (locale === "bn") return __bn.common_seeker(inputs)
+	if (locale === "pa") return __pa.common_seeker(inputs)
+	if (locale === "sw") return __sw.common_seeker(inputs)
+	if (locale === "el") return __el.common_seeker(inputs)
+	if (locale === "cs") return __cs.common_seeker(inputs)
+	if (locale === "ro") return __ro.common_seeker(inputs)
+	if (locale === "hu") return __hu.common_seeker(inputs)
+	if (locale === "sv") return __sv.common_seeker(inputs)
+	if (locale === "he") return __he.common_seeker(inputs)
+	return __ru.common_seeker(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "To the map" |
 *
 * @param {Common_To_MapInputs} inputs
@@ -1502,6 +4803,226 @@ export const common_to_map = /** @type {((inputs?: Common_To_MapInputs, options?
 	if (locale === "sv") return __sv.common_to_map(inputs)
 	if (locale === "he") return __he.common_to_map(inputs)
 	return __ru.common_to_map(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Verified" |
+*
+* @param {Common_VerifiedInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const common_verified = /** @type {((inputs?: Common_VerifiedInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Common_VerifiedInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.common_verified(inputs)
+	if (locale === "fr") return __fr.common_verified(inputs)
+	if (locale === "es") return __es.common_verified(inputs)
+	if (locale === "zh") return __zh.common_verified(inputs)
+	if (locale === "zh-TW") return __zh_tw2.common_verified(inputs)
+	if (locale === "hi") return __hi.common_verified(inputs)
+	if (locale === "ar") return __ar.common_verified(inputs)
+	if (locale === "pt") return __pt.common_verified(inputs)
+	if (locale === "de") return __de.common_verified(inputs)
+	if (locale === "ja") return __ja.common_verified(inputs)
+	if (locale === "ko") return __ko.common_verified(inputs)
+	if (locale === "it") return __it.common_verified(inputs)
+	if (locale === "tr") return __tr.common_verified(inputs)
+	if (locale === "pl") return __pl.common_verified(inputs)
+	if (locale === "uk") return __uk.common_verified(inputs)
+	if (locale === "nl") return __nl.common_verified(inputs)
+	if (locale === "vi") return __vi.common_verified(inputs)
+	if (locale === "id") return __id.common_verified(inputs)
+	if (locale === "ms") return __ms.common_verified(inputs)
+	if (locale === "th") return __th.common_verified(inputs)
+	if (locale === "fa") return __fa.common_verified(inputs)
+	if (locale === "ur") return __ur.common_verified(inputs)
+	if (locale === "bn") return __bn.common_verified(inputs)
+	if (locale === "pa") return __pa.common_verified(inputs)
+	if (locale === "sw") return __sw.common_verified(inputs)
+	if (locale === "el") return __el.common_verified(inputs)
+	if (locale === "cs") return __cs.common_verified(inputs)
+	if (locale === "ro") return __ro.common_verified(inputs)
+	if (locale === "hu") return __hu.common_verified(inputs)
+	if (locale === "sv") return __sv.common_verified(inputs)
+	if (locale === "he") return __he.common_verified(inputs)
+	return __ru.common_verified(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Recently active" |
+*
+* @param {Common_Was_RecentlyInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const common_was_recently = /** @type {((inputs?: Common_Was_RecentlyInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Common_Was_RecentlyInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.common_was_recently(inputs)
+	if (locale === "fr") return __fr.common_was_recently(inputs)
+	if (locale === "es") return __es.common_was_recently(inputs)
+	if (locale === "zh") return __zh.common_was_recently(inputs)
+	if (locale === "zh-TW") return __zh_tw2.common_was_recently(inputs)
+	if (locale === "hi") return __hi.common_was_recently(inputs)
+	if (locale === "ar") return __ar.common_was_recently(inputs)
+	if (locale === "pt") return __pt.common_was_recently(inputs)
+	if (locale === "de") return __de.common_was_recently(inputs)
+	if (locale === "ja") return __ja.common_was_recently(inputs)
+	if (locale === "ko") return __ko.common_was_recently(inputs)
+	if (locale === "it") return __it.common_was_recently(inputs)
+	if (locale === "tr") return __tr.common_was_recently(inputs)
+	if (locale === "pl") return __pl.common_was_recently(inputs)
+	if (locale === "uk") return __uk.common_was_recently(inputs)
+	if (locale === "nl") return __nl.common_was_recently(inputs)
+	if (locale === "vi") return __vi.common_was_recently(inputs)
+	if (locale === "id") return __id.common_was_recently(inputs)
+	if (locale === "ms") return __ms.common_was_recently(inputs)
+	if (locale === "th") return __th.common_was_recently(inputs)
+	if (locale === "fa") return __fa.common_was_recently(inputs)
+	if (locale === "ur") return __ur.common_was_recently(inputs)
+	if (locale === "bn") return __bn.common_was_recently(inputs)
+	if (locale === "pa") return __pa.common_was_recently(inputs)
+	if (locale === "sw") return __sw.common_was_recently(inputs)
+	if (locale === "el") return __el.common_was_recently(inputs)
+	if (locale === "cs") return __cs.common_was_recently(inputs)
+	if (locale === "ro") return __ro.common_was_recently(inputs)
+	if (locale === "hu") return __hu.common_was_recently(inputs)
+	if (locale === "sv") return __sv.common_was_recently(inputs)
+	if (locale === "he") return __he.common_was_recently(inputs)
+	return __ru.common_was_recently(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Jobs" |
+*
+* @param {Common_WorkInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const common_work = /** @type {((inputs?: Common_WorkInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Common_WorkInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.common_work(inputs)
+	if (locale === "fr") return __fr.common_work(inputs)
+	if (locale === "es") return __es.common_work(inputs)
+	if (locale === "zh") return __zh.common_work(inputs)
+	if (locale === "zh-TW") return __zh_tw2.common_work(inputs)
+	if (locale === "hi") return __hi.common_work(inputs)
+	if (locale === "ar") return __ar.common_work(inputs)
+	if (locale === "pt") return __pt.common_work(inputs)
+	if (locale === "de") return __de.common_work(inputs)
+	if (locale === "ja") return __ja.common_work(inputs)
+	if (locale === "ko") return __ko.common_work(inputs)
+	if (locale === "it") return __it.common_work(inputs)
+	if (locale === "tr") return __tr.common_work(inputs)
+	if (locale === "pl") return __pl.common_work(inputs)
+	if (locale === "uk") return __uk.common_work(inputs)
+	if (locale === "nl") return __nl.common_work(inputs)
+	if (locale === "vi") return __vi.common_work(inputs)
+	if (locale === "id") return __id.common_work(inputs)
+	if (locale === "ms") return __ms.common_work(inputs)
+	if (locale === "th") return __th.common_work(inputs)
+	if (locale === "fa") return __fa.common_work(inputs)
+	if (locale === "ur") return __ur.common_work(inputs)
+	if (locale === "bn") return __bn.common_work(inputs)
+	if (locale === "pa") return __pa.common_work(inputs)
+	if (locale === "sw") return __sw.common_work(inputs)
+	if (locale === "el") return __el.common_work(inputs)
+	if (locale === "cs") return __cs.common_work(inputs)
+	if (locale === "ro") return __ro.common_work(inputs)
+	if (locale === "hu") return __hu.common_work(inputs)
+	if (locale === "sv") return __sv.common_work(inputs)
+	if (locale === "he") return __he.common_work(inputs)
+	return __ru.common_work(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Workers" |
+*
+* @param {Common_WorkersInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const common_workers = /** @type {((inputs?: Common_WorkersInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Common_WorkersInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.common_workers(inputs)
+	if (locale === "fr") return __fr.common_workers(inputs)
+	if (locale === "es") return __es.common_workers(inputs)
+	if (locale === "zh") return __zh.common_workers(inputs)
+	if (locale === "zh-TW") return __zh_tw2.common_workers(inputs)
+	if (locale === "hi") return __hi.common_workers(inputs)
+	if (locale === "ar") return __ar.common_workers(inputs)
+	if (locale === "pt") return __pt.common_workers(inputs)
+	if (locale === "de") return __de.common_workers(inputs)
+	if (locale === "ja") return __ja.common_workers(inputs)
+	if (locale === "ko") return __ko.common_workers(inputs)
+	if (locale === "it") return __it.common_workers(inputs)
+	if (locale === "tr") return __tr.common_workers(inputs)
+	if (locale === "pl") return __pl.common_workers(inputs)
+	if (locale === "uk") return __uk.common_workers(inputs)
+	if (locale === "nl") return __nl.common_workers(inputs)
+	if (locale === "vi") return __vi.common_workers(inputs)
+	if (locale === "id") return __id.common_workers(inputs)
+	if (locale === "ms") return __ms.common_workers(inputs)
+	if (locale === "th") return __th.common_workers(inputs)
+	if (locale === "fa") return __fa.common_workers(inputs)
+	if (locale === "ur") return __ur.common_workers(inputs)
+	if (locale === "bn") return __bn.common_workers(inputs)
+	if (locale === "pa") return __pa.common_workers(inputs)
+	if (locale === "sw") return __sw.common_workers(inputs)
+	if (locale === "el") return __el.common_workers(inputs)
+	if (locale === "cs") return __cs.common_workers(inputs)
+	if (locale === "ro") return __ro.common_workers(inputs)
+	if (locale === "hu") return __hu.common_workers(inputs)
+	if (locale === "sv") return __sv.common_workers(inputs)
+	if (locale === "he") return __he.common_workers(inputs)
+	return __ru.common_workers(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Message" |
+*
+* @param {Common_WriteInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const common_write = /** @type {((inputs?: Common_WriteInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Common_WriteInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.common_write(inputs)
+	if (locale === "fr") return __fr.common_write(inputs)
+	if (locale === "es") return __es.common_write(inputs)
+	if (locale === "zh") return __zh.common_write(inputs)
+	if (locale === "zh-TW") return __zh_tw2.common_write(inputs)
+	if (locale === "hi") return __hi.common_write(inputs)
+	if (locale === "ar") return __ar.common_write(inputs)
+	if (locale === "pt") return __pt.common_write(inputs)
+	if (locale === "de") return __de.common_write(inputs)
+	if (locale === "ja") return __ja.common_write(inputs)
+	if (locale === "ko") return __ko.common_write(inputs)
+	if (locale === "it") return __it.common_write(inputs)
+	if (locale === "tr") return __tr.common_write(inputs)
+	if (locale === "pl") return __pl.common_write(inputs)
+	if (locale === "uk") return __uk.common_write(inputs)
+	if (locale === "nl") return __nl.common_write(inputs)
+	if (locale === "vi") return __vi.common_write(inputs)
+	if (locale === "id") return __id.common_write(inputs)
+	if (locale === "ms") return __ms.common_write(inputs)
+	if (locale === "th") return __th.common_write(inputs)
+	if (locale === "fa") return __fa.common_write(inputs)
+	if (locale === "ur") return __ur.common_write(inputs)
+	if (locale === "bn") return __bn.common_write(inputs)
+	if (locale === "pa") return __pa.common_write(inputs)
+	if (locale === "sw") return __sw.common_write(inputs)
+	if (locale === "el") return __el.common_write(inputs)
+	if (locale === "cs") return __cs.common_write(inputs)
+	if (locale === "ro") return __ro.common_write(inputs)
+	if (locale === "hu") return __hu.common_write(inputs)
+	if (locale === "sv") return __sv.common_write(inputs)
+	if (locale === "he") return __he.common_write(inputs)
+	return __ru.common_write(inputs)
 });
 /**
 * | output |
@@ -3047,6 +6568,50 @@ export const legal_rules = /** @type {((inputs?: Legal_RulesInputs, options?: { 
 /**
 * | output |
 * | --- |
+* | "Map" |
+*
+* @param {Map_TitleInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const map_title = /** @type {((inputs?: Map_TitleInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Map_TitleInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.map_title(inputs)
+	if (locale === "fr") return __fr.map_title(inputs)
+	if (locale === "es") return __es.map_title(inputs)
+	if (locale === "zh") return __zh.map_title(inputs)
+	if (locale === "zh-TW") return __zh_tw2.map_title(inputs)
+	if (locale === "hi") return __hi.map_title(inputs)
+	if (locale === "ar") return __ar.map_title(inputs)
+	if (locale === "pt") return __pt.map_title(inputs)
+	if (locale === "de") return __de.map_title(inputs)
+	if (locale === "ja") return __ja.map_title(inputs)
+	if (locale === "ko") return __ko.map_title(inputs)
+	if (locale === "it") return __it.map_title(inputs)
+	if (locale === "tr") return __tr.map_title(inputs)
+	if (locale === "pl") return __pl.map_title(inputs)
+	if (locale === "uk") return __uk.map_title(inputs)
+	if (locale === "nl") return __nl.map_title(inputs)
+	if (locale === "vi") return __vi.map_title(inputs)
+	if (locale === "id") return __id.map_title(inputs)
+	if (locale === "ms") return __ms.map_title(inputs)
+	if (locale === "th") return __th.map_title(inputs)
+	if (locale === "fa") return __fa.map_title(inputs)
+	if (locale === "ur") return __ur.map_title(inputs)
+	if (locale === "bn") return __bn.map_title(inputs)
+	if (locale === "pa") return __pa.map_title(inputs)
+	if (locale === "sw") return __sw.map_title(inputs)
+	if (locale === "el") return __el.map_title(inputs)
+	if (locale === "cs") return __cs.map_title(inputs)
+	if (locale === "ro") return __ro.map_title(inputs)
+	if (locale === "hu") return __hu.map_title(inputs)
+	if (locale === "sv") return __sv.map_title(inputs)
+	if (locale === "he") return __he.map_title(inputs)
+	return __ru.map_title(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "Add a listing" |
 *
 * @param {Menu_Add_CardInputs} inputs
@@ -4411,6 +7976,270 @@ export const notifications_title = /** @type {((inputs?: Notifications_TitleInpu
 /**
 * | output |
 * | --- |
+* | "You have a new notification." |
+*
+* @param {Notify_GenericInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const notify_generic = /** @type {((inputs?: Notify_GenericInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Notify_GenericInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.notify_generic(inputs)
+	if (locale === "fr") return __fr.notify_generic(inputs)
+	if (locale === "es") return __es.notify_generic(inputs)
+	if (locale === "zh") return __zh.notify_generic(inputs)
+	if (locale === "zh-TW") return __zh_tw2.notify_generic(inputs)
+	if (locale === "hi") return __hi.notify_generic(inputs)
+	if (locale === "ar") return __ar.notify_generic(inputs)
+	if (locale === "pt") return __pt.notify_generic(inputs)
+	if (locale === "de") return __de.notify_generic(inputs)
+	if (locale === "ja") return __ja.notify_generic(inputs)
+	if (locale === "ko") return __ko.notify_generic(inputs)
+	if (locale === "it") return __it.notify_generic(inputs)
+	if (locale === "tr") return __tr.notify_generic(inputs)
+	if (locale === "pl") return __pl.notify_generic(inputs)
+	if (locale === "uk") return __uk.notify_generic(inputs)
+	if (locale === "nl") return __nl.notify_generic(inputs)
+	if (locale === "vi") return __vi.notify_generic(inputs)
+	if (locale === "id") return __id.notify_generic(inputs)
+	if (locale === "ms") return __ms.notify_generic(inputs)
+	if (locale === "th") return __th.notify_generic(inputs)
+	if (locale === "fa") return __fa.notify_generic(inputs)
+	if (locale === "ur") return __ur.notify_generic(inputs)
+	if (locale === "bn") return __bn.notify_generic(inputs)
+	if (locale === "pa") return __pa.notify_generic(inputs)
+	if (locale === "sw") return __sw.notify_generic(inputs)
+	if (locale === "el") return __el.notify_generic(inputs)
+	if (locale === "cs") return __cs.notify_generic(inputs)
+	if (locale === "ro") return __ro.notify_generic(inputs)
+	if (locale === "hu") return __hu.notify_generic(inputs)
+	if (locale === "sv") return __sv.notify_generic(inputs)
+	if (locale === "he") return __he.notify_generic(inputs)
+	return __ru.notify_generic(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "New message" |
+*
+* @param {Notify_New_MessageInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const notify_new_message = /** @type {((inputs?: Notify_New_MessageInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Notify_New_MessageInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.notify_new_message(inputs)
+	if (locale === "fr") return __fr.notify_new_message(inputs)
+	if (locale === "es") return __es.notify_new_message(inputs)
+	if (locale === "zh") return __zh.notify_new_message(inputs)
+	if (locale === "zh-TW") return __zh_tw2.notify_new_message(inputs)
+	if (locale === "hi") return __hi.notify_new_message(inputs)
+	if (locale === "ar") return __ar.notify_new_message(inputs)
+	if (locale === "pt") return __pt.notify_new_message(inputs)
+	if (locale === "de") return __de.notify_new_message(inputs)
+	if (locale === "ja") return __ja.notify_new_message(inputs)
+	if (locale === "ko") return __ko.notify_new_message(inputs)
+	if (locale === "it") return __it.notify_new_message(inputs)
+	if (locale === "tr") return __tr.notify_new_message(inputs)
+	if (locale === "pl") return __pl.notify_new_message(inputs)
+	if (locale === "uk") return __uk.notify_new_message(inputs)
+	if (locale === "nl") return __nl.notify_new_message(inputs)
+	if (locale === "vi") return __vi.notify_new_message(inputs)
+	if (locale === "id") return __id.notify_new_message(inputs)
+	if (locale === "ms") return __ms.notify_new_message(inputs)
+	if (locale === "th") return __th.notify_new_message(inputs)
+	if (locale === "fa") return __fa.notify_new_message(inputs)
+	if (locale === "ur") return __ur.notify_new_message(inputs)
+	if (locale === "bn") return __bn.notify_new_message(inputs)
+	if (locale === "pa") return __pa.notify_new_message(inputs)
+	if (locale === "sw") return __sw.notify_new_message(inputs)
+	if (locale === "el") return __el.notify_new_message(inputs)
+	if (locale === "cs") return __cs.notify_new_message(inputs)
+	if (locale === "ro") return __ro.notify_new_message(inputs)
+	if (locale === "hu") return __hu.notify_new_message(inputs)
+	if (locale === "sv") return __sv.notify_new_message(inputs)
+	if (locale === "he") return __he.notify_new_message(inputs)
+	return __ru.notify_new_message(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Open the chat in GRABIT." |
+*
+* @param {Notify_Open_ChatInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const notify_open_chat = /** @type {((inputs?: Notify_Open_ChatInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Notify_Open_ChatInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.notify_open_chat(inputs)
+	if (locale === "fr") return __fr.notify_open_chat(inputs)
+	if (locale === "es") return __es.notify_open_chat(inputs)
+	if (locale === "zh") return __zh.notify_open_chat(inputs)
+	if (locale === "zh-TW") return __zh_tw2.notify_open_chat(inputs)
+	if (locale === "hi") return __hi.notify_open_chat(inputs)
+	if (locale === "ar") return __ar.notify_open_chat(inputs)
+	if (locale === "pt") return __pt.notify_open_chat(inputs)
+	if (locale === "de") return __de.notify_open_chat(inputs)
+	if (locale === "ja") return __ja.notify_open_chat(inputs)
+	if (locale === "ko") return __ko.notify_open_chat(inputs)
+	if (locale === "it") return __it.notify_open_chat(inputs)
+	if (locale === "tr") return __tr.notify_open_chat(inputs)
+	if (locale === "pl") return __pl.notify_open_chat(inputs)
+	if (locale === "uk") return __uk.notify_open_chat(inputs)
+	if (locale === "nl") return __nl.notify_open_chat(inputs)
+	if (locale === "vi") return __vi.notify_open_chat(inputs)
+	if (locale === "id") return __id.notify_open_chat(inputs)
+	if (locale === "ms") return __ms.notify_open_chat(inputs)
+	if (locale === "th") return __th.notify_open_chat(inputs)
+	if (locale === "fa") return __fa.notify_open_chat(inputs)
+	if (locale === "ur") return __ur.notify_open_chat(inputs)
+	if (locale === "bn") return __bn.notify_open_chat(inputs)
+	if (locale === "pa") return __pa.notify_open_chat(inputs)
+	if (locale === "sw") return __sw.notify_open_chat(inputs)
+	if (locale === "el") return __el.notify_open_chat(inputs)
+	if (locale === "cs") return __cs.notify_open_chat(inputs)
+	if (locale === "ro") return __ro.notify_open_chat(inputs)
+	if (locale === "hu") return __hu.notify_open_chat(inputs)
+	if (locale === "sv") return __sv.notify_open_chat(inputs)
+	if (locale === "he") return __he.notify_open_chat(inputs)
+	return __ru.notify_open_chat(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Open pedometer" |
+*
+* @param {Notify_Steps_ActionInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const notify_steps_action = /** @type {((inputs?: Notify_Steps_ActionInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Notify_Steps_ActionInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.notify_steps_action(inputs)
+	if (locale === "fr") return __fr.notify_steps_action(inputs)
+	if (locale === "es") return __es.notify_steps_action(inputs)
+	if (locale === "zh") return __zh.notify_steps_action(inputs)
+	if (locale === "zh-TW") return __zh_tw2.notify_steps_action(inputs)
+	if (locale === "hi") return __hi.notify_steps_action(inputs)
+	if (locale === "ar") return __ar.notify_steps_action(inputs)
+	if (locale === "pt") return __pt.notify_steps_action(inputs)
+	if (locale === "de") return __de.notify_steps_action(inputs)
+	if (locale === "ja") return __ja.notify_steps_action(inputs)
+	if (locale === "ko") return __ko.notify_steps_action(inputs)
+	if (locale === "it") return __it.notify_steps_action(inputs)
+	if (locale === "tr") return __tr.notify_steps_action(inputs)
+	if (locale === "pl") return __pl.notify_steps_action(inputs)
+	if (locale === "uk") return __uk.notify_steps_action(inputs)
+	if (locale === "nl") return __nl.notify_steps_action(inputs)
+	if (locale === "vi") return __vi.notify_steps_action(inputs)
+	if (locale === "id") return __id.notify_steps_action(inputs)
+	if (locale === "ms") return __ms.notify_steps_action(inputs)
+	if (locale === "th") return __th.notify_steps_action(inputs)
+	if (locale === "fa") return __fa.notify_steps_action(inputs)
+	if (locale === "ur") return __ur.notify_steps_action(inputs)
+	if (locale === "bn") return __bn.notify_steps_action(inputs)
+	if (locale === "pa") return __pa.notify_steps_action(inputs)
+	if (locale === "sw") return __sw.notify_steps_action(inputs)
+	if (locale === "el") return __el.notify_steps_action(inputs)
+	if (locale === "cs") return __cs.notify_steps_action(inputs)
+	if (locale === "ro") return __ro.notify_steps_action(inputs)
+	if (locale === "hu") return __hu.notify_steps_action(inputs)
+	if (locale === "sv") return __sv.notify_steps_action(inputs)
+	if (locale === "he") return __he.notify_steps_action(inputs)
+	return __ru.notify_steps_action(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Tap to start counting steps." |
+*
+* @param {Notify_Steps_BodyInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const notify_steps_body = /** @type {((inputs?: Notify_Steps_BodyInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Notify_Steps_BodyInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.notify_steps_body(inputs)
+	if (locale === "fr") return __fr.notify_steps_body(inputs)
+	if (locale === "es") return __es.notify_steps_body(inputs)
+	if (locale === "zh") return __zh.notify_steps_body(inputs)
+	if (locale === "zh-TW") return __zh_tw2.notify_steps_body(inputs)
+	if (locale === "hi") return __hi.notify_steps_body(inputs)
+	if (locale === "ar") return __ar.notify_steps_body(inputs)
+	if (locale === "pt") return __pt.notify_steps_body(inputs)
+	if (locale === "de") return __de.notify_steps_body(inputs)
+	if (locale === "ja") return __ja.notify_steps_body(inputs)
+	if (locale === "ko") return __ko.notify_steps_body(inputs)
+	if (locale === "it") return __it.notify_steps_body(inputs)
+	if (locale === "tr") return __tr.notify_steps_body(inputs)
+	if (locale === "pl") return __pl.notify_steps_body(inputs)
+	if (locale === "uk") return __uk.notify_steps_body(inputs)
+	if (locale === "nl") return __nl.notify_steps_body(inputs)
+	if (locale === "vi") return __vi.notify_steps_body(inputs)
+	if (locale === "id") return __id.notify_steps_body(inputs)
+	if (locale === "ms") return __ms.notify_steps_body(inputs)
+	if (locale === "th") return __th.notify_steps_body(inputs)
+	if (locale === "fa") return __fa.notify_steps_body(inputs)
+	if (locale === "ur") return __ur.notify_steps_body(inputs)
+	if (locale === "bn") return __bn.notify_steps_body(inputs)
+	if (locale === "pa") return __pa.notify_steps_body(inputs)
+	if (locale === "sw") return __sw.notify_steps_body(inputs)
+	if (locale === "el") return __el.notify_steps_body(inputs)
+	if (locale === "cs") return __cs.notify_steps_body(inputs)
+	if (locale === "ro") return __ro.notify_steps_body(inputs)
+	if (locale === "hu") return __hu.notify_steps_body(inputs)
+	if (locale === "sv") return __sv.notify_steps_body(inputs)
+	if (locale === "he") return __he.notify_steps_body(inputs)
+	return __ru.notify_steps_body(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "GRABIT pedometer" |
+*
+* @param {Notify_Steps_TitleInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const notify_steps_title = /** @type {((inputs?: Notify_Steps_TitleInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Notify_Steps_TitleInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.notify_steps_title(inputs)
+	if (locale === "fr") return __fr.notify_steps_title(inputs)
+	if (locale === "es") return __es.notify_steps_title(inputs)
+	if (locale === "zh") return __zh.notify_steps_title(inputs)
+	if (locale === "zh-TW") return __zh_tw2.notify_steps_title(inputs)
+	if (locale === "hi") return __hi.notify_steps_title(inputs)
+	if (locale === "ar") return __ar.notify_steps_title(inputs)
+	if (locale === "pt") return __pt.notify_steps_title(inputs)
+	if (locale === "de") return __de.notify_steps_title(inputs)
+	if (locale === "ja") return __ja.notify_steps_title(inputs)
+	if (locale === "ko") return __ko.notify_steps_title(inputs)
+	if (locale === "it") return __it.notify_steps_title(inputs)
+	if (locale === "tr") return __tr.notify_steps_title(inputs)
+	if (locale === "pl") return __pl.notify_steps_title(inputs)
+	if (locale === "uk") return __uk.notify_steps_title(inputs)
+	if (locale === "nl") return __nl.notify_steps_title(inputs)
+	if (locale === "vi") return __vi.notify_steps_title(inputs)
+	if (locale === "id") return __id.notify_steps_title(inputs)
+	if (locale === "ms") return __ms.notify_steps_title(inputs)
+	if (locale === "th") return __th.notify_steps_title(inputs)
+	if (locale === "fa") return __fa.notify_steps_title(inputs)
+	if (locale === "ur") return __ur.notify_steps_title(inputs)
+	if (locale === "bn") return __bn.notify_steps_title(inputs)
+	if (locale === "pa") return __pa.notify_steps_title(inputs)
+	if (locale === "sw") return __sw.notify_steps_title(inputs)
+	if (locale === "el") return __el.notify_steps_title(inputs)
+	if (locale === "cs") return __cs.notify_steps_title(inputs)
+	if (locale === "ro") return __ro.notify_steps_title(inputs)
+	if (locale === "hu") return __hu.notify_steps_title(inputs)
+	if (locale === "sv") return __sv.notify_steps_title(inputs)
+	if (locale === "he") return __he.notify_steps_title(inputs)
+	return __ru.notify_steps_title(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "Settings" |
 *
 * @param {Profile_SettingsInputs} inputs
@@ -4587,6 +8416,94 @@ export const pwa_installed = /** @type {((inputs?: Pwa_InstalledInputs, options?
 /**
 * | output |
 * | --- |
+* | "Open the app. The pedometer is on the panel — start counting steps." |
+*
+* @param {Pwa_Open_App_StepsInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const pwa_open_app_steps = /** @type {((inputs?: Pwa_Open_App_StepsInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Pwa_Open_App_StepsInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.pwa_open_app_steps(inputs)
+	if (locale === "fr") return __fr.pwa_open_app_steps(inputs)
+	if (locale === "es") return __es.pwa_open_app_steps(inputs)
+	if (locale === "zh") return __zh.pwa_open_app_steps(inputs)
+	if (locale === "zh-TW") return __zh_tw2.pwa_open_app_steps(inputs)
+	if (locale === "hi") return __hi.pwa_open_app_steps(inputs)
+	if (locale === "ar") return __ar.pwa_open_app_steps(inputs)
+	if (locale === "pt") return __pt.pwa_open_app_steps(inputs)
+	if (locale === "de") return __de.pwa_open_app_steps(inputs)
+	if (locale === "ja") return __ja.pwa_open_app_steps(inputs)
+	if (locale === "ko") return __ko.pwa_open_app_steps(inputs)
+	if (locale === "it") return __it.pwa_open_app_steps(inputs)
+	if (locale === "tr") return __tr.pwa_open_app_steps(inputs)
+	if (locale === "pl") return __pl.pwa_open_app_steps(inputs)
+	if (locale === "uk") return __uk.pwa_open_app_steps(inputs)
+	if (locale === "nl") return __nl.pwa_open_app_steps(inputs)
+	if (locale === "vi") return __vi.pwa_open_app_steps(inputs)
+	if (locale === "id") return __id.pwa_open_app_steps(inputs)
+	if (locale === "ms") return __ms.pwa_open_app_steps(inputs)
+	if (locale === "th") return __th.pwa_open_app_steps(inputs)
+	if (locale === "fa") return __fa.pwa_open_app_steps(inputs)
+	if (locale === "ur") return __ur.pwa_open_app_steps(inputs)
+	if (locale === "bn") return __bn.pwa_open_app_steps(inputs)
+	if (locale === "pa") return __pa.pwa_open_app_steps(inputs)
+	if (locale === "sw") return __sw.pwa_open_app_steps(inputs)
+	if (locale === "el") return __el.pwa_open_app_steps(inputs)
+	if (locale === "cs") return __cs.pwa_open_app_steps(inputs)
+	if (locale === "ro") return __ro.pwa_open_app_steps(inputs)
+	if (locale === "hu") return __hu.pwa_open_app_steps(inputs)
+	if (locale === "sv") return __sv.pwa_open_app_steps(inputs)
+	if (locale === "he") return __he.pwa_open_app_steps(inputs)
+	return __ru.pwa_open_app_steps(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Rating {rating} · {votes}" |
+*
+* @param {Rating_VotesInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const rating_votes = /** @type {((inputs: Rating_VotesInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Rating_VotesInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.rating_votes(inputs)
+	if (locale === "fr") return __fr.rating_votes(inputs)
+	if (locale === "es") return __es.rating_votes(inputs)
+	if (locale === "zh") return __zh.rating_votes(inputs)
+	if (locale === "zh-TW") return __zh_tw2.rating_votes(inputs)
+	if (locale === "hi") return __hi.rating_votes(inputs)
+	if (locale === "ar") return __ar.rating_votes(inputs)
+	if (locale === "pt") return __pt.rating_votes(inputs)
+	if (locale === "de") return __de.rating_votes(inputs)
+	if (locale === "ja") return __ja.rating_votes(inputs)
+	if (locale === "ko") return __ko.rating_votes(inputs)
+	if (locale === "it") return __it.rating_votes(inputs)
+	if (locale === "tr") return __tr.rating_votes(inputs)
+	if (locale === "pl") return __pl.rating_votes(inputs)
+	if (locale === "uk") return __uk.rating_votes(inputs)
+	if (locale === "nl") return __nl.rating_votes(inputs)
+	if (locale === "vi") return __vi.rating_votes(inputs)
+	if (locale === "id") return __id.rating_votes(inputs)
+	if (locale === "ms") return __ms.rating_votes(inputs)
+	if (locale === "th") return __th.rating_votes(inputs)
+	if (locale === "fa") return __fa.rating_votes(inputs)
+	if (locale === "ur") return __ur.rating_votes(inputs)
+	if (locale === "bn") return __bn.rating_votes(inputs)
+	if (locale === "pa") return __pa.rating_votes(inputs)
+	if (locale === "sw") return __sw.rating_votes(inputs)
+	if (locale === "el") return __el.rating_votes(inputs)
+	if (locale === "cs") return __cs.rating_votes(inputs)
+	if (locale === "ro") return __ro.rating_votes(inputs)
+	if (locale === "hu") return __hu.rating_votes(inputs)
+	if (locale === "sv") return __sv.rating_votes(inputs)
+	if (locale === "he") return __he.rating_votes(inputs)
+	return __ru.rating_votes(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "Search" |
 *
 * @param {Search_TitleInputs} inputs
@@ -4627,6 +8544,94 @@ export const search_title = /** @type {((inputs?: Search_TitleInputs, options?: 
 	if (locale === "sv") return __sv.search_title(inputs)
 	if (locale === "he") return __he.search_title(inputs)
 	return __ru.search_title(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "What to search" |
+*
+* @param {Search_WhatInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const search_what = /** @type {((inputs?: Search_WhatInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Search_WhatInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.search_what(inputs)
+	if (locale === "fr") return __fr.search_what(inputs)
+	if (locale === "es") return __es.search_what(inputs)
+	if (locale === "zh") return __zh.search_what(inputs)
+	if (locale === "zh-TW") return __zh_tw2.search_what(inputs)
+	if (locale === "hi") return __hi.search_what(inputs)
+	if (locale === "ar") return __ar.search_what(inputs)
+	if (locale === "pt") return __pt.search_what(inputs)
+	if (locale === "de") return __de.search_what(inputs)
+	if (locale === "ja") return __ja.search_what(inputs)
+	if (locale === "ko") return __ko.search_what(inputs)
+	if (locale === "it") return __it.search_what(inputs)
+	if (locale === "tr") return __tr.search_what(inputs)
+	if (locale === "pl") return __pl.search_what(inputs)
+	if (locale === "uk") return __uk.search_what(inputs)
+	if (locale === "nl") return __nl.search_what(inputs)
+	if (locale === "vi") return __vi.search_what(inputs)
+	if (locale === "id") return __id.search_what(inputs)
+	if (locale === "ms") return __ms.search_what(inputs)
+	if (locale === "th") return __th.search_what(inputs)
+	if (locale === "fa") return __fa.search_what(inputs)
+	if (locale === "ur") return __ur.search_what(inputs)
+	if (locale === "bn") return __bn.search_what(inputs)
+	if (locale === "pa") return __pa.search_what(inputs)
+	if (locale === "sw") return __sw.search_what(inputs)
+	if (locale === "el") return __el.search_what(inputs)
+	if (locale === "cs") return __cs.search_what(inputs)
+	if (locale === "ro") return __ro.search_what(inputs)
+	if (locale === "hu") return __hu.search_what(inputs)
+	if (locale === "sv") return __sv.search_what(inputs)
+	if (locale === "he") return __he.search_what(inputs)
+	return __ru.search_what(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Specialist" |
+*
+* @param {SpecialistInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const specialist = /** @type {((inputs?: SpecialistInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<SpecialistInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.specialist(inputs)
+	if (locale === "fr") return __fr.specialist(inputs)
+	if (locale === "es") return __es.specialist(inputs)
+	if (locale === "zh") return __zh.specialist(inputs)
+	if (locale === "zh-TW") return __zh_tw2.specialist(inputs)
+	if (locale === "hi") return __hi.specialist(inputs)
+	if (locale === "ar") return __ar.specialist(inputs)
+	if (locale === "pt") return __pt.specialist(inputs)
+	if (locale === "de") return __de.specialist(inputs)
+	if (locale === "ja") return __ja.specialist(inputs)
+	if (locale === "ko") return __ko.specialist(inputs)
+	if (locale === "it") return __it.specialist(inputs)
+	if (locale === "tr") return __tr.specialist(inputs)
+	if (locale === "pl") return __pl.specialist(inputs)
+	if (locale === "uk") return __uk.specialist(inputs)
+	if (locale === "nl") return __nl.specialist(inputs)
+	if (locale === "vi") return __vi.specialist(inputs)
+	if (locale === "id") return __id.specialist(inputs)
+	if (locale === "ms") return __ms.specialist(inputs)
+	if (locale === "th") return __th.specialist(inputs)
+	if (locale === "fa") return __fa.specialist(inputs)
+	if (locale === "ur") return __ur.specialist(inputs)
+	if (locale === "bn") return __bn.specialist(inputs)
+	if (locale === "pa") return __pa.specialist(inputs)
+	if (locale === "sw") return __sw.specialist(inputs)
+	if (locale === "el") return __el.specialist(inputs)
+	if (locale === "cs") return __cs.specialist(inputs)
+	if (locale === "ro") return __ro.specialist(inputs)
+	if (locale === "hu") return __hu.specialist(inputs)
+	if (locale === "sv") return __sv.specialist(inputs)
+	if (locale === "he") return __he.specialist(inputs)
+	return __ru.specialist(inputs)
 });
 /**
 * | output |

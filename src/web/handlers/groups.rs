@@ -169,7 +169,64 @@ fn load_group_messages(
         messages.reverse();
     }
     decorate_group_messages(db, viewer_user_id, &mut messages);
+    apply_group_delivery_ticks(db, group_id, viewer_user_id, &mut messages);
     messages
+}
+
+fn apply_group_delivery_ticks(
+    db: &rusqlite::Connection,
+    group_id: i64,
+    viewer_user_id: i64,
+    messages: &mut [crate::web::view_models::ChatMessageRow],
+) {
+    let others: Vec<i64> = group_member_ids(db, group_id)
+        .into_iter()
+        .filter(|id| *id > 0 && *id != viewer_user_id)
+        .collect();
+    if others.is_empty() {
+        return;
+    }
+    let mut max_other_read: i64 = 0;
+    for member_id in &others {
+        let read_id: i64 = db
+            .query_row(
+                "SELECT COALESCE(last_read_message_id, 0)
+                 FROM chat_group_members
+                 WHERE group_id = ?1 AND user_id = ?2",
+                rusqlite::params![group_id, member_id],
+                |row| row.get(0),
+            )
+            .unwrap_or(0);
+        if read_id > max_other_read {
+            max_other_read = read_id;
+        }
+    }
+    for message in messages.iter_mut() {
+        if message.sender_user_id != viewer_user_id || message.deleted_at > 0 {
+            continue;
+        }
+        // Persisted for other members = delivered.
+        message.delivered_at = message.created_at.max(1);
+        if max_other_read >= message.id {
+            message.read_at = message.created_at.max(1);
+            message.is_read = 1;
+        } else {
+            message.read_at = 0;
+            message.is_read = 0;
+        }
+    }
+}
+
+fn group_peer_read_through(db: &rusqlite::Connection, group_id: i64, viewer_user_id: i64) -> i64 {
+    db.query_row(
+        "SELECT COALESCE(MAX(last_read_message_id), 0)
+         FROM chat_group_members
+         WHERE group_id = ?1
+           AND user_id <> ?2",
+        rusqlite::params![group_id, viewer_user_id],
+        |row| row.get(0),
+    )
+    .unwrap_or(0)
 }
 
 fn profile_display_name(db: &rusqlite::Connection, user_id: i64) -> String {
@@ -301,7 +358,7 @@ fn map_group_message_row(
                 id: message_id,
                 sender_user_id: row.get(1)?,
                 message: row.get(2)?,
-                is_read: 1,
+                is_read: 0,
                 created_at: row.get(3)?,
                 delivered_at: 0,
                 read_at: 0,
@@ -548,11 +605,12 @@ pub async fn api_group_messages(
         .iter()
         .map(|message| message_json(message, user_id))
         .collect();
+    let peer_read_through_id = group_peer_read_through(&db, group_id, user_id);
     Json(json!({
         "ok": true,
         "messages": items,
         "has_more": messages.len() as i64 >= limit,
-        "peer_read_through_id": 0,
+        "peer_read_through_id": peer_read_through_id,
     }))
     .into_response()
 }

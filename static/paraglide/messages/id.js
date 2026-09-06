@@ -1,36 +1,114 @@
 /* eslint-disable */
 /** @typedef {import('../runtime.js').LocalizedString} LocalizedString */
+/** @typedef {{}} Auth_EmailInputs */
+/** @typedef {{}} Auth_ForgotInputs */
+/** @typedef {{}} Auth_LoginInputs */
+/** @typedef {{}} Auth_PasswordInputs */
+/** @typedef {{}} Auth_RegisterInputs */
+/** @typedef {{}} Back_To_CitiesInputs */
+/** @typedef {{}} Chat_Actions_AriaInputs */
 /** @typedef {{}} Chat_All_ReadInputs */
+/** @typedef {{}} Chat_Cancel_ReplyInputs */
+/** @typedef {{}} Chat_CloseInputs */
+/** @typedef {{}} Chat_Compressing_PhotoInputs */
+/** @typedef {{}} Chat_Conn_OkInputs */
+/** @typedef {{}} Chat_ConnectingInputs */
 /** @typedef {{}} Chat_CopyInputs */
 /** @typedef {{}} Chat_DeleteInputs */
+/** @typedef {{}} Chat_DeletedInputs */
+/** @typedef {{}} Chat_DeletingInputs */
 /** @typedef {{}} Chat_DialogsInputs */
 /** @typedef {{}} Chat_EditInputs */
+/** @typedef {{}} Chat_EditedInputs */
 /** @typedef {{}} Chat_EmptyInputs */
 /** @typedef {{}} Chat_ForwardInputs */
+/** @typedef {{}} Chat_Forward_OfflineInputs */
+/** @typedef {{}} Chat_Forward_TitleInputs */
+/** @typedef {{}} Chat_ForwardedInputs */
+/** @typedef {{}} Chat_ForwardingInputs */
+/** @typedef {{}} Chat_Forwarding_PhotoInputs */
+/** @typedef {{}} Chat_Forwarding_VoiceInputs */
 /** @typedef {{}} Chat_GroupInputs */
+/** @typedef {{}} Chat_History_ErrorInputs */
+/** @typedef {{}} Chat_History_RetryInputs */
+/** @typedef {{}} Chat_History_StartInputs */
+/** @typedef {{}} Chat_Just_NowInputs */
+/** @typedef {{ when: NonNullable<unknown> }} Chat_Last_SeenInputs */
 /** @typedef {{}} Chat_LeadInputs */
 /** @typedef {{}} Chat_LeaveInputs */
+/** @typedef {{}} Chat_Link_OffInputs */
+/** @typedef {{}} Chat_Link_OkInputs */
+/** @typedef {{}} Chat_Load_OlderInputs */
+/** @typedef {{}} Chat_LoadingInputs */
+/** @typedef {{}} Chat_Long_AgoInputs */
 /** @typedef {{}} Chat_MembersInputs */
+/** @typedef {{}} Chat_MessageInputs */
+/** @typedef {{}} Chat_Mic_DeniedInputs */
+/** @typedef {{}} Chat_New_DialogInputs */
 /** @typedef {{}} Chat_New_GroupInputs */
+/** @typedef {{}} Chat_New_Group_PreviewInputs */
+/** @typedef {{}} Chat_No_NetworkInputs */
 /** @typedef {{}} Chat_OnlineInputs */
+/** @typedef {{}} Chat_OriginalInputs */
+/** @typedef {{}} Chat_PeerInputs */
 /** @typedef {{}} Chat_PhotoInputs */
+/** @typedef {{}} Chat_Photo_ErrorInputs */
+/** @typedef {{}} Chat_Photo_FailedInputs */
+/** @typedef {{}} Chat_Photo_LabelInputs */
+/** @typedef {{}} Chat_Photo_OfflineInputs */
+/** @typedef {{}} Chat_Photo_Over_8mbInputs */
+/** @typedef {{}} Chat_Photo_Too_BigInputs */
+/** @typedef {{}} Chat_Profile_MissingInputs */
+/** @typedef {{}} Chat_Rate_LimitedInputs */
+/** @typedef {{}} Chat_RecordingInputs */
+/** @typedef {{}} Chat_Recording_ReleaseInputs */
 /** @typedef {{}} Chat_ReplyInputs */
+/** @typedef {{}} Chat_Reply_LabelInputs */
+/** @typedef {{}} Chat_SaveInputs */
+/** @typedef {{}} Chat_SavingInputs */
+/** @typedef {{}} Chat_Send_UnavailableInputs */
+/** @typedef {{}} Chat_SendingInputs */
+/** @typedef {{ n: NonNullable<unknown> }} Chat_Sending_LeftInputs */
+/** @typedef {{}} Chat_Sending_PhotoInputs */
+/** @typedef {{}} Chat_Sending_VoiceInputs */
+/** @typedef {{}} Chat_Sent_HintInputs */
+/** @typedef {{}} Chat_Session_ExpiredInputs */
+/** @typedef {{}} Chat_Status_SendingInputs */
 /** @typedef {{}} Chat_TitleInputs */
 /** @typedef {{}} Chat_TypingInputs */
+/** @typedef {{}} Chat_User_UnavailableInputs */
+/** @typedef {{}} Chat_VoiceInputs */
+/** @typedef {{}} Chat_Voice_ErrorInputs */
+/** @typedef {{}} Chat_Voice_FailedInputs */
+/** @typedef {{}} Chat_Voice_OfflineInputs */
+/** @typedef {{}} Chat_Voice_Too_ShortInputs */
+/** @typedef {{}} Chat_Voice_UnsupportedInputs */
 /** @typedef {{}} Common_Account_NeededInputs */
 /** @typedef {{ feature: NonNullable<unknown> }} Common_Account_Needed_BodyInputs */
+/** @typedef {{}} Common_AllInputs */
 /** @typedef {{}} Common_BackInputs */
+/** @typedef {{}} Common_BusinessInputs */
 /** @typedef {{}} Common_Create_AccountInputs */
 /** @typedef {{}} Common_Guest_CopyInputs */
 /** @typedef {{}} Common_Guest_ModeInputs */
+/** @typedef {{}} Common_ListingInputs */
 /** @typedef {{}} Common_LoginInputs */
 /** @typedef {{}} Common_Login_PasswordInputs */
+/** @typedef {{}} Common_OfferInputs */
+/** @typedef {{}} Common_OnlineInputs */
 /** @typedef {{}} Common_Open_ProfileInputs */
+/** @typedef {{}} Common_PremiumInputs */
 /** @typedef {{}} Common_PrivacyInputs */
 /** @typedef {{}} Common_ProfileInputs */
 /** @typedef {{}} Common_RegisterInputs */
 /** @typedef {{}} Common_RulesInputs */
+/** @typedef {{}} Common_SeekerInputs */
 /** @typedef {{}} Common_To_MapInputs */
+/** @typedef {{}} Common_VerifiedInputs */
+/** @typedef {{}} Common_Was_RecentlyInputs */
+/** @typedef {{}} Common_WorkInputs */
+/** @typedef {{}} Common_WorkersInputs */
+/** @typedef {{}} Common_WriteInputs */
 /** @typedef {{}} Footer_AriaInputs */
 /** @typedef {{}} Lang_ArInputs */
 /** @typedef {{}} Lang_BnInputs */
@@ -66,6 +144,7 @@
 /** @typedef {{}} Lang_Zh_Tw2Inputs */
 /** @typedef {{}} Legal_PrivacyInputs */
 /** @typedef {{}} Legal_RulesInputs */
+/** @typedef {{}} Map_TitleInputs */
 /** @typedef {{}} Menu_Add_CardInputs */
 /** @typedef {{}} Menu_Add_MetaInputs */
 /** @typedef {{}} Menu_AppInputs */
@@ -97,18 +176,76 @@
 /** @typedef {{}} Nav_MenuInputs */
 /** @typedef {{}} Nav_SearchInputs */
 /** @typedef {{}} Notifications_TitleInputs */
+/** @typedef {{}} Notify_GenericInputs */
+/** @typedef {{}} Notify_New_MessageInputs */
+/** @typedef {{}} Notify_Open_ChatInputs */
+/** @typedef {{}} Notify_Steps_ActionInputs */
+/** @typedef {{}} Notify_Steps_BodyInputs */
+/** @typedef {{}} Notify_Steps_TitleInputs */
 /** @typedef {{}} Profile_SettingsInputs */
 /** @typedef {{}} Profile_Settings_SoundInputs */
 /** @typedef {{}} Profile_TitleInputs */
 /** @typedef {{}} Pwa_InstalledInputs */
+/** @typedef {{}} Pwa_Open_App_StepsInputs */
+/** @typedef {{ rating: NonNullable<unknown>, votes: NonNullable<unknown> }} Rating_VotesInputs */
 /** @typedef {{}} Search_TitleInputs */
+/** @typedef {{}} Search_WhatInputs */
+/** @typedef {{}} SpecialistInputs */
 /** @typedef {{}} Steps_InstallInputs */
 /** @typedef {{}} Steps_LeadInputs */
 /** @typedef {{}} Steps_TitleInputs */
 
 
+export const auth_email = /** @type {(inputs: Auth_EmailInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Email`)
+};
+
+export const auth_forgot = /** @type {(inputs: Auth_ForgotInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Lupa kata sandi?`)
+};
+
+export const auth_login = /** @type {(inputs: Auth_LoginInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Masuk`)
+};
+
+export const auth_password = /** @type {(inputs: Auth_PasswordInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Kata sandi`)
+};
+
+export const auth_register = /** @type {(inputs: Auth_RegisterInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Daftar`)
+};
+
+export const back_to_cities = /** @type {(inputs: Back_To_CitiesInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Kembali ke kota`)
+};
+
+export const chat_actions_aria = /** @type {(inputs: Chat_Actions_AriaInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Tindakan pesan`)
+};
+
 export const chat_all_read = /** @type {(inputs: Chat_All_ReadInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`All read`)
+};
+
+export const chat_cancel_reply = /** @type {(inputs: Chat_Cancel_ReplyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Batalkan balasan`)
+};
+
+export const chat_close = /** @type {(inputs: Chat_CloseInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Tutup`)
+};
+
+export const chat_compressing_photo = /** @type {(inputs: Chat_Compressing_PhotoInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Memampatkan foto…`)
+};
+
+export const chat_conn_ok = /** @type {(inputs: Chat_Conn_OkInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Terhubung`)
+};
+
+export const chat_connecting = /** @type {(inputs: Chat_ConnectingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Menghubungkan ulang…`)
 };
 
 export const chat_copy = /** @type {(inputs: Chat_CopyInputs) => LocalizedString} */ () => {
@@ -119,12 +256,24 @@ export const chat_delete = /** @type {(inputs: Chat_DeleteInputs) => LocalizedSt
 	return /** @type {LocalizedString} */ (`Delete`)
 };
 
+export const chat_deleted = /** @type {(inputs: Chat_DeletedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Pesan dihapus`)
+};
+
+export const chat_deleting = /** @type {(inputs: Chat_DeletingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Menghapus…`)
+};
+
 export const chat_dialogs = /** @type {(inputs: Chat_DialogsInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Conversations`)
 };
 
 export const chat_edit = /** @type {(inputs: Chat_EditInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Edit`)
+};
+
+export const chat_edited = /** @type {(inputs: Chat_EditedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`diedit`)
 };
 
 export const chat_empty = /** @type {(inputs: Chat_EmptyInputs) => LocalizedString} */ () => {
@@ -135,8 +284,52 @@ export const chat_forward = /** @type {(inputs: Chat_ForwardInputs) => Localized
 	return /** @type {LocalizedString} */ (`Forward`)
 };
 
+export const chat_forward_offline = /** @type {(inputs: Chat_Forward_OfflineInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Tanpa jaringan — penerusan tidak tersedia`)
+};
+
+export const chat_forward_title = /** @type {(inputs: Chat_Forward_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Teruskan pesan`)
+};
+
+export const chat_forwarded = /** @type {(inputs: Chat_ForwardedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Diteruskan · Enter untuk kirim`)
+};
+
+export const chat_forwarding = /** @type {(inputs: Chat_ForwardingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Meneruskan…`)
+};
+
+export const chat_forwarding_photo = /** @type {(inputs: Chat_Forwarding_PhotoInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Meneruskan foto…`)
+};
+
+export const chat_forwarding_voice = /** @type {(inputs: Chat_Forwarding_VoiceInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Meneruskan suara…`)
+};
+
 export const chat_group = /** @type {(inputs: Chat_GroupInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Group`)
+};
+
+export const chat_history_error = /** @type {(inputs: Chat_History_ErrorInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Gagal memuat riwayat`)
+};
+
+export const chat_history_retry = /** @type {(inputs: Chat_History_RetryInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Gagal · Coba lagi`)
+};
+
+export const chat_history_start = /** @type {(inputs: Chat_History_StartInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Awal percakapan`)
+};
+
+export const chat_just_now = /** @type {(inputs: Chat_Just_NowInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`baru saja`)
+};
+
+export const chat_last_seen = /** @type {(inputs: Chat_Last_SeenInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`terakhir dilihat ${i?.when}`)
 };
 
 export const chat_lead = /** @type {(inputs: Chat_LeadInputs) => LocalizedString} */ () => {
@@ -147,24 +340,156 @@ export const chat_leave = /** @type {(inputs: Chat_LeaveInputs) => LocalizedStri
 	return /** @type {LocalizedString} */ (`Leave`)
 };
 
+export const chat_link_off = /** @type {(inputs: Chat_Link_OffInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`mati`)
+};
+
+export const chat_link_ok = /** @type {(inputs: Chat_Link_OkInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`langsung`)
+};
+
+export const chat_load_older = /** @type {(inputs: Chat_Load_OlderInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Muat pesan sebelumnya`)
+};
+
+export const chat_loading = /** @type {(inputs: Chat_LoadingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Memuat…`)
+};
+
+export const chat_long_ago = /** @type {(inputs: Chat_Long_AgoInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`lama sekali`)
+};
+
 export const chat_members = /** @type {(inputs: Chat_MembersInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Members`)
+};
+
+export const chat_message = /** @type {(inputs: Chat_MessageInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Pesan`)
+};
+
+export const chat_mic_denied = /** @type {(inputs: Chat_Mic_DeniedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Akses mikrofon ditolak`)
+};
+
+export const chat_new_dialog = /** @type {(inputs: Chat_New_DialogInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Obrolan baru`)
 };
 
 export const chat_new_group = /** @type {(inputs: Chat_New_GroupInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Create group`)
 };
 
+export const chat_new_group_preview = /** @type {(inputs: Chat_New_Group_PreviewInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Grup baru`)
+};
+
+export const chat_no_network = /** @type {(inputs: Chat_No_NetworkInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Tanpa jaringan`)
+};
+
 export const chat_online = /** @type {(inputs: Chat_OnlineInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`online`)
+};
+
+export const chat_original = /** @type {(inputs: Chat_OriginalInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Pesan asli`)
+};
+
+export const chat_peer = /** @type {(inputs: Chat_PeerInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Kontak`)
 };
 
 export const chat_photo = /** @type {(inputs: Chat_PhotoInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Photo`)
 };
 
+export const chat_photo_error = /** @type {(inputs: Chat_Photo_ErrorInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Kesalahan foto`)
+};
+
+export const chat_photo_failed = /** @type {(inputs: Chat_Photo_FailedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Foto tidak terkirim`)
+};
+
+export const chat_photo_label = /** @type {(inputs: Chat_Photo_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Foto`)
+};
+
+export const chat_photo_offline = /** @type {(inputs: Chat_Photo_OfflineInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Tanpa jaringan — foto offline tidak bisa`)
+};
+
+export const chat_photo_over_8mb = /** @type {(inputs: Chat_Photo_Over_8mbInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Foto lebih dari 8 MB`)
+};
+
+export const chat_photo_too_big = /** @type {(inputs: Chat_Photo_Too_BigInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Foto terlalu besar`)
+};
+
+export const chat_profile_missing = /** @type {(inputs: Chat_Profile_MissingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Profil tidak ditemukan`)
+};
+
+export const chat_rate_limited = /** @type {(inputs: Chat_Rate_LimitedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Terlalu sering · tunggu`)
+};
+
+export const chat_recording = /** @type {(inputs: Chat_RecordingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Merekam…`)
+};
+
+export const chat_recording_release = /** @type {(inputs: Chat_Recording_ReleaseInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Merekam… lepas untuk kirim`)
+};
+
 export const chat_reply = /** @type {(inputs: Chat_ReplyInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Reply`)
+};
+
+export const chat_reply_label = /** @type {(inputs: Chat_Reply_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Balasan`)
+};
+
+export const chat_save = /** @type {(inputs: Chat_SaveInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Simpan`)
+};
+
+export const chat_saving = /** @type {(inputs: Chat_SavingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Menyimpan…`)
+};
+
+export const chat_send_unavailable = /** @type {(inputs: Chat_Send_UnavailableInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Pengiriman tidak tersedia`)
+};
+
+export const chat_sending = /** @type {(inputs: Chat_SendingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Mengirim…`)
+};
+
+export const chat_sending_left = /** @type {(inputs: Chat_Sending_LeftInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Mengirim · sisa ${i?.n}`)
+};
+
+export const chat_sending_photo = /** @type {(inputs: Chat_Sending_PhotoInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Mengirim foto…`)
+};
+
+export const chat_sending_voice = /** @type {(inputs: Chat_Sending_VoiceInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Mengirim suara…`)
+};
+
+export const chat_sent_hint = /** @type {(inputs: Chat_Sent_HintInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Terkirim · Enter untuk kirim`)
+};
+
+export const chat_session_expired = /** @type {(inputs: Chat_Session_ExpiredInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Sesi berakhir`)
+};
+
+export const chat_status_sending = /** @type {(inputs: Chat_Status_SendingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Mengirim`)
 };
 
 export const chat_title = /** @type {(inputs: Chat_TitleInputs) => LocalizedString} */ () => {
@@ -175,6 +500,34 @@ export const chat_typing = /** @type {(inputs: Chat_TypingInputs) => LocalizedSt
 	return /** @type {LocalizedString} */ (`typing…`)
 };
 
+export const chat_user_unavailable = /** @type {(inputs: Chat_User_UnavailableInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Pengguna tidak tersedia`)
+};
+
+export const chat_voice = /** @type {(inputs: Chat_VoiceInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Pesan suara`)
+};
+
+export const chat_voice_error = /** @type {(inputs: Chat_Voice_ErrorInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Kesalahan suara`)
+};
+
+export const chat_voice_failed = /** @type {(inputs: Chat_Voice_FailedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Suara tidak terkirim`)
+};
+
+export const chat_voice_offline = /** @type {(inputs: Chat_Voice_OfflineInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Tanpa jaringan — suara offline tidak bisa`)
+};
+
+export const chat_voice_too_short = /** @type {(inputs: Chat_Voice_Too_ShortInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Rekaman terlalu pendek`)
+};
+
+export const chat_voice_unsupported = /** @type {(inputs: Chat_Voice_UnsupportedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Perekaman suara tidak didukung di browser ini`)
+};
+
 export const common_account_needed = /** @type {(inputs: Common_Account_NeededInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Account required`)
 };
@@ -183,8 +536,16 @@ export const common_account_needed_body = /** @type {(inputs: Common_Account_Nee
 	return /** @type {LocalizedString} */ (`“${i?.feature}” is available after login. Cities and search work without an account.`)
 };
 
+export const common_all = /** @type {(inputs: Common_AllInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Semua`)
+};
+
 export const common_back = /** @type {(inputs: Common_BackInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Back`)
+};
+
+export const common_business = /** @type {(inputs: Common_BusinessInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Bisnis`)
 };
 
 export const common_create_account = /** @type {(inputs: Common_Create_AccountInputs) => LocalizedString} */ () => {
@@ -199,6 +560,10 @@ export const common_guest_mode = /** @type {(inputs: Common_Guest_ModeInputs) =>
 	return /** @type {LocalizedString} */ (`You are browsing as a guest`)
 };
 
+export const common_listing = /** @type {(inputs: Common_ListingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Iklan`)
+};
+
 export const common_login = /** @type {(inputs: Common_LoginInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Masuk`)
 };
@@ -207,8 +572,20 @@ export const common_login_password = /** @type {(inputs: Common_Login_PasswordIn
 	return /** @type {LocalizedString} */ (`Email and password`)
 };
 
+export const common_offer = /** @type {(inputs: Common_OfferInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Lowongan`)
+};
+
+export const common_online = /** @type {(inputs: Common_OnlineInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Online`)
+};
+
 export const common_open_profile = /** @type {(inputs: Common_Open_ProfileInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Open profile`)
+};
+
+export const common_premium = /** @type {(inputs: Common_PremiumInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Premium`)
 };
 
 export const common_privacy = /** @type {(inputs: Common_PrivacyInputs) => LocalizedString} */ () => {
@@ -227,8 +604,32 @@ export const common_rules = /** @type {(inputs: Common_RulesInputs) => Localized
 	return /** @type {LocalizedString} */ (`Aturan`)
 };
 
+export const common_seeker = /** @type {(inputs: Common_SeekerInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Mencari kerja`)
+};
+
 export const common_to_map = /** @type {(inputs: Common_To_MapInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`To the map`)
+};
+
+export const common_verified = /** @type {(inputs: Common_VerifiedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Terverifikasi`)
+};
+
+export const common_was_recently = /** @type {(inputs: Common_Was_RecentlyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Baru aktif`)
+};
+
+export const common_work = /** @type {(inputs: Common_WorkInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Pekerjaan`)
+};
+
+export const common_workers = /** @type {(inputs: Common_WorkersInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Pekerja`)
+};
+
+export const common_write = /** @type {(inputs: Common_WriteInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Tulis`)
 };
 
 export const footer_aria = /** @type {(inputs: Footer_AriaInputs) => LocalizedString} */ () => {
@@ -371,6 +772,10 @@ export const legal_rules = /** @type {(inputs: Legal_RulesInputs) => LocalizedSt
 	return /** @type {LocalizedString} */ (`Rules`)
 };
 
+export const map_title = /** @type {(inputs: Map_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Peta`)
+};
+
 export const menu_add_card = /** @type {(inputs: Menu_Add_CardInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Add a listing`)
 };
@@ -495,6 +900,30 @@ export const notifications_title = /** @type {(inputs: Notifications_TitleInputs
 	return /** @type {LocalizedString} */ (`Notifikasi`)
 };
 
+export const notify_generic = /** @type {(inputs: Notify_GenericInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Anda punya notifikasi baru.`)
+};
+
+export const notify_new_message = /** @type {(inputs: Notify_New_MessageInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Pesan baru`)
+};
+
+export const notify_open_chat = /** @type {(inputs: Notify_Open_ChatInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Buka chat di GRABIT.`)
+};
+
+export const notify_steps_action = /** @type {(inputs: Notify_Steps_ActionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Buka pedometer`)
+};
+
+export const notify_steps_body = /** @type {(inputs: Notify_Steps_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ketuk untuk hitung langkah.`)
+};
+
+export const notify_steps_title = /** @type {(inputs: Notify_Steps_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Pedometer GRABIT`)
+};
+
 export const profile_settings = /** @type {(inputs: Profile_SettingsInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Settings`)
 };
@@ -511,8 +940,24 @@ export const pwa_installed = /** @type {(inputs: Pwa_InstalledInputs) => Localiz
 	return /** @type {LocalizedString} */ (`Already installed`)
 };
 
+export const pwa_open_app_steps = /** @type {(inputs: Pwa_Open_App_StepsInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Buka aplikasi. Pedometer ada di panel.`)
+};
+
+export const rating_votes = /** @type {(inputs: Rating_VotesInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Peringkat ${i?.rating} · ${i?.votes}`)
+};
+
 export const search_title = /** @type {(inputs: Search_TitleInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Cari`)
+};
+
+export const search_what = /** @type {(inputs: Search_WhatInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Cari apa`)
+};
+
+export const specialist = /** @type {(inputs: SpecialistInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Spesialis`)
 };
 
 export const steps_install = /** @type {(inputs: Steps_InstallInputs) => LocalizedString} */ () => {

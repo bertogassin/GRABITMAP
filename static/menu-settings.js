@@ -9,6 +9,16 @@
         }
     }
 
+    function t(key, fallback) {
+        if (typeof window.rmT === "function") {
+            var value = window.rmT(key);
+            if (value && value !== key) {
+                return value;
+            }
+        }
+        return fallback;
+    }
+
     function updateSoundToggle(button) {
         var enabled =
             typeof window.chatSoundsAreEnabled === "function"
@@ -17,9 +27,13 @@
 
         var state = button.querySelector(".rm-menu-row-state");
         if (state) {
-            state.textContent = enabled ? "Включён" : "Выключен";
+            state.textContent = enabled
+                ? t("menu_sound_on", "Включён")
+                : t("menu_sound_off", "Выключен");
         } else {
-            button.textContent = enabled ? "Звук включён" : "Звук выключен";
+            button.textContent = enabled
+                ? t("menu_sound_on", "Звук включён")
+                : t("menu_sound_off", "Звук выключен");
         }
         button.setAttribute("aria-pressed", enabled ? "true" : "false");
         button.classList.toggle("is-off", !enabled);
@@ -33,11 +47,13 @@
 
         var state = button.querySelector(".rm-menu-row-state");
         if (state) {
-            state.textContent = enabled ? "Включена" : "Выключена";
+            state.textContent = enabled
+                ? t("menu_haptics_on", "Включена")
+                : t("menu_haptics_off", "Выключена");
         } else {
             button.textContent = enabled
-                ? "Вибрация включена"
-                : "Вибрация выключена";
+                ? t("menu_haptics_on", "Вибрация включена")
+                : t("menu_haptics_off", "Вибрация выключена");
         }
         button.setAttribute("aria-pressed", enabled ? "true" : "false");
         button.classList.toggle("is-off", !enabled);

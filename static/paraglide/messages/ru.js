@@ -1,36 +1,114 @@
 /* eslint-disable */
 /** @typedef {import('../runtime.js').LocalizedString} LocalizedString */
+/** @typedef {{}} Auth_EmailInputs */
+/** @typedef {{}} Auth_ForgotInputs */
+/** @typedef {{}} Auth_LoginInputs */
+/** @typedef {{}} Auth_PasswordInputs */
+/** @typedef {{}} Auth_RegisterInputs */
+/** @typedef {{}} Back_To_CitiesInputs */
+/** @typedef {{}} Chat_Actions_AriaInputs */
 /** @typedef {{}} Chat_All_ReadInputs */
+/** @typedef {{}} Chat_Cancel_ReplyInputs */
+/** @typedef {{}} Chat_CloseInputs */
+/** @typedef {{}} Chat_Compressing_PhotoInputs */
+/** @typedef {{}} Chat_Conn_OkInputs */
+/** @typedef {{}} Chat_ConnectingInputs */
 /** @typedef {{}} Chat_CopyInputs */
 /** @typedef {{}} Chat_DeleteInputs */
+/** @typedef {{}} Chat_DeletedInputs */
+/** @typedef {{}} Chat_DeletingInputs */
 /** @typedef {{}} Chat_DialogsInputs */
 /** @typedef {{}} Chat_EditInputs */
+/** @typedef {{}} Chat_EditedInputs */
 /** @typedef {{}} Chat_EmptyInputs */
 /** @typedef {{}} Chat_ForwardInputs */
+/** @typedef {{}} Chat_Forward_OfflineInputs */
+/** @typedef {{}} Chat_Forward_TitleInputs */
+/** @typedef {{}} Chat_ForwardedInputs */
+/** @typedef {{}} Chat_ForwardingInputs */
+/** @typedef {{}} Chat_Forwarding_PhotoInputs */
+/** @typedef {{}} Chat_Forwarding_VoiceInputs */
 /** @typedef {{}} Chat_GroupInputs */
+/** @typedef {{}} Chat_History_ErrorInputs */
+/** @typedef {{}} Chat_History_RetryInputs */
+/** @typedef {{}} Chat_History_StartInputs */
+/** @typedef {{}} Chat_Just_NowInputs */
+/** @typedef {{ when: NonNullable<unknown> }} Chat_Last_SeenInputs */
 /** @typedef {{}} Chat_LeadInputs */
 /** @typedef {{}} Chat_LeaveInputs */
+/** @typedef {{}} Chat_Link_OffInputs */
+/** @typedef {{}} Chat_Link_OkInputs */
+/** @typedef {{}} Chat_Load_OlderInputs */
+/** @typedef {{}} Chat_LoadingInputs */
+/** @typedef {{}} Chat_Long_AgoInputs */
 /** @typedef {{}} Chat_MembersInputs */
+/** @typedef {{}} Chat_MessageInputs */
+/** @typedef {{}} Chat_Mic_DeniedInputs */
+/** @typedef {{}} Chat_New_DialogInputs */
 /** @typedef {{}} Chat_New_GroupInputs */
+/** @typedef {{}} Chat_New_Group_PreviewInputs */
+/** @typedef {{}} Chat_No_NetworkInputs */
 /** @typedef {{}} Chat_OnlineInputs */
+/** @typedef {{}} Chat_OriginalInputs */
+/** @typedef {{}} Chat_PeerInputs */
 /** @typedef {{}} Chat_PhotoInputs */
+/** @typedef {{}} Chat_Photo_ErrorInputs */
+/** @typedef {{}} Chat_Photo_FailedInputs */
+/** @typedef {{}} Chat_Photo_LabelInputs */
+/** @typedef {{}} Chat_Photo_OfflineInputs */
+/** @typedef {{}} Chat_Photo_Over_8mbInputs */
+/** @typedef {{}} Chat_Photo_Too_BigInputs */
+/** @typedef {{}} Chat_Profile_MissingInputs */
+/** @typedef {{}} Chat_Rate_LimitedInputs */
+/** @typedef {{}} Chat_RecordingInputs */
+/** @typedef {{}} Chat_Recording_ReleaseInputs */
 /** @typedef {{}} Chat_ReplyInputs */
+/** @typedef {{}} Chat_Reply_LabelInputs */
+/** @typedef {{}} Chat_SaveInputs */
+/** @typedef {{}} Chat_SavingInputs */
+/** @typedef {{}} Chat_Send_UnavailableInputs */
+/** @typedef {{}} Chat_SendingInputs */
+/** @typedef {{ n: NonNullable<unknown> }} Chat_Sending_LeftInputs */
+/** @typedef {{}} Chat_Sending_PhotoInputs */
+/** @typedef {{}} Chat_Sending_VoiceInputs */
+/** @typedef {{}} Chat_Sent_HintInputs */
+/** @typedef {{}} Chat_Session_ExpiredInputs */
+/** @typedef {{}} Chat_Status_SendingInputs */
 /** @typedef {{}} Chat_TitleInputs */
 /** @typedef {{}} Chat_TypingInputs */
+/** @typedef {{}} Chat_User_UnavailableInputs */
+/** @typedef {{}} Chat_VoiceInputs */
+/** @typedef {{}} Chat_Voice_ErrorInputs */
+/** @typedef {{}} Chat_Voice_FailedInputs */
+/** @typedef {{}} Chat_Voice_OfflineInputs */
+/** @typedef {{}} Chat_Voice_Too_ShortInputs */
+/** @typedef {{}} Chat_Voice_UnsupportedInputs */
 /** @typedef {{}} Common_Account_NeededInputs */
 /** @typedef {{ feature: NonNullable<unknown> }} Common_Account_Needed_BodyInputs */
+/** @typedef {{}} Common_AllInputs */
 /** @typedef {{}} Common_BackInputs */
+/** @typedef {{}} Common_BusinessInputs */
 /** @typedef {{}} Common_Create_AccountInputs */
 /** @typedef {{}} Common_Guest_CopyInputs */
 /** @typedef {{}} Common_Guest_ModeInputs */
+/** @typedef {{}} Common_ListingInputs */
 /** @typedef {{}} Common_LoginInputs */
 /** @typedef {{}} Common_Login_PasswordInputs */
+/** @typedef {{}} Common_OfferInputs */
+/** @typedef {{}} Common_OnlineInputs */
 /** @typedef {{}} Common_Open_ProfileInputs */
+/** @typedef {{}} Common_PremiumInputs */
 /** @typedef {{}} Common_PrivacyInputs */
 /** @typedef {{}} Common_ProfileInputs */
 /** @typedef {{}} Common_RegisterInputs */
 /** @typedef {{}} Common_RulesInputs */
+/** @typedef {{}} Common_SeekerInputs */
 /** @typedef {{}} Common_To_MapInputs */
+/** @typedef {{}} Common_VerifiedInputs */
+/** @typedef {{}} Common_Was_RecentlyInputs */
+/** @typedef {{}} Common_WorkInputs */
+/** @typedef {{}} Common_WorkersInputs */
+/** @typedef {{}} Common_WriteInputs */
 /** @typedef {{}} Footer_AriaInputs */
 /** @typedef {{}} Lang_ArInputs */
 /** @typedef {{}} Lang_BnInputs */
@@ -66,6 +144,7 @@
 /** @typedef {{}} Lang_Zh_Tw2Inputs */
 /** @typedef {{}} Legal_PrivacyInputs */
 /** @typedef {{}} Legal_RulesInputs */
+/** @typedef {{}} Map_TitleInputs */
 /** @typedef {{}} Menu_Add_CardInputs */
 /** @typedef {{}} Menu_Add_MetaInputs */
 /** @typedef {{}} Menu_AppInputs */
@@ -97,18 +176,76 @@
 /** @typedef {{}} Nav_MenuInputs */
 /** @typedef {{}} Nav_SearchInputs */
 /** @typedef {{}} Notifications_TitleInputs */
+/** @typedef {{}} Notify_GenericInputs */
+/** @typedef {{}} Notify_New_MessageInputs */
+/** @typedef {{}} Notify_Open_ChatInputs */
+/** @typedef {{}} Notify_Steps_ActionInputs */
+/** @typedef {{}} Notify_Steps_BodyInputs */
+/** @typedef {{}} Notify_Steps_TitleInputs */
 /** @typedef {{}} Profile_SettingsInputs */
 /** @typedef {{}} Profile_Settings_SoundInputs */
 /** @typedef {{}} Profile_TitleInputs */
 /** @typedef {{}} Pwa_InstalledInputs */
+/** @typedef {{}} Pwa_Open_App_StepsInputs */
+/** @typedef {{ rating: NonNullable<unknown>, votes: NonNullable<unknown> }} Rating_VotesInputs */
 /** @typedef {{}} Search_TitleInputs */
+/** @typedef {{}} Search_WhatInputs */
+/** @typedef {{}} SpecialistInputs */
 /** @typedef {{}} Steps_InstallInputs */
 /** @typedef {{}} Steps_LeadInputs */
 /** @typedef {{}} Steps_TitleInputs */
 
 
+export const auth_email = /** @type {(inputs: Auth_EmailInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Email`)
+};
+
+export const auth_forgot = /** @type {(inputs: Auth_ForgotInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Забыли пароль?`)
+};
+
+export const auth_login = /** @type {(inputs: Auth_LoginInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Войти`)
+};
+
+export const auth_password = /** @type {(inputs: Auth_PasswordInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Пароль`)
+};
+
+export const auth_register = /** @type {(inputs: Auth_RegisterInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Регистрация`)
+};
+
+export const back_to_cities = /** @type {(inputs: Back_To_CitiesInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Вернуться к городам`)
+};
+
+export const chat_actions_aria = /** @type {(inputs: Chat_Actions_AriaInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Действия с сообщением`)
+};
+
 export const chat_all_read = /** @type {(inputs: Chat_All_ReadInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Все прочитано`)
+};
+
+export const chat_cancel_reply = /** @type {(inputs: Chat_Cancel_ReplyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Отменить ответ`)
+};
+
+export const chat_close = /** @type {(inputs: Chat_CloseInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Закрыть`)
+};
+
+export const chat_compressing_photo = /** @type {(inputs: Chat_Compressing_PhotoInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сжимаем фото…`)
+};
+
+export const chat_conn_ok = /** @type {(inputs: Chat_Conn_OkInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Связь есть`)
+};
+
+export const chat_connecting = /** @type {(inputs: Chat_ConnectingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Связь восстанавливается…`)
 };
 
 export const chat_copy = /** @type {(inputs: Chat_CopyInputs) => LocalizedString} */ () => {
@@ -119,12 +256,24 @@ export const chat_delete = /** @type {(inputs: Chat_DeleteInputs) => LocalizedSt
 	return /** @type {LocalizedString} */ (`Удалить`)
 };
 
+export const chat_deleted = /** @type {(inputs: Chat_DeletedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сообщение удалено`)
+};
+
+export const chat_deleting = /** @type {(inputs: Chat_DeletingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Удаление…`)
+};
+
 export const chat_dialogs = /** @type {(inputs: Chat_DialogsInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Диалоги`)
 };
 
 export const chat_edit = /** @type {(inputs: Chat_EditInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Изменить`)
+};
+
+export const chat_edited = /** @type {(inputs: Chat_EditedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`изменено`)
 };
 
 export const chat_empty = /** @type {(inputs: Chat_EmptyInputs) => LocalizedString} */ () => {
@@ -135,8 +284,52 @@ export const chat_forward = /** @type {(inputs: Chat_ForwardInputs) => Localized
 	return /** @type {LocalizedString} */ (`Переслать`)
 };
 
+export const chat_forward_offline = /** @type {(inputs: Chat_Forward_OfflineInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Нет сети — пересылка недоступна`)
+};
+
+export const chat_forward_title = /** @type {(inputs: Chat_Forward_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Переслать сообщение`)
+};
+
+export const chat_forwarded = /** @type {(inputs: Chat_ForwardedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Переслано · Enter — отправить`)
+};
+
+export const chat_forwarding = /** @type {(inputs: Chat_ForwardingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Пересылка…`)
+};
+
+export const chat_forwarding_photo = /** @type {(inputs: Chat_Forwarding_PhotoInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Пересылка фото…`)
+};
+
+export const chat_forwarding_voice = /** @type {(inputs: Chat_Forwarding_VoiceInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Пересылка голосового…`)
+};
+
 export const chat_group = /** @type {(inputs: Chat_GroupInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Группа`)
+};
+
+export const chat_history_error = /** @type {(inputs: Chat_History_ErrorInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ошибка загрузки истории`)
+};
+
+export const chat_history_retry = /** @type {(inputs: Chat_History_RetryInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Не удалось загрузить · Повторить`)
+};
+
+export const chat_history_start = /** @type {(inputs: Chat_History_StartInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Начало переписки`)
+};
+
+export const chat_just_now = /** @type {(inputs: Chat_Just_NowInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`только что`)
+};
+
+export const chat_last_seen = /** @type {(inputs: Chat_Last_SeenInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`был(а) ${i?.when}`)
 };
 
 export const chat_lead = /** @type {(inputs: Chat_LeadInputs) => LocalizedString} */ () => {
@@ -147,24 +340,156 @@ export const chat_leave = /** @type {(inputs: Chat_LeaveInputs) => LocalizedStri
 	return /** @type {LocalizedString} */ (`Выйти`)
 };
 
+export const chat_link_off = /** @type {(inputs: Chat_Link_OffInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`нет`)
+};
+
+export const chat_link_ok = /** @type {(inputs: Chat_Link_OkInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`связь`)
+};
+
+export const chat_load_older = /** @type {(inputs: Chat_Load_OlderInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Загрузить предыдущие сообщения`)
+};
+
+export const chat_loading = /** @type {(inputs: Chat_LoadingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Загрузка…`)
+};
+
+export const chat_long_ago = /** @type {(inputs: Chat_Long_AgoInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`давно`)
+};
+
 export const chat_members = /** @type {(inputs: Chat_MembersInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Участники`)
+};
+
+export const chat_message = /** @type {(inputs: Chat_MessageInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сообщение`)
+};
+
+export const chat_mic_denied = /** @type {(inputs: Chat_Mic_DeniedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Нет доступа к микрофону`)
+};
+
+export const chat_new_dialog = /** @type {(inputs: Chat_New_DialogInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Новый диалог`)
 };
 
 export const chat_new_group = /** @type {(inputs: Chat_New_GroupInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Создать группу`)
 };
 
+export const chat_new_group_preview = /** @type {(inputs: Chat_New_Group_PreviewInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Новая группа`)
+};
+
+export const chat_no_network = /** @type {(inputs: Chat_No_NetworkInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Нет сети`)
+};
+
 export const chat_online = /** @type {(inputs: Chat_OnlineInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`онлайн`)
+};
+
+export const chat_original = /** @type {(inputs: Chat_OriginalInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Исходное сообщение`)
+};
+
+export const chat_peer = /** @type {(inputs: Chat_PeerInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Собеседник`)
 };
 
 export const chat_photo = /** @type {(inputs: Chat_PhotoInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Фото`)
 };
 
+export const chat_photo_error = /** @type {(inputs: Chat_Photo_ErrorInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ошибка фото`)
+};
+
+export const chat_photo_failed = /** @type {(inputs: Chat_Photo_FailedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Фото не отправлено`)
+};
+
+export const chat_photo_label = /** @type {(inputs: Chat_Photo_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Фото`)
+};
+
+export const chat_photo_offline = /** @type {(inputs: Chat_Photo_OfflineInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Нет сети — фото нельзя отправить офлайн`)
+};
+
+export const chat_photo_over_8mb = /** @type {(inputs: Chat_Photo_Over_8mbInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Фото больше 8 МБ`)
+};
+
+export const chat_photo_too_big = /** @type {(inputs: Chat_Photo_Too_BigInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Фото слишком большое`)
+};
+
+export const chat_profile_missing = /** @type {(inputs: Chat_Profile_MissingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Профиль не найден`)
+};
+
+export const chat_rate_limited = /** @type {(inputs: Chat_Rate_LimitedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Слишком часто · подождите`)
+};
+
+export const chat_recording = /** @type {(inputs: Chat_RecordingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Запись…`)
+};
+
+export const chat_recording_release = /** @type {(inputs: Chat_Recording_ReleaseInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Запись… отпустите для отправки`)
+};
+
 export const chat_reply = /** @type {(inputs: Chat_ReplyInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Ответить`)
+};
+
+export const chat_reply_label = /** @type {(inputs: Chat_Reply_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ответ`)
+};
+
+export const chat_save = /** @type {(inputs: Chat_SaveInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сохранить`)
+};
+
+export const chat_saving = /** @type {(inputs: Chat_SavingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сохранение…`)
+};
+
+export const chat_send_unavailable = /** @type {(inputs: Chat_Send_UnavailableInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Отправка недоступна`)
+};
+
+export const chat_sending = /** @type {(inputs: Chat_SendingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Отправка…`)
+};
+
+export const chat_sending_left = /** @type {(inputs: Chat_Sending_LeftInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Отправка · осталось ${i?.n}`)
+};
+
+export const chat_sending_photo = /** @type {(inputs: Chat_Sending_PhotoInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Отправка фото…`)
+};
+
+export const chat_sending_voice = /** @type {(inputs: Chat_Sending_VoiceInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Отправка голосового…`)
+};
+
+export const chat_sent_hint = /** @type {(inputs: Chat_Sent_HintInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Отправлено · Enter — отправить`)
+};
+
+export const chat_session_expired = /** @type {(inputs: Chat_Session_ExpiredInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сессия истекла`)
+};
+
+export const chat_status_sending = /** @type {(inputs: Chat_Status_SendingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Отправляется`)
 };
 
 export const chat_title = /** @type {(inputs: Chat_TitleInputs) => LocalizedString} */ () => {
@@ -175,6 +500,34 @@ export const chat_typing = /** @type {(inputs: Chat_TypingInputs) => LocalizedSt
 	return /** @type {LocalizedString} */ (`печатает…`)
 };
 
+export const chat_user_unavailable = /** @type {(inputs: Chat_User_UnavailableInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Пользователь недоступен`)
+};
+
+export const chat_voice = /** @type {(inputs: Chat_VoiceInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Голосовое`)
+};
+
+export const chat_voice_error = /** @type {(inputs: Chat_Voice_ErrorInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ошибка голосового`)
+};
+
+export const chat_voice_failed = /** @type {(inputs: Chat_Voice_FailedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Голосовое не отправлено`)
+};
+
+export const chat_voice_offline = /** @type {(inputs: Chat_Voice_OfflineInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Нет сети — голосовое нельзя отправить офлайн`)
+};
+
+export const chat_voice_too_short = /** @type {(inputs: Chat_Voice_Too_ShortInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Слишком короткая запись`)
+};
+
+export const chat_voice_unsupported = /** @type {(inputs: Chat_Voice_UnsupportedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Запись голоса недоступна в этом браузере`)
+};
+
 export const common_account_needed = /** @type {(inputs: Common_Account_NeededInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Нужен аккаунт`)
 };
@@ -183,8 +536,16 @@ export const common_account_needed_body = /** @type {(inputs: Common_Account_Nee
 	return /** @type {LocalizedString} */ (`Раздел «${i?.feature}» доступен после входа. Города и поиск работают без регистрации.`)
 };
 
+export const common_all = /** @type {(inputs: Common_AllInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Все`)
+};
+
 export const common_back = /** @type {(inputs: Common_BackInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Назад`)
+};
+
+export const common_business = /** @type {(inputs: Common_BusinessInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Бизнес`)
 };
 
 export const common_create_account = /** @type {(inputs: Common_Create_AccountInputs) => LocalizedString} */ () => {
@@ -199,6 +560,10 @@ export const common_guest_mode = /** @type {(inputs: Common_Guest_ModeInputs) =>
 	return /** @type {LocalizedString} */ (`Вы в гостевом режиме`)
 };
 
+export const common_listing = /** @type {(inputs: Common_ListingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Объявление`)
+};
+
 export const common_login = /** @type {(inputs: Common_LoginInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Войти`)
 };
@@ -207,8 +572,20 @@ export const common_login_password = /** @type {(inputs: Common_Login_PasswordIn
 	return /** @type {LocalizedString} */ (`Логин и пароль`)
 };
 
+export const common_offer = /** @type {(inputs: Common_OfferInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Предложение работы`)
+};
+
+export const common_online = /** @type {(inputs: Common_OnlineInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Онлайн`)
+};
+
 export const common_open_profile = /** @type {(inputs: Common_Open_ProfileInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Открыть профиль`)
+};
+
+export const common_premium = /** @type {(inputs: Common_PremiumInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Премиум`)
 };
 
 export const common_privacy = /** @type {(inputs: Common_PrivacyInputs) => LocalizedString} */ () => {
@@ -227,8 +604,32 @@ export const common_rules = /** @type {(inputs: Common_RulesInputs) => Localized
 	return /** @type {LocalizedString} */ (`Правила`)
 };
 
+export const common_seeker = /** @type {(inputs: Common_SeekerInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ищу работу`)
+};
+
 export const common_to_map = /** @type {(inputs: Common_To_MapInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`К карте`)
+};
+
+export const common_verified = /** @type {(inputs: Common_VerifiedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Проверен`)
+};
+
+export const common_was_recently = /** @type {(inputs: Common_Was_RecentlyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Был недавно`)
+};
+
+export const common_work = /** @type {(inputs: Common_WorkInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Работа`)
+};
+
+export const common_workers = /** @type {(inputs: Common_WorkersInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Работники`)
+};
+
+export const common_write = /** @type {(inputs: Common_WriteInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Написать`)
 };
 
 export const footer_aria = /** @type {(inputs: Footer_AriaInputs) => LocalizedString} */ () => {
@@ -371,6 +772,10 @@ export const legal_rules = /** @type {(inputs: Legal_RulesInputs) => LocalizedSt
 	return /** @type {LocalizedString} */ (`Правила`)
 };
 
+export const map_title = /** @type {(inputs: Map_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Карта`)
+};
+
 export const menu_add_card = /** @type {(inputs: Menu_Add_CardInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Добавить объявление`)
 };
@@ -495,6 +900,30 @@ export const notifications_title = /** @type {(inputs: Notifications_TitleInputs
 	return /** @type {LocalizedString} */ (`Уведомления`)
 };
 
+export const notify_generic = /** @type {(inputs: Notify_GenericInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Есть новое уведомление.`)
+};
+
+export const notify_new_message = /** @type {(inputs: Notify_New_MessageInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Новое сообщение`)
+};
+
+export const notify_open_chat = /** @type {(inputs: Notify_Open_ChatInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Откройте чат в GRABIT.`)
+};
+
+export const notify_steps_action = /** @type {(inputs: Notify_Steps_ActionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Открыть шагомер`)
+};
+
+export const notify_steps_body = /** @type {(inputs: Notify_Steps_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Нажмите — сразу считать шаги.`)
+};
+
+export const notify_steps_title = /** @type {(inputs: Notify_Steps_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Шагомер GRABIT`)
+};
+
 export const profile_settings = /** @type {(inputs: Profile_SettingsInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Настройки`)
 };
@@ -511,8 +940,24 @@ export const pwa_installed = /** @type {(inputs: Pwa_InstalledInputs) => Localiz
 	return /** @type {LocalizedString} */ (`Уже скачано`)
 };
 
+export const pwa_open_app_steps = /** @type {(inputs: Pwa_Open_App_StepsInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Откройте приложение. Шагомер на панели — сразу считать шаги.`)
+};
+
+export const rating_votes = /** @type {(inputs: Rating_VotesInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Оценка ${i?.rating} · ${i?.votes}`)
+};
+
 export const search_title = /** @type {(inputs: Search_TitleInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Поиск`)
+};
+
+export const search_what = /** @type {(inputs: Search_WhatInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Что искать`)
+};
+
+export const specialist = /** @type {(inputs: SpecialistInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Специалист`)
 };
 
 export const steps_install = /** @type {(inputs: Steps_InstallInputs) => LocalizedString} */ () => {

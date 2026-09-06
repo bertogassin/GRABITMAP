@@ -758,9 +758,7 @@ pub async fn admin_resources(
 
         let premium_badge = if premium == 1 {
             templates::premium_badge_html("admin")
-        } else {
-            ""
-        };
+        } else { String::new() };
 
         let active_badge = templates::resource_visibility_badge(active);
 

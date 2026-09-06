@@ -1381,15 +1381,11 @@ pub fn render_search(
 
                     let premium_badge = if *premium != 0 {
                         premium_badge_html("default")
-                    } else {
-                        ""
-                    };
+                    } else { String::new() };
 
                     let verified_badge = if *verified != 0 {
                         verified_badge_html(true)
-                    } else {
-                        ""
-                    };
+                    } else { String::new() };
 
                     let write_href = if *owner_user_id > 0 {
                         format!("/app/chat/{owner_user_id}")
@@ -1406,8 +1402,8 @@ pub fn render_search(
                         votes: *votes,
                         location_html: &escape_html(&location),
                         address_html: &escape_html(address),
-                        premium_badge_html: premium_badge,
-                        verified_badge_html: verified_badge,
+                        premium_badge_html: &premium_badge,
+                        verified_badge_html: &verified_badge,
                         write_href: &write_href,
                     })
                 },

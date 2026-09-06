@@ -49,9 +49,7 @@ fn home_city_select_html(continent: i64, country: i64, city: i64) -> String {
                 let zi = zi as i64;
                 let selected = if continent == ci && country == si && city == zi {
                     " selected"
-                } else {
-                    ""
-                };
+                } else { "" };
                 options.push_str(&format!(
                     r#"<option value="{ci}:{si}:{zi}"{selected}>{} · {}</option>"#,
                     escape_html(city_name),
@@ -114,9 +112,7 @@ fn render_user_sessions_panel(sessions: &[crate::web::view_models::UserSessionRo
             };
             let current = if session.is_current {
                 r#"<span class="rm-session-current">Это устройство</span>"#
-            } else {
-                ""
-            };
+            } else { "" };
             let revoke_form = if session.is_current {
                 String::new()
             } else {
@@ -1494,9 +1490,7 @@ pub fn render_notifications(
 
                     let unread_badge = if *is_read == 0 {
                         r#"<span class="rm-notif-new">Новое</span>"#
-                    } else {
-                        ""
-                    };
+                    } else { "" };
 
                     format!(
                         r#"
@@ -1727,15 +1721,11 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
 
                     let verified_badge = if *verified != 0 {
                         verified_badge_html(true)
-                    } else {
-                        ""
-                    };
+                    } else { String::new() };
 
                     let premium_badge = if *premium != 0 {
                         premium_badge_html("compact")
-                    } else {
-                        ""
-                    };
+                    } else { String::new() };
 
                     profile_resource_card(super::common::ProfileResourceCardParams {
                         href: &format!("/app/resource/{}", id),
@@ -1746,8 +1736,8 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
                         address: None,
                         rating: *rating,
                         votes: *votes,
-                        premium_badge_html: premium_badge,
-                        verified_badge_html: verified_badge,
+                        premium_badge_html: &premium_badge,
+                        verified_badge_html: &verified_badge,
                     })
                 },
             )
@@ -1898,15 +1888,11 @@ pub fn render_favorites(
                 |(id, title, category, description, address, rating, votes, verified, premium)| {
                     let premium_badge = if *premium != 0 {
                         premium_badge_html("compact")
-                    } else {
-                        ""
-                    };
+                    } else { String::new() };
 
                     let verified_badge = if *verified != 0 {
                         verified_badge_html(true)
-                    } else {
-                        ""
-                    };
+                    } else { String::new() };
 
                     profile_resource_card(super::common::ProfileResourceCardParams {
                         href: &format!("/app/resource/{}", id),
@@ -1917,8 +1903,8 @@ pub fn render_favorites(
                         address: Some(address.as_str()),
                         rating: *rating,
                         votes: *votes,
-                        premium_badge_html: premium_badge,
-                        verified_badge_html: verified_badge,
+                        premium_badge_html: &premium_badge,
+                        verified_badge_html: &verified_badge,
                     })
                 },
             )

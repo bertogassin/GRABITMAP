@@ -161,22 +161,16 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
 
                     let verified_badge = if *verified != 0 {
                         verified_badge_html(false)
-                    } else {
-                        ""
-                    };
+                    } else { String::new() };
 
                     let premium_badge = if *premium != 0 {
                         premium_badge_html("default")
-                    } else {
-                        ""
-                    };
+                    } else { String::new() };
 
                     let card_class = resource_card_link_class(*premium != 0);
                     let premium_shine = if *premium != 0 {
                         r#"<div class="rm-resource-card-shine"></div>"#
-                    } else {
-                        ""
-                    };
+                    } else { "" };
 
                     let write_href = if *owner_user_id > 0 {
                         format!("/app/chat/{owner_user_id}")
@@ -187,8 +181,9 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                         String::new()
                     } else {
                         format!(
-                            r#"<a href="{href}" class="rm-person-write">Написать</a>"#,
+                            r#"<a href="{href}" class="rm-person-write">{write}</a>"#,
                             href = escape_html(&write_href),
+                            write = crate::i18n::t("common_write"),
                         )
                     };
 
@@ -460,15 +455,11 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
 
     let premium_badge = if premium != 0 {
         premium_badge_html("default")
-    } else {
-        ""
-    };
+    } else { String::new() };
 
     let verified_badge = if verified != 0 {
         verified_badge_html(false)
-    } else {
-        ""
-    };
+    } else { String::new() };
 
     let listing_label = resource_listing_label(listing_type);
     let rubric_label = if crate::catalog::by_id(rubric).is_some() {
@@ -651,8 +642,9 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
             public_id = urlencoding::encode(owner_public_id),
             write_html = if owner_user_id > 0 && !owner_preview {
                 format!(
-                    r#"<a href="/app/chat/{owner_user_id}" class="rm-resource-owner-link">Написать</a>"#,
+                    r#"<a href="/app/chat/{owner_user_id}" class="rm-resource-owner-link">{write}</a>"#,
                     owner_user_id = owner_user_id,
+                    write = crate::i18n::t("common_write"),
                 )
             } else {
                 String::new()
@@ -688,8 +680,9 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
     };
     let primary_contact = if !write_href.is_empty() {
         format!(
-            r#"<a href="{href}" class="rm-resource-contact-btn rm-resource-contact-btn--gold">Написать</a>"#,
+            r#"<a href="{href}" class="rm-resource-contact-btn rm-resource-contact-btn--gold">{write}</a>"#,
             href = escape_html(&write_href),
+            write = crate::i18n::t("common_write"),
         )
     } else if !contact_clean.is_empty() {
         format!(
@@ -997,9 +990,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
         &format!("{} · GRABIT", title),
         if owner_preview {
             r#"<meta name="robots" content="noindex, nofollow">"#
-        } else {
-            ""
-        },
+        } else { "" },
         "",
         &format!(
             "{topbar}\n\n{hero}\n\n{content}",
@@ -1503,9 +1494,7 @@ pub fn render_my_resources(
 
                 let premium_badge = if *premium != 0 {
                     premium_badge_html("compact")
-                } else {
-                    ""
-                };
+                } else { String::new() };
 
                 let moderation_badge =
                     my_resource_moderation_badge(*is_active, moderation_status);
@@ -1676,14 +1665,10 @@ pub fn render_edit_resource(params: RenderEditResourceParams<'_>) -> String {
     {
         let offer_selected = if listing_type != "seeker" {
             " selected"
-        } else {
-            ""
-        };
+        } else { "" };
         let seeker_selected = if listing_type == "seeker" {
             " selected"
-        } else {
-            ""
-        };
+        } else { "" };
 
         format!(
             r#"
@@ -1875,9 +1860,7 @@ fn rubric_select_html(selected: &str, kind: Option<crate::catalog::RubricKind>) 
         for rubric in crate::catalog::by_kind(group_kind) {
             let selected_attr = if selected == rubric.id {
                 " selected"
-            } else {
-                ""
-            };
+            } else { "" };
             options.push_str(&format!(
                 r#"<option value="{id}"{selected_attr}>{label}</option>"#,
                 id = escape_html(rubric.id),

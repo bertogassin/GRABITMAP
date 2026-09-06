@@ -43,7 +43,7 @@
                 '<span class="chat-dialog-typing">' +
                 '<span class="chat-typing-dots" aria-hidden="true">' +
                 "<i></i><i></i><i></i></span>" +
-                "печатает…" +
+                t("chat_typing", "печатает…") +
                 "</span>"
             );
         }
@@ -55,7 +55,7 @@
 
             liveBadge.hidden = false;
             liveBadge.dataset.state = online ? "online" : "offline";
-            liveBadge.textContent = online ? "связь" : "нет";
+            liveBadge.textContent = online ? t("chat_link_ok", "связь") : t("chat_link_off", "нет");
         }
 
         function conversationKey(conversation) {
@@ -105,13 +105,16 @@
             var previewText = !isGroup && activeTyping[userId]
                 ? typingPreviewHtml()
                 : escapeHtml(
-                    conversation.last_message || (isGroup ? "Новая группа" : "Новый диалог")
+                    conversation.last_message || (isGroup ? t("chat_new_group_preview", "Новая группа") : t("chat_new_dialog", "Новый диалог"))
                 );
+            var fallbackAvatar = isGroup ? USERS_ICON : MESSAGE_ICON;
             var avatarHtml = !isGroup && conversation.has_avatar && userId
                 ? '<img class="rm-me-avatar-img" src="/api/avatars/'
                   + encodeURIComponent(userId)
-                  + '" alt="" onerror="this.remove()">'
-                : (isGroup ? USERS_ICON : MESSAGE_ICON);
+                  + '" alt="" onerror=\'this.onerror=null;var p=this.parentNode;this.remove();if(p)p.insertAdjacentHTML("beforeend",'
+                  + JSON.stringify(MESSAGE_ICON)
+                  + ');\'>'
+                : fallbackAvatar;
 
             return (
                 '<a href="'
@@ -142,7 +145,7 @@
         function unreadCaption(totalUnread) {
             var n = Number(totalUnread || 0);
             if (n <= 0) {
-                return "Все прочитано";
+                return t("chat_all_read", "Все прочитано");
             }
             if (n % 10 === 1 && n % 100 !== 11) {
                 return n + " непрочитанное";

@@ -4,8 +4,20 @@
         return document.querySelector('meta[name="theme-color"]');
     }
 
+    function t(key, fallback) {
+        if (typeof window.rmT === "function") {
+            var value = window.rmT(key);
+            if (value && value !== key) {
+                return value;
+            }
+        }
+        return fallback;
+    }
+
     function setButtonLabels(isLight) {
-        var label = isLight ? "Сейчас светлая" : "Сейчас тёмная";
+        var label = isLight
+            ? t("menu_theme_light", "Сейчас светлая")
+            : t("menu_theme_dark", "Сейчас тёмная");
         var labels = document.querySelectorAll(".theme-toggle-label");
         for (var i = 0; i < labels.length; i++) {
             labels[i].textContent = label;

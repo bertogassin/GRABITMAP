@@ -8,6 +8,21 @@
         return;
     }
 
+    function t(key, fallback) {
+        if (window.m && typeof window.m[key] === "function") {
+            try {
+                return window.m[key]();
+            } catch (_) {}
+        }
+        if (typeof window.rmT === "function") {
+            var translated = window.rmT(key);
+            if (translated && translated !== key) {
+                return translated;
+            }
+        }
+        return fallback;
+    }
+
     function notifySound() {
         if (typeof window.resursmapPlayNotificationSound === "function") {
             window.resursmapPlayNotificationSound();
@@ -66,16 +81,16 @@
             localStorage.setItem(key, "1");
         } catch (e) {}
         var options = {
-            body: "Нажмите — сразу считать шаги.",
+            body: t("notify_steps_body", "Нажмите — сразу считать шаги."),
             icon: "/static/app-icon-192.png",
             tag: "grabit-steps-panel",
             renotify: false,
             data: { url: "/app/steps" },
-            actions: [{ action: "open-steps", title: "Открыть шагомер" }]
+            actions: [{ action: "open-steps", title: t("notify_steps_action", "Открыть шагомер") }]
         };
         if (navigator.serviceWorker && navigator.serviceWorker.ready) {
             navigator.serviceWorker.ready.then(function (reg) {
-                return reg.showNotification("Шагомер GRABIT", options);
+                return reg.showNotification(t("notify_steps_title", "Шагомер GRABIT"), options);
             }).catch(function () {});
             return;
         }

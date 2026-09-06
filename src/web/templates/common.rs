@@ -24,7 +24,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = "5.0.1";
+pub const STATIC_ASSET_VERSION: &str = "5.0.2";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -4337,13 +4337,14 @@ pub(crate) fn render_auth_page(params: AuthPageParams<'_>) -> String {
         {footer}
     </section>
     <div class="rm-auth-back">
-        <a href="/app">&larr; Вернуться к городам</a>
+        <a href="/app">&larr; {back}</a>
     </div>
 </div>"#,
         heading = escape_html(params.heading),
         subtitle = escape_html(params.subtitle),
         body = params.body_html,
         footer = params.footer_html,
+        back = crate::i18n::t("back_to_cities"),
     );
 
     page_document(
@@ -4575,11 +4576,11 @@ pub(crate) fn back_navigation_card(href: &str, title: &str, meta: &str) -> Strin
     })
 }
 
-pub(crate) fn resource_listing_label(listing_type: &str) -> &'static str {
+pub(crate) fn resource_listing_label(listing_type: &str) -> String {
     match listing_type.trim() {
-        "seeker" => "Ищу работу",
-        "offer" => "Предложение работы",
-        _ => "Объявление",
+        "seeker" => crate::i18n::t("common_seeker"),
+        "offer" => crate::i18n::t("common_offer"),
+        _ => crate::i18n::t("common_listing"),
     }
 }
 
@@ -4594,8 +4595,9 @@ pub(crate) fn people_result_card(
 ) -> String {
     let write_html = match write_href.filter(|value| !value.is_empty()) {
         Some(write_href) => format!(
-            r#"<a href="{href}" class="rm-person-write">Написать</a>"#,
+            r#"<a href="{href}" class="rm-person-write">{write}</a>"#,
             href = escape_html(write_href),
+            write = crate::i18n::t("common_write"),
         ),
         None => String::new(),
     };
@@ -4678,7 +4680,7 @@ pub(crate) fn search_people_cards(people: &[crate::web::view_models::SearchPerso
                 let display_name = if !safe_category.is_empty() {
                     safe_category.clone()
                 } else {
-                    "Специалист".to_string()
+                    crate::i18n::t("specialist")
                 };
 
                 let profession_html = if !full_name.is_empty() {
@@ -4709,11 +4711,20 @@ pub(crate) fn search_people_cards(people: &[crate::web::view_models::SearchPerso
                 };
 
                 let contact_html = if is_online {
-                    r#"<span class="rm-presence-badge rm-presence-badge--online">Онлайн</span>"#
+                    format!(
+                        r#"<span class="rm-presence-badge rm-presence-badge--online">{}</span>"#,
+                        crate::i18n::t("common_online")
+                    )
                 } else if *last_seen_at > 0 {
-                    r#"<span class="rm-presence-badge">Был недавно</span>"#
+                    format!(
+                        r#"<span class="rm-presence-badge">{}</span>"#,
+                        crate::i18n::t("common_was_recently")
+                    )
                 } else {
-                    r#"<span class="rm-presence-badge">Написать</span>"#
+                    format!(
+                        r#"<span class="rm-presence-badge">{}</span>"#,
+                        crate::i18n::t("common_write")
+                    )
                 };
 
                 let write_href = if *user_id > 0 {
@@ -4727,7 +4738,7 @@ pub(crate) fn search_people_cards(people: &[crate::web::view_models::SearchPerso
                     &display_name,
                     &profession_html,
                     &intent_html,
-                    contact_html,
+                    &contact_html,
                     is_online || intent_is_active,
                     write_href.as_deref(),
                 )
@@ -4763,15 +4774,16 @@ pub(crate) fn intent_kind_chips(
     let mut chips = String::new();
 
     if include_all {
-        chips.push_str(&kind_chip(active.is_empty(), all_href, "Все"));
+        chips.push_str(&kind_chip(active.is_empty(), all_href, &crate::i18n::t("common_all")));
     }
 
-    chips.push_str(&kind_chip(active == "work", work_href, "Работа"));
-    chips.push_str(&kind_chip(active == "workers", workers_href, "Работники"));
-    chips.push_str(&kind_chip(active == "business", business_href, "Бизнес"));
+    chips.push_str(&kind_chip(active == "work", work_href, &crate::i18n::t("common_work")));
+    chips.push_str(&kind_chip(active == "workers", workers_href, &crate::i18n::t("common_workers")));
+    chips.push_str(&kind_chip(active == "business", business_href, &crate::i18n::t("common_business")));
 
     format!(
-        r#"<nav class="rm-kind-chips" aria-label="Что искать">{chips}</nav>"#,
+        r#"<nav class="rm-kind-chips" aria-label="{aria}">{chips}</nav>"#,
+        aria = crate::i18n::t("search_what"),
         chips = chips
     )
 }
@@ -4808,8 +4820,9 @@ pub(crate) fn resource_result_card(params: ResourceResultCardParams<'_>) -> Stri
         String::new()
     } else {
         format!(
-            r#"<a href="{href}" class="rm-person-write">Написать</a>"#,
+            r#"<a href="{href}" class="rm-person-write">{write}</a>"#,
             href = escape_html(write_href),
+            write = crate::i18n::t("common_write"),
         )
     };
     format!(
@@ -4972,19 +4985,27 @@ pub(crate) fn status_page(
     page_document(title, "", "", &content, "", "")
 }
 
-pub(crate) fn premium_badge_html(variant: &str) -> &'static str {
+pub(crate) fn premium_badge_html(variant: &str) -> String {
+    let label = crate::i18n::t("common_premium");
     match variant {
-        "compact" => r#"<span class="rm-premium-badge rm-premium-badge--compact">★ Премиум</span>"#,
-        "admin" => r#"<span class="rm-premium-badge rm-premium-badge--admin">★ Премиум</span>"#,
-        _ => r#"<span class="rm-premium-badge">★ Премиум</span>"#,
+        "compact" => format!(
+            r#"<span class="rm-premium-badge rm-premium-badge--compact">★ {label}</span>"#
+        ),
+        "admin" => format!(
+            r#"<span class="rm-premium-badge rm-premium-badge--admin">★ {label}</span>"#
+        ),
+        _ => format!(r#"<span class="rm-premium-badge">★ {label}</span>"#),
     }
 }
 
-pub(crate) fn verified_badge_html(compact: bool) -> &'static str {
+pub(crate) fn verified_badge_html(compact: bool) -> String {
+    let label = crate::i18n::t("common_verified");
     if compact {
-        r#"<span class="rm-verified-badge rm-verified-badge--compact">✓ Проверен</span>"#
+        format!(
+            r#"<span class="rm-verified-badge rm-verified-badge--compact">✓ {label}</span>"#
+        )
     } else {
-        r#"<span class="rm-verified-badge">✓ Проверен</span>"#
+        format!(r#"<span class="rm-verified-badge">✓ {label}</span>"#)
     }
 }
 

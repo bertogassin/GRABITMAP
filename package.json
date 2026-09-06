@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "i18n": "node scripts/build-messages.mjs && node scripts/compile-i18n.mjs"
+    "i18n": "node scripts/compile-i18n.mjs"
   },
   "devDependencies": {
     "@inlang/paraglide-js": "^2.4.0"

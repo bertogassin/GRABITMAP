@@ -342,8 +342,10 @@ pub async fn api_attention_count(State(state): State<AppState>, headers: HeaderM
         rusqlite::params![user_id],
     );
 
-    let nudges = super::notifications::ensure_daily_nudges(&db, user_id);
     let counts = query_attention_counts(&db, user_id);
+    // Do not insert fresh unread nudges on the badge poll — that spam-creates
+    // menu badges. Only surface nudges already unread for today.
+    let nudges = super::notifications::list_unread_daily_nudges(&db, user_id);
 
     Json(json!({
         "count": counts.0,
@@ -1066,7 +1068,7 @@ pub async fn api_profile_avatar_get(
             ),
             (
                 header::CACHE_CONTROL,
-                HeaderValue::from_static("public, max-age=3600"),
+                HeaderValue::from_static("private, max-age=60, must-revalidate"),
             ),
         ],
         bytes,
