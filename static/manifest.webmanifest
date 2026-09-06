@@ -2,7 +2,8 @@
   "id": "/app",
   "name": "GRABIT",
   "short_name": "GRABIT",
-  "description": "Карта ресурсов, людей и возможностей",
+  "description": "Работа, люди и бизнес на карте",
+  "lang": "ru",
   "start_url": "/app",
   "scope": "/",
   "display": "standalone",
@@ -11,16 +12,28 @@
   "theme_color": "#080a0d",
   "icons": [
     {
-      "src": "/static/app-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/static/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/static/app-icon.svg",
+      "src": "/static/app-icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "/static/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }

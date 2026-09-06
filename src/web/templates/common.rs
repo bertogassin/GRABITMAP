@@ -24,7 +24,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = "4.9.88";
+pub const STATIC_ASSET_VERSION: &str = "4.9.90";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -184,10 +184,17 @@ pub fn brand_logo() -> &'static str {
 pub(crate) fn site_head_links() -> String {
     format!(
         r##"<meta name="theme-color" content="#080a0d">
-<link rel="icon" href="{icon}" type="image/svg+xml">
-<link rel="apple-touch-icon" href="{icon}">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GRABIT">
+<link rel="icon" href="{favicon}" type="image/png" sizes="32x32">
+<link rel="icon" href="{icon_svg}" type="image/svg+xml">
+<link rel="apple-touch-icon" href="{apple_icon}" sizes="180x180">
 <link rel="manifest" href="{manifest}">"##,
-        icon = static_asset("app-icon.svg"),
+        favicon = static_asset("favicon-32.png"),
+        icon_svg = static_asset("app-icon.svg"),
+        apple_icon = static_asset("apple-touch-icon.png"),
         manifest = static_asset("manifest.webmanifest"),
     )
 }
@@ -532,8 +539,8 @@ body::before { display: none; }
     width: auto;
     max-width: min(52vw, 188px);
     object-fit: contain;
-    border-radius: 10px;
-    background: var(--surface);
+    border-radius: 0;
+    background: transparent;
 }
 
 .brand-name {
@@ -2968,6 +2975,11 @@ a.feature.rm-feature-add {
     font-size: 12px;
 }
 
+.rm-pwa-home-btn {
+    width: 100%;
+    margin: 4px 0 2px;
+}
+
 .rm-home-start-card {
     display: block;
     padding: 18px;
@@ -4064,6 +4076,7 @@ pub(crate) fn page_document(
 <script src="{theme_toggle_js}" defer></script>
 <script src="{place_memory_js}" defer></script>
 <script src="{share_js}" defer></script>
+<script src="{pwa_install_js}" defer></script>
 
 </body>
 </html>"#,
@@ -4082,6 +4095,7 @@ pub(crate) fn page_document(
         theme_toggle_js = static_asset("theme-toggle.js"),
         place_memory_js = static_asset("place-memory.js"),
         share_js = static_asset("share.js"),
+        pwa_install_js = static_asset("pwa-install.js"),
     )
 }
 
@@ -5989,8 +6003,21 @@ mod public_entry_tests {
         assert!(html.contains("href=\"/app/me\""));
         assert!(html.contains("Профиль"));
         assert!(html.contains("brand-logo-img"));
+        assert!(html.contains("brand-logo.png"));
         assert!(html.contains("GRABIT"));
         assert!(!html.contains("/app/auth"));
+    }
+
+    #[test]
+    fn site_head_uses_png_app_icons() {
+        let html = site_head_links();
+        assert!(html.contains("apple-touch-icon.png"));
+        assert!(html.contains("favicon-32.png"));
+        assert!(html.contains("apple-mobile-web-app-capable"));
+        assert!(html.contains("manifest.webmanifest"));
+        let page = page_document("Тест", "", "", "<p>ok</p>", "", "");
+        assert!(page.contains("/static/pwa-install.js"));
+        assert!(page.contains("apple-touch-icon.png"));
     }
 
     #[test]

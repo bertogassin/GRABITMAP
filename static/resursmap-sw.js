@@ -1,11 +1,14 @@
 "use strict";
 
-const CACHE_VERSION = "grabit-shell-v4.9.88";
+const CACHE_VERSION = "grabit-shell-v4.9.90";
 
 const STATIC_ASSETS = [
     "/static/manifest.webmanifest",
     "/static/map-catalog-search.js",
     "/static/app-icon.svg",
+    "/static/app-icon-192.png",
+    "/static/app-icon-512.png",
+    "/static/apple-touch-icon.png",
     "/static/nav-badge.js",
 ];
 

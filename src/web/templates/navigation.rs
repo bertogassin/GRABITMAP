@@ -245,6 +245,11 @@ pub fn render_geo_root(
     <div class="eyebrow">{logo} GRABIT</div>
     <h1>Глобальная карта</h1>
     <p>Выберите континент. Дальше — страна, город и объявления.</p>
+    <button id="resursmap-install-pwa"
+            type="button"
+            class="ui-button rm-pwa-home-btn">
+        Скачать приложение
+    </button>
     {guest_hint}
     <div class="rm-map-stats">
         <div><strong>{users_count}</strong><span>{users_word}</span></div>
@@ -838,6 +843,12 @@ pub fn render_continents(
     <h1>Города и профессии</h1>
 
     <p>Работа, работники и бизнес — найдите нужное рядом.</p>
+
+    <button id="resursmap-install-pwa"
+            type="button"
+            class="ui-button rm-pwa-home-btn">
+        Скачать приложение
+    </button>
 
     {guest_hint}
 
@@ -1543,8 +1554,6 @@ pub fn render_search(
 }
 
 pub fn render_menu() -> String {
-    let pwa_install_js = super::common::static_asset("pwa-install.js");
-
     let content = format!(
         r#"<section>
     {section_head_settings}
@@ -1561,18 +1570,18 @@ pub fn render_menu() -> String {
         <div class="rm-pwa-compact-row">
             <div class="rm-pwa-compact-copy">
                 <div class="card-title rm-pwa-compact-title">
-                    На главный экран
+                    Приложение
                 </div>
                 <div id="resursmap-install-hint"
                      class="card-meta rm-pwa-hint">
-                    Ярлык сайта — не загрузка из магазина
+                    На главный экран телефона
                 </div>
             </div>
 
             <button id="resursmap-install-pwa"
                     type="button"
                     class="ui-button rm-pwa-install-btn">
-                Добавить
+                Скачать
             </button>
         </div>
     </section>
@@ -1664,9 +1673,7 @@ pub fn render_menu() -> String {
     );
 
     let body_after = format!(
-        r#"<script src="{pwa_install_js}" defer></script>
-<script src="{menu_settings_js}" defer></script>"#,
-        pwa_install_js = pwa_install_js,
+        r#"<script src="{menu_settings_js}" defer></script>"#,
         menu_settings_js = super::common::static_asset("menu-settings.js"),
     );
 
