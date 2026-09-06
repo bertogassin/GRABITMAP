@@ -27,7 +27,6 @@
     var dayMeta = document.getElementById("rm-step-day-meta");
     var goalForm = document.getElementById("rm-step-goal-form");
     var goalInput = document.getElementById("rm-step-goal");
-    var pinBtn = document.getElementById("rm-step-pin");
 
     var snapshot = null;
     var localToday = localDate();
@@ -242,42 +241,6 @@
         } catch (_) {}
     }
 
-    function requestPanelPermission() {
-        if (!("Notification" in window)) {
-            setStatus(t("steps_counting", "Считаем шаги с телефона"));
-            return Promise.resolve(false);
-        }
-        if (Notification.permission === "granted") {
-            updateLivePanel(true);
-            setStatus(t("steps_keep_panel", "Панель на телефоне обновляется сама"));
-            return Promise.resolve(true);
-        }
-        if (Notification.permission === "denied") {
-            setStatus(
-                t(
-                    "steps_notify_denied",
-                    "Уведомления запрещены — панель на телефоне недоступна"
-                )
-            );
-            return Promise.resolve(false);
-        }
-        return Notification.requestPermission()
-            .then(function (permission) {
-                if (permission === "granted") {
-                    updateLivePanel(true);
-                    setStatus(
-                        t("steps_keep_panel", "Панель на телефоне обновляется сама")
-                    );
-                    return true;
-                }
-                setStatus(t("steps_counting", "Считаем шаги с телефона"));
-                return false;
-            })
-            .catch(function () {
-                return false;
-            });
-    }
-
     function applySnapshot(data) {
         if (!data || !data.ok) return;
         snapshot = data;
@@ -489,7 +452,7 @@
                 setStatus(
                     t(
                         "steps_sensor_quiet",
-                        "Датчик молчит. Держите экран открытым или установите ярлык."
+                        "Датчик молчит. Держите экран открытым и походите с телефоном."
                     )
                 );
             }
@@ -533,24 +496,24 @@
             var day = event.target.closest("[data-date]");
             if (day) openDay(day.getAttribute("data-date"));
         });
-        if (pinBtn) {
-            pinBtn.addEventListener("click", function () {
-                requestNotifyPermission().then(function () {
-                    requestListen();
-                });
-            });
-        }
         if (goalForm) {
             goalForm.addEventListener("submit", async function (event) {
                 event.preventDefault();
+                var nextGoal = Number(goalInput.value || DEFAULT_GOAL);
+                if (!Number.isFinite(nextGoal)) {
+                    setStatus(t("steps_goal_bad", "Проверьте цель"));
+                    return;
+                }
                 var data = await send({
                     date: localToday,
-                    goal: Number(goalInput.value || DEFAULT_GOAL),
+                    goal: nextGoal,
                 });
-                if (data) {
+                if (data && data.ok !== false) {
                     applySnapshot(data);
                     setStatus(t("steps_goal_updated", "Цель обновлена"));
                     updateLivePanel(true);
+                } else {
+                    setStatus(t("steps_goal_failed", "Не удалось сохранить цель"));
                 }
             });
         }

@@ -64,7 +64,7 @@
         );
         var sendState = document.getElementById(
             "chat-send-state"
-        );
+        ) || { textContent: "" };
         var connectionState = document.getElementById(
             "chat-connection-state"
         );
@@ -2242,6 +2242,32 @@
                 return "/api/group/" + groupId + suffix;
             }
             return "/api/chat/" + otherUserId + suffix;
+        }
+
+        function t(key, fallback, params) {
+            if (window.m && typeof window.m[key] === "function") {
+                try {
+                    return window.m[key](params || {});
+                } catch (_) {
+                    /* fall through */
+                }
+            }
+            if (typeof window.rmT === "function") {
+                var translated = window.rmT(key, params);
+                if (translated && translated !== key) {
+                    return translated;
+                }
+            }
+            if (!params) {
+                return fallback;
+            }
+            return String(fallback).replace(/\{(\w+)\}/g, function (_, name) {
+                return params[name] != null ? String(params[name]) : "";
+            });
+        }
+
+        function tf(key, fallback, params) {
+            return t(key, fallback, params);
         }
 
         var messageCache = new Map();

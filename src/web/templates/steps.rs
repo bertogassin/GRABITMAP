@@ -88,7 +88,6 @@ fn steps_style() -> &'static str {
     r#"<style>
 .rm-steps{display:grid;gap:12px;margin-top:8px}
 .rm-step-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.rm-step-toolbar .ui-button,.rm-step-toolbar .rm-pwa-install-btn{flex:1 1 140px;min-height:40px;margin:0;font-size:14px}
 .rm-step-today{display:grid;gap:12px;padding:14px;border:1px solid var(--line);border-radius:18px;background:radial-gradient(120% 80% at 10% 0%,rgba(232,204,150,.14),transparent 55%),var(--bg-soft)}
 .rm-step-hero{display:grid;grid-template-columns:112px 1fr;gap:12px;align-items:center}
 .rm-step-ring{position:relative;width:112px;height:112px}
@@ -154,8 +153,6 @@ fn authenticated_body(snapshot: &StepSnapshot) -> String {
         r#"<section class="rm-steps" id="rm-steps" data-today="{today}" data-goal="{goal}">
     <div class="rm-step-toolbar">
         {back}
-        <button id="rm-step-pin" type="button" class="ui-button">{pin}</button>
-        <button id="resursmap-install-pwa" type="button" class="ui-button rm-pwa-install-btn rm-pwa-home-btn">{install}</button>
     </div>
 
     <article class="rm-step-today">
@@ -203,8 +200,6 @@ fn authenticated_body(snapshot: &StepSnapshot) -> String {
         today = escape_html(&snapshot.today),
         goal = snapshot.goal,
         back = back_link("/app/me", &crate::i18n::t("common_profile"), "arrow-left"),
-        pin = escape_html(&crate::i18n::t("steps_pin")),
-        install = escape_html(&crate::i18n::t("steps_install")),
         circ = circ,
         offset = ring_offset(snapshot.today_steps, snapshot.goal),
         today_steps = snapshot.today_steps,
@@ -308,8 +303,9 @@ mod tests {
         assert!(!html.contains("Считать шаги"));
         assert!(!html.contains("data-add"));
         assert!(html.contains("/static/pedometer.js"));
-        assert!(html.contains("resursmap-install-pwa"));
-        assert!(html.contains("rm-step-pin"));
+        assert!(!html.contains("resursmap-install-pwa"));
+        assert!(!html.contains("rm-step-pin"));
+        assert!(html.contains("rm-step-goal-form"));
         assert!(html.contains("rm-step-hero"));
         assert!(html.contains("rm-step-week"));
     }
