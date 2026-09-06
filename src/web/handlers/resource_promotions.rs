@@ -156,7 +156,7 @@ fn status_response(
             &format!("/app/resource/{resource_id}"),
             "map-pin",
             "Вернуться к объявлению",
-            "Открыть ресурс",
+            "Страница объявления",
         ),
     ))
     .into_response()

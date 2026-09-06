@@ -838,7 +838,7 @@ pub async fn resource_create_city_submit(
                     templates::navigation_card(
                         "/app/my-resources",
                         "menu",
-                        "Мои ресурсы",
+                        "Мои объявления",
                         "Управление публикациями",
                     ),
                 ),

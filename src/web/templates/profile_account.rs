@@ -292,7 +292,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
                 "/app/search",
                 "search",
                 "Сначала поиск",
-                "Найдите людей и ресурсы"
+                "Найдите людей и объявления"
             ),
         )
     };
@@ -326,7 +326,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
             {resources_count}
         </div>
         <div class="card-meta rm-me-stat-meta">
-            Мои ресурсы
+            Мои объявления
         </div>
     </div>
 
@@ -735,7 +735,7 @@ body.light-theme .rm-command-icon {{
     </h1>
 
     <p class="rm-center-subtitle">
-        Ваш личный штурвал: ресурсы, связи,
+        Ваш личный штурвал: объявления, связи,
         сообщения, активность и возможности
         в одном защищённом пространстве.
     </p>
@@ -798,7 +798,7 @@ body.light-theme .rm-command-icon {{
                 {resources_icon}
             </span>
             <span class="rm-command-copy">
-                <strong>Мои ресурсы</strong>
+                <strong>Мои объявления</strong>
                 <small>
                     Опубликовано: {approved_count} ·
                     На проверке: {pending_count} ·
@@ -818,7 +818,7 @@ body.light-theme .rm-command-icon {{
             <span class="rm-command-copy">
                 <strong>Избранное</strong>
                 <small>
-                    Сохранённые ресурсы: {favorites_count}
+                    Сохранённые объявления: {favorites_count}
                 </small>
             </span>
             <span class="rm-command-arrow">
@@ -1295,7 +1295,7 @@ body.light-theme .rm-command-icon {{
             "user",
             "GRABIT",
             "Профиль",
-            "Ваши ресурсы, сохранённые места и активность.",
+            "Ваши объявления, сохранённые места и активность.",
         ),
         content = content_html,
     );
@@ -1420,7 +1420,7 @@ pub fn render_notifications(
             "user",
             "Уведомления",
             "Центр уведомлений",
-            "Статусы модерации и важные изменения ваших ресурсов.",
+            "Статусы модерации и важные изменения ваших объявлений.",
         ),
         &content,
         &bottom_nav("menu"),
@@ -1738,7 +1738,7 @@ pub fn render_favorites(
             "Откройте любое объявление и сохраните его в избранное.",
             &format!(
                 "{}{}",
-                empty_state_action("/app/search", "Найти ресурсы"),
+                empty_state_action("/app/search", "Найти объявления"),
                 empty_state_action("/app", "На карту"),
             ),
         )
@@ -1791,7 +1791,7 @@ pub fn render_favorites(
             &back_link("/app/me", "Профиль", "arrow-left"),
             "heart",
             "Избранное",
-            "Сохранённые ресурсы",
+            "Сохранённые объявления",
             "Всё, что вы отметили сердцем.",
         ),
         &content,

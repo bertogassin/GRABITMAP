@@ -97,7 +97,7 @@ fn allocate_email_user_id(transaction: &rusqlite::Transaction<'_>) -> i64 {
         .unwrap_or(EMAIL_USER_ID_BASE)
 }
 
-fn email_delivery_configured() -> bool {
+pub(crate) fn email_delivery_configured() -> bool {
     std::env::var("RESEND_API_KEY")
         .ok()
         .map(|value| !value.trim().is_empty())
@@ -506,6 +506,19 @@ pub async fn login_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
     let register_href = auth_related_href("/register", &redirect_target);
     let forgot_href = auth_related_href("/login/forgot", &redirect_target);
     let code_href = auth_related_href("/login/code", &redirect_target);
+    let mail_ready = email_delivery_configured();
+    let auth_links = if mail_ready {
+        format!(
+            r##"<div class="rm-auth-links">
+            <a href="{forgot_href}">Забыли пароль?</a>
+            <a href="{code_href}">Войти по коду</a>
+        </div>"##,
+            forgot_href = forgot_href,
+            code_href = code_href,
+        )
+    } else {
+        String::new()
+    };
 
     let body_html = format!(
         r##"
@@ -518,15 +531,11 @@ pub async fn login_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
             <button id="password-toggle" type="button" class="rm-auth-password-toggle" aria-label="Показать пароль">Показать</button>
         </div>
 
-        <div class="rm-auth-links">
-            <a href="{forgot_href}">Забыли пароль?</a>
-            <a href="{code_href}">Войти по коду</a>
-        </div>
+        {auth_links}
 
         <button id="login-button" type="button" class="ui-button rm-auth-button">Войти</button>
 "##,
-        forgot_href = forgot_href,
-        code_href = code_href,
+        auth_links = auth_links,
     );
 
     let footer_html = format!(
@@ -552,11 +561,11 @@ pub async fn login_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
 
     function errorMessage(error) {{
         const messages = {{
-            invalid_email: "Проверьте правильность email.",
+            invalid_email: "Проверьте правильность почты.",
             invalid_password: "Введите пароль.",
-            invalid_credentials: "Неверный email или пароль.",
-            password_not_set: "Для этого email пароль ещё не задан. Используйте «Забыли пароль?» или вход по коду.",
-            verification_required: "Подтвердите email кодом из письма. Если письма нет — войдите паролем после регистрации.",
+            invalid_credentials: "Неверная почта или пароль.",
+            password_not_set: "Для этой почты пароль ещё не задан.",
+            verification_required: "Подтвердите почту кодом из письма. Если письма нет — войдите паролем после регистрации.",
             rate_limited: "Слишком много попыток. Попробуйте позже.",
             database_unavailable: "Сервис временно недоступен."
         }};
@@ -568,7 +577,7 @@ pub async fn login_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
         const password = passwordInput.value;
 
         if (!email) {{
-            setStatus("Введите email.", true);
+            setStatus("Введите почту.", true);
             emailInput.focus();
             return;
         }}
@@ -639,6 +648,7 @@ pub async fn register_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
     let redirect_target = auth_redirect_target(query.next.as_deref());
     let login_href = auth_related_href("/login", &redirect_target);
     let forgot_href = auth_related_href("/login/forgot", &redirect_target);
+    let mail_ready = email_delivery_configured();
 
     let body_html = r##"
         <label class="rm-auth-label" for="email-input">Почта</label>
@@ -651,16 +661,26 @@ pub async fn register_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
         </div>
 
         <label class="rm-auth-label" for="password-confirm-input">Повторите пароль</label>
-        <input id="password-confirm-input" class="ui-input rm-auth-input" type="password" autocomplete="new-password" maxlength="128" placeholder="Ещё раз">
+        <div class="rm-auth-password-row">
+            <input id="password-confirm-input" class="ui-input rm-auth-input" type="password" autocomplete="new-password" maxlength="128" placeholder="Ещё раз">
+            <button id="password-confirm-toggle" type="button" class="rm-auth-password-toggle" aria-label="Показать пароль">Показать</button>
+        </div>
 
         <button id="register-button" type="button" class="ui-button rm-auth-button">Создать аккаунт</button>
 "##;
 
-    let footer_html = format!(
-        r##"<p class="rm-auth-footer">Уже есть аккаунт? <a href="{login_href}">Войти</a> · <a href="{forgot_href}">Забыли пароль?</a></p>"##,
-        login_href = login_href,
-        forgot_href = forgot_href,
-    );
+    let footer_html = if mail_ready {
+        format!(
+            r##"<p class="rm-auth-footer">Уже есть аккаунт? <a href="{login_href}">Войти</a> · <a href="{forgot_href}">Забыли пароль?</a></p>"##,
+            login_href = login_href,
+            forgot_href = forgot_href,
+        )
+    } else {
+        format!(
+            r##"<p class="rm-auth-footer">Уже есть аккаунт? <a href="{login_href}">Войти</a></p>"##,
+            login_href = login_href,
+        )
+    };
 
     let body_after = format!(
         r##"
@@ -671,6 +691,7 @@ pub async fn register_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
     const passwordInput = document.getElementById("password-input");
     const passwordConfirmInput = document.getElementById("password-confirm-input");
     const passwordToggle = document.getElementById("password-toggle");
+    const passwordConfirmToggle = document.getElementById("password-confirm-toggle");
     const registerButton = document.getElementById("register-button");
     const authStatus = document.getElementById("auth-status");
 
@@ -681,12 +702,12 @@ pub async fn register_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
 
     function errorMessage(error) {{
         const messages = {{
-            invalid_email: "Проверьте правильность email.",
+            invalid_email: "Проверьте правильность почты.",
             password_too_short: "Пароль должен быть не короче 8 символов.",
             password_too_long: "Пароль слишком длинный.",
             password_mismatch: "Пароли не совпадают.",
-            email_already_registered: "Этот email уже зарегистрирован. Попробуйте войти или восстановить пароль.",
-            verification_required: "Подтвердите email кодом из письма.",
+            email_already_registered: "Эта почта уже зарегистрирована. Попробуйте войти.",
+            verification_required: "Подтвердите почту кодом из письма.",
             rate_limited: "Слишком много попыток. Попробуйте позже.",
             database_unavailable: "Сервис временно недоступен."
         }};
@@ -699,7 +720,7 @@ pub async fn register_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
         const passwordConfirm = passwordConfirmInput.value;
 
         if (!email) {{
-            setStatus("Введите email.", true);
+            setStatus("Введите почту.", true);
             emailInput.focus();
             return;
         }}
@@ -740,7 +761,7 @@ pub async fn register_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
             }}
 
             if (data.verification_required) {{
-                setStatus("Теперь подтвердите email кодом.", false);
+                setStatus("Теперь подтвердите почту кодом.", false);
                 const next = encodeURIComponent(redirectTarget);
                 window.location.replace("/login/code?next=" + next);
                 return;
@@ -756,7 +777,18 @@ pub async fn register_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
     }}
 
     if (window.resursmapAuthForms) {{
-        window.resursmapAuthForms.bindPasswordToggle(passwordToggle, passwordInput);
+        if (window.resursmapAuthForms.bindLinkedPasswordToggles) {{
+            window.resursmapAuthForms.bindLinkedPasswordToggles([
+                {{ button: passwordToggle, input: passwordInput }},
+                {{ button: passwordConfirmToggle, input: passwordConfirmInput }}
+            ]);
+        }} else {{
+            window.resursmapAuthForms.bindPasswordToggle(
+                passwordToggle,
+                passwordInput,
+                passwordConfirmInput
+            );
+        }}
         window.resursmapAuthForms.bindEnterSubmit(
             [emailInput, passwordInput, passwordConfirmInput],
             register
@@ -776,7 +808,11 @@ pub async fn register_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
         crate::web::templates::AuthPageParams {
             document_title: "Регистрация · GRABIT",
             heading: "Регистрация",
-            subtitle: "Создайте аккаунт по email и паролю. Письмо с кодом нужно только если настроена почта.",
+            subtitle: if mail_ready {
+                "Почта и пароль. Если письма включены, придёт код подтверждения."
+            } else {
+                "Почта и пароль. После регистрации вход сразу."
+            },
             body_html,
             footer_html: &footer_html,
             script_html: &body_after,

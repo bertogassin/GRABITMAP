@@ -328,7 +328,7 @@ pub async fn resource_profile(
                     "Ресурс не найден · GRABIT",
                     "⚠ GRABIT",
                     "Ресурс не найден",
-                    "Этот ресурс ещё на проверке, скрыт или был удалён.",
+                    "Это объявление ещё на проверке, скрыто или было удалено.",
                     &templates::navigation_card(
                         "/app",
                         "map",
@@ -400,7 +400,7 @@ pub async fn resource_profile(
             "Ресурс не найден · GRABIT",
             "⚠ GRABIT",
             "Ресурс не найден",
-            "Этот ресурс больше недоступен или был удалён.",
+            "Это объявление больше недоступно или было удалено.",
             &templates::navigation_card("/app", "map", "Вернуться к городам", "Открыть GRABIT"),
         )),
     }
@@ -598,7 +598,7 @@ pub async fn add_resource(
             "Требуется вход · GRABIT",
             "⚠ Авторизация",
             "Не удалось подтвердить пользователя",
-            "Войдите в аккаунт и попробуйте добавить ресурс снова.",
+            "Войдите в аккаунт и попробуйте добавить объявление снова.",
             &templates::navigation_card(
                 &format!("/login?next={}", urlencoding::encode("/app/add")),
                 "user",
@@ -779,7 +779,7 @@ pub async fn add_resource(
                 templates::navigation_card(
                     "/app/my-resources",
                     "user",
-                    "Мои ресурсы",
+                    "Мои объявления",
                     "Статус проверки",
                 ),
             );
@@ -796,7 +796,7 @@ pub async fn add_resource(
         Err(_) => Html(templates::status_page(
             "Ошибка · GRABIT",
             "⚠ Ошибка",
-            "Не удалось добавить ресурс",
+            "Не удалось добавить объявление",
             "Попробуйте ещё раз.",
             &format!(
                 r#"<a href="/app/{}/{}/{}/cat/{}">Назад</a>"#,
@@ -937,7 +937,7 @@ pub async fn edit_resource_page(
             "Нет доступа · GRABIT",
             "⚠ Доступ",
             "Редактирование недоступно",
-            "Этот ресурс не принадлежит текущему пользователю.",
+            "Это объявление не принадлежит текущему пользователю.",
             &templates::navigation_card("/app/me", "user", "Вернуться в профиль", ""),
         )),
     }
@@ -969,7 +969,7 @@ pub async fn edit_resource(
     {
         return (
             StatusCode::BAD_REQUEST,
-            Html("<h1>400</h1><p>Проверьте длину и содержимое полей ресурса.</p>".to_string()),
+            Html("<h1>400</h1><p>Проверьте длину и содержимое полей объявления.</p>".to_string()),
         )
             .into_response();
     }
@@ -1011,7 +1011,7 @@ pub async fn edit_resource(
             StatusCode::TOO_MANY_REQUESTS,
             [(header::RETRY_AFTER, retry_after.to_string())],
             Html(
-                "<h1>429</h1><p>Слишком много изменений ресурсов. Попробуйте позже.</p>"
+                "<h1>429</h1><p>Слишком много изменений объявлений. Попробуйте позже.</p>"
                     .to_string(),
             ),
         )
@@ -1106,8 +1106,8 @@ pub async fn edit_resource(
             "Изменения сохранены · GRABIT",
             "✓ Готово",
             "Изменения сохранены",
-            "После изменения ресурс снова ожидает проверки.",
-            &templates::navigation_card("/app/my-resources", "map", "Вернуться в мои ресурсы", ""),
+            "После изменения объявление снова ожидает проверки.",
+            &templates::navigation_card("/app/my-resources", "map", "Вернуться к объявлениям", ""),
         ))
         .into_response()
     } else {
@@ -1115,7 +1115,7 @@ pub async fn edit_resource(
             "Нет доступа · GRABIT",
             "⚠ Ошибка",
             "Не удалось сохранить",
-            "Проверьте владельца ресурса.",
+            "Проверьте владельца объявления.",
             "",
         ))
         .into_response()

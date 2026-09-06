@@ -483,7 +483,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
         _ => "",
     };
     let (back_url, back_label) = if owner_preview {
-        ("/app/my-resources".to_string(), "Мои ресурсы")
+        ("/app/my-resources".to_string(), "Мои объявления")
     } else if continent_index >= 0 && country_index >= 0 && city_index >= 0 {
         (
             format!(
@@ -627,7 +627,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
     <div class="card-content rm-resource-owner-content">
 
         <div class="rm-resource-owner-kicker">
-            Владелец ресурса
+            Автор объявления
         </div>
 
         <div class="card-title">
@@ -635,7 +635,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
         </div>
 
         <div class="card-meta rm-resource-owner-meta">
-            Другие ресурсы и актуальный статус
+            Другие объявления и актуальный статус
         </div>
 
     </div>
@@ -719,7 +719,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
 <section class="{detail_section_class}">
 
     <div class="rm-resource-section-kicker">
-        О ресурсе
+        Об объявлении
     </div>
 
     <div class="rm-resource-description">
@@ -1446,11 +1446,11 @@ pub fn render_my_resources(
     resources: Vec<crate::web::view_models::MyResourceRow>,
 ) -> String {
     let cards = if client_id.is_empty() {
-        guest_locked_section("Мои ресурсы", "/app/my-resources")
+        guest_locked_section("Мои объявления", "/app/my-resources")
     } else if resources.is_empty() {
         empty_state_card_with_actions(
-            "Нет опубликованных ресурсов",
-            "Добавьте ресурс в выбранном городе и категории.",
+            "Нет опубликованных объявлений",
+            "Добавьте объявление в выбранном городе и категории.",
             &format!(
                 "{}{}",
                 empty_state_action("/app/add", "Добавить объявление"),
@@ -1505,7 +1505,7 @@ pub fn render_my_resources(
                     if *is_active == 0
                         && moderation_status != "rejected"
                     {
-                        r#"<div class="rm-my-resource-note rm-my-resource-note--hidden"><strong>Ресурс скрыт.</strong> Публикация недоступна другим участникам.</div>"#
+                        r#"<div class="rm-my-resource-note rm-my-resource-note--hidden"><strong>Объявление скрыто.</strong> Публикация недоступна другим участникам.</div>"#
                             .to_string()
                     } else {
                         String::new()
@@ -1621,13 +1621,13 @@ pub fn render_my_resources(
     );
 
     page_shell(
-        "Мои ресурсы · GRABIT",
-        &topbar("Мои ресурсы", "map"),
+        "Мои объявления · GRABIT",
+        &topbar("Мои объявления", "map"),
         &back_hero(
             &back_link("/app/me", "Профиль", "arrow-left"),
             "user",
             "Управление",
-            "Мои ресурсы",
+            "Мои объявления",
             "Ваши объявления по работе и бизнесу.",
         ),
         &content,
@@ -1750,7 +1750,7 @@ pub fn render_edit_resource(params: RenderEditResourceParams<'_>) -> String {
     </button>
 
     <div class="ui-form-note">
-        После сохранения ресурс автоматически вернётся на повторную модерацию.
+        После сохранения объявление автоматически вернётся на повторную модерацию.
     </div>
 
 </form>"####,
@@ -1764,17 +1764,17 @@ pub fn render_edit_resource(params: RenderEditResourceParams<'_>) -> String {
     );
 
     page_shell(
-        "Редактировать ресурс · GRABIT",
+        "Редактировать объявление · GRABIT",
         &topbar("Редактирование", "map"),
         &back_hero(
             &back_link(
                 &format!("/app/resource/{}", id),
-                "Назад к ресурсу",
+                "Назад к объявлению",
                 "arrow-left",
             ),
             "edit",
             "Редактирование",
-            "Редактировать ресурс",
+            "Редактировать объявление",
             &format!("Рубрика: {}", profession_label(rubric)),
         ),
         &content,

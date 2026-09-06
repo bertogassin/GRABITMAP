@@ -24,7 +24,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = "4.9.84";
+pub const STATIC_ASSET_VERSION: &str = "4.9.85";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -5719,7 +5719,7 @@ pub(crate) fn guest_mode_panel(next_path: &str) -> String {
             Вы в гостевом режиме
         </div>
         <div class="card-meta rm-guest-copy">
-            Смотрите карту и ресурсы без регистрации.
+            Смотрите карту и объявления без регистрации.
             Войдите, когда понадобятся сообщения, избранное или публикации.
         </div>
     </div>
@@ -5732,7 +5732,7 @@ pub(crate) fn guest_mode_panel(next_path: &str) -> String {
     </div>
 </div>"#,
         map_card = navigation_card("/app", "globe", "Города", "Страны и города"),
-        search_card = navigation_card("/app/search", "search", "Поиск", "Люди и ресурсы"),
+        search_card = navigation_card("/app/search", "search", "Поиск", "Люди и объявления"),
         login_card = navigation_card(&login_href, "user", "Войти", "Логин и пароль",),
         register_card = navigation_card(
             &register_href,

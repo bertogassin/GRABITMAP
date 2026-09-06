@@ -509,7 +509,7 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
          aria-label="Разделы центра">
         <a href="#global-overview">Обзор</a>
         <a href="#global-indicators">Показатели</a>
-        <a href="/app/admin/resources?filter=pending">Ресурсы</a>
+        <a href="/app/admin/resources?filter=pending">Объявления</a>
         <a href="/app/center/geography">География</a>
         <a href="#system-state">Система</a>
         <a href="#admin-hierarchy">Иерархия</a>
@@ -567,7 +567,7 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
 
             <div class="admin-globe">
                 <span class="admin-globe-equator"></span>
-                <span class="admin-globe-core">RM</span>
+                <span class="admin-globe-core">G</span>
             </div>
 
             <div class="admin-visual-state">
@@ -593,7 +593,7 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     <div class="admin-section-title"
          id="system-state">
         <h2>Состояние управления</h2>
-        <span>Админ V2</span>
+        <span>Рабочие разделы</span>
     </div>
 
     <section class="admin-command-grid">
@@ -603,7 +603,7 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
                 <div class="admin-command-status">● В СЕТИ</div>
             </div>
             <div class="admin-command-meta">
-                SQLite подключена. Миграция Admin V2 активна.
+                База подключена. Показатели с живых данных.
             </div>
         </article>
 
@@ -672,7 +672,7 @@ fn render_stats(data: &AdminDashboardData<'_>) -> String {
         (
             "◈",
             data.resources,
-            "Активные ресурсы",
+            "Активные объявления",
             Some("/app/admin/resources"),
         ),
         (
@@ -684,7 +684,7 @@ fn render_stats(data: &AdminDashboardData<'_>) -> String {
         (
             "★",
             data.premium_resources,
-            "Премиум-ресурсы",
+            "Премиум-объявления",
             Some("/app/admin/resources?filter=premium"),
         ),
         (
@@ -697,7 +697,7 @@ fn render_stats(data: &AdminDashboardData<'_>) -> String {
         (
             "🔐",
             data.active_sessions,
-            "Admin-сессии",
+            "Сессии администраторов",
             Some("/app/center/security"),
         ),
         ("▤", data.audit_events, "События аудита", None),

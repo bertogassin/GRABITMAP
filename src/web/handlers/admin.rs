@@ -207,7 +207,7 @@ pub async fn admin_reports(State(state): State<AppState>, headers: HeaderMap) ->
     <div class="rm-mod-card-head">
         <div>
             <div class="rm-mod-card-kicker">
-                Жалоба #{report_id} · ресурс #{resource_id}
+                Жалоба #{report_id} · объявление #{resource_id}
             </div>
 
             <h2 class="rm-mod-card-title">
@@ -242,21 +242,21 @@ pub async fn admin_reports(State(state): State<AppState>, headers: HeaderMap) ->
         <form method="post"
               action="/app/admin/report/{report_id}/hide-resource{key_query}">
             <button type="submit" class="rm-mod-btn rm-mod-btn--danger">
-                Скрыть ресурс
+                Скрыть объявление
             </button>
         </form>
 
         <form method="post"
               action="/app/admin/report/{report_id}/reject-resource{key_query}">
             <button type="submit" class="rm-mod-btn rm-mod-btn--danger-strong">
-                ✕ Отклонить ресурс
+                ✕ Отклонить объявление
             </button>
         </form>
 
         <a href="/app/resource/{resource_id}"
            target="_blank"
            class="rm-mod-link">
-            Открыть ресурс
+            Открыть объявление
         </a>
 
     </div>
@@ -311,7 +311,7 @@ pub async fn admin_reports(State(state): State<AppState>, headers: HeaderMap) ->
     <h1>Жалобы</h1>
 
     <p>
-        Проверка жалоб пользователей на опубликованные ресурсы.
+        Проверка жалоб на опубликованные объявления.
     </p>
 
 </section>
@@ -319,7 +319,7 @@ pub async fn admin_reports(State(state): State<AppState>, headers: HeaderMap) ->
 <div class="rm-mod-nav">
 
     <a href="/app/admin/resources{key_query}" class="rm-mod-chip">
-        Ресурсы
+        Объявления
     </a>
 
     <a href="/app/admin/reports{key_query}" class="rm-mod-chip rm-mod-chip--reports">
@@ -446,7 +446,7 @@ pub async fn admin_hide_reported_resource(
     if let Some(resource_id) = resource_id {
         if !resource_id_in_moderation_scope(&state, &headers, resource_id) {
             drop(db);
-            return (StatusCode::FORBIDDEN, "Ресурс вне вашей территории").into_response();
+            return (StatusCode::FORBIDDEN, "Объявление вне вашей территории").into_response();
         }
 
         let transaction_result = (|| -> rusqlite::Result<()> {
@@ -527,7 +527,7 @@ pub async fn admin_reject_reported_resource(
     if let Some((resource_id, reason)) = report {
         if !resource_id_in_moderation_scope(&state, &headers, resource_id) {
             drop(db);
-            return (StatusCode::FORBIDDEN, "Ресурс вне вашей территории").into_response();
+            return (StatusCode::FORBIDDEN, "Объявление вне вашей территории").into_response();
         }
 
         let rejection_reason = format!("Жалоба пользователя: {}", reason);
@@ -851,7 +851,7 @@ pub async fn admin_resources(
         <a href="/app/resource/{id}"
            target="_blank"
            class="rm-mod-link">
-            Открыть ресурс
+            Открыть объявление
         </a>
 
     </div>
@@ -877,7 +877,7 @@ pub async fn admin_resources(
         cards = r#"
 <div class="card rm-mod-empty">
     <div class="card-content">
-        <div class="card-title">Ресурсы не найдены</div>
+        <div class="card-title">Объявления не найдены</div>
         <div class="card-meta">По текущему фильтру и поиску ничего не найдено.</div>
     </div>
 </div>
@@ -906,10 +906,10 @@ pub async fn admin_resources(
         Модерация
     </div>
 
-    <h1>Модерация ресурсов</h1>
+    <h1>Модерация объявлений</h1>
 
     <p>
-        Проверка, премиум-статус и видимость ресурсов.
+        Проверка, премиум-статус и видимость объявлений.
     </p>
 
 </section>
@@ -1184,7 +1184,7 @@ content="1;url=/app/admin/resources?filter={filter_url}&amp;q={q_url}">"#,
     let main_html = format!(
         r#"<section class="card rm-mod-result">
     <div class="card-title">
-        Изменено ресурсов: {changed}
+        Изменено объявлений: {changed}
     </div>
 
     <div class="card-meta rm-mod-result-meta">
@@ -1366,7 +1366,7 @@ pub async fn admin_approve_resource(
                         ?1,
                         ?2,
                         'resource_approved',
-                        'Ресурс одобрен',
+                        'Объявление одобрено',
                         ?3,
                         0,
                         strftime('%s','now')
@@ -1375,7 +1375,7 @@ pub async fn admin_approve_resource(
                         user_id,
                         id,
                         format!(
-                            "Ваш ресурс «{}» прошёл модерацию и опубликован.",
+                            "Ваше объявление «{}» прошло модерацию и опубликовано.",
                             resource_title
                         ),
                     ],
@@ -1387,7 +1387,7 @@ pub async fn admin_approve_resource(
     drop(db);
 
     match result {
-        Ok(0) => (StatusCode::FORBIDDEN, "Ресурс вне вашей территории").into_response(),
+        Ok(0) => (StatusCode::FORBIDDEN, "Объявление вне вашей территории").into_response(),
         Ok(_) => (
             StatusCode::SEE_OTHER,
             [(header::LOCATION, "/app/admin/resources?filter=pending")],
@@ -1467,7 +1467,7 @@ pub async fn admin_reject_resource(
 
         if let Some((client_id, resource_title)) = owner {
             if let Some(user_id) = resource_owner_user_id(&client_id) {
-                let message = format!("Ресурс «{}» отклонён. Причина: {}", resource_title, reason);
+                let message = format!("Объявление «{}» отклонено. Причина: {}", resource_title, reason);
 
                 let _ = db.execute(
                     "INSERT INTO user_notifications (
@@ -1483,7 +1483,7 @@ pub async fn admin_reject_resource(
                         ?1,
                         ?2,
                         'resource_rejected',
-                        'Ресурс требует исправления',
+                        'Объявление требует исправления',
                         ?3,
                         0,
                         strftime('%s','now')
@@ -1497,7 +1497,7 @@ pub async fn admin_reject_resource(
     drop(db);
 
     match result {
-        Ok(0) => (StatusCode::FORBIDDEN, "Ресурс вне вашей территории").into_response(),
+        Ok(0) => (StatusCode::FORBIDDEN, "Объявление вне вашей территории").into_response(),
         Ok(_) => (
             StatusCode::SEE_OTHER,
             [(header::LOCATION, "/app/admin/resources?filter=pending")],
@@ -1617,17 +1617,17 @@ pub async fn moderate_resource(
             let (kind, title, message) = if status == "approved" {
                 (
                     "resource_approved",
-                    "Ресурс одобрен",
+                    "Объявление одобрено",
                     format!(
-                        "Ваш ресурс «{}» прошёл модерацию и опубликован.",
+                        "Ваше объявление «{}» прошло модерацию и опубликовано.",
                         resource_title
                     ),
                 )
             } else {
                 (
                     "resource_rejected",
-                    "Ресурс отклонён",
-                    format!("Ваш ресурс «{}» отклонён модератором.", resource_title),
+                    "Объявление отклонено",
+                    format!("Ваше объявление «{}» отклонено модератором.", resource_title),
                 )
             };
 

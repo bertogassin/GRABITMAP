@@ -1,20 +1,62 @@
 (function () {
     "use strict";
 
-    function bindPasswordToggle(toggleButton, input) {
-        if (!toggleButton || !input) {
+    function uniqueNodes(nodes) {
+        var seen = [];
+        (nodes || []).forEach(function (node) {
+            if (!node || seen.indexOf(node) !== -1) {
+                return;
+            }
+            seen.push(node);
+        });
+        return seen;
+    }
+
+    function bindPasswordFields(buttons, inputs) {
+        buttons = uniqueNodes(buttons);
+        inputs = uniqueNodes(inputs);
+        if (!buttons.length || !inputs.length) {
             return;
         }
 
-        toggleButton.addEventListener("click", function () {
-            var show = input.type === "password";
-            input.type = show ? "text" : "password";
-            toggleButton.textContent = show ? "Скрыть" : "Показать";
-            toggleButton.setAttribute(
-                "aria-label",
-                show ? "Скрыть пароль" : "Показать пароль"
-            );
+        function apply(show) {
+            inputs.forEach(function (input) {
+                input.type = show ? "text" : "password";
+            });
+            buttons.forEach(function (button) {
+                button.textContent = show ? "Скрыть" : "Показать";
+                button.setAttribute(
+                    "aria-label",
+                    show ? "Скрыть пароль" : "Показать пароль"
+                );
+            });
+        }
+
+        buttons.forEach(function (button) {
+            button.addEventListener("click", function () {
+                apply(inputs[0].type === "password");
+            });
         });
+    }
+
+    function bindLinkedPasswordToggles(pairs) {
+        var buttons = [];
+        var inputs = [];
+        (pairs || []).forEach(function (pair) {
+            if (!pair) {
+                return;
+            }
+            buttons.push(pair.button);
+            inputs.push(pair.input);
+        });
+        bindPasswordFields(buttons, inputs);
+    }
+
+    function bindPasswordToggle(toggleButton, input, extraInput) {
+        bindPasswordFields(
+            [toggleButton],
+            extraInput ? [input, extraInput] : [input]
+        );
     }
 
     function bindEnterSubmit(inputs, submit) {
@@ -61,6 +103,7 @@
 
     window.resursmapAuthForms = {
         bindPasswordToggle: bindPasswordToggle,
+        bindLinkedPasswordToggles: bindLinkedPasswordToggles,
         bindEnterSubmit: bindEnterSubmit,
         bindResendCountdown: bindResendCountdown,
     };

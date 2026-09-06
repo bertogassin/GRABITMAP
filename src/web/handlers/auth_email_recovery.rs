@@ -1,7 +1,7 @@
 use super::auth::{auth_redirect_target, email_rate_limit_id, normalize_email};
 use super::auth_email::{
-    auth_related_href, email_password_auth_response, hash_password, validate_password,
-    AuthNextQuery,
+    auth_related_href, email_delivery_configured, email_password_auth_response, hash_password,
+    validate_password, AuthNextQuery,
 };
 use super::common::{
     csrf_rejected_response, rate_limit_retry_after, request_is_cross_site, unix_now,
@@ -438,6 +438,23 @@ pub async fn login_code_page(Query(query): Query<AuthNextQuery>) -> Html<String>
     let redirect_target = auth_redirect_target(query.next.as_deref());
     let login_href = auth_related_href("/login", &redirect_target);
 
+    if !email_delivery_configured() {
+        let footer_html = format!(
+            r##"<p class="rm-auth-footer"><a href="{login_href}">Войти с паролем</a></p>"##,
+            login_href = login_href,
+        );
+        return Html(crate::web::templates::render_auth_page(
+            crate::web::templates::AuthPageParams {
+                document_title: "Вход по коду · GRABIT",
+                heading: "Вход по коду",
+                subtitle: "Сейчас письма не отправляются. Войдите почтой и паролем.",
+                body_html: "",
+                footer_html: &footer_html,
+                script_html: "",
+            },
+        ));
+    }
+
     let body_html = r##"
         <label class="rm-auth-label" for="email-input">Почта</label>
         <input id="email-input" class="ui-input rm-auth-input" type="email" autocomplete="email" maxlength="254" placeholder="pochta@mail.ru">
@@ -476,7 +493,7 @@ pub async fn login_code_page(Query(query): Query<AuthNextQuery>) -> Html<String>
 
     function otpError(error) {{
         const messages = {{
-            invalid_email: "Проверьте правильность email.",
+            invalid_email: "Проверьте правильность почты.",
             invalid_code: "Введите шестизначный код.",
             code_not_found: "Сначала запросите код.",
             code_used: "Этот код уже использован.",
@@ -491,7 +508,7 @@ pub async fn login_code_page(Query(query): Query<AuthNextQuery>) -> Html<String>
     async function requestCode() {{
         const email = emailInput.value.trim();
         if (!email) {{
-            setStatus("Введите email.", true);
+            setStatus("Введите почту.", true);
             emailInput.focus();
             return;
         }}
@@ -578,7 +595,7 @@ pub async fn login_code_page(Query(query): Query<AuthNextQuery>) -> Html<String>
         crate::web::templates::AuthPageParams {
             document_title: "Вход по коду · GRABIT",
             heading: "Вход по коду",
-            subtitle: "Для аккаунтов, созданных ранее по email-коду. Новым пользователям проще зарегистрироваться с паролем.",
+            subtitle: "Код придёт на почту. Если пароль помните — проще войти им.",
             body_html,
             footer_html: &footer_html,
             script_html: &body_after,
@@ -589,6 +606,23 @@ pub async fn login_code_page(Query(query): Query<AuthNextQuery>) -> Html<String>
 pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
     let redirect_target = auth_redirect_target(query.next.as_deref());
     let login_href = auth_related_href("/login", &redirect_target);
+
+    if !email_delivery_configured() {
+        let footer_html = format!(
+            r##"<p class="rm-auth-footer"><a href="{login_href}">Вернуться ко входу</a></p>"##,
+            login_href = login_href,
+        );
+        return Html(crate::web::templates::render_auth_page(
+            crate::web::templates::AuthPageParams {
+                document_title: "Сброс пароля · GRABIT",
+                heading: "Сброс пароля",
+                subtitle: "Сейчас письма не отправляются. Войдите почтой и паролем или создайте аккаунт заново.",
+                body_html: "",
+                footer_html: &footer_html,
+                script_html: "",
+            },
+        ));
+    }
 
     let body_html = r##"
         <label class="rm-auth-label" for="email-input">Почта</label>
@@ -601,7 +635,10 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
             <input id="code-input" class="ui-input rm-auth-input rm-auth-input--code" type="text" inputmode="numeric" maxlength="6" placeholder="000000">
 
             <label class="rm-auth-label" for="password-input">Новый пароль</label>
-            <input id="password-input" class="ui-input rm-auth-input" type="password" autocomplete="new-password" maxlength="128" placeholder="Минимум 8 символов">
+            <div class="rm-auth-password-row">
+                <input id="password-input" class="ui-input rm-auth-input" type="password" autocomplete="new-password" maxlength="128" placeholder="Минимум 8 символов">
+                <button id="password-toggle" type="button" class="rm-auth-password-toggle" aria-label="Показать пароль">Показать</button>
+            </div>
 
             <button id="reset-button" type="button" class="ui-button rm-auth-button rm-auth-button--compact">Сохранить пароль</button>
         </div>
@@ -620,6 +657,7 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
     const emailInput = document.getElementById("email-input");
     const codeInput = document.getElementById("code-input");
     const passwordInput = document.getElementById("password-input");
+    const passwordToggle = document.getElementById("password-toggle");
     const resetSection = document.getElementById("reset-section");
     const requestButton = document.getElementById("request-button");
     const resetButton = document.getElementById("reset-button");
@@ -632,7 +670,7 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
 
     function resetError(error) {{
         const messages = {{
-            invalid_email: "Проверьте правильность email.",
+            invalid_email: "Проверьте правильность почты.",
             invalid_code: "Введите шестизначный код.",
             password_too_short: "Пароль должен быть не короче 8 символов.",
             code_not_found: "Сначала запросите код.",
@@ -648,7 +686,7 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
     async function requestCode() {{
         const email = emailInput.value.trim();
         if (!email) {{
-            setStatus("Введите email.", true);
+            setStatus("Введите почту.", true);
             emailInput.focus();
             return;
         }}
@@ -719,6 +757,10 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
         }}
     }}
 
+    if (window.resursmapAuthForms) {{
+        window.resursmapAuthForms.bindPasswordToggle(passwordToggle, passwordInput);
+    }}
+
     requestButton.addEventListener("click", requestCode);
     resetButton.addEventListener("click", submitReset);
     codeInput.addEventListener("input", function () {{
@@ -736,7 +778,7 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
         crate::web::templates::AuthPageParams {
             document_title: "Сброс пароля · GRABIT",
             heading: "Сброс пароля",
-            subtitle: "Отправим код на email. Подойдёт и для старых аккаунтов без пароля — вы сможете задать новый.",
+            subtitle: "Отправим код на почту. Подойдёт и для старых аккаунтов без пароля — зададите новый.",
             body_html,
             footer_html: &footer_html,
             script_html: &body_after,
