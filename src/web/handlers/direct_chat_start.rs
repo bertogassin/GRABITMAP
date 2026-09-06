@@ -42,10 +42,6 @@ fn normalized_pair(sender_user_id: i64, receiver_user_id: i64) -> Option<(i64, i
     }
 }
 
-fn contact_request_is_required(conversation_exists: bool) -> bool {
-    !conversation_exists
-}
-
 fn json_error(status: StatusCode, error: &str) -> Response {
     (
         status,
@@ -106,21 +102,6 @@ pub async fn api_start_direct_chat(
         }
     };
 
-    let sender_is_verified: i64 = connection
-        .query_row(
-            "SELECT EXISTS(
-                SELECT 1 FROM auth_identities
-                WHERE user_id = ?1 AND verified_at > 0
-            )",
-            rusqlite::params![sender_user_id],
-            |row| row.get(0),
-        )
-        .unwrap_or(0);
-
-    if sender_is_verified != 1 {
-        return json_error(StatusCode::FORBIDDEN, "verification_required");
-    }
-
     let receiver: Option<i64> = connection
         .query_row(
             "SELECT profile.user_id
@@ -160,107 +141,6 @@ pub async fn api_start_direct_chat(
         )
         .optional()
         .unwrap_or(None);
-
-    let request_pending = contact_request_is_required(existing_conversation.is_some());
-
-    if !request_pending {
-        let gate_status: Option<String> = connection
-            .query_row(
-                "SELECT status
-                 FROM contact_requests
-                 WHERE (
-                     sender_user_id = ?1 AND receiver_user_id = ?2
-                 ) OR (
-                     sender_user_id = ?2 AND receiver_user_id = ?1
-                 )
-                 ORDER BY id DESC
-                 LIMIT 1",
-                rusqlite::params![sender_user_id, receiver_user_id],
-                |row| row.get(0),
-            )
-            .optional()
-            .unwrap_or(None);
-
-        match gate_status.as_deref() {
-            Some("pending") => {
-                return json_error(StatusCode::CONFLICT, "request_pending");
-            }
-            Some("rejected") => {
-                return json_error(StatusCode::FORBIDDEN, "request_rejected");
-            }
-            _ => {}
-        }
-    }
-
-    if request_pending {
-        let existing_status: Option<String> = connection
-            .query_row(
-                "SELECT status
-                 FROM contact_requests
-                 WHERE sender_user_id = ?1
-                   AND receiver_user_id = ?2
-                 LIMIT 1",
-                rusqlite::params![sender_user_id, receiver_user_id],
-                |row| row.get(0),
-            )
-            .optional()
-            .unwrap_or(None);
-
-        match existing_status.as_deref() {
-            Some("pending") => {
-                return json_error(StatusCode::CONFLICT, "request_already_pending");
-            }
-            Some("accepted") => {
-                return json_error(StatusCode::CONFLICT, "already_connected");
-            }
-            _ => {}
-        }
-
-        let now = crate::web::handlers::common::unix_now();
-
-        if connection
-            .execute(
-                "INSERT INTO contact_requests (
-                    sender_user_id,
-                    receiver_user_id,
-                    message,
-                    status,
-                    created_at,
-                    updated_at
-                 )
-                 VALUES (?1, ?2, ?3, 'pending', ?4, ?4)
-                 ON CONFLICT(sender_user_id, receiver_user_id)
-                 DO UPDATE SET
-                    message = excluded.message,
-                    status = 'pending',
-                    updated_at = excluded.updated_at",
-                rusqlite::params![sender_user_id, receiver_user_id, message, now],
-            )
-            .is_err()
-        {
-            return json_error(StatusCode::INTERNAL_SERVER_ERROR, "request_store_failed");
-        }
-
-        let _ = connection.execute(
-            "INSERT INTO user_notifications (
-                user_id,
-                resource_id,
-                kind,
-                title,
-                message,
-                is_read,
-                created_at
-             )
-             VALUES (
-                ?1, ?2,
-                'contact_request',
-                'Новый запрос на связь',
-                'Участник хочет связаться через GRABIT.',
-                0, ?3
-             )",
-            rusqlite::params![receiver_user_id, sender_user_id, now],
-        );
-    }
 
     let now = crate::web::handlers::common::unix_now();
 
@@ -346,22 +226,20 @@ pub async fn api_start_direct_chat(
         rusqlite::params![conversation_id, now],
     );
 
-    if !request_pending {
-        let _ = transaction.execute(
-            "UPDATE contact_requests
-             SET status = 'accepted',
-                 updated_at = ?3
-             WHERE (
-                 sender_user_id = ?1
-                 AND receiver_user_id = ?2
-             )
-             OR (
-                 sender_user_id = ?2
-                 AND receiver_user_id = ?1
-             )",
-            rusqlite::params![sender_user_id, receiver_user_id, now],
-        );
-    }
+    let _ = transaction.execute(
+        "UPDATE contact_requests
+         SET status = 'accepted',
+             updated_at = ?3
+         WHERE (
+             sender_user_id = ?1
+             AND receiver_user_id = ?2
+         )
+         OR (
+             sender_user_id = ?2
+             AND receiver_user_id = ?1
+         )",
+        rusqlite::params![sender_user_id, receiver_user_id, now],
+    );
 
     let updated_notification = transaction
         .execute(
@@ -416,11 +294,7 @@ pub async fn api_start_direct_chat(
             "message_id": message_id,
             "existing_conversation":
                 existing_conversation.is_some(),
-            "status": if request_pending {
-                "pending"
-            } else {
-                "accepted"
-            },
+            "status": "open",
             "chat_url": format!(
                 "/app/chat/{}#chat-end",
                 receiver_user_id
@@ -450,8 +324,8 @@ mod tests {
     }
 
     #[test]
-    fn closed_profile_requires_contact_acceptance() {
-        assert!(contact_request_is_required(false));
-        assert!(!contact_request_is_required(true));
+    fn first_message_opens_chat_immediately() {
+        assert!(first_message_is_valid("Напишите сразу"));
+        assert_eq!(normalized_pair(12, 7), Some((7, 12)));
     }
 }

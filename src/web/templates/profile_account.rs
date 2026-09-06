@@ -820,7 +820,7 @@ body.light-theme .rm-command-icon {{
             <span class="rm-command-copy">
                 <strong>Запросы на связь</strong>
                 <small>
-                    Решайте, кто сможет связаться с вами
+                    Старые запросы. Новые сообщения приходят сразу
                 </small>
             </span>
             {contacts_badge}
@@ -1526,8 +1526,6 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
 
     let contact_html = String::new();
 
-    let public_id_js = serde_json::to_string(public_id).unwrap_or_else(|_| "\"\"".to_string());
-
     let internal_contact_html = if let Some(chat_user_id) = chat_user_id {
         format!(
             r#"
@@ -1538,11 +1536,11 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
     </div>
 
     <div class="card-meta rm-public-copy">
-        Открыть личный диалог.
+        Напишите сразу. Потом можно заблокировать или удалить.
     </div>
 
     <a href="/app/chat/{chat_user_id}" class="rm-public-chat-link">
-        Открыть чат
+        Написать
     </a>
     <button type="button" class="ui-button" data-share data-share-title="Профиль GRABIT" data-share-status="share-status">Поделиться</button>
     <div id="share-status" class="ui-status"></div>
@@ -1552,7 +1550,8 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
             chat_user_id = chat_user_id,
         )
     } else {
-        r#"
+        format!(
+            r#"
 <section class="card rm-public-section">
 
     <div class="rm-public-kicker">
@@ -1560,54 +1559,19 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
     </div>
 
     <div class="card-meta rm-public-copy">
-        Отправьте запрос.
+        Войдите и напишите сразу. Подтверждение не нужно.
     </div>
 
-    <button
-        id="contact-request-open"
-        type="button"
-        class="ui-button rm-public-contact-btn">
-        Написать
-    </button>
-
-    <div id="contact-request-panel" class="rm-public-contact-panel">
-
-        <textarea
-            id="contact-request-message"
-            maxlength="500"
-            rows="5"
-            placeholder="Напишите короткое сообщение..."
-            class="ui-textarea"></textarea>
-
-        <div class="rm-public-contact-actions">
-
-            <button
-                id="contact-request-send"
-                type="button"
-                class="ui-button rm-public-contact-send">
-                Отправить
-            </button>
-
-            <button
-                id="contact-request-cancel"
-                type="button"
-                class="ui-button rm-public-contact-cancel">
-                Отмена
-            </button>
-
-        </div>
-
-        <div id="contact-request-status" class="ui-status rm-public-contact-status">
-        </div>
-
-    </div>
-
+    <a href="/login?next=/app/user/{public_id}" class="rm-public-chat-link">
+        Войти и написать
+    </a>
     <button type="button" class="ui-button" data-share data-share-title="Профиль GRABIT" data-share-status="share-status">Поделиться</button>
     <div id="share-status" class="ui-status"></div>
 
 </section>
-"#
-        .to_string()
+"#,
+            public_id = escape_html(public_id),
+        )
     };
 
     let intent_html = if safe_intent.is_empty() {
@@ -1736,199 +1700,6 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
         cards = cards,
     );
 
-    let body_after = format!(
-        r####"
-
-
-
-<script>
-(function() {{
-    const publicId = {public_id_js};
-
-    const openButton =
-        document.getElementById("contact-request-open");
-
-    const panel =
-        document.getElementById("contact-request-panel");
-
-    const message =
-        document.getElementById("contact-request-message");
-
-    const sendButton =
-        document.getElementById("contact-request-send");
-
-    const cancelButton =
-        document.getElementById("contact-request-cancel");
-
-    const status =
-        document.getElementById("contact-request-status");
-
-    if (openButton && panel) {{
-        openButton.addEventListener("click", () => {{
-            panel.style.display = "block";
-
-            if (message) {{
-                message.focus();
-            }}
-        }});
-    }}
-
-    if (cancelButton && panel) {{
-        cancelButton.addEventListener("click", () => {{
-            panel.style.display = "none";
-
-            if (status) {{
-                status.textContent = "";
-            }}
-        }});
-    }}
-
-    if (sendButton) {{
-        sendButton.addEventListener("click", async () => {{
-            const text =
-                message
-                    ? message.value.trim()
-                    : "";
-
-            if (text.length < 2) {{
-                if (status) {{
-                    status.textContent =
-                        "Напишите сообщение.";
-                }}
-
-                return;
-            }}
-
-            sendButton.disabled = true;
-
-            if (status) {{
-                status.textContent =
-                    "Отправляем...";
-            }}
-
-            try {{
-                const response = await fetch(
-                    "/api/contact/request",
-                    {{
-                        method: "POST",
-                        headers: {{
-                            "Content-Type": "application/json"
-                        }},
-                        body: JSON.stringify({{
-                            public_id: publicId,
-                            message: text
-                        }})
-                    }}
-                );
-
-                const data =
-                    await response.json();
-
-                if (response.status === 401) {{
-                    window.location.href =
-                        "/login?next="
-                        + encodeURIComponent(
-                            window.location.pathname
-                                + window.location.search
-                        );
-                    return;
-                }}
-
-                if (
-                    response.status === 400 &&
-                    data.error === "cannot_contact_self"
-                ) {{
-                    if (status) {{
-                        status.textContent =
-                            "Нельзя отправить запрос самому себе.";
-                    }}
-
-                    sendButton.disabled = false;
-                    return;
-                }}
-
-                if (
-                    response.status === 409 &&
-                    data.error === "request_already_pending"
-                ) {{
-                    if (status) {{
-                        status.textContent =
-                            "Диалог уже создаётся.";
-                    }}
-
-                    sendButton.disabled = false;
-                    return;
-                }}
-
-                if (
-                    response.status === 409 &&
-                    data.error === "already_connected"
-                ) {{
-                    if (status) {{
-                        status.textContent =
-                            "Диалог уже открыт.";
-                    }}
-
-                    sendButton.disabled = false;
-                    return;
-                }}
-
-                if (!data.ok) {{
-                    if (status) {{
-                        status.textContent =
-                            "Не удалось отправить запрос.";
-                    }}
-
-                    sendButton.disabled = false;
-                    return;
-                }}
-
-                if (data.status === "pending") {{
-                    if (status) {{
-                        status.textContent =
-                            "Сообщение отправлено. Открываем чат…";
-                    }}
-
-                    if (data.chat_url) {{
-                        window.location.href = data.chat_url;
-                        return;
-                    }}
-                }}
-
-                if (status) {{
-                    status.textContent =
-                        "Открываем диалог…";
-                }}
-
-                if (message) {{
-                    message.value = "";
-                }}
-
-                openButton.disabled = false;
-                openButton.textContent =
-                    "Открыть чат";
-
-                if (data.chat_url) {{
-                    window.location.href =
-                        data.chat_url;
-                    return;
-                }}
-
-            }} catch (_) {{
-                if (status) {{
-                    status.textContent =
-                        "Ошибка соединения.";
-                }}
-            }}
-
-            sendButton.disabled = false;
-        }});
-    }}
-}})();
-</script>"####,
-        public_id_js = public_id_js,
-    );
-
     page_document(
         &format!("{} · GRABIT", display_name),
         r#"<meta name="robots" content="noindex, nofollow">"#,
@@ -1950,7 +1721,7 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
             content = main_html,
         ),
         &bottom_nav("search"),
-        &body_after,
+        "",
     )
 }
 

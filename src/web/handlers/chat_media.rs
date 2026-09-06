@@ -1,5 +1,5 @@
 use super::auth::verify_user_session;
-use super::chat_api::{chat_contact_gate_error, user_has_verified_identity};
+use super::chat_api::ensure_conversation_for_outgoing;
 use super::common::{input_text_is_valid, rate_limit_retry_after, request_is_cross_site, unix_now};
 use super::user_blocks::users_are_blocked;
 use crate::state::app_state::AppState;
@@ -56,16 +56,6 @@ fn normalized_pair(a: i64, b: i64) -> Option<(i64, i64)> {
     } else {
         Some((b, a))
     }
-}
-
-fn conversation_id(conn: &rusqlite::Connection, a: i64, b: i64) -> Option<i64> {
-    let (u1, u2) = normalized_pair(a, b)?;
-    conn.query_row(
-        "SELECT id FROM conversations WHERE user1_id = ?1 AND user2_id = ?2 LIMIT 1",
-        rusqlite::params![u1, u2],
-        |row| row.get(0),
-    )
-    .ok()
 }
 
 fn client_message_id_is_valid(value: &str) -> bool {
@@ -268,15 +258,10 @@ pub async fn api_chat_send_image(
     if users_are_blocked(&connection, user_id, other_user_id) {
         return json_error(StatusCode::FORBIDDEN, "user_blocked");
     }
-    if !user_has_verified_identity(&connection, user_id) {
-        return json_error(StatusCode::FORBIDDEN, "verification_required");
-    }
-    if let Some(error) = chat_contact_gate_error(&connection, user_id, other_user_id) {
-        return json_error(StatusCode::FORBIDDEN, error);
-    }
-    let conversation_id = match conversation_id(&connection, user_id, other_user_id) {
-        Some(id) => id,
-        None => return json_error(StatusCode::FORBIDDEN, "conversation_not_open"),
+    let conversation_id = match ensure_conversation_for_outgoing(&connection, user_id, other_user_id)
+    {
+        Ok(id) => id,
+        Err(error) => return json_error(StatusCode::FORBIDDEN, error),
     };
 
     if !client_message_id.is_empty() {
@@ -513,15 +498,10 @@ pub async fn api_chat_send_voice(
     if users_are_blocked(&connection, user_id, other_user_id) {
         return json_error(StatusCode::FORBIDDEN, "user_blocked");
     }
-    if !user_has_verified_identity(&connection, user_id) {
-        return json_error(StatusCode::FORBIDDEN, "verification_required");
-    }
-    if let Some(error) = chat_contact_gate_error(&connection, user_id, other_user_id) {
-        return json_error(StatusCode::FORBIDDEN, error);
-    }
-    let conversation_id = match conversation_id(&connection, user_id, other_user_id) {
-        Some(id) => id,
-        None => return json_error(StatusCode::FORBIDDEN, "conversation_not_open"),
+    let conversation_id = match ensure_conversation_for_outgoing(&connection, user_id, other_user_id)
+    {
+        Ok(id) => id,
+        Err(error) => return json_error(StatusCode::FORBIDDEN, error),
     };
 
     if !client_message_id.is_empty() {

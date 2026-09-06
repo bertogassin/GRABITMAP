@@ -1055,16 +1055,16 @@
                 return "Сессия истекла";
             }
             if (code === "verification_required") {
-                return "Подтвердите аккаунт, чтобы писать";
+                return "Войдите в аккаунт, чтобы писать";
             }
             if (code === "request_pending") {
-                return "Ждём ответа на запрос";
+                return "Не удалось отправить. Попробуйте ещё раз";
             }
             if (code === "request_rejected") {
-                return "Запрос отклонён";
+                return "Собеседник ограничил этот диалог";
             }
             if (code === "conversation_not_open") {
-                return "Диалог ещё не открыт";
+                return "Не удалось открыть диалог";
             }
             if (code === "user_blocked") {
                 return "Пользователь недоступен";

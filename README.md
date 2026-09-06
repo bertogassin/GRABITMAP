@@ -4,14 +4,52 @@
 
 Стек: Rust + Axum + SQLite.
 
-## Запуск
+## Что умеет
 
-1. Скопируйте `.env.example` в `.env` и задайте `ADMIN_KEY`.
-2. Для локального HTTP без HTTPS установите `GRABIT_COOKIE_SECURE=0`.
-3. Запустите сервер:
+- карта: континент → страна → город
+- поиск по рубрикам и профессиям
+- объявления
+- чат
+- вход по email и паролю
+- админка
 
-```bash
-cargo run
+Telegram не обязателен. Сайт работает без бота.
+
+## Локальный запуск
+
+1. Скопируйте `.env.example` в `.env`.
+2. Задайте `ADMIN_KEY`.
+3. Для HTTP без HTTPS поставьте `GRABIT_COOKIE_SECURE=0`.
+4. Запустите:
+
+```powershell
+.\scripts\run_local.ps1
 ```
 
-4. Откройте http://127.0.0.1:3000/app
+или `cargo run`.
+
+Откройте http://127.0.0.1:3000/app
+
+Проверка: http://127.0.0.1:3000/health должно вернуть `ok`.
+
+Если почта (`RESEND_API_KEY`) не задана, регистрация сразу входит в аккаунт. Код из письма нужен только когда почта настроена.
+
+## Docker
+
+```bash
+docker compose up --build
+```
+
+Перед продом задайте свой `ADMIN_KEY` и `PUBLIC_BASE_URL=https://grabitmap.com`.
+
+## Переменные
+
+| Переменная | Зачем |
+|---|---|
+| `ADMIN_KEY` | обязательный секрет админки |
+| `GRABIT_COOKIE_SECURE` | `0` для локального HTTP |
+| `PORT` | порт, по умолчанию 3000 |
+| `DATABASE_URL` | SQLite, по умолчанию `sqlite:data/votes.db` |
+| `PUBLIC_BASE_URL` | публичный адрес сайта |
+| `RESEND_API_KEY` | письма: код входа и сброс пароля |
+| `OWNER_BOOTSTRAP_EMAIL` / `OWNER_BOOTSTRAP_PASSWORD` | первый владелец |

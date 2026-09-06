@@ -714,42 +714,18 @@ pub fn render_chat(
 
         let may_have_older = if messages.len() >= 100 { "1" } else { "0" };
 
-        let composer_locked = contact_request
-            .is_some_and(|request| request.status == "pending" || request.status == "rejected");
-
-        let waiting_as_sender = contact_request.is_some_and(|request| {
-            request.status == "pending" && request.sender_user_id == viewer_user_id
-        });
+        let composer_locked = false;
+        let _ = contact_request;
 
         let message_cards = if messages.is_empty() {
-            if waiting_as_sender {
-                r#"
-<div class="chat-empty-thread">
-    <div class="chat-empty-thread-icon" aria-hidden="true"></div>
-    <strong>Запрос отправлен</strong>
-    <p>Первое сообщение уже у собеседника. Ответ появится, когда он примет общение.</p>
-</div>
-"#
-                .to_string()
-            } else if composer_locked {
-                r#"
-<div class="chat-empty-thread">
-    <div class="chat-empty-thread-icon" aria-hidden="true"></div>
-    <strong>Диалог ещё не открыт</strong>
-    <p>Переписка станет доступна после решения по запросу.</p>
-</div>
-"#
-                .to_string()
-            } else {
-                r#"
+            r#"
 <div class="chat-empty-thread">
     <div class="chat-empty-thread-icon" aria-hidden="true"></div>
     <strong>Диалог открыт</strong>
-    <p>Напишите первое сообщение — Enter для отправки.</p>
+    <p>Напишите сразу — сообщение сразу дойдёт. Потом можно заблокировать или удалить.</p>
 </div>
 "#
-                .to_string()
-            }
+            .to_string()
         } else {
             let mut last_date_key = String::new();
 
@@ -767,29 +743,7 @@ pub fn render_chat(
                 .join("")
         };
 
-        let contact_gate = contact_request
-            .map(|request| {
-                if request.status == "pending" && request.sender_user_id != viewer_user_id {
-                    format!(
-                        r#"<aside class="chat-request-gate">
-<strong>Запрос на общение</strong>
-<p>Примите запрос, чтобы продолжить переписку.</p>
-<div class="chat-request-actions">
-<form method="post" action="/app/contact-request/{id}/accept"><button type="submit">Принять</button></form>
-<form method="post" action="/app/contact-request/{id}/reject"><button type="submit">Отклонить</button></form>
-</div>
-</aside>"#,
-                        id = request.id
-                    )
-                } else if request.status == "pending" {
-                    r#"<aside class="chat-request-gate"><strong>Запрос отправлен</strong><p>Первое сообщение уже видно собеседнику. Следующие сообщения будут доступны, когда он примет общение.</p></aside>"#.to_string()
-                } else if request.status == "rejected" {
-                    r#"<aside class="chat-request-gate is-rejected"><strong>Запрос отклонён</strong><p>Продолжить этот диалог сейчас нельзя.</p></aside>"#.to_string()
-                } else {
-                    String::new()
-                }
-            })
-            .unwrap_or_default();
+        let contact_gate = String::new();
 
         let composer = format!(
             r#"

@@ -483,7 +483,7 @@ pub async fn login_code_page(Query(query): Query<AuthNextQuery>) -> Html<String>
             code_expired: "Срок действия кода истёк.",
             wrong_code: "Код введён неверно.",
             rate_limited: "Слишком много попыток. Попробуйте позже.",
-            mail_unavailable: "Отправка писем временно недоступна."
+            mail_unavailable: "Почта не настроена. Войдите email и паролем."
         }};
         return messages[error] || "Не удалось выполнить запрос.";
     }}
@@ -640,7 +640,7 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
             code_expired: "Срок действия кода истёк.",
             wrong_code: "Код введён неверно.",
             rate_limited: "Слишком много попыток.",
-            mail_unavailable: "Отправка писем временно недоступна."
+            mail_unavailable: "Почта не настроена. Войдите email и паролем."
         }};
         return messages[error] || "Не удалось выполнить запрос.";
     }}

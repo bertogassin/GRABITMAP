@@ -1,0 +1,21 @@
+services:
+  grabit:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      ADMIN_KEY: ${ADMIN_KEY:-change-me}
+      PORT: "3000"
+      DATABASE_URL: sqlite:data/votes.db
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://127.0.0.1:3000}
+      GRABIT_COOKIE_SECURE: ${GRABIT_COOKIE_SECURE:-0}
+      GRABIT_MAIL_FROM: ${GRABIT_MAIL_FROM:-GRABIT <noreply@grabitmap.com>}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      OWNER_BOOTSTRAP_EMAIL: ${OWNER_BOOTSTRAP_EMAIL:-}
+      OWNER_BOOTSTRAP_PASSWORD: ${OWNER_BOOTSTRAP_PASSWORD:-}
+    volumes:
+      - grabit-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  grabit-data:

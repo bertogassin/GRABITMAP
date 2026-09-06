@@ -7,7 +7,7 @@ pub fn escape_html(value: &str) -> String {
         .replace('\'', "&#39;")
 }
 
-pub const STATIC_ASSET_VERSION: &str = "4.9.60";
+pub const STATIC_ASSET_VERSION: &str = "4.9.62";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -428,7 +428,7 @@ body::before { display: none; }
 .page {
     width: min(100% - 32px, 900px);
     margin: 0 auto;
-    padding: 28px 0 calc(110px + env(safe-area-inset-bottom, 0px));
+    padding: 28px 0 calc(140px + env(safe-area-inset-bottom, 0px));
 }
 
 .icon {

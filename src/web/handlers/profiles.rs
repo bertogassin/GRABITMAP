@@ -556,33 +556,12 @@ pub async fn public_user_profile(
     // Определяем, кто сейчас смотрит публичный профиль.
     let viewer_user_id = verify_user_session(&state, &headers);
 
-    // Если между текущим пользователем и владельцем профиля
-    // уже существует conversation, передаём ID владельца
-    // в шаблон, чтобы вместо повторного запроса показать чат.
     let chat_user_id: Option<i64> = viewer_user_id.and_then(|viewer_id| {
         if viewer_id <= 0 || profile_user_id <= 0 || viewer_id == profile_user_id {
             return None;
         }
 
-        let (user1_id, user2_id) = if viewer_id < profile_user_id {
-            (viewer_id, profile_user_id)
-        } else {
-            (profile_user_id, viewer_id)
-        };
-
-        let exists: Option<i64> = db
-            .query_row(
-                "SELECT id
-                     FROM conversations
-                     WHERE user1_id = ?1
-                       AND user2_id = ?2
-                     LIMIT 1",
-                rusqlite::params![user1_id, user2_id,],
-                |row| row.get(0),
-            )
-            .ok();
-
-        exists.map(|_| profile_user_id)
+        Some(profile_user_id)
     });
 
     drop(db);

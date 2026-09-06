@@ -1,0 +1,12 @@
+.git
+.github
+target
+.env
+.env.*
+!.env.example
+*.db
+data/*.db
+data/*.db-*
+data/chat-media
+backups
+*.log

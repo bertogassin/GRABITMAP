@@ -97,10 +97,18 @@ fn allocate_email_user_id(transaction: &rusqlite::Transaction<'_>) -> i64 {
         .unwrap_or(EMAIL_USER_ID_BASE)
 }
 
+fn email_delivery_configured() -> bool {
+    std::env::var("RESEND_API_KEY")
+        .ok()
+        .map(|value| !value.trim().is_empty())
+        .unwrap_or(false)
+}
+
 fn provision_email_account(
     transaction: &rusqlite::Transaction<'_>,
     email: &str,
     password_hash: &str,
+    verified_at: i64,
 ) -> Result<i64, &'static str> {
     let existing_user_id: Option<i64> = transaction
         .query_row(
@@ -157,7 +165,7 @@ fn provision_email_account(
                 ?5,
                 ?5
              )",
-            rusqlite::params![next_id, email, password_hash, 0, now],
+            rusqlite::params![next_id, email, password_hash, verified_at, now],
         )
         .map_err(|_| "identity_create_failed")?;
 
@@ -322,7 +330,10 @@ pub async fn register_email(
         }
     };
 
-    let user_id = match provision_email_account(&transaction, &email, &password_hash) {
+    let verification_required = email_delivery_configured();
+    let verified_at = if verification_required { 0 } else { unix_now() };
+
+    let user_id = match provision_email_account(&transaction, &email, &password_hash, verified_at) {
         Ok(user_id) => user_id,
         Err(error) => {
             let status = if error == "email_already_registered" {
@@ -355,15 +366,19 @@ pub async fn register_email(
 
     drop(db);
 
-    (
-        StatusCode::OK,
-        Json(json!({
-            "ok": true,
-            "user_id": user_id,
-            "verification_required": true
-        })),
-    )
-        .into_response()
+    if verification_required {
+        return (
+            StatusCode::OK,
+            Json(json!({
+                "ok": true,
+                "user_id": user_id,
+                "verification_required": true
+            })),
+        )
+            .into_response();
+    }
+
+    email_password_auth_response(&state, user_id, &headers)
 }
 
 pub async fn login_email(
@@ -455,7 +470,7 @@ pub async fn login_email(
         }
     };
 
-    if verified_at <= 0 {
+    if verified_at <= 0 && email_delivery_configured() {
         return (
             StatusCode::FORBIDDEN,
             Json(json!({
@@ -541,6 +556,7 @@ pub async fn login_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
             invalid_password: "Введите пароль.",
             invalid_credentials: "Неверный email или пароль.",
             password_not_set: "Для этого email пароль ещё не задан. Используйте «Забыли пароль?» или вход по коду.",
+            verification_required: "Подтвердите email кодом из письма. Если письма нет — войдите паролем после регистрации.",
             rate_limited: "Слишком много попыток. Попробуйте позже.",
             database_unavailable: "Сервис временно недоступен."
         }};
@@ -760,7 +776,7 @@ pub async fn register_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
         crate::web::templates::AuthPageParams {
             document_title: "Регистрация · GRABIT",
             heading: "Регистрация",
-            subtitle: "Создайте аккаунт по email и паролю. Telegram используется только для уведомлений и публикаций, не для входа.",
+            subtitle: "Создайте аккаунт по email и паролю. Письмо с кодом нужно только если настроена почта.",
             body_html,
             footer_html: &footer_html,
             script_html: &body_after,
