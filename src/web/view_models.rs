@@ -15,7 +15,6 @@ pub type CategoryResourceRow = (
 );
 pub type FavoriteResourceRow = (i64, String, String, String, String, f64, i64, i64, i64);
 pub type NotificationRow = (i64, Option<i64>, String, String, String, i64, i64);
-pub type ContactRequestRow = (i64, i64, String, String, String, String, String, i64, i64);
 
 pub struct ConversationRow {
     pub _id: i64,

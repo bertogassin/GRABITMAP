@@ -1055,15 +1055,6 @@
             if (error && error.status === 401) {
                 return "Сессия истекла";
             }
-            if (code === "verification_required") {
-                return "Войдите в аккаунт, чтобы писать";
-            }
-            if (code === "request_pending") {
-                return "Не удалось отправить. Попробуйте ещё раз";
-            }
-            if (code === "request_rejected") {
-                return "Собеседник ограничил этот диалог";
-            }
             if (code === "conversation_not_open") {
                 return "Не удалось открыть диалог";
             }

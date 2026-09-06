@@ -226,21 +226,6 @@ pub async fn api_start_direct_chat(
         rusqlite::params![conversation_id, now],
     );
 
-    let _ = transaction.execute(
-        "UPDATE contact_requests
-         SET status = 'accepted',
-             updated_at = ?3
-         WHERE (
-             sender_user_id = ?1
-             AND receiver_user_id = ?2
-         )
-         OR (
-             sender_user_id = ?2
-             AND receiver_user_id = ?1
-         )",
-        rusqlite::params![sender_user_id, receiver_user_id, now],
-    );
-
     let updated_notification = transaction
         .execute(
             "UPDATE user_notifications

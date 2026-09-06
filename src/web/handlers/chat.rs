@@ -145,7 +145,6 @@ pub async fn chat_page(
                 "",
                 "",
                 vec![],
-                None,
             ));
         }
     };
@@ -159,7 +158,6 @@ pub async fn chat_page(
             "",
             "",
             vec![],
-            None,
         ));
     }
 
@@ -370,7 +368,6 @@ pub async fn chat_page(
         &other_first_name,
         &other_last_name,
         messages,
-        None,
     ))
 }
 

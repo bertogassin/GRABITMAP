@@ -1,178 +1,8 @@
 use super::common::{
-    back_hero, back_link, bottom_nav, bottom_nav_with_badge, contact_request_status_badge,
-    empty_state_action, empty_state_card, empty_state_card_with_actions, escape_html,
-    guest_locked_section, icon, page_document, page_shell, section_head, simple_hero, static_asset,
-    topbar,
+    back_hero, back_link, bottom_nav, bottom_nav_with_badge, empty_state_action, empty_state_card,
+    empty_state_card_with_actions, escape_html, guest_locked_section, icon, page_document,
+    page_shell, section_head, simple_hero, static_asset, topbar,
 };
-
-#[allow(dead_code)]
-pub fn render_contact_requests(
-    requests: Vec<crate::web::view_models::ContactRequestRow>,
-    authenticated: bool,
-) -> String {
-    let pending_count = requests.iter().filter(|r| r.3 == "pending").count();
-
-    let cards = if !authenticated {
-        guest_locked_section("Запросы на связь", "/app/contact-requests")
-    } else if requests.is_empty() {
-        empty_state_card_with_actions(
-            "Нет входящих запросов",
-            "Новые запросы будут отображаться здесь.",
-            &empty_state_action("/app/search", "Найти участников"),
-        )
-    } else {
-        requests
-            .iter()
-            .map(
-                |(
-                    request_id,
-                    sender_user_id,
-                    message,
-                    status,
-                    public_id,
-                    username,
-                    first_name,
-                    created_at,
-                    _sort,
-                )| {
-                    let safe_message = escape_html(message);
-
-                    let safe_username = escape_html(username);
-
-                    let safe_first_name = escape_html(first_name);
-
-                    let display_name = if !safe_first_name.is_empty() {
-                        safe_first_name
-                    } else if !safe_username.is_empty() {
-                        format!("@{}", safe_username)
-                    } else {
-                        format!("Участник · {:06}", sender_user_id.rem_euclid(1_000_000))
-                    };
-
-                    let username_html = if !safe_username.is_empty() {
-                        format!(
-                            r#"<div class="card-meta rm-contact-username">@{username}</div>"#,
-                            username = safe_username,
-                        )
-                    } else {
-                        String::new()
-                    };
-
-                    let profile_link = if !public_id.trim().is_empty() {
-                        format!(
-                            r#"<a href="/app/user/{public_id}" class="rm-contact-profile-link">Открыть профиль</a>"#,
-                            public_id = public_id,
-                        )
-                    } else {
-                        String::new()
-                    };
-
-                    let status_badge = contact_request_status_badge(status);
-
-                    let actions = if status == "pending" {
-                        format!(
-                            r#"
-<div class="rm-contact-actions">
-    <form method="post" action="/app/contact-request/{id}/accept" class="ui-form">
-        <button type="submit" class="ui-button rm-contact-btn rm-contact-btn--accept">Принять</button>
-    </form>
-    <form method="post" action="/app/contact-request/{id}/reject" class="ui-form">
-        <button type="submit" class="ui-button rm-contact-btn rm-contact-btn--reject">✕ Отклонить</button>
-    </form>
-</div>
-"#,
-                            id = request_id,
-                        )
-                    } else if status == "accepted" {
-                        format!(
-                            r#"<a href="/app/chat/{sender_user_id}" class="rm-contact-open-chat">Открыть чат</a>"#,
-                            sender_user_id = sender_user_id,
-                        )
-                    } else {
-                        String::new()
-                    };
-
-                    format!(
-                        r#"
-<article class="card rm-contact-card">
-    <div class="rm-contact-layout">
-        <div class="card-icon">{user_icon}</div>
-        <div class="rm-contact-body">
-            <div class="rm-contact-head">
-                <div>
-                    <div class="card-title rm-contact-title">{display_name}</div>
-                    {username_html}
-                </div>
-                <div>{status_badge}</div>
-            </div>
-            <div class="rm-contact-message">{message}</div>
-            {profile_link}
-            {actions}
-            <div class="card-meta rm-contact-meta">{created_at}</div>
-        </div>
-    </div>
-</article>
-"#,
-                        user_icon = icon("user"),
-                        display_name = display_name,
-                        username_html = username_html,
-                        status_badge = status_badge,
-                        message = safe_message,
-                        profile_link = profile_link,
-                        actions = actions,
-                        created_at = created_at,
-                    )
-                },
-            )
-            .collect::<Vec<_>>()
-            .join("")
-    };
-
-    let content_html = format!(
-        r####"<div class="card rm-contact-summary">
-
-    <div class="card-content">
-
-        <div class="card-title">
-            Новые запросы
-        </div>
-
-        <div class="card-meta rm-contact-summary-copy">
-            Ожидают вашего решения
-        </div>
-
-    </div>
-
-    <div class="rm-contact-summary-count">
-        {pending_count}
-    </div>
-
-</div>
-
-
-<section>
-
-    {cards}
-
-</section>"####,
-        pending_count = pending_count,
-        cards = cards,
-    );
-
-    page_shell(
-        "Запросы · GRABIT",
-        &topbar("Запросы контактов", "users"),
-        &back_hero(
-            &back_link("/app/me", "Профиль", "arrow-left"),
-            "user",
-            "Связи",
-            "Запросы на связь",
-            "Управление ранее полученными запросами.",
-        ),
-        &content_html,
-        &bottom_nav("chats"),
-    )
-}
 
 // ============================================================
 // TASK 7.22G-C — MESSAGES LIST
@@ -663,12 +493,6 @@ fn render_chat_message_row(
     )
 }
 
-pub struct ChatContactRequestState {
-    pub id: i64,
-    pub sender_user_id: i64,
-    pub status: String,
-}
-
 #[allow(clippy::too_many_arguments)]
 pub fn render_chat(
     authenticated: bool,
@@ -678,7 +502,6 @@ pub fn render_chat(
     first_name: &str,
     last_name: &str,
     messages: Vec<crate::web::view_models::ChatMessageRow>,
-    contact_request: Option<&ChatContactRequestState>,
 ) -> String {
     let safe_username = escape_html(username);
     let safe_first_name = escape_html(first_name);
@@ -715,9 +538,6 @@ pub fn render_chat(
 
         let may_have_older = if messages.len() >= 100 { "1" } else { "0" };
 
-        let composer_locked = false;
-        let _ = contact_request;
-
         let message_cards = if messages.is_empty() {
             r#"
 <div class="chat-empty-thread">
@@ -744,12 +564,9 @@ pub fn render_chat(
                 .join("")
         };
 
-        let contact_gate = String::new();
-
-        let composer = format!(
-            r#"
+        let composer = r#"
 <form id="chat-form"
-      class="ui-form chat-composer{locked_class}"{hidden_attr}>
+      class="ui-form chat-composer">
 
     <div id="chat-reply-bar"
          class="chat-reply-bar"
@@ -782,20 +599,16 @@ pub fn render_chat(
     </div>
 
     <div class="chat-composer-main">
-        <textarea id="chat-input" name="message" rows="1" maxlength="2000" required autocomplete="off" enterkeyhint="send" aria-label="Текст сообщения" placeholder="Сообщение…" class="ui-textarea chat-input"{disabled_attr}></textarea>
+        <textarea id="chat-input" name="message" rows="1" maxlength="2000" required autocomplete="off" enterkeyhint="send" aria-label="Текст сообщения" placeholder="Сообщение…" class="ui-textarea chat-input"></textarea>
         <button id="chat-clear" type="button" class="chat-clear-button" aria-label="Очистить сообщение" hidden>×</button>
     </div>
     <input type="file" id="chat-image-input" accept="image/jpeg,image/png,image/webp" hidden>
-    <button id="chat-voice-btn" type="button" class="chat-voice-btn"{disabled_attr}>Голос</button>
-    <button id="chat-image-btn" type="button" class="chat-image-btn"{disabled_attr}>Фото</button>
-    <button id="chat-send" type="submit" class="ui-button chat-send-button"{disabled_attr}>Отправить</button>
+    <button id="chat-voice-btn" type="button" class="chat-voice-btn">Голос</button>
+    <button id="chat-image-btn" type="button" class="chat-image-btn">Фото</button>
+    <button id="chat-send" type="submit" class="ui-button chat-send-button">Отправить</button>
     <div class="chat-composer-footer"><span id="chat-send-state">Enter — отправить · Shift+Enter — новая строка</span><span id="chat-counter">0 / 2000</span></div>
 </form>
-"#,
-            locked_class = if composer_locked { " is-locked" } else { "" },
-            hidden_attr = if composer_locked { " hidden" } else { "" },
-            disabled_attr = if composer_locked { " disabled" } else { "" },
-        );
+"#;
 
         format!(
             r#"
@@ -869,8 +682,6 @@ pub fn render_chat(
         ↓
     </button>
 
-    {contact_gate}
-
     {composer}
 
 </section>
@@ -890,7 +701,6 @@ pub fn render_chat(
             last_message_id = last_message_id,
             may_have_older = may_have_older,
             message_cards = message_cards,
-            contact_gate = contact_gate,
             composer = composer,
         )
     };

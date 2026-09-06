@@ -99,7 +99,6 @@ pub async fn app_me(State(state): State<AppState>, headers: HeaderMap) -> Html<S
                 rejected_count: 0,
                 favorites_count: 0,
                 unread_notifications_count: 0,
-                pending_contact_requests_count: 0,
                 unread_messages_count: 0,
                 moderator_level: 0,
                 intent_text: "",
@@ -263,8 +262,6 @@ pub async fn app_me(State(state): State<AppState>, headers: HeaderMap) -> Html<S
         )
         .unwrap_or(0);
 
-    let pending_contact_requests_count: i64 = 0;
-
     let unread_messages_count: i64 = db
         .query_row(
             "SELECT COUNT(*)
@@ -296,7 +293,6 @@ pub async fn app_me(State(state): State<AppState>, headers: HeaderMap) -> Html<S
         rejected_count,
         favorites_count,
         unread_notifications_count,
-        pending_contact_requests_count,
         unread_messages_count,
         moderator_level,
         intent_text: &intent_text,
@@ -317,7 +313,6 @@ pub async fn api_attention_count(State(state): State<AppState>, headers: HeaderM
                 "count": 0,
                 "messages": 0,
                 "notifications": 0,
-                "contacts": 0,
             }))
             .into_response();
         }
@@ -347,12 +342,11 @@ pub async fn api_attention_count(State(state): State<AppState>, headers: HeaderM
         "count": counts.0,
         "messages": counts.1,
         "notifications": counts.2,
-        "contacts": 0,
     }))
     .into_response()
 }
 
-fn query_attention_counts(db: &rusqlite::Connection, user_id: i64) -> (i64, i64, i64, i64) {
+fn query_attention_counts(db: &rusqlite::Connection, user_id: i64) -> (i64, i64, i64) {
     let notifications: i64 = db
         .query_row(
             "SELECT COUNT(*)
@@ -379,7 +373,7 @@ fn query_attention_counts(db: &rusqlite::Connection, user_id: i64) -> (i64, i64,
         )
         .unwrap_or(0);
 
-    (messages + notifications, messages, notifications, 0)
+    (messages + notifications, messages, notifications)
 }
 
 fn load_user_sessions(

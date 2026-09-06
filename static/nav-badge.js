@@ -68,8 +68,7 @@
             .then(function (data) {
                 var messages = Number(data.messages) || 0;
                 var notifications = Number(data.notifications) || 0;
-                var contacts = Number(data.contacts) || 0;
-                var menuCount = notifications + contacts;
+                var menuCount = notifications;
 
                 if (notifications > lastNotifications && lastNotifications > 0) {
                     notifySound();

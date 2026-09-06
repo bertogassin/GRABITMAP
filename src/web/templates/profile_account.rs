@@ -18,7 +18,6 @@ pub struct RenderMeParams<'a> {
     pub rejected_count: i64,
     pub favorites_count: i64,
     pub unread_notifications_count: i64,
-    pub pending_contact_requests_count: i64,
     pub unread_messages_count: i64,
     pub moderator_level: i64,
     pub intent_text: &'a str,
@@ -187,7 +186,6 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
         rejected_count,
         favorites_count,
         unread_notifications_count,
-        pending_contact_requests_count: _,
         unread_messages_count,
         moderator_level,
         intent_text,
@@ -1346,9 +1344,6 @@ pub fn render_notifications(
                         "promotion_publish_failed" => (icon("alert-triangle"), "rm-notif-card--rejected", "rm-notif-icon--rejected"),
                         "promotion_rejected" => (icon("x"), "rm-notif-card--rejected", "rm-notif-icon--rejected"),
                         "admin_assignment" => (icon("shield"), "rm-notif-card--contact", "rm-notif-icon--contact"),
-                        "chat_message" => (icon("message-circle"), "rm-notif-card--chat", "rm-notif-icon--chat"),
-                        "contact_accepted" => (icon("check"), "rm-notif-card--contact", "rm-notif-icon--contact"),
-                        "contact_rejected" => (icon("x"), "rm-notif-card--rejected", "rm-notif-icon--rejected"),
                         _ => (icon("bell"), "", "rm-notif-icon--default"),
                     };
 
@@ -1813,7 +1808,6 @@ mod personal_center_tests {
             rejected_count: 1,
             favorites_count: 3,
             unread_notifications_count: 5,
-            pending_contact_requests_count: 2,
             unread_messages_count: 6,
             moderator_level: 0,
             intent_text: "Ищу партнёров",
