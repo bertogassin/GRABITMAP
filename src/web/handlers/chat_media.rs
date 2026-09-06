@@ -66,7 +66,11 @@ fn client_message_id_is_valid(value: &str) -> bool {
 }
 
 pub(crate) fn media_root() -> PathBuf {
-    PathBuf::from("data/chat-media")
+    std::env::var("CHAT_MEDIA_DIR")
+        .ok()
+        .map(PathBuf::from)
+        .filter(|path| !path.as_os_str().is_empty())
+        .unwrap_or_else(|| PathBuf::from("data/chat-media"))
 }
 
 pub(crate) fn detect_image(bytes: &[u8]) -> Option<(&'static str, &'static str)> {
@@ -258,11 +262,11 @@ pub async fn api_chat_send_image(
     if users_are_blocked(&connection, user_id, other_user_id) {
         return json_error(StatusCode::FORBIDDEN, "user_blocked");
     }
-    let conversation_id = match ensure_conversation_for_outgoing(&connection, user_id, other_user_id)
-    {
-        Ok(id) => id,
-        Err(error) => return json_error(StatusCode::FORBIDDEN, error),
-    };
+    let conversation_id =
+        match ensure_conversation_for_outgoing(&connection, user_id, other_user_id) {
+            Ok(id) => id,
+            Err(error) => return json_error(StatusCode::FORBIDDEN, error),
+        };
 
     if !client_message_id.is_empty() {
         if let Ok(existing_id) = connection.query_row(
@@ -498,11 +502,11 @@ pub async fn api_chat_send_voice(
     if users_are_blocked(&connection, user_id, other_user_id) {
         return json_error(StatusCode::FORBIDDEN, "user_blocked");
     }
-    let conversation_id = match ensure_conversation_for_outgoing(&connection, user_id, other_user_id)
-    {
-        Ok(id) => id,
-        Err(error) => return json_error(StatusCode::FORBIDDEN, error),
-    };
+    let conversation_id =
+        match ensure_conversation_for_outgoing(&connection, user_id, other_user_id) {
+            Ok(id) => id,
+            Err(error) => return json_error(StatusCode::FORBIDDEN, error),
+        };
 
     if !client_message_id.is_empty() {
         if let Ok(existing_id) = connection.query_row(

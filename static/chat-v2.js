@@ -4131,6 +4131,7 @@
         var heartbeatTimer = null;
         var stopped = false;
         var retryAttempt = 0;
+        var lastEventId = 0;
 
         function websocketUrl() {
             var scheme =
@@ -4142,7 +4143,8 @@
                 scheme +
                 "//" +
                 window.location.host +
-                "/api/chat/realtime"
+                "/api/chat/realtime?last_event_id=" +
+                encodeURIComponent(String(lastEventId))
             );
         }
 
@@ -4199,6 +4201,9 @@
                     )
                 )
             ) {
+                if (payload.event && Number(payload.event.event_id) > lastEventId) {
+                    lastEventId = Number(payload.event.event_id);
+                }
                 return;
             }
 

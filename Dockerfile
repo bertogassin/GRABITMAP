@@ -21,6 +21,7 @@ COPY --from=build /app/data ./data
 
 ENV PORT=3000 \
     DATABASE_URL=sqlite:data/votes.db \
+    CHAT_MEDIA_DIR=data/chat-media \
     PUBLIC_BASE_URL=https://grabitmap.com \
     GRABIT_COOKIE_SECURE=1
 

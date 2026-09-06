@@ -4,7 +4,7 @@ use crate::state::app_state::AppState;
 use axum::{
     extract::{
         ws::{Message, WebSocket},
-        State, WebSocketUpgrade,
+        Query, State, WebSocketUpgrade,
     },
     http::{HeaderMap, StatusCode},
     response::{IntoResponse, Response},
@@ -19,6 +19,11 @@ struct ClientFrame {
     #[serde(rename = "type")]
     frame_type: String,
     other_user_id: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub(crate) struct RealtimeQuery {
+    last_event_id: Option<u64>,
 }
 
 fn parse_other_user_id(value: Option<&str>) -> Option<i64> {
@@ -58,6 +63,7 @@ pub async fn api_chat_realtime(
     State(state): State<AppState>,
     headers: HeaderMap,
     websocket: WebSocketUpgrade,
+    Query(query): Query<RealtimeQuery>,
 ) -> Response {
     if request_is_cross_site(&headers) {
         return (
@@ -85,7 +91,9 @@ pub async fn api_chat_realtime(
     };
 
     websocket
-        .on_upgrade(move |socket| chat_socket(socket, state, user_id))
+        .on_upgrade(move |socket| {
+            chat_socket(socket, state, user_id, query.last_event_id.unwrap_or(0))
+        })
         .into_response()
 }
 
@@ -96,7 +104,7 @@ async fn send_json(socket: &mut WebSocket, value: serde_json::Value) -> bool {
         .is_ok()
 }
 
-async fn chat_socket(mut socket: WebSocket, state: AppState, user_id: i64) {
+async fn chat_socket(mut socket: WebSocket, state: AppState, user_id: i64, last_event_id: u64) {
     let mut events = state.chat_events.subscribe();
     let mut typing_events = state.chat_typing_events.subscribe();
 
@@ -109,6 +117,15 @@ async fn chat_socket(mut socket: WebSocket, state: AppState, user_id: i64) {
         }),
     )
     .await
+    {
+        return;
+    }
+    if last_event_id > 0
+        && !send_json(
+            &mut socket,
+            json!({"type": "sync_required", "after_event_id": last_event_id}),
+        )
+        .await
     {
         return;
     }

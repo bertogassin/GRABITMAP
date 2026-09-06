@@ -49,6 +49,7 @@
         var retryTimer = null;
         var heartbeatTimer = null;
         var retryAttempt = 0;
+        var lastEventId = 0;
         var stopped = false;
         var lastSnapshot = "";
         var activeTyping = Object.create(null);
@@ -337,7 +338,8 @@
                 window.location.protocol === "https:" ? "wss:" : "ws:";
 
             return (
-                scheme + "//" + window.location.host + "/api/chat/realtime"
+                scheme + "//" + window.location.host + "/api/chat/realtime?last_event_id=" +
+                encodeURIComponent(String(lastEventId))
             );
         }
 
@@ -429,6 +431,9 @@
                     payload = JSON.parse(event.data);
                 } catch (_) {
                     return;
+                }
+                if (payload.event && Number(payload.event.event_id) > lastEventId) {
+                    lastEventId = Number(payload.event.event_id);
                 }
 
                 handleTypingPayload(payload);
