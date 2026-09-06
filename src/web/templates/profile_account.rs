@@ -395,7 +395,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
             .saturating_add(unread_messages_count);
 
         let availability_class = "available";
-        let availability_text = "Внутренние сообщения доступны";
+        let availability_text = "Можно писать сразу";
 
         let category_text = crate::catalog::resolve(category)
             .map(|rubric| rubric.label)

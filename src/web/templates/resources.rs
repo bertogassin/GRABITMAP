@@ -401,6 +401,7 @@ pub struct RenderResourceProfileParams<'a> {
     pub city_id: Option<i64>,
     pub _created_at: i64,
     pub owner_public_id: &'a str,
+    pub owner_user_id: i64,
     pub rubric: &'a str,
     pub owner_preview: bool,
     pub moderation_status: &'a str,
@@ -426,6 +427,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
         city_id,
         _created_at,
         owner_public_id,
+        owner_user_id,
         rubric,
         owner_preview,
         moderation_status,
@@ -644,13 +646,22 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
     </div>
 
     <a href="/app/user/{public_id}" class="rm-resource-owner-link">
-        Открыть
+        Профиль
     </a>
+    {write_html}
 
 </section>
 "#,
             owner_icon = icon("user"),
             public_id = urlencoding::encode(owner_public_id),
+            write_html = if owner_user_id > 0 && !owner_preview {
+                format!(
+                    r#"<a href="/app/chat/{owner_user_id}" class="rm-resource-owner-link">Написать</a>"#,
+                    owner_user_id = owner_user_id,
+                )
+            } else {
+                String::new()
+            },
         )
     };
 
@@ -1074,10 +1085,10 @@ pub fn render_resource_promotion(params: RenderResourcePromotionParams<'_>) -> S
     } else {
         r#"
 <div class="card rm-promo-pending">
-    <div class="card-title">Telegram не настроен</div>
+    <div class="card-title">Городская группа ещё не подключена</div>
     <div class="card-meta rm-promo-pending-copy">
-        Оплата и заявка возможны, но автоматическая публикация в группу
-        заработает только после настройки TELEGRAM_BOT_TOKEN на сервере.
+        Оплата возможна. Публикация в городскую группу заработает,
+        когда на сервере настроят отправку.
     </div>
 </div>
 "#
@@ -1089,7 +1100,7 @@ pub fn render_resource_promotion(params: RenderResourcePromotionParams<'_>) -> S
 <div class="card rm-promo-pending rm-promo-published">
     <div class="card-title">Опубликовано в группе</div>
     <div class="card-meta rm-promo-pending-copy">
-        Объявление уже отправлено в Telegram-группу города.
+        Объявление уже отправлено в городскую группу.
     </div>
 </div>
 "#
@@ -1179,7 +1190,7 @@ pub fn render_resource_promotion(params: RenderResourcePromotionParams<'_>) -> S
     </div>
 
     <button type="submit" class="ui-button rm-promo-submit">
-        Продвинуть в Telegram-группу
+        Продвинуть в городе
     </button>
 </form>
 "#,
@@ -1369,9 +1380,9 @@ pub fn render_promotion_payment(
                 "arrow-left",
             ),
             "credit-card",
-            "Публикация в группе",
+            "Продвижение",
             "Оплата",
-            "После оплаты объявление отправится в Telegram-группу города.",
+            "После оплаты объявление уйдёт в городскую ленту и группу, если она настроена.",
         ),
         &content,
         "",
@@ -2113,6 +2124,7 @@ mod catalog_publish_tests {
             city_id: Some(13),
             _created_at: 0,
             owner_public_id: "abc",
+            owner_user_id: 0,
             rubric: "security",
             owner_preview: true,
             moderation_status: "pending",

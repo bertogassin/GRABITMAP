@@ -214,28 +214,6 @@ pub async fn chat_page(
     let (other_username, other_first_name, other_last_name) =
         other_profile.unwrap_or_else(|| (String::new(), String::new(), String::new()));
 
-    let contact_request = db
-        .query_row(
-            "SELECT id, sender_user_id, status
-             FROM contact_requests
-             WHERE (
-                 sender_user_id = ?1 AND receiver_user_id = ?2
-             ) OR (
-                 sender_user_id = ?2 AND receiver_user_id = ?1
-             )
-             ORDER BY id DESC
-             LIMIT 1",
-            rusqlite::params![user_id, other_user_id],
-            |row| {
-                Ok(templates::ChatContactRequestState {
-                    id: row.get(0)?,
-                    sender_user_id: row.get(1)?,
-                    status: row.get(2)?,
-                })
-            },
-        )
-        .ok();
-
     let mut messages: Vec<crate::web::view_models::ChatMessageRow> = if conversation_id <= 0 {
         Vec::new()
     } else {
@@ -392,7 +370,7 @@ pub async fn chat_page(
         &other_first_name,
         &other_last_name,
         messages,
-        contact_request.as_ref(),
+        None,
     ))
 }
 

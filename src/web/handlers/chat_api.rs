@@ -1354,20 +1354,19 @@ pub async fn api_chat_peer(
 
     touch_profile_last_seen(&connection, user_id);
 
-    let peer_row: Option<(i64, i64)> = connection
+    let peer_row: Option<i64> = connection
         .query_row(
             "SELECT
-                COALESCE(last_seen_at, 0),
-                COALESCE(open_contact, 0)
+                COALESCE(last_seen_at, 0)
              FROM profiles
              WHERE user_id = ?1
              LIMIT 1",
             rusqlite::params![other_user_id],
-            |row| Ok((row.get(0)?, row.get(1)?)),
+            |row| row.get(0),
         )
         .ok();
 
-    let (last_seen_at, open_contact) = peer_row.unwrap_or((0, 0));
+    let last_seen_at = peer_row.unwrap_or(0);
     let now = crate::web::handlers::common::unix_now();
     let online = last_seen_at > 0 && now.saturating_sub(last_seen_at) < 300;
 
@@ -1378,7 +1377,7 @@ pub async fn api_chat_peer(
             "peer_user_id": other_user_id.to_string(),
             "online": online,
             "last_seen_at": last_seen_at,
-            "open_contact": open_contact == 1
+            "open_contact": true
         })),
     )
         .into_response()

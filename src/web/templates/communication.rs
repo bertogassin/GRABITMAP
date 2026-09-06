@@ -705,7 +705,7 @@ pub fn render_chat(
     };
 
     let content = if !authenticated {
-        guest_locked_section("Чат", "/app/messages")
+        guest_locked_section("Чат", &format!("/app/chat/{other_user_id}"))
     } else if other_user_id <= 0 || other_user_id == viewer_user_id {
         empty_state_card("Чат недоступен", "Диалог недоступен.")
     } else {

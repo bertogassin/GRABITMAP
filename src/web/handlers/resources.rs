@@ -253,7 +253,8 @@ pub async fn resource_profile(
                 r.moderation_status,
                 r.is_active,
                 COALESCE(r.rubric, ''),
-                r.city_id
+                r.city_id,
+                COALESCE(p.user_id, 0)
          FROM resources r
          LEFT JOIN profiles p
            ON p.client_id = r.client_id
@@ -281,6 +282,7 @@ pub async fn resource_profile(
                     row.get::<_, i64>(17)?,
                     row.get::<_, String>(18)?,
                     row.get::<_, Option<i64>>(19)?,
+                    row.get::<_, i64>(20)?,
                 ))
             },
         )
@@ -310,6 +312,7 @@ pub async fn resource_profile(
             is_active,
             rubric,
             city_id,
+            owner_user_id,
         )) => {
             let is_public = is_active != 0 && moderation_status == "approved";
             let is_owner = verify_authenticated_user(&state, &headers).is_some_and(|user| {
@@ -350,6 +353,7 @@ pub async fn resource_profile(
                     city_id,
                     _created_at: created_at,
                     owner_public_id: &owner_public_id,
+                    owner_user_id,
                     rubric: &rubric,
                     owner_preview: !is_public,
                     moderation_status: &moderation_status,
