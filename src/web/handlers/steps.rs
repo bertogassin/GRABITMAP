@@ -40,17 +40,11 @@ fn snapshot_json(snapshot: &crate::db::steps::StepSnapshot) -> serde_json::Value
         "streak": snapshot.streak,
         "best_date": snapshot.best_date,
         "best_steps": snapshot.best_steps,
-        "km": ((snapshot.lifetime as f64) * 0.75 / 1000.0 * 10.0).round() / 10.0,
+        "km": ((snapshot.today_steps as f64) * 0.75 / 1000.0 * 10.0).round() / 10.0,
         "days": snapshot.days.iter().map(|day| json!({
             "date": day.date,
             "steps": day.steps
         })).collect::<Vec<_>>(),
-        "log": snapshot.log.iter().map(|entry| json!({
-            "date": entry.date,
-            "delta": entry.delta,
-            "source": entry.source,
-            "at": entry.created_at
-        })).collect::<Vec<_>>()
     })
 }
 

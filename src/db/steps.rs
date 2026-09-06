@@ -15,6 +15,7 @@ pub struct StepDay {
 }
 
 #[derive(Clone, Debug)]
+#[allow(dead_code)]
 pub struct StepLogEntry {
     pub date: String,
     pub delta: i64,
@@ -33,6 +34,7 @@ pub struct StepSnapshot {
     pub best_date: String,
     pub best_steps: i64,
     pub days: Vec<StepDay>,
+    #[allow(dead_code)]
     pub log: Vec<StepLogEntry>,
 }
 
@@ -165,12 +167,36 @@ pub fn load_snapshot(conn: &Connection, user_id: i64, today: &str) -> Result<Ste
         .optional()?
         .unwrap_or(DEFAULT_GOAL);
 
+    let (lifetime, walked_days, best_steps): (i64, i64, i64) = conn.query_row(
+        "SELECT COALESCE(SUM(step_count), 0),
+                COALESCE(SUM(CASE WHEN step_count > 0 THEN 1 ELSE 0 END), 0),
+                COALESCE(MAX(step_count), 0)
+         FROM user_step_days
+         WHERE user_id = ?1",
+        [user_id],
+        |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+    )?;
+    let best_date = if best_steps > 0 {
+        conn.query_row(
+            "SELECT step_date FROM user_step_days
+             WHERE user_id = ?1 AND step_count = ?2
+             ORDER BY step_date DESC LIMIT 1",
+            rusqlite::params![user_id, best_steps],
+            |row| row.get(0),
+        )
+        .unwrap_or_default()
+    } else {
+        String::new()
+    };
+
+    // Keep enough recent days for week + streak; lifetime/best come from aggregates.
     let days: Vec<StepDay> = conn
         .prepare(
             "SELECT step_date, step_count
              FROM user_step_days
              WHERE user_id = ?1
-             ORDER BY step_date DESC",
+             ORDER BY step_date DESC
+             LIMIT 120",
         )
         .and_then(|mut stmt| {
             stmt.query_map([user_id], |row| {
@@ -182,39 +208,11 @@ pub fn load_snapshot(conn: &Connection, user_id: i64, today: &str) -> Result<Ste
             .collect::<Result<Vec<_>, _>>()
         })?;
 
-    let log: Vec<StepLogEntry> = conn
-        .prepare(
-            "SELECT step_date, delta, source, created_at
-             FROM user_step_log
-             WHERE user_id = ?1
-             ORDER BY created_at DESC, id DESC
-             LIMIT 60",
-        )
-        .and_then(|mut stmt| {
-            stmt.query_map([user_id], |row| {
-                Ok(StepLogEntry {
-                    date: row.get(0)?,
-                    delta: row.get(1)?,
-                    source: row.get(2)?,
-                    created_at: row.get(3)?,
-                })
-            })?
-            .collect::<Result<Vec<_>, _>>()
-        })?;
-
     let today_steps = days
         .iter()
         .find(|day| day.date == today)
         .map(|day| day.steps)
         .unwrap_or(0);
-
-    let lifetime = days.iter().map(|day| day.steps).sum();
-    let walked_days = days.iter().filter(|day| day.steps > 0).count() as i64;
-    let (best_date, best_steps) = days
-        .iter()
-        .max_by_key(|day| day.steps)
-        .map(|day| (day.date.clone(), day.steps))
-        .unwrap_or_else(|| (String::new(), 0));
 
     Ok(StepSnapshot {
         today: today.to_string(),
@@ -226,7 +224,7 @@ pub fn load_snapshot(conn: &Connection, user_id: i64, today: &str) -> Result<Ste
         best_date,
         best_steps,
         days,
-        log,
+        log: Vec::new(),
     })
 }
 
