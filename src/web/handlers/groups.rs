@@ -310,7 +310,7 @@ fn decorate_group_messages(
             ) {
                 message.reply_sender_user_id = sender;
                 message.reply_message = if deleted > 0 {
-                    "Сообщение удалено".to_string()
+                    "__deleted__".to_string()
                 } else {
                     text
                 };
@@ -663,7 +663,18 @@ pub async fn api_group_messages(
         .get("read_through_id")
         .and_then(|v| v.parse::<i64>().ok())
         .unwrap_or(0);
-    let messages = load_group_messages(&db, group_id, user_id, after_id, before_id, limit);
+    let fetch_limit = limit.saturating_add(1);
+    let mut messages = load_group_messages(&db, group_id, user_id, after_id, before_id, fetch_limit);
+    let has_more = messages.len() as i64 > limit;
+    if has_more {
+        if before_id > 0 || after_id <= 0 {
+            // ASC pages where the extra row is the oldest (first).
+            messages.remove(0);
+        } else {
+            // after_id ASC: extra row is the newest (last).
+            messages.truncate(limit as usize);
+        }
+    }
     if mark_read {
         let through = read_through.max(messages.last().map(|m| m.id).unwrap_or(0));
         mark_group_read(Some(&state), &db, group_id, user_id, through);
@@ -676,7 +687,7 @@ pub async fn api_group_messages(
     Json(json!({
         "ok": true,
         "messages": items,
-        "has_more": messages.len() as i64 >= limit,
+        "has_more": has_more,
         "peer_read_through_id": peer_read_through_id,
     }))
     .into_response()
@@ -1160,7 +1171,7 @@ pub async fn api_group_delete(
         group_id,
         message_id,
         user_id,
-        "Сообщение удалено",
+        "__deleted__",
     );
     Json(json!({"ok": true, "deleted_at": now})).into_response()
 }
@@ -1367,7 +1378,7 @@ pub fn load_user_groups(
             g.name,
             COALESCE((
                 SELECT CASE
-                    WHEN m.deleted_at > 0 THEN 'Сообщение удалено'
+                    WHEN m.deleted_at > 0 THEN '__deleted__'
                     WHEN m.attachment_kind = 'image' THEN 'Фото'
                     ELSE m.message
                 END

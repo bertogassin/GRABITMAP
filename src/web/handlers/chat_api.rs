@@ -358,7 +358,7 @@ fn load_api_message_by_id(
                 COALESCE((
                     SELECT CASE
                         WHEN reply.deleted_at > 0
-                        THEN 'Сообщение удалено'
+                        THEN '__deleted__'
                         ELSE reply.message
                     END
                     FROM messages AS reply
@@ -507,7 +507,7 @@ pub async fn api_chat_messages(
                     COALESCE((
                         SELECT CASE
                             WHEN reply.deleted_at > 0
-                            THEN 'Сообщение удалено'
+                            THEN '__deleted__'
                             ELSE reply.message
                         END
                         FROM messages AS reply
@@ -589,7 +589,7 @@ pub async fn api_chat_messages(
                     COALESCE((
                         SELECT CASE
                             WHEN reply.deleted_at > 0
-                            THEN 'Сообщение удалено'
+                            THEN '__deleted__'
                             ELSE reply.message
                         END
                         FROM messages AS reply
@@ -671,7 +671,7 @@ pub async fn api_chat_messages(
                     COALESCE((
                         SELECT CASE
                             WHEN reply.deleted_at > 0
-                            THEN 'Сообщение удалено'
+                            THEN '__deleted__'
                             ELSE reply.message
                         END
                         FROM messages AS reply

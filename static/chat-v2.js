@@ -102,31 +102,42 @@
             return;
         }
 
-        function t(key, fallback) {
+        function t(key, fallback, params) {
             if (window.m && typeof window.m[key] === "function") {
                 try {
-                    return window.m[key]();
+                    return window.m[key](params || {});
                 } catch (_) {
                     /* fall through */
                 }
             }
             if (typeof window.rmT === "function") {
-                var translated = window.rmT(key);
+                var translated = window.rmT(key, params);
                 if (translated && translated !== key) {
                     return translated;
                 }
             }
-            return fallback;
+            if (!params) {
+                return fallback;
+            }
+            return String(fallback).replace(/\{(\w+)\}/g, function (_, name) {
+                return params[name] != null ? String(params[name]) : "";
+            });
         }
 
         function tf(key, fallback, params) {
-            var template = t(key, fallback);
-            if (!params) {
-                return template;
+            return t(key, fallback, params);
+        }
+
+        function localizeDeletedText(value) {
+            var text = String(value || "");
+            if (
+                text === "Сообщение удалено" ||
+                text === "__deleted__" ||
+                text === t("chat_deleted", "Сообщение удалено")
+            ) {
+                return t("chat_deleted", "Сообщение удалено");
             }
-            return String(template).replace(/\{(\w+)\}/g, function (_, name) {
-                return params[name] != null ? String(params[name]) : "";
-            });
+            return text;
         }
 
         var otherUserId = String(
@@ -245,14 +256,20 @@
             }
 
             if (delta < 3600) {
-                return Math.floor(delta / 60) + " мин назад";
+                return tf("chat_mins_ago", "{n} мин назад", {
+                    n: Math.floor(delta / 60),
+                });
             }
 
             if (delta < 86400) {
-                return Math.floor(delta / 3600) + " ч назад";
+                return tf("chat_hours_ago", "{n} ч назад", {
+                    n: Math.floor(delta / 3600),
+                });
             }
 
-            return Math.floor(delta / 86400) + " д назад";
+            return tf("chat_days_ago", "{n} д назад", {
+                n: Math.floor(delta / 86400),
+            });
         }
 
         function typingDotsHtml(label) {
@@ -303,7 +320,7 @@
             }
 
             headerStatus.textContent =
-                defaultSubtitle || "не в сети";
+                defaultSubtitle || t("chat_offline", "не в сети");
         }
 
         function updatePeerState() {
@@ -324,7 +341,7 @@
                     peerState.textContent =
                         peerLastSeenAt > 0
                             ? tf("chat_last_seen", "был(а) {when}", { when: formatLastSeen(peerLastSeenAt) })
-                            : "не в сети";
+                            : t("chat_offline", "не в сети");
                 }
             }
 
@@ -782,8 +799,10 @@
                 row.classList.remove("is-sending");
                 status.classList.add("is-error");
                 status.textContent = "!";
-                status.title =
-                    "Не отправлено · нажмите повторить";
+                status.title = t(
+                    "chat_send_failed_retry",
+                    "Не отправлено · нажмите повторить"
+                );
                 status.setAttribute(
                     "role",
                     "button"
@@ -1194,7 +1213,10 @@
                 return t("chat_session_expired", "Сессия истекла");
             }
             if (code === "conversation_not_open") {
-                return "Не удалось открыть диалог";
+                return t(
+                    "chat_dialog_open_failed",
+                    "Не удалось открыть диалог"
+                );
             }
             if (code === "user_blocked") {
                 return t("chat_user_unavailable", "Пользователь недоступен");
@@ -1208,7 +1230,10 @@
             if (error && error.status === 403) {
                 return t("chat_send_unavailable", "Отправка недоступна");
             }
-            return "Не отправлено · нажмите !";
+            return t(
+                "chat_send_failed_retry",
+                "Не отправлено · нажмите повторить"
+            );
         }
 
         function scheduleRetryWithDelay(item, delayMs) {
@@ -1254,8 +1279,12 @@
                 renderPendingItem(item);
                 sendState.textContent =
                     pendingQueue.length > 1
-                        ? "Отправка \u00b7 осталось " + pendingQueue.length
-                        : "Отправка\u2026";
+                        ? tf(
+                              "chat_sending_left",
+                              "Отправка · осталось {n}",
+                              { n: pendingQueue.length }
+                          )
+                        : t("chat_sending", "Отправка…");
                 try {
                     var data = await fetchJson(
                         chatApi("/send"),
@@ -1311,20 +1340,32 @@
                     var exhausted = item.attempts >= MAX_AUTO_RETRIES;
                     if (recoverable && !exhausted) {
                         if (error.status === 429 && error.retryAfter > 0) {
-                            sendState.textContent =
-                                "\u041b\u0438\u043c\u0438\u0442 \u00b7 \u043f\u043e\u0432\u0442\u043e\u0440 \u0447\u0435\u0440\u0435\u0437 " + error.retryAfter + " \u0441\u0435\u043a.";
+                            sendState.textContent = tf(
+                                "chat_retry_in_sec",
+                                "Лимит · повтор через {n} сек.",
+                                { n: error.retryAfter }
+                            );
                             scheduleRetryWithDelay(item, error.retryAfter * 1000);
                         } else {
-                            sendState.textContent = "\u041f\u043e\u0432\u0442\u043e\u0440 \u0447\u0435\u0440\u0435\u0437 \u043d\u0435\u0441\u043a\u043e\u043b\u044c\u043a\u043e \u0441\u0435\u043a\u0443\u043d\u0434\u2026";
+                            sendState.textContent = t(
+                                "chat_retry_soon",
+                                "Повтор через несколько секунд…"
+                            );
                             scheduleRetry(item);
                         }
-                        setConnection("\u041e\u0448\u0438\u0431\u043a\u0430 \u043e\u0442\u043f\u0440\u0430\u0432\u043a\u0438", "is-error");
+                        setConnection(
+                            t("chat_send_error", "Ошибка отправки"),
+                            "is-error"
+                        );
                     } else {
                         item.state = "failed";
                         savePendingQueue();
                         renderPendingItem(item);
                         sendState.textContent = sendErrorCopy(error);
-                        setConnection("\u041e\u0448\u0438\u0431\u043a\u0430 \u043e\u0442\u043f\u0440\u0430\u0432\u043a\u0438", "is-error");
+                        setConnection(
+                            t("chat_send_error", "Ошибка отправки"),
+                            "is-error"
+                        );
                         if (typeof window.playChatError === "function") {
                             window.playChatError();
                         }
@@ -1333,7 +1374,10 @@
                 }
             }
             if (pendingQueue.length === 0) {
-                sendState.textContent = "\u041e\u0442\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u043e \u00b7 Enter \u2014 \u043e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c";
+                sendState.textContent = t(
+                    "chat_sent_hint",
+                    "Отправлено · Enter — отправить"
+                );
             }
         } finally {
             sending = false;
@@ -2290,16 +2334,20 @@
                 'role="dialog" aria-modal="true">' +
                 '<div class="chat-sheet-handle"></div>' +
                 '<div class="chat-editor-title">' +
-                    'Редактировать сообщение' +
+                    t("chat_edit_title", "Редактировать сообщение") +
                 '</div>' +
                 '<textarea id="chat-editor-input" ' +
                     'maxlength="2000" rows="4"></textarea>' +
                 '<div class="chat-editor-footer">' +
                     '<button type="button" ' +
-                        'data-close-editor>Отмена</button>' +
+                        'data-close-editor>' +
+                        t("chat_cancel", "Отмена") +
+                    '</button>' +
                     '<button type="button" ' +
                         'class="is-primary" ' +
-                        'id="chat-editor-save">Сохранить</button>' +
+                        'id="chat-editor-save">' +
+                        t("chat_save", "Сохранить") +
+                    '</button>' +
                 '</div>' +
             '</section>';
 
@@ -2317,16 +2365,24 @@
                 '<div class="chat-sheet-handle"></div>' +
                 '<div class="chat-delete-icon">⌫</div>' +
                 '<div class="chat-editor-title">' +
-                    'Удалить сообщение?' +
+                    t("chat_delete_title", "Удалить сообщение?") +
                 '</div>' +
-                '<p>У собеседников вместо текста появится ' +
-                    'отметка «Сообщение удалено».</p>' +
+                '<p>' +
+                    t(
+                        "chat_delete_body",
+                        "У собеседников вместо текста появится отметка «Сообщение удалено»."
+                    ) +
+                '</p>' +
                 '<div class="chat-editor-footer">' +
                     '<button type="button" ' +
-                        'data-close-delete>Отмена</button>' +
+                        'data-close-delete>' +
+                        t("chat_cancel", "Отмена") +
+                    '</button>' +
                     '<button type="button" ' +
                         'class="is-danger" ' +
-                        'id="chat-delete-apply">Удалить</button>' +
+                        'id="chat-delete-apply">' +
+                        t("chat_delete", "Удалить") +
+                    '</button>' +
                 '</div>' +
             '</section>';
 
@@ -2457,8 +2513,9 @@
         function buildForwardCaption(payload, comment) {
             var core =
                 String(payload.text || "").trim() ||
-                "📷 Фото";
-            var block = "[Переслано]\n" + core;
+                ("📷 " + t("chat_photo_label", "Фото"));
+            var block =
+                t("chat_forwarded_tag", "[Переслано]") + "\n" + core;
 
             if (comment) {
                 return comment + "\n\n" + block;
@@ -2481,7 +2538,9 @@
             forwardPickerPreview.textContent =
                 forwardPreviewLabel(message);
             forwardList.innerHTML =
-                '<div class="chat-forward-empty">Загрузка диалогов…</div>';
+                '<div class="chat-forward-empty">' +
+                t("chat_forward_loading", "Загрузка диалогов…") +
+                "</div>";
             forwardPicker.hidden = false;
             document.body.classList.add("chat-overlay-open");
 
@@ -2502,7 +2561,12 @@
 
                     if (!conversations.length) {
                         forwardList.innerHTML =
-                            '<div class="chat-forward-empty">Нет других диалогов для пересылки.</div>';
+                            '<div class="chat-forward-empty">' +
+                            t(
+                                "chat_forward_empty",
+                                "Нет других диалогов для пересылки."
+                            ) +
+                            "</div>";
                         return;
                     }
 
@@ -2584,7 +2648,12 @@
                 })
                 .catch(function () {
                     forwardList.innerHTML =
-                        '<div class="chat-forward-empty">Не удалось загрузить диалоги.</div>';
+                        '<div class="chat-forward-empty">' +
+                        t(
+                            "chat_forward_load_failed",
+                            "Не удалось загрузить диалоги."
+                        ) +
+                        "</div>";
                 });
         }
 
@@ -2723,7 +2792,12 @@
                         setSendState(t("chat_forwarded", "Переслано · Enter — отправить"));
                     })
                     .catch(function () {
-                        setSendState("Не удалось переслать голосовое");
+                        setSendState(
+                            t(
+                                "chat_forward_voice_failed",
+                                "Не удалось переслать голосовое"
+                            )
+                        );
                     });
 
                 return;
@@ -2790,7 +2864,12 @@
                         setSendState(t("chat_forwarded", "Переслано · Enter — отправить"));
                     })
                     .catch(function () {
-                        setSendState("Не удалось переслать фото");
+                        setSendState(
+                            t(
+                                "chat_forward_photo_failed",
+                                "Не удалось переслать фото"
+                            )
+                        );
                     });
 
                 return;
@@ -2826,7 +2905,12 @@
                     setSendState(t("chat_forwarded", "Переслано · Enter — отправить"));
                 })
                 .catch(function () {
-                    setSendState("Не удалось переслать сообщение");
+                    setSendState(
+                        t(
+                            "chat_forward_failed",
+                            "Не удалось переслать сообщение"
+                        )
+                    );
                 });
         };
 
@@ -3212,13 +3296,13 @@
                 var replySender = String(
                     message.reply_sender_user_id || ""
                 ).trim();
-                var author = "Сообщение";
+                var author = t("chat_message", "Сообщение");
 
                 if (replySender) {
                     author =
                         replySender === otherUserId
                             ? t("chat_peer", "Собеседник")
-                            : "Вы";
+                            : t("chat_you", "Вы");
                 }
 
                 var authorNode =
@@ -3228,8 +3312,10 @@
 
                 authorNode.textContent = author;
                 textNode.textContent = shortText(
-                    message.reply_message ||
-                        t("chat_original", "Исходное сообщение"),
+                    localizeDeletedText(
+                        message.reply_message ||
+                            t("chat_original", "Исходное сообщение")
+                    ),
                     120
                 );
 

@@ -1,6 +1,22 @@
 (function () {
     "use strict";
 
+    function t(key, fallback, params) {
+        if (window.m && typeof window.m[key] === "function") {
+            try {
+                return window.m[key](params || {});
+            } catch (_) {}
+        }
+        if (typeof window.rmT === "function") {
+            var translated = window.rmT(key, params);
+            if (translated && translated !== key) return translated;
+        }
+        if (!params) return fallback;
+        return String(fallback).replace(/\{(\w+)\}/g, function (_, name) {
+            return params[name] != null ? String(params[name]) : "";
+        });
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
         var input = document.getElementById("rm-map-country-search");
         var clear = document.getElementById("rm-map-country-clear");
@@ -28,9 +44,12 @@
             if (!query) {
                 status.textContent = "";
             } else if (shown) {
-                status.textContent = "Найдено: " + shown;
+                status.textContent = t("map_found_n", "Найдено: {n}", { n: shown });
             } else {
-                status.textContent = "Страна не найдена на этом континенте";
+                status.textContent = t(
+                    "map_country_not_found",
+                    "Страна не найдена на этом континенте"
+                );
             }
         }
 

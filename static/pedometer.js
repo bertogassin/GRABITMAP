@@ -41,24 +41,26 @@
     let lastPanelAt = 0;
     let lastPanelCount = -1;
 
-    function t(key, fallback) {
+    function t(key, fallback, params) {
         if (window.m && typeof window.m[key] === "function") {
             try {
-                return window.m[key]();
+                return window.m[key](params || {});
             } catch (_) {}
         }
         if (typeof window.rmT === "function") {
-            var translated = window.rmT(key);
+            var translated = window.rmT(key, params);
             if (translated && translated !== key) return translated;
         }
-        return fallback;
+        if (!params) {
+            return fallback;
+        }
+        return String(fallback).replace(/\{(\w+)\}/g, function (_, name) {
+            return params[name] != null ? String(params[name]) : "";
+        });
     }
 
     function tf(key, fallback, params) {
-        var template = t(key, fallback);
-        return String(template).replace(/\{(\w+)\}/g, function (_, name) {
-            return params && params[name] != null ? String(params[name]) : "";
-        });
+        return t(key, fallback, params);
     }
 
     function localeTag() {
@@ -252,7 +254,7 @@
             return Promise.resolve(true);
         }
         if (Notification.permission === "denied") {
-            setStatus(t("steps_need_motion", "Нужен доступ к движению телефона"));
+            setStatus(t("steps_notify_denied", "Уведомления запрещены — панель на телефоне недоступна"));
             return Promise.resolve(false);
         }
         return Notification.requestPermission().then(function (permission) {

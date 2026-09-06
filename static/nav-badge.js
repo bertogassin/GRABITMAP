@@ -8,19 +8,24 @@
         return;
     }
 
-    function t(key, fallback) {
+    function t(key, fallback, params) {
         if (window.m && typeof window.m[key] === "function") {
             try {
-                return window.m[key]();
+                return window.m[key](params || {});
             } catch (_) {}
         }
         if (typeof window.rmT === "function") {
-            var translated = window.rmT(key);
+            var translated = window.rmT(key, params);
             if (translated && translated !== key) {
                 return translated;
             }
         }
-        return fallback;
+        if (!params) {
+            return fallback;
+        }
+        return String(fallback).replace(/\{(\w+)\}/g, function (_, name) {
+            return params[name] != null ? String(params[name]) : "";
+        });
     }
 
     function notifySound() {
@@ -111,10 +116,11 @@
             ? (count + " / " + goal)
             : t("notify_steps_title", "Шагомер GRABIT");
         var body = count > 0
-            ? t("steps_live_body", "{pct}% · {km} km · goal {goal}")
-                .replace("{pct}", String(pct))
-                .replace("{km}", km)
-                .replace("{goal}", String(goal))
+            ? t("steps_live_body", "{pct}% · {km} km · goal {goal}", {
+                pct: pct,
+                km: km,
+                goal: goal,
+            })
             : t("notify_steps_body", "Нажмите — сразу считать шаги.");
         var options = {
             body: body,

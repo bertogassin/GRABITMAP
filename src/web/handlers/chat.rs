@@ -41,7 +41,7 @@ fn load_recent_chat_messages(
                 COALESCE((
                     SELECT CASE
                         WHEN reply.deleted_at > 0
-                        THEN 'Сообщение удалено'
+                        THEN '__deleted__'
                         ELSE reply.message
                     END
                     FROM messages AS reply
@@ -150,7 +150,7 @@ pub(super) fn load_user_conversations(
             COALESCE((
                 SELECT CASE
                     WHEN m.deleted_at > 0
-                    THEN 'Сообщение удалено'
+                    THEN '__deleted__'
                     ELSE m.message
                 END
                 FROM messages m

@@ -27,26 +27,42 @@
             .replace(/'/g, "&#39;");
     }
 
+    function t(key, fallback, params) {
+        if (window.m && typeof window.m[key] === "function") {
+            try {
+                return window.m[key](params || {});
+            } catch (_) {}
+        }
+        if (typeof window.rmT === "function") {
+            var translated = window.rmT(key, params);
+            if (translated && translated !== key) return translated;
+        }
+        if (!params) return fallback;
+        return String(fallback).replace(/\{(\w+)\}/g, function (_, name) {
+            return params[name] != null ? String(params[name]) : "";
+        });
+    }
+
     function iconForKind(kind) {
         if (kind === "continent") {
-            return "Мир";
+            return t("explore_icon_world", "Мир");
         }
         if (kind === "country") {
-            return "Стр";
+            return t("explore_icon_country", "Стр");
         }
         if (kind === "city") {
-            return "Гор";
+            return t("explore_icon_city", "Гор");
         }
         if (kind === "work") {
-            return "Раб";
+            return t("explore_icon_work", "Раб");
         }
         if (kind === "workers") {
-            return "Люд";
+            return t("explore_icon_people", "Люд");
         }
         if (kind === "business") {
-            return "Биз";
+            return t("explore_icon_biz", "Биз");
         }
-        return "Про";
+        return t("explore_icon_pro", "Про");
     }
 
     ready(function () {
@@ -94,7 +110,12 @@
             if (hits.length === 0) {
                 if (input.value.trim().length >= 2) {
                     results.innerHTML =
-                        '<div class="rm-explore-empty">Ничего не найдено. Нажмите Enter — откроется полный поиск.</div>';
+                        '<div class="rm-explore-empty">' +
+                        t(
+                            "explore_empty",
+                            "Ничего не найдено. Нажмите Enter — откроется полный поиск."
+                        ) +
+                        "</div>";
                     results.hidden = false;
                 } else {
                     results.innerHTML = "";

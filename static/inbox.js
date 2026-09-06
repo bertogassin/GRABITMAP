@@ -16,6 +16,30 @@
             return;
         }
 
+        function t(key, fallback, params) {
+            if (window.m && typeof window.m[key] === "function") {
+                try {
+                    return window.m[key](params || {});
+                } catch (_) {}
+            }
+            if (typeof window.rmT === "function") {
+                var translated = window.rmT(key, params);
+                if (translated && translated !== key) {
+                    return translated;
+                }
+            }
+            if (!params) {
+                return fallback;
+            }
+            return String(fallback).replace(/\{(\w+)\}/g, function (_, name) {
+                return params[name] != null ? String(params[name]) : "";
+            });
+        }
+
+        function tf(key, fallback, params) {
+            return t(key, fallback, params);
+        }
+
         var caption = document.getElementById("inbox-unread-caption");
         var liveBadge = document.getElementById("inbox-live-badge");
         var fetching = false;
@@ -54,6 +78,7 @@
             }
 
             liveBadge.hidden = false;
+            liveBadge.removeAttribute("aria-hidden");
             liveBadge.dataset.state = online ? "online" : "offline";
             liveBadge.textContent = online ? t("chat_link_ok", "связь") : t("chat_link_off", "нет");
         }
@@ -148,14 +173,25 @@
                 return t("chat_all_read", "Все прочитано");
             }
             if (n % 10 === 1 && n % 100 !== 11) {
-                return n + " непрочитанное";
+                return tf("inbox_unread_one", "{n} непрочитанное", { n: n });
             }
-            return n + " непрочитанных";
+            return tf("inbox_unread_many", "{n} непрочитанных", { n: n });
         }
 
         function renderEmptyState() {
             return (
-                '<div class="card rm-empty-state"><div class="card-content"><div class="card-title">Нет диалогов</div><div class="card-meta">Откройте профиль участника, чтобы начать диалог, или создайте группу.</div><div class="rm-empty-state-actions"><a class="rm-empty-action ui-button" href="/app/search">Найти участников</a><a class="rm-empty-action ui-button" href="/app/groups/new">Создать группу</a></div></div></div>'
+                '<div class="card rm-empty-state"><div class="card-content"><div class="card-title">' +
+                t("inbox_empty_title", "Нет диалогов") +
+                '</div><div class="card-meta">' +
+                t(
+                    "inbox_empty_body",
+                    "Откройте профиль участника, чтобы начать диалог, или создайте группу."
+                ) +
+                '</div><div class="rm-empty-state-actions"><a class="rm-empty-action ui-button" href="/app/search">' +
+                t("inbox_find_people", "Найти участников") +
+                '</a><a class="rm-empty-action ui-button" href="/app/groups/new">' +
+                t("chat_new_group", "Создать группу") +
+                "</a></div></div></div>"
             );
         }
 

@@ -1,6 +1,21 @@
 (function () {
     "use strict";
 
+    function t(key, fallback) {
+        if (window.m && typeof window.m[key] === "function") {
+            try {
+                return window.m[key]({});
+            } catch (_) {}
+        }
+        if (typeof window.rmT === "function") {
+            var translated = window.rmT(key);
+            if (translated && translated !== key) {
+                return translated;
+            }
+        }
+        return fallback;
+    }
+
     function uniqueNodes(nodes) {
         var seen = [];
         (nodes || []).forEach(function (node) {
@@ -24,10 +39,14 @@
                 input.type = show ? "text" : "password";
             });
             buttons.forEach(function (button) {
-                button.textContent = show ? "Скрыть" : "Показать";
+                button.textContent = show
+                    ? t("auth_hide", "Скрыть")
+                    : t("auth_show", "Показать");
                 button.setAttribute(
                     "aria-label",
-                    show ? "Скрыть пароль" : "Показать пароль"
+                    show
+                        ? t("auth_hide_password", "Скрыть пароль")
+                        : t("auth_show_password", "Показать пароль")
                 );
             });
         }

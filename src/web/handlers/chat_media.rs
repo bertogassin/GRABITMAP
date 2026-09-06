@@ -135,7 +135,7 @@ fn load_message(
                 messages.reply_to_message_id,
                 (SELECT reply.sender_user_id FROM messages AS reply
                   WHERE reply.id = messages.reply_to_message_id AND reply.conversation_id = messages.conversation_id),
-                COALESCE((SELECT CASE WHEN reply.deleted_at > 0 THEN 'Сообщение удалено' ELSE reply.message END
+                COALESCE((SELECT CASE WHEN reply.deleted_at > 0 THEN '__deleted__' ELSE reply.message END
                           FROM messages AS reply
                           WHERE reply.id = messages.reply_to_message_id AND reply.conversation_id = messages.conversation_id), ''),
                 messages.edited_at, messages.deleted_at,

@@ -24,7 +24,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = "5.0.4";
+pub const STATIC_ASSET_VERSION: &str = "5.0.6";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -32,11 +32,32 @@ pub fn profession_label(raw: &str) -> String {
     }
 
     match raw.trim().to_lowercase().as_str() {
-        "work" | "job" | "jobs" => "Работа".to_string(),
-        "business" | "services" | "service" => "Бизнес".to_string(),
-        "community" => String::new(),
+        "work" | "job" | "jobs" | "работа" => crate::i18n::t("common_work"),
+        "business" | "services" | "service" | "бизнес" | "услуги" => {
+            crate::i18n::t("common_business")
+        }
+        "community" | "сообщество" => String::new(),
         _ => raw.trim().to_string(),
     }
+}
+
+/// True when `raw` is a generic intent/category key, not a specific trade.
+pub(crate) fn is_generic_profession_key(raw: &str) -> bool {
+    matches!(
+        raw.trim().to_lowercase().as_str(),
+        "work"
+            | "job"
+            | "jobs"
+            | "business"
+            | "services"
+            | "service"
+            | "community"
+            | "работа"
+            | "бизнес"
+            | "услуги"
+            | "сообщество"
+            | ""
+    )
 }
 
 pub fn static_asset(path: &str) -> String {
@@ -4825,6 +4846,13 @@ pub(crate) fn resource_result_card(params: ResourceResultCardParams<'_>) -> Stri
             write = crate::i18n::t("common_write"),
         )
     };
+    let rating_line = crate::i18n::tf(
+        "common_rating",
+        &[
+            ("rating", &format!("{rating:.1}")),
+            ("votes", &votes.to_string()),
+        ],
+    );
     format!(
         r#"
 <div class="card card--result card--listing">
@@ -4840,7 +4868,7 @@ pub(crate) fn resource_result_card(params: ResourceResultCardParams<'_>) -> Stri
             </div>
 
             <div class="rm-card-rating">
-                Оценка {rating:.1} · {votes}
+                {rating_line}
             </div>
         </div>
 
@@ -4877,8 +4905,7 @@ pub(crate) fn resource_result_card(params: ResourceResultCardParams<'_>) -> Stri
         title = title_html,
         category = category_html,
         description = description_html,
-        rating = rating,
-        votes = votes,
+        rating_line = escape_html(&rating_line),
         location = location_html,
         address = address_html,
         premium_badge = premium_badge_html,
@@ -4938,7 +4965,7 @@ pub(crate) fn profile_resource_card(params: ProfileResourceCardParams<'_>) -> St
         <div class="card-meta card-meta--desc">{description}</div>
 
         {address_html}
-        <div class="card-meta card-meta--mt-8">Оценка {rating:.1} · {votes}</div>
+        <div class="card-meta card-meta--mt-8">{rating_line}</div>
 
         <div class="rm-card-row--badges">
             {premium_badge}
@@ -4954,8 +4981,20 @@ pub(crate) fn profile_resource_card(params: ProfileResourceCardParams<'_>) -> St
         category = escape_html(category),
         description = escape_html(description),
         address_html = address_html,
-        rating = rating,
-        votes = ru_count(votes, "голос", "голоса", "голосов"),
+        rating_line = escape_html(&crate::i18n::tf(
+            "common_rating",
+            &[
+                ("rating", &format!("{rating:.1}")),
+                (
+                    "votes",
+                    &if crate::i18n::locale() == "ru" {
+                        ru_count(votes, "голос", "голоса", "голосов")
+                    } else {
+                        votes.to_string()
+                    },
+                ),
+            ],
+        )),
         premium_badge = premium_badge_html,
         verified_badge = verified_badge_html,
         arrow = icon("chevron"),

@@ -1,9 +1,10 @@
 use super::common::{
     back_hero, back_link, bottom_nav, empty_state_action, empty_state_card_with_actions,
-    escape_html, guest_locked_section, icon, kind_chip, my_resource_moderation_badge,
-    navigation_card, page_document, page_shell, premium_badge_html, profession_label,
-    resource_card_link_class, resource_detail_section_class, resource_listing_label, ru_count,
-    search_people_cards, section_head, topbar, verified_badge_html,
+    escape_html, guest_locked_section, icon, is_generic_profession_key, kind_chip,
+    my_resource_moderation_badge, navigation_card, page_document, page_shell, premium_badge_html,
+    profession_label, resource_card_link_class, resource_detail_section_class,
+    resource_listing_label, ru_count, search_people_cards, section_head, topbar,
+    verified_badge_html,
 };
 
 pub struct RenderCategoryParams<'a> {
@@ -135,19 +136,16 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                     let safe_title = escape_html(title);
                     let safe_description = escape_html(description);
                     let safe_address = escape_html(address);
-                    let rubric_label = profession_label(row_rubric);
                     let listing_label = {
                         let mut parts = Vec::new();
                         if listing_type.is_none() {
                             parts.push(resource_listing_label(row_listing_type).to_string());
                         }
-                        if !rubric_label.is_empty()
-                            && !matches!(
-                                rubric_label.as_str(),
-                                "Работа" | "Бизнес" | "Услуги" | "Сообщество"
-                            )
-                        {
-                            parts.push(rubric_label);
+                        if !is_generic_profession_key(row_rubric) {
+                            let rubric_label = profession_label(row_rubric);
+                            if !rubric_label.is_empty() {
+                                parts.push(rubric_label);
+                            }
                         }
                         if parts.is_empty() {
                             String::new()
@@ -1478,11 +1476,13 @@ pub fn render_my_resources(
                 let safe_title = escape_html(title);
                 let safe_description = escape_html(description);
                 let safe_rejection_reason = escape_html(rejection_reason);
-                let rubric_label = profession_label(row_rubric);
-                let category_label = if !rubric_label.is_empty()
-                    && !matches!(rubric_label.as_str(), "Работа" | "Бизнес")
-                {
-                    rubric_label
+                let category_label = if !is_generic_profession_key(row_rubric) {
+                    let rubric_label = profession_label(row_rubric);
+                    if rubric_label.is_empty() {
+                        profession_label(category)
+                    } else {
+                        rubric_label
+                    }
                 } else {
                     profession_label(category)
                 };

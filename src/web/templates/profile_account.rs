@@ -1,10 +1,9 @@
 use super::common::{
     back_hero, back_link, bottom_nav, bottom_nav_with_badges, empty_state_action,
     empty_state_card_with_actions, escape_html, guest_locked_section, guest_mode_panel, icon,
-    moderator_level_badge, navigation_card, page_document, page_shell, premium_badge_html,
-    ru_count, ru_plural,
-    profession_label, profile_resource_card, section_head, simple_hero, topbar,
-    verified_badge_html,
+    is_generic_profession_key, moderator_level_badge, navigation_card, page_document, page_shell,
+    premium_badge_html, ru_count, ru_plural, profession_label, profile_resource_card, section_head,
+    simple_hero, topbar, verified_badge_html,
 };
 
 pub struct RenderMeParams<'a> {
@@ -1590,16 +1589,15 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
         profile_user_id,
     } = params;
     let profession = {
-        let label = profession_label(category);
-        if label.is_empty()
-            || matches!(
-                label.as_str(),
-                "Работа" | "Бизнес" | "Услуги" | "Сообщество"
-            )
-        {
-            "Специалист".to_string()
+        if is_generic_profession_key(category) {
+            crate::i18n::t("specialist")
         } else {
-            label
+            let label = profession_label(category);
+            if label.is_empty() {
+                crate::i18n::t("specialist")
+            } else {
+                label
+            }
         }
     };
     let hero_full_name = format!("{} {}", first_name.trim(), last_name.trim(),)
@@ -1634,29 +1632,36 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
 
     let contact_html = String::new();
 
+    let write_label = crate::i18n::t("common_write");
+    let share_label = crate::i18n::t("common_share");
+    let share_text = crate::i18n::t("profile_share_text");
     let internal_contact_html = if let Some(chat_user_id) = chat_user_id {
         format!(
             r#"
 <section class="card rm-public-section">
 
     <div class="rm-public-kicker">
-        Написать
+        {write_label}
     </div>
 
     <div class="card-meta rm-public-copy">
-        Напишите сразу. Потом можно заблокировать или удалить.
+        {write_hint}
     </div>
 
     <a href="/app/chat/{chat_user_id}" class="rm-public-chat-link">
-        Написать
+        {write_label}
     </a>
-    <button type="button" class="ui-button" data-share data-share-title="GRABIT" data-share-text="Заходи в GRABIT по моей ссылке. Чат сразу, шагомер и работа рядом." data-share-url="/app/join/{public_id}" data-share-status="share-status">Поделиться</button>
+    <button type="button" class="ui-button" data-share data-share-title="GRABIT" data-share-text="{share_text}" data-share-url="/app/join/{public_id}" data-share-status="share-status">{share_label}</button>
     <div id="share-status" class="ui-status"></div>
 
 </section>
 "#,
             chat_user_id = chat_user_id,
             public_id = escape_html(public_id),
+            write_label = escape_html(&write_label),
+            write_hint = escape_html(&crate::i18n::t("profile_write_hint")),
+            share_label = escape_html(&share_label),
+            share_text = escape_html(&share_text),
         )
     } else {
         format!(
@@ -1664,22 +1669,27 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
 <section class="card rm-public-section">
 
     <div class="rm-public-kicker">
-        Написать
+        {write_label}
     </div>
 
     <div class="card-meta rm-public-copy">
-        Войдите, чтобы написать участнику.
+        {login_hint}
     </div>
 
     <a href="/login?next=/app/user/{public_id}" class="rm-public-chat-link">
-        Войти и написать
+        {login_write}
     </a>
-    <button type="button" class="ui-button" data-share data-share-title="GRABIT" data-share-text="Заходи в GRABIT по моей ссылке. Чат сразу, шагомер и работа рядом." data-share-url="/app/join/{public_id}" data-share-status="share-status">Поделиться</button>
+    <button type="button" class="ui-button" data-share data-share-title="GRABIT" data-share-text="{share_text}" data-share-url="/app/join/{public_id}" data-share-status="share-status">{share_label}</button>
     <div id="share-status" class="ui-status"></div>
 
 </section>
 "#,
             public_id = escape_html(public_id),
+            write_label = escape_html(&write_label),
+            login_hint = escape_html(&crate::i18n::t("profile_write_login_hint")),
+            login_write = escape_html(&crate::i18n::t("profile_login_write")),
+            share_label = escape_html(&share_label),
+            share_text = escape_html(&share_text),
         )
     };
 

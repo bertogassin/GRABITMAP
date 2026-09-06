@@ -75,9 +75,19 @@ fn ru_weekday_short(weekday: chrono::Weekday) -> String {
 
 fn inbox_unread_caption(total_unread: i64) -> String {
     if total_unread <= 0 {
-        "Все прочитано".to_string()
+        crate::i18n::t("chat_all_read")
+    } else if crate::i18n::locale() == "ru" {
+        ru_count(
+            total_unread,
+            "непрочитанное",
+            "непрочитанных",
+            "непрочитанных",
+        )
     } else {
-        ru_count(total_unread, "непрочитанное", "непрочитанных", "непрочитанных")
+        crate::i18n::tf(
+            "inbox_unread_many",
+            &[("n", &total_unread.to_string())],
+        )
     }
 }
 
@@ -88,15 +98,15 @@ pub fn render_messages(
     let total_unread: i64 = conversations.iter().map(|c| c.unread_count).sum();
 
     let content = if !authenticated {
-        guest_locked_section("Сообщения", "/app/messages")
+        guest_locked_section(&crate::i18n::t("chat_title"), "/app/messages")
     } else if conversations.is_empty() {
         empty_state_card_with_actions(
-            "Нет диалогов",
-            "Откройте профиль участника, чтобы начать диалог, или создайте группу.",
+            &crate::i18n::t("inbox_empty_title"),
+            &crate::i18n::t("inbox_empty_body"),
             &format!(
                 "{}{}",
-                empty_state_action("/app/search", "Найти участников"),
-                empty_state_action("/app/groups/new", "Создать группу"),
+                empty_state_action("/app/search", &crate::i18n::t("inbox_find_people")),
+                empty_state_action("/app/groups/new", &crate::i18n::t("chat_new_group")),
             ),
         )
     } else {
@@ -237,12 +247,13 @@ pub fn render_messages(
     </div>
     <div class="inbox-head-actions">
         <a href="/app/groups/new" class="ui-button inbox-group-btn">{group}</a>
-        <span class="inbox-live-badge" id="inbox-live-badge" hidden aria-hidden="true">связь</span>
+        <span class="inbox-live-badge" id="inbox-live-badge" hidden aria-hidden="true">{live}</span>
     </div>
 </div>"#,
             dialogs = crate::i18n::t("chat_dialogs"),
             unread_caption = unread_caption,
             group = crate::i18n::t("chat_group"),
+            live = crate::i18n::t("chat_link_ok"),
         )
     } else {
         section_head(&crate::i18n::t("chat_dialogs"), &unread_caption, None)
@@ -304,7 +315,10 @@ pub fn render_messages(
 
 fn chat_message_body_html(message: &crate::web::view_models::ChatMessageRow) -> String {
     if message.deleted_at > 0 {
-        return r#"<div class="chat-message-body is-deleted">Сообщение удалено</div>"#.to_string();
+        return format!(
+            r#"<div class="chat-message-body is-deleted">{}</div>"#,
+            crate::i18n::t("chat_deleted")
+        );
     }
 
     if message.attachment_kind == "voice" && !message.attachment_url.is_empty() {
