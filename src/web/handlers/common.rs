@@ -23,7 +23,9 @@ pub(crate) async fn security_headers(request: Request, next: Next) -> Response {
     );
     headers.insert(
         header::REFERRER_POLICY,
-        "strict-origin-when-cross-origin".parse().expect("valid header"),
+        "strict-origin-when-cross-origin"
+            .parse()
+            .expect("valid header"),
     );
     headers.insert(
         "permissions-policy",
@@ -214,6 +216,8 @@ mod request_origin_tests {
         assert!(trusted_request_origin("https://t.me"));
         assert!(trusted_request_origin("https://web.telegram.org"));
         assert!(!trusted_request_origin("https://evil.example"));
-        assert!(!trusted_request_origin("https://grabitmap.com.evil.example"));
+        assert!(!trusted_request_origin(
+            "https://grabitmap.com.evil.example"
+        ));
     }
 }

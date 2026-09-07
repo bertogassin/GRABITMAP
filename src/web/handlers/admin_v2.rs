@@ -16,11 +16,7 @@ pub async fn center_panel(State(state): State<AppState>, headers: HeaderMap) -> 
     let authenticated_user = match verify_authenticated_user(&state, &headers) {
         Some(user) => user,
         None => {
-            return (
-                StatusCode::UNAUTHORIZED,
-                "Требуется вход в аккаунт GRABIT",
-            )
-                .into_response();
+            return (StatusCode::UNAUTHORIZED, "Требуется вход в аккаунт GRABIT").into_response();
         }
     };
 

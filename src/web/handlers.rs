@@ -17,17 +17,17 @@ mod chat_realtime;
 mod direct_chat_start;
 mod groups;
 pub use chat::*;
-pub use groups::{
-    add_group_members, api_group_delete, api_group_edit, api_group_media, api_group_messages,
-    api_group_react, api_group_send, api_group_send_image, api_group_send_voice, create_group,
-    group_chat_page, group_members_page, leave_group, new_group_page,
-};
 pub use chat_api::{
     api_chat_conversations, api_chat_delete, api_chat_edit, api_chat_messages, api_chat_peer,
     api_chat_react, api_chat_send,
 };
 pub use chat_media::{api_chat_media, api_chat_send_image, api_chat_send_voice};
 pub use chat_realtime::api_chat_realtime;
+pub use groups::{
+    add_group_members, api_group_delete, api_group_edit, api_group_media, api_group_messages,
+    api_group_react, api_group_send, api_group_send_image, api_group_send_voice, create_group,
+    group_chat_page, group_members_page, leave_group, new_group_page,
+};
 
 mod profiles;
 pub use profiles::*;

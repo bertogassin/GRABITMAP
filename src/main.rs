@@ -1,9 +1,9 @@
 use std::env;
 
 mod catalog;
-mod i18n;
 mod db;
 mod geography;
+mod i18n;
 mod resource_publisher;
 mod resource_screening;
 mod state;

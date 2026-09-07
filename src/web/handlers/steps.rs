@@ -1,7 +1,8 @@
 use super::auth::verify_user_session;
 use super::common::{csrf_rejected_response, rate_limit_retry_after, request_is_cross_site};
 use crate::db::steps::{
-    apply_steps, clamp_goal, date_is_allowed, load_snapshot, parse_step_date, save_goal, today_local,
+    apply_steps, clamp_goal, date_is_allowed, load_snapshot, parse_step_date, save_goal,
+    today_local,
 };
 use crate::state::app_state::AppState;
 use crate::web::templates;
@@ -161,7 +162,8 @@ pub async fn api_steps_write(
         }
     };
 
-    if let Some(retry_after) = rate_limit_retry_after(&state, user_id, "steps_write", 90, 60).await {
+    if let Some(retry_after) = rate_limit_retry_after(&state, user_id, "steps_write", 90, 60).await
+    {
         return (
             StatusCode::TOO_MANY_REQUESTS,
             [(header::RETRY_AFTER, retry_after.to_string())],
@@ -214,14 +216,14 @@ pub async fn api_steps_write(
         }
     }
 
-    if payload.steps.is_some() {
-        if apply_steps(&db, user_id, &date, "sensor", payload.steps, None).is_err() {
-            return (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(json!({ "ok": false, "error": "save_failed" })),
-            )
-                .into_response();
-        }
+    if payload.steps.is_some()
+        && apply_steps(&db, user_id, &date, "sensor", payload.steps, None).is_err()
+    {
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({ "ok": false, "error": "save_failed" })),
+        )
+            .into_response();
     }
 
     match load_snapshot(&db, user_id, &date) {

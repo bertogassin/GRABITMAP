@@ -1073,10 +1073,7 @@ pub async fn api_profile_avatar_get(
     };
     (
         [
-            (
-                header::CONTENT_TYPE,
-                HeaderValue::from_static(mime),
-            ),
+            (header::CONTENT_TYPE, HeaderValue::from_static(mime)),
             (
                 header::CACHE_CONTROL,
                 HeaderValue::from_static("private, max-age=60, must-revalidate"),

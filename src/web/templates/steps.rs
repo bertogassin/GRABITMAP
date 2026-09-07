@@ -1,6 +1,5 @@
 use super::common::{
-    back_link, bottom_nav, escape_html, guest_locked_section, page_document, static_asset,
-    topbar,
+    back_link, bottom_nav, escape_html, guest_locked_section, page_document, static_asset, topbar,
 };
 use crate::db::steps::{StepDay, StepSnapshot};
 use chrono::{Datelike, Duration, NaiveDate};
@@ -149,6 +148,7 @@ fn authenticated_body(snapshot: &StepSnapshot) -> String {
         0
     };
     let km = (snapshot.today_steps as f64 * 0.75 / 1000.0).max(0.0);
+    let km_label = format!("{km:.1} km");
     format!(
         r#"<section class="rm-steps" id="rm-steps" data-today="{today}" data-goal="{goal}">
     <div class="rm-step-toolbar">
@@ -211,7 +211,7 @@ fn authenticated_body(snapshot: &StepSnapshot) -> String {
             "steps_today_pct",
             &[("pct", &pct.to_string())],
         )),
-        km_label = format!("{km:.1} km"),
+        km_label = km_label,
         status = escape_html(&crate::i18n::t("steps_lead")),
         streak = snapshot.streak,
         best = if snapshot.best_steps > 0 {

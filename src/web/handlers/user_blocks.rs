@@ -221,13 +221,7 @@ pub async fn api_chat_block(
     );
 
     let conversation_id = conversation_id_for_pair(&connection, user_id, other_user_id);
-    state.publish_chat_event(
-        "user.blocked",
-        conversation_id,
-        1,
-        user_id,
-        other_user_id,
-    );
+    state.publish_chat_event("user.blocked", conversation_id, 1, user_id, other_user_id);
 
     (
         StatusCode::OK,
@@ -281,13 +275,7 @@ pub async fn api_chat_unblock(
 
     let still_blocked = users_are_blocked(&connection, user_id, other_user_id);
     let conversation_id = conversation_id_for_pair(&connection, user_id, other_user_id);
-    state.publish_chat_event(
-        "user.unblocked",
-        conversation_id,
-        1,
-        user_id,
-        other_user_id,
-    );
+    state.publish_chat_event("user.unblocked", conversation_id, 1, user_id, other_user_id);
 
     (
         StatusCode::OK,

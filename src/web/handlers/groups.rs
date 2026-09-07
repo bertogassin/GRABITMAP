@@ -125,10 +125,7 @@ fn is_member(db: &rusqlite::Connection, group_id: i64, user_id: i64) -> bool {
     .is_ok()
 }
 
-fn partners_for_picker(
-    db: &rusqlite::Connection,
-    user_id: i64,
-) -> Vec<(i64, String)> {
+fn partners_for_picker(db: &rusqlite::Connection, user_id: i64) -> Vec<(i64, String)> {
     load_user_conversations(db, user_id)
         .into_iter()
         .filter(|row| !row.is_group && row.other_user_id > 0)
@@ -164,9 +161,12 @@ fn load_group_messages(
         db.prepare(sql)
             .ok()
             .and_then(|mut stmt| {
-                stmt.query_map(rusqlite::params![group_id, after_id, limit], map_group_message_row)
-                    .ok()
-                    .map(|rows| rows.filter_map(Result::ok).collect::<Vec<_>>())
+                stmt.query_map(
+                    rusqlite::params![group_id, after_id, limit],
+                    map_group_message_row,
+                )
+                .ok()
+                .map(|rows| rows.filter_map(Result::ok).collect::<Vec<_>>())
             })
             .unwrap_or_default()
     } else if before_id > 0 {
@@ -180,9 +180,12 @@ fn load_group_messages(
             .prepare(sql)
             .ok()
             .and_then(|mut stmt| {
-                stmt.query_map(rusqlite::params![group_id, before_id, limit], map_group_message_row)
-                    .ok()
-                    .map(|rows| rows.filter_map(Result::ok).collect::<Vec<_>>())
+                stmt.query_map(
+                    rusqlite::params![group_id, before_id, limit],
+                    map_group_message_row,
+                )
+                .ok()
+                .map(|rows| rows.filter_map(Result::ok).collect::<Vec<_>>())
             })
             .unwrap_or_default();
         rows.reverse();
@@ -308,7 +311,13 @@ fn decorate_group_messages(
                  FROM group_messages
                  WHERE id = ?1 AND group_id = ?2",
                 rusqlite::params![message.reply_to_message_id, group_id],
-                |row| Ok((row.get::<_, i64>(0)?, row.get::<_, String>(1)?, row.get::<_, i64>(2)?)),
+                |row| {
+                    Ok((
+                        row.get::<_, i64>(0)?,
+                        row.get::<_, String>(1)?,
+                        row.get::<_, i64>(2)?,
+                    ))
+                },
             ) {
                 message.reply_sender_user_id = sender;
                 message.reply_message = if deleted > 0 {
@@ -333,7 +342,11 @@ fn decorate_group_messages(
     };
     let params = rusqlite::params_from_iter(ids.iter());
     let rows = match stmt.query_map(params, |row| {
-        Ok((row.get::<_, i64>(0)?, row.get::<_, String>(1)?, row.get::<_, i64>(2)?))
+        Ok((
+            row.get::<_, i64>(0)?,
+            row.get::<_, String>(1)?,
+            row.get::<_, i64>(2)?,
+        ))
     }) {
         Ok(rows) => rows.filter_map(Result::ok).collect::<Vec<_>>(),
         Err(_) => return,
@@ -351,11 +364,13 @@ fn decorate_group_messages(
         message.reactions = grouped
             .iter()
             .filter(|((id, _), _)| *id == message.id)
-            .map(|((_, emoji), (count, mine))| crate::web::view_models::ChatReactionRow {
-                emoji: emoji.clone(),
-                count: *count,
-                mine: *mine,
-            })
+            .map(
+                |((_, emoji), (count, mine))| crate::web::view_models::ChatReactionRow {
+                    emoji: emoji.clone(),
+                    count: *count,
+                    mine: *mine,
+                },
+            )
             .collect();
     }
 }
@@ -417,40 +432,43 @@ fn mark_group_read(
 fn map_group_message_row(
     row: &rusqlite::Row<'_>,
 ) -> rusqlite::Result<crate::web::view_models::ChatMessageRow> {
-            let deleted_at: i64 = row.get(5)?;
-            let attachment_kind: String = row.get(6)?;
-            let attachment_path: String = row.get(7)?;
-            let client_message_id: String = row.get(8)?;
-            let message_id: i64 = row.get(0)?;
-            Ok(crate::web::view_models::ChatMessageRow {
-                id: message_id,
-                sender_user_id: row.get(1)?,
-                message: row.get(2)?,
-                is_read: 0,
-                created_at: row.get(3)?,
-                delivered_at: 0,
-                read_at: 0,
-                reply_to_message_id: row.get(9)?,
-                reply_sender_user_id: 0,
-                reply_message: String::new(),
-                edited_at: row.get(4)?,
-                deleted_at,
-                attachment_kind: attachment_kind.clone(),
-                attachment_url: if deleted_at == 0
-                    && (attachment_kind == "image" || attachment_kind == "voice")
-                    && !attachment_path.is_empty()
-                {
-                    format!("/api/group/media/{message_id}")
-                } else {
-                    String::new()
-                },
-                reactions: Vec::new(),
-                sender_name: String::new(),
-                client_message_id,
-            })
+    let deleted_at: i64 = row.get(5)?;
+    let attachment_kind: String = row.get(6)?;
+    let attachment_path: String = row.get(7)?;
+    let client_message_id: String = row.get(8)?;
+    let message_id: i64 = row.get(0)?;
+    Ok(crate::web::view_models::ChatMessageRow {
+        id: message_id,
+        sender_user_id: row.get(1)?,
+        message: row.get(2)?,
+        is_read: 0,
+        created_at: row.get(3)?,
+        delivered_at: 0,
+        read_at: 0,
+        reply_to_message_id: row.get(9)?,
+        reply_sender_user_id: 0,
+        reply_message: String::new(),
+        edited_at: row.get(4)?,
+        deleted_at,
+        attachment_kind: attachment_kind.clone(),
+        attachment_url: if deleted_at == 0
+            && (attachment_kind == "image" || attachment_kind == "voice")
+            && !attachment_path.is_empty()
+        {
+            format!("/api/group/media/{message_id}")
+        } else {
+            String::new()
+        },
+        reactions: Vec::new(),
+        sender_name: String::new(),
+        client_message_id,
+    })
 }
 
-fn message_json(message: &crate::web::view_models::ChatMessageRow, viewer_user_id: i64) -> serde_json::Value {
+fn message_json(
+    message: &crate::web::view_models::ChatMessageRow,
+    viewer_user_id: i64,
+) -> serde_json::Value {
     json!({
         "id": message.id,
         "sender_user_id": message.sender_user_id.to_string(),
@@ -582,7 +600,14 @@ pub async fn group_chat_page(
         }
     };
     if group_id <= 0 {
-        return Html(templates::render_group_chat(true, user_id, 0, "", 0, vec![]));
+        return Html(templates::render_group_chat(
+            true,
+            user_id,
+            0,
+            "",
+            0,
+            vec![],
+        ));
     }
     let db = match crate::db::pool::get_connection(&state.db_pool) {
         Ok(db) => db,
@@ -666,7 +691,8 @@ pub async fn api_group_messages(
         .and_then(|v| v.parse::<i64>().ok())
         .unwrap_or(0);
     let fetch_limit = limit.saturating_add(1);
-    let mut messages = load_group_messages(&db, group_id, user_id, after_id, before_id, fetch_limit);
+    let mut messages =
+        load_group_messages(&db, group_id, user_id, after_id, before_id, fetch_limit);
     let has_more = messages.len() as i64 > limit;
     if has_more {
         if before_id > 0 || after_id <= 0 {
@@ -936,7 +962,11 @@ pub async fn api_group_send_image(
         group_id,
         message_id,
         user_id,
-        if caption.is_empty() { "Фото" } else { caption.as_str() },
+        if caption.is_empty() {
+            "Фото"
+        } else {
+            caption.as_str()
+        },
     );
     Json(json!({
         "ok": true,
@@ -1188,7 +1218,15 @@ pub async fn api_group_edit(
     {
         return json_error(StatusCode::CONFLICT, "message_changed");
     }
-    fanout_group_message(&state, &db, "message.updated", group_id, message_id, user_id, text);
+    fanout_group_message(
+        &state,
+        &db,
+        "message.updated",
+        group_id,
+        message_id,
+        user_id,
+        text,
+    );
     Json(json!({"ok": true, "message_id": message_id, "message": text, "edited_at": now}))
         .into_response()
 }
@@ -1291,10 +1329,7 @@ pub async fn api_group_react(
         );
     }
     let mut loaded = load_group_messages(&db, group_id, user_id, message_id - 1, 0, 1);
-    let reactions = loaded
-        .pop()
-        .map(|m| m.reactions)
-        .unwrap_or_default();
+    let reactions = loaded.pop().map(|m| m.reactions).unwrap_or_default();
     fanout_group_message(
         &state,
         &db,
@@ -1324,14 +1359,30 @@ pub async fn group_members_page(
 ) -> Html<String> {
     let user_id = match verify_user_session(&state, &headers) {
         Some(id) => id,
-        None => return Html(templates::render_group_members(false, 0, "", vec![], vec![], "")),
+        None => {
+            return Html(templates::render_group_members(
+                false,
+                0,
+                "",
+                vec![],
+                vec![],
+                "",
+            ))
+        }
     };
     let db = match crate::db::pool::get_connection(&state.db_pool) {
         Ok(db) => db,
         Err(_) => return Html("<h1>503</h1><p>База данных временно недоступна.</p>".to_string()),
     };
     if group_id <= 0 || !is_member(&db, group_id, user_id) {
-        return Html(templates::render_group_members(true, group_id, "Группа", vec![], vec![], "Нет доступа"));
+        return Html(templates::render_group_members(
+            true,
+            group_id,
+            "Группа",
+            vec![],
+            vec![],
+            "Нет доступа",
+        ));
     }
     let name: String = db
         .query_row(
@@ -1346,7 +1397,9 @@ pub async fn group_members_page(
         .into_iter()
         .filter(|(id, _)| !current.contains(id))
         .collect();
-    Html(templates::render_group_members(true, group_id, &name, members, candidates, ""))
+    Html(templates::render_group_members(
+        true, group_id, &name, members, candidates, "",
+    ))
 }
 
 pub async fn add_group_members(
@@ -1411,21 +1464,16 @@ pub async fn leave_group(
     Redirect::to("/app/messages").into_response()
 }
 
-fn load_group_member_names(
-    db: &rusqlite::Connection,
-    group_id: i64,
-) -> Vec<(i64, String)> {
-    db.prepare(
-        "SELECT user_id FROM chat_group_members WHERE group_id = ?1 ORDER BY joined_at ASC",
-    )
-    .and_then(|mut stmt| {
-        stmt.query_map(rusqlite::params![group_id], |row| row.get(0))?
-            .collect::<Result<Vec<i64>, _>>()
-    })
-    .unwrap_or_default()
-    .into_iter()
-    .map(|id| (id, profile_display_name(db, id)))
-    .collect()
+fn load_group_member_names(db: &rusqlite::Connection, group_id: i64) -> Vec<(i64, String)> {
+    db.prepare("SELECT user_id FROM chat_group_members WHERE group_id = ?1 ORDER BY joined_at ASC")
+        .and_then(|mut stmt| {
+            stmt.query_map(rusqlite::params![group_id], |row| row.get(0))?
+                .collect::<Result<Vec<i64>, _>>()
+        })
+        .unwrap_or_default()
+        .into_iter()
+        .map(|id| (id, profile_display_name(db, id)))
+        .collect()
 }
 
 pub fn load_user_groups(

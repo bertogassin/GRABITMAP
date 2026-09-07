@@ -73,11 +73,7 @@ pub async fn revoke_admin_session(
     let authenticated = match verify_authenticated_user(&state, &headers) {
         Some(user) => user,
         None => {
-            return (
-                StatusCode::UNAUTHORIZED,
-                "Требуется вход в аккаунт GRABIT",
-            )
-                .into_response();
+            return (StatusCode::UNAUTHORIZED, "Требуется вход в аккаунт GRABIT").into_response();
         }
     };
 

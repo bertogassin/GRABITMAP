@@ -344,11 +344,7 @@ fn render_page(
         cards = cards,
     );
 
-    admin_ops_page_themed(
-        "География и группы · GRABIT",
-        "rm-admin-ops--geo",
-        &content,
-    )
+    admin_ops_page_themed("География и группы · GRABIT", "rm-admin-ops--geo", &content)
 }
 
 pub async fn admin_geography_page(
@@ -359,11 +355,7 @@ pub async fn admin_geography_page(
     let authenticated_user = match verify_authenticated_user(&state, &headers) {
         Some(user) => user,
         None => {
-            return (
-                StatusCode::UNAUTHORIZED,
-                "Требуется вход в аккаунт GRABIT",
-            )
-                .into_response();
+            return (StatusCode::UNAUTHORIZED, "Требуется вход в аккаунт GRABIT").into_response();
         }
     };
 
@@ -682,11 +674,7 @@ pub async fn admin_geography_group_save(
     let user = match verify_authenticated_user(&state, &headers) {
         Some(user) => user,
         None => {
-            return (
-                StatusCode::UNAUTHORIZED,
-                "Требуется вход в аккаунт GRABIT",
-            )
-                .into_response();
+            return (StatusCode::UNAUTHORIZED, "Требуется вход в аккаунт GRABIT").into_response();
         }
     };
 
@@ -1021,11 +1009,7 @@ pub async fn admin_geography_group_verify(
     let user = match verify_authenticated_user(&state, &headers) {
         Some(user) => user,
         None => {
-            return (
-                StatusCode::UNAUTHORIZED,
-                "Требуется вход в аккаунт GRABIT",
-            )
-                .into_response();
+            return (StatusCode::UNAUTHORIZED, "Требуется вход в аккаунт GRABIT").into_response();
         }
     };
 
