@@ -6,9 +6,6 @@
     }
 
     function t(key, vars) {
-        if (window.m && typeof window.m[key] === "function") {
-            return window.m[key](vars || {});
-        }
         var text = messages()[key];
         if (typeof text !== "string") {
             text = key;
@@ -26,6 +23,9 @@
         window.m = new Proxy({}, {
             get: function (_, key) {
                 return function (vars) {
+                    // Translate directly from the server-provided table.
+                    // Calling window.m from t() would call this proxy again
+                    // and recurse until the browser stack is exhausted.
                     return t(String(key), vars);
                 };
             }

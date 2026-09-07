@@ -44,6 +44,8 @@
     var syncQueued = false;
     var motionTicks = 0;
     var wakeLock = null;
+    var accelerometer = null;
+    var accelerometerTimer = 0;
     var lastPanelAt = 0;
     var lastPanelCount = -1;
     var diagnostics = {
@@ -477,16 +479,14 @@
         }
     }
 
-    function onMotion(event) {
-        var acc = event.accelerationIncludingGravity || event.acceleration;
-        if (!acc) return;
+    function processAcceleration(x, y, z) {
         motionTicks += 1;
         diagnostics.motionTicks = motionTicks;
         var mag =
             Math.sqrt(
-                (acc.x || 0) * (acc.x || 0) +
-                    (acc.y || 0) * (acc.y || 0) +
-                    (acc.z || 0) * (acc.z || 0)
+                (x || 0) * (x || 0) +
+                    (y || 0) * (y || 0) +
+                    (z || 0) * (z || 0)
             ) / 9.81;
 
         // Separate gravity and device orientation from the short pulse made
@@ -507,6 +507,34 @@
         if (motionPeak >= trigger && motion <= release) {
             registerStep();
             motionPeak = 0;
+        }
+    }
+
+    function onMotion(event) {
+        var acc = event.accelerationIncludingGravity || event.acceleration;
+        if (!acc) return;
+        processAcceleration(acc.x, acc.y, acc.z);
+    }
+
+    function startAccelerometerFallback() {
+        if (motionTicks >= 3 || accelerometer || typeof Accelerometer === "undefined") {
+            return;
+        }
+        try {
+            accelerometer = new Accelerometer({ frequency: 30 });
+            accelerometer.addEventListener("reading", function () {
+                processAcceleration(accelerometer.x, accelerometer.y, accelerometer.z);
+            });
+            accelerometer.addEventListener("error", function (event) {
+                diagnostics.lastError = "accelerometer_" +
+                    (event && event.error && event.error.name
+                        ? event.error.name
+                        : "error");
+            });
+            accelerometer.start();
+        } catch (error) {
+            diagnostics.lastError = "accelerometer_" +
+                (error && error.name ? error.name : "error");
         }
     }
 
@@ -537,6 +565,7 @@
 
         syncSensor(true);
         updateLivePanel(true);
+        accelerometerTimer = window.setTimeout(startAccelerometerFallback, 2500);
         window.setTimeout(function () {
             if (listening && motionTicks < 3 && localCount === serverTodaySteps()) {
                 setStatus(
@@ -561,6 +590,14 @@
         if (wakeLock && typeof wakeLock.release === "function") {
             wakeLock.release().catch(function () {});
             wakeLock = null;
+        }
+        if (accelerometerTimer) {
+            window.clearTimeout(accelerometerTimer);
+            accelerometerTimer = 0;
+        }
+        if (accelerometer) {
+            try { accelerometer.stop(); } catch (_) {}
+            accelerometer = null;
         }
     }
 

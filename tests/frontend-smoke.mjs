@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import vm from "node:vm";
 
 const root = new URL("../", import.meta.url);
 const locales = ["ru","en","fr","es","zh","zh-TW","hi","ar","pt","de","ja","ko","it","tr","pl","uk","nl","vi","id","ms","th","fa","ur","bn","pa","sw","el","cs","ro","hu","sv","he"];
@@ -94,4 +95,50 @@ test("successful direct chat send clears the account-scoped draft", async () => 
   assert.match(chat, /localStorage\.removeItem\("grabit-chat-draft:" \+ scope\)/);
   assert.match(chat, /clearStoredDraft\(\)/);
   assert.match(chat, /voiceBtn\.textContent = t\("chat_voice_send", "Отправить"\)/);
+});
+
+test("chat has one active submit owner and accepts practical voice sizes", async () => {
+  const [chat, media, groups] = await Promise.all([
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("src/web/handlers/chat_media.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
+  ]);
+  assert.match(chat, /if \(form\.dataset\.chatCoreReady === "1"\) \{\s*return;/);
+  assert.match(chat, /voice\." \+ extension/);
+  assert.match(chat, /voice_too_large/);
+  assert.match(media, /MAX_VOICE_BYTES: usize = 8 \* 1024 \* 1024/);
+  assert.match(groups, /bytes\.len\(\) > MAX_VOICE_BYTES/);
+});
+
+test("pedometer falls back to the Android Generic Sensor API", async () => {
+  const pedometer = await readFile(new URL("static/pedometer.js", root), "utf8");
+  assert.match(pedometer, /new Accelerometer\(\{ frequency: 30 \}\)/);
+  assert.match(pedometer, /startAccelerometerFallback/);
+  assert.match(pedometer, /processAcceleration\(accelerometer\.x/);
+  assert.match(pedometer, /accelerometer\.stop\(\)/);
+});
+
+test("mobile diagnostics probes session chat microphone and motion", async () => {
+  const diagnostics = await readFile(new URL("static/mobile-diagnostics.js", root), "utf8");
+  assert.match(diagnostics, /grabit-mobile-diagnostic/);
+  assert.match(diagnostics, /chatCoreReady/);
+  assert.match(diagnostics, /getUserMedia/);
+  assert.match(diagnostics, /DeviceMotionEvent\.requestPermission/);
+  assert.match(diagnostics, /\/api\/steps\?today=/);
+});
+
+test("browser i18n fallback cannot recurse and generated bare imports are not loaded", async () => {
+  const [boot, common] = await Promise.all([
+    readFile(new URL("static/i18n-boot.js", root), "utf8"),
+    readFile(new URL("src/web/templates/common.rs", root), "utf8"),
+  ]);
+  assert.doesNotMatch(boot, /window\.m && typeof window\.m\[key\]/);
+  assert.match(boot, /return t\(String\(key\), vars\)/);
+  assert.doesNotMatch(common, /type="module" src="\{paraglide_boot_js\}"/);
+  const browser = {
+    resursmapI18n: { messages: { greeting: "Привет, {name}" } },
+  };
+  vm.runInNewContext(boot, { window: browser });
+  assert.equal(browser.rmT("greeting", { name: "Амир" }), "Привет, Амир");
+  assert.equal(browser.m.greeting({ name: "Амир" }), "Привет, Амир");
 });

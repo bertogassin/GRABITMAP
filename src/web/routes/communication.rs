@@ -9,6 +9,7 @@ use super::super::handlers::{
 };
 use crate::state::app_state::AppState;
 use axum::{
+    response::Redirect,
     routing::{get, post},
     Router,
 };
@@ -17,6 +18,10 @@ pub(super) fn routes() -> Router<AppState> {
     Router::new()
         .route("/app/contact-requests", get(contact_requests_page))
         .route("/app/messages", get(messages_page))
+        .route(
+            "/app/chats",
+            get(|| async { Redirect::to("/app/messages") }),
+        )
         .route(
             "/app/contact-request/{id}/accept",
             get(retired_contact_decision).post(retired_contact_decision),

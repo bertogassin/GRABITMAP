@@ -1,7 +1,9 @@
 use super::auth::verify_user_session;
 use super::chat::load_user_conversations;
 use super::chat_api::{message_can_be_edited, message_is_valid, reaction_emoji_is_allowed};
-use super::chat_media::{detect_audio, detect_image, extension_for_mime, media_root};
+use super::chat_media::{
+    detect_audio, detect_image, extension_for_mime, media_root, MAX_VOICE_BYTES,
+};
 use super::common::{input_text_is_valid, request_is_cross_site, unix_now};
 use crate::state::app_state::AppState;
 use crate::web::templates;
@@ -1110,7 +1112,7 @@ pub async fn api_group_send_voice(
             .into_response();
         }
     }
-    if bytes.len() > 512 * 1024 {
+    if bytes.len() > MAX_VOICE_BYTES {
         return json_error(StatusCode::BAD_REQUEST, "voice_too_large");
     }
     let Some((_, mime)) = detect_audio(&bytes) else {
