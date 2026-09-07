@@ -4019,13 +4019,88 @@
     function installChatFallback() {
         var form =
             document.getElementById("chat-form");
+        var input =
+            document.getElementById("chat-input");
+        var send =
+            document.getElementById("chat-send");
         var state =
             document.getElementById(
                 "chat-connection-state"
             );
+        var sendState =
+            document.getElementById("chat-send-state");
+        var history =
+            document.getElementById("chat-messages");
 
-        if (!form) {
+        if (!form || !input || !history) {
             return;
+        }
+
+        function fallbackApi() {
+            var groupId = String(history.dataset.groupId || "").trim();
+            var otherUserId = String(history.dataset.otherUserId || "").trim();
+
+            if (/^[1-9][0-9]{0,18}$/.test(groupId)) {
+                return "/api/group/" + groupId + "/send";
+            }
+            if (/^[1-9][0-9]{0,18}$/.test(otherUserId)) {
+                return "/api/chat/" + otherUserId + "/send";
+            }
+            return "";
+        }
+
+        function fallbackClientId() {
+            if (window.crypto && typeof window.crypto.randomUUID === "function") {
+                return window.crypto.randomUUID();
+            }
+            return "fallback_" + Date.now().toString(36) + "_" +
+                Math.random().toString(36).slice(2, 14);
+        }
+
+        async function fallbackSend() {
+            var message = input.value.trim();
+            var url = fallbackApi();
+
+            if (!message || !url || form.dataset.chatFallbackSending === "1") {
+                return;
+            }
+
+            form.dataset.chatFallbackSending = "1";
+            if (send) send.disabled = true;
+            if (state) state.textContent = "Отправка…";
+            if (sendState) sendState.textContent = "Сохраняем сообщение…";
+
+            try {
+                var response = await fetch(url, {
+                    method: "POST",
+                    credentials: "same-origin",
+                    cache: "no-store",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        client_message_id: fallbackClientId()
+                    })
+                });
+                var data = await response.json().catch(function () { return null; });
+                if (!response.ok || !data || !data.ok) {
+                    throw new Error(data && data.error ? data.error : "send_failed");
+                }
+
+                input.value = "";
+                if (sendState) sendState.textContent = "Сообщение сохранено";
+                window.location.reload();
+            } catch (_) {
+                if (state) state.textContent = "Ошибка отправки";
+                if (sendState) {
+                    sendState.textContent = "Не отправлено — проверьте интернет и повторите";
+                }
+            } finally {
+                delete form.dataset.chatFallbackSending;
+                if (send) send.disabled = input.value.trim().length === 0;
+            }
         }
 
         function publishComposerHeight() {
@@ -4062,13 +4137,16 @@
             );
         }
 
-        // Запрещаем браузеру переходить на сырой JSON/текст
-        // при submit. Основной обработчик Chat V2 продолжает
-        // получать событие и отправляет сообщение через fetch.
+        // Основной Chat V2 обрабатывает submit в обычном режиме. Если его
+        // инициализация оборвалась из-за несовместимости браузера, этот путь
+        // всё равно отправит и сохранит обычное текстовое сообщение.
         form.addEventListener(
             "submit",
             function (event) {
                 event.preventDefault();
+                if (form.dataset.chatCoreReady !== "1") {
+                    fallbackSend();
+                }
             },
             true
         );

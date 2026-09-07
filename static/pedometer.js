@@ -26,9 +26,6 @@
     var dayDate = document.getElementById("rm-step-day-date");
     var daySteps = document.getElementById("rm-step-day-steps");
     var dayMeta = document.getElementById("rm-step-day-meta");
-    var goalForm = document.getElementById("rm-step-goal-form");
-    var goalInput = document.getElementById("rm-step-goal");
-    var toggleButton = document.getElementById("rm-step-toggle");
     var sensorLabel = document.getElementById("rm-step-sensor-label");
 
     var snapshot = null;
@@ -145,12 +142,6 @@
 
     function paintListeningState() {
         root.classList.toggle("is-listening", listening);
-        if (toggleButton) {
-            toggleButton.textContent = listening
-                ? t("steps_pause", "Остановить")
-                : t("steps_start", "Запустить шагомер");
-            toggleButton.setAttribute("aria-pressed", listening ? "true" : "false");
-        }
         if (sensorLabel) {
             sensorLabel.textContent = listening
                 ? t("steps_sensor_active", "Датчик активен")
@@ -357,7 +348,6 @@
         if (lifeEl && snapshot) {
             lifeEl.textContent = String((snapshot.lifetime || 0) + extra);
         }
-        if (goalInput && snapshot) goalInput.value = String(snapshot.goal);
         renderWeek();
     }
 
@@ -496,23 +486,6 @@
         }, 5000);
     }
 
-    function stopListen() {
-        if (!listening) return;
-        window.removeEventListener("devicemotion", onMotion);
-        listening = false;
-        if (syncTimer) {
-            window.clearInterval(syncTimer);
-            syncTimer = 0;
-        }
-        if (wakeLock) {
-            wakeLock.release().catch(function () {});
-            wakeLock = null;
-        }
-        syncSensor(true);
-        paintListeningState();
-        setStatus(t("steps_paused", "Шагомер остановлен"));
-    }
-
     async function requestListen() {
         if (listening) return;
         if (!canSenseOnThisDevice()) {
@@ -550,40 +523,6 @@
             var day = event.target.closest("[data-date]");
             if (day) openDay(day.getAttribute("data-date"));
         });
-        if (toggleButton) {
-            toggleButton.addEventListener("click", function () {
-                if (listening) {
-                    stopListen();
-                } else {
-                    requestListen();
-                }
-            });
-        }
-        if (goalForm) {
-            goalForm.addEventListener("submit", async function (event) {
-                event.preventDefault();
-                var nextGoal = Number(goalInput ? goalInput.value : DEFAULT_GOAL);
-                if (
-                    !Number.isFinite(nextGoal) ||
-                    nextGoal < 1000 ||
-                    nextGoal > 50000
-                ) {
-                    setStatus(t("steps_goal_bad", "Проверьте цель"));
-                    return;
-                }
-                var data = await send({
-                    date: localToday,
-                    goal: nextGoal,
-                });
-                if (data && data.ok !== false) {
-                    applySnapshot(data);
-                    setStatus(t("steps_goal_updated", "Цель обновлена"));
-                    updateLivePanel(true);
-                } else {
-                    setStatus(t("steps_goal_failed", "Не удалось сохранить цель"));
-                }
-            });
-        }
         document.addEventListener("visibilitychange", function () {
             if (document.hidden) {
                 syncSensor(true);
@@ -622,12 +561,16 @@
         }
         if (localCount > 0) syncSensor(true);
         if (notifyReady()) updateLivePanel(true);
-        setStatus(
-            t(
-                "steps_tap_start",
-                "Нажмите «Запустить» и разрешите доступ к движению"
-            )
-        );
+        if (typeof DeviceMotionEvent !== "undefined" &&
+            typeof DeviceMotionEvent.requestPermission === "function") {
+            setStatus(t("steps_need_motion", "Коснитесь экрана для доступа к движению"));
+            document.addEventListener("pointerdown", requestListen, {
+                once: true,
+                passive: true,
+            });
+        } else {
+            requestListen();
+        }
     }
 
     boot();
