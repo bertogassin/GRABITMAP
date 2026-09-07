@@ -1,3 +1,12 @@
+FROM node:20-bookworm AS frontend-build
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY project.inlang ./project.inlang
+COPY scripts ./scripts
+COPY static ./static
+RUN npm run i18n
+
 FROM rust:1-bookworm AS build
 WORKDIR /app
 
@@ -5,10 +14,11 @@ COPY Cargo.toml Cargo.lock ./
 COPY src ./src
 COPY data ./data
 COPY static ./static
+COPY --from=frontend-build /app/static/paraglide ./static/paraglide
 
 RUN cargo build --release --locked
 
-FROM debian:bookworm-slim
+FROM debian:bookworm-slim AS runtime
 WORKDIR /app
 
 RUN apt-get update \

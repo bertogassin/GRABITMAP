@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_VERSION = "grabit-shell-v5.0.8";
+const CACHE_VERSION = "grabit-shell-v5.0.9";
 
 const STATIC_ASSETS = [
     "/static/manifest.webmanifest",
@@ -11,6 +11,43 @@ const STATIC_ASSETS = [
     "/static/app-icon-512.png",
     "/static/apple-touch-icon.png",
     "/static/nav-badge.js",
+    "/static/i18n-boot.js",
+    "/static/i18n-runtime.js",
+    "/static/paraglide/messages.js",
+    "/static/paraglide/runtime.js",
+    "/static/paraglide/messages/_index.js",
+    "/static/paraglide/messages/ru.js",
+    "/static/paraglide/messages/en.js",
+    "/static/paraglide/messages/fr.js",
+    "/static/paraglide/messages/es.js",
+    "/static/paraglide/messages/zh.js",
+    "/static/paraglide/messages/zh-TW.js",
+    "/static/paraglide/messages/hi.js",
+    "/static/paraglide/messages/ar.js",
+    "/static/paraglide/messages/pt.js",
+    "/static/paraglide/messages/de.js",
+    "/static/paraglide/messages/ja.js",
+    "/static/paraglide/messages/ko.js",
+    "/static/paraglide/messages/it.js",
+    "/static/paraglide/messages/tr.js",
+    "/static/paraglide/messages/pl.js",
+    "/static/paraglide/messages/uk.js",
+    "/static/paraglide/messages/nl.js",
+    "/static/paraglide/messages/vi.js",
+    "/static/paraglide/messages/id.js",
+    "/static/paraglide/messages/ms.js",
+    "/static/paraglide/messages/th.js",
+    "/static/paraglide/messages/fa.js",
+    "/static/paraglide/messages/ur.js",
+    "/static/paraglide/messages/bn.js",
+    "/static/paraglide/messages/pa.js",
+    "/static/paraglide/messages/sw.js",
+    "/static/paraglide/messages/el.js",
+    "/static/paraglide/messages/cs.js",
+    "/static/paraglide/messages/ro.js",
+    "/static/paraglide/messages/hu.js",
+    "/static/paraglide/messages/sv.js",
+    "/static/paraglide/messages/he.js",
 ];
 
 self.addEventListener("install", function (event) {
@@ -127,11 +164,11 @@ self.addEventListener("fetch", function (event) {
     }
 
     if (url.pathname.startsWith("/static/")) {
+        var cacheKey = new URL(request.url);
+        cacheKey.search = "";
         event.respondWith(
             fetch(request).catch(function () {
-                return caches.match(request, {
-                    ignoreSearch: true
-                });
+                return caches.match(cacheKey.toString());
             })
         );
     }

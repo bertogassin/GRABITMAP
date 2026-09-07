@@ -4201,9 +4201,6 @@
                     )
                 )
             ) {
-                if (payload.event && Number(payload.event.event_id) > lastEventId) {
-                    lastEventId = Number(payload.event.event_id);
-                }
                 return;
             }
 

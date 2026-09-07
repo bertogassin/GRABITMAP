@@ -21,6 +21,7 @@ jobs:
         continue-on-error: true
       - run: rustfmt --edition 2021 --check src/web/handlers/chat_media.rs src/web/handlers/chat_realtime.rs
       - run: cargo test --all-targets
+      - run: cargo build --release --locked
       - run: cargo clippy --all-targets
 
   frontend:

@@ -38,7 +38,7 @@ fn parse_other_user_id(value: Option<&str>) -> Option<i64> {
 fn handle_client_frame(state: &AppState, user_id: i64, text: &str) -> bool {
     let frame = match serde_json::from_str::<ClientFrame>(text) {
         Ok(frame) => frame,
-        Err(_) => return text.contains("\"ping\""),
+        Err(_) => return false,
     };
 
     match frame.frame_type.as_str() {
