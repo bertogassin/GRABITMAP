@@ -1660,7 +1660,10 @@
             }
             var clientMessageId = createClientMessageId();
             var formData = new FormData();
-            formData.append("voice", blob, "voice.webm");
+            var extension = mimeType.indexOf("ogg") !== -1
+                ? "ogg"
+                : (mimeType.indexOf("mp4") !== -1 ? "m4a" : "webm");
+            formData.append("voice", blob, "voice." + extension);
             formData.append("client_message_id", clientMessageId);
             var reply = window.ResursMapChatReply || null;
             if (reply && reply.id) {
@@ -1699,9 +1702,12 @@
                 if (typeof window.playChatSend === "function") {
                     window.playChatSend();
                 }
-            }).catch(function () {
+            }).catch(function (error) {
                 setConnection(t("chat_voice_error", "Ошибка голосового"), "is-error");
-                sendState.textContent = t("chat_voice_failed", "Голосовое не отправлено");
+                var code = error && error.message ? error.message : "send_failed";
+                sendState.textContent = code === "voice_too_large"
+                    ? t("chat_voice_too_large", "Запись слишком длинная — максимум 2 минуты")
+                    : t("chat_voice_failed", "Голосовое не отправлено") + " (" + code + ")";
                 if (typeof window.playChatError === "function") {
                     window.playChatError();
                 }
@@ -1786,6 +1792,15 @@
                         if (event.data && event.data.size > 0) {
                             voiceChunks.push(event.data);
                         }
+                    };
+
+                    voiceRecorder.onerror = function () {
+                        voiceChunks = [];
+                        hideVoiceRecording();
+                        sendState.textContent = t(
+                            "chat_voice_record_failed",
+                            "Телефон остановил запись. Попробуйте ещё раз."
+                        );
                     };
 
                     voiceRecorder.start(250);
@@ -4137,6 +4152,9 @@
         form.addEventListener(
             "submit",
             function (event) {
+                if (form.dataset.chatCoreReady === "1") {
+                    return;
+                }
                 event.preventDefault();
                 event.stopImmediatePropagation();
                 fallbackSend();
