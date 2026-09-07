@@ -80,3 +80,18 @@ test("Docker build includes Rust compile-time locale sources", async () => {
   assert.match(dockerfile, /COPY messages \.\/messages/);
   assert.match(dockerfile, /RUN cargo build --release --locked/);
 });
+
+test("same-origin mobile sensors and microphone are permitted", async () => {
+  const headers = await readFile(new URL("src/web/handlers/common.rs", root), "utf8");
+  assert.match(headers, /microphone=\(self\)/);
+  assert.match(headers, /accelerometer=\(self\)/);
+  assert.match(headers, /gyroscope=\(self\)/);
+  assert.doesNotMatch(headers, /microphone=\(\)/);
+});
+
+test("successful direct chat send clears the account-scoped draft", async () => {
+  const chat = await readFile(new URL("static/chat-v2.js", root), "utf8");
+  assert.match(chat, /localStorage\.removeItem\("grabit-chat-draft:" \+ scope\)/);
+  assert.match(chat, /clearStoredDraft\(\)/);
+  assert.match(chat, /voiceBtn\.textContent = t\("chat_voice_send", "Отправить"\)/);
+});

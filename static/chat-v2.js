@@ -1592,6 +1592,7 @@
 
         var voiceBtn = document.getElementById("chat-voice-btn");
         var voiceRecording = false;
+        var voiceStarting = false;
         var voiceRecorder = null;
         var voiceChunks = [];
         var voiceStartedAt = 0;
@@ -1631,9 +1632,12 @@
 
         function hideVoiceRecording() {
             voiceRecording = false;
+            voiceStarting = false;
             voiceOverlay.hidden = true;
             if (voiceBtn) {
                 voiceBtn.classList.remove("is-recording");
+                voiceBtn.textContent = t("chat_voice", "Голос");
+                voiceBtn.disabled = false;
             }
             if (voiceTimerId) {
                 window.clearInterval(voiceTimerId);
@@ -1741,7 +1745,7 @@
         }
 
         function startVoiceRecording() {
-            if (voiceRecording || !voiceBtn) {
+            if (voiceRecording || voiceStarting || !voiceBtn) {
                 return;
             }
 
@@ -1755,8 +1759,13 @@
                 return;
             }
 
+            voiceStarting = true;
+            voiceBtn.disabled = true;
+            sendState.textContent = t("chat_mic_request", "Разрешите доступ к микрофону…");
             navigator.mediaDevices.getUserMedia({ audio: true })
                 .then(function (stream) {
+                    voiceStarting = false;
+                    voiceBtn.disabled = false;
                     voiceChunks = [];
                     var mimeType = "";
                     if (MediaRecorder.isTypeSupported(
@@ -1783,6 +1792,7 @@
                     voiceRecording = true;
                     voiceStartedAt = Date.now();
                     voiceBtn.classList.add("is-recording");
+                    voiceBtn.textContent = t("chat_voice_send", "Отправить");
                     voiceOverlay.hidden = false;
                     updateVoiceTimer();
                     voiceTimerId = window.setInterval(
@@ -1795,6 +1805,8 @@
                     sendState.textContent = t("chat_recording_release", "Запись… отпустите для отправки");
                 })
                 .catch(function () {
+                    voiceStarting = false;
+                    voiceBtn.disabled = false;
                     sendState.textContent =
                         t("chat_mic_denied", "Нет доступа к микрофону");
                     if (typeof window.playChatError === "function") {
@@ -1804,65 +1816,17 @@
         }
 
         if (voiceBtn) {
-            var voicePointerId = null;
-
             voiceBtn.addEventListener(
-                "pointerdown",
+                "click",
                 function (event) {
-                    if (
-                        event.pointerType === "mouse" &&
-                        event.button !== 0
-                    ) {
-                        return;
-                    }
-
                     event.preventDefault();
-                    voicePointerId = event.pointerId;
-
-                    try {
-                        voiceBtn.setPointerCapture(
-                            event.pointerId
-                        );
-                    } catch (_) {}
-
-                    haptic("voice");
-
-                    startVoiceRecording();
-                }
-            );
-
-            voiceBtn.addEventListener(
-                "pointerup",
-                function (event) {
-                    if (
-                        voicePointerId !== null &&
-                        event.pointerId !== voicePointerId
-                    ) {
-                        return;
-                    }
-
-                    event.preventDefault();
-
                     if (voiceRecording) {
                         stopVoiceRecording(true);
+                        haptic("voice-send");
+                    } else {
+                        startVoiceRecording();
+                        haptic("voice");
                     }
-
-                    haptic("voice-send");
-
-                    voicePointerId = null;
-                }
-            );
-
-            voiceBtn.addEventListener(
-                "pointercancel",
-                function (event) {
-                    event.preventDefault();
-
-                    if (voiceRecording) {
-                        stopVoiceRecording(false);
-                    }
-
-                    voicePointerId = null;
                 }
             );
 
@@ -4073,6 +4037,19 @@
                 Math.random().toString(36).slice(2, 14);
         }
 
+        function clearStoredDraft() {
+            var viewerUserId = String(history.dataset.viewerUserId || "").trim();
+            var groupId = String(history.dataset.groupId || "").trim();
+            var otherUserId = String(history.dataset.otherUserId || "").trim();
+            var scope = viewerUserId + ":" +
+                (/^[1-9][0-9]{0,18}$/.test(groupId)
+                    ? "g" + groupId
+                    : "d" + otherUserId);
+            try {
+                localStorage.removeItem("grabit-chat-draft:" + scope);
+            } catch (_) {}
+        }
+
         async function fallbackSend() {
             var message = input.value.trim();
             var url = fallbackApi();
@@ -4106,6 +4083,7 @@
                 }
 
                 input.value = "";
+                clearStoredDraft();
                 if (sendState) sendState.textContent = "Сообщение сохранено";
                 window.location.reload();
             } catch (_) {
