@@ -98,10 +98,6 @@ pub struct AppState {
 }
 
 impl AppState {
-    pub fn current_chat_event_id(&self) -> u64 {
-        self.chat_event_sequence.load(Ordering::Relaxed)
-    }
-
     pub fn new(db_pool: DbPool, bot_token: Option<String>, admin_key: String) -> Self {
         let (chat_events, _) = broadcast::channel(2_048);
         let (chat_typing_events, _) = broadcast::channel(1_024);

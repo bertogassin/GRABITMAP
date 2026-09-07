@@ -191,10 +191,7 @@ async fn chat_socket(mut socket: WebSocket, state: AppState, user_id: i64, last_
                     Err(broadcast::error::RecvError::Lagged(_)) => {
                         if !send_json(
                             &mut socket,
-                            json!({
-                                "type": "sync_required",
-                                "after_event_id": state.current_chat_event_id()
-                            }),
+                            json!({"type": "sync_required"}),
                         )
                         .await
                         {
