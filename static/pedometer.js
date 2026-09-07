@@ -28,6 +28,8 @@
     var dayMeta = document.getElementById("rm-step-day-meta");
     var goalForm = document.getElementById("rm-step-goal-form");
     var goalInput = document.getElementById("rm-step-goal");
+    var toggleButton = document.getElementById("rm-step-toggle");
+    var sensorLabel = document.getElementById("rm-step-sensor-label");
 
     var snapshot = null;
     var localToday = localDate();
@@ -139,6 +141,21 @@
 
     function setStatus(text) {
         if (statusEl) statusEl.textContent = text;
+    }
+
+    function paintListeningState() {
+        root.classList.toggle("is-listening", listening);
+        if (toggleButton) {
+            toggleButton.textContent = listening
+                ? t("steps_pause", "Остановить")
+                : t("steps_start", "Запустить шагомер");
+            toggleButton.setAttribute("aria-pressed", listening ? "true" : "false");
+        }
+        if (sensorLabel) {
+            sensorLabel.textContent = listening
+                ? t("steps_sensor_active", "Датчик активен")
+                : t("steps_sensor_ready", "Готов к запуску");
+        }
     }
 
     function canSenseOnThisDevice() {
@@ -399,6 +416,12 @@
         pendingSync += 1;
         writeLocal();
         paint();
+        var ringShell = ring ? ring.closest(".rm-step-ring") : null;
+        if (ringShell) {
+            ringShell.classList.remove("is-step");
+            void ringShell.offsetWidth;
+            ringShell.classList.add("is-step");
+        }
         if (localCount % PANEL_EVERY === 0) updateLivePanel(false);
         if (localCount % 100 === 0 && navigator.vibrate) {
             navigator.vibrate(10);
@@ -449,6 +472,8 @@
         if (listening) return;
         window.addEventListener("devicemotion", onMotion, { passive: true });
         listening = true;
+        motionTicks = 0;
+        paintListeningState();
         setStatus(t("steps_counting", "Считаем шаги с телефона"));
         holdScreen();
         if (!syncTimer) {
@@ -469,6 +494,23 @@
                 );
             }
         }, 5000);
+    }
+
+    function stopListen() {
+        if (!listening) return;
+        window.removeEventListener("devicemotion", onMotion);
+        listening = false;
+        if (syncTimer) {
+            window.clearInterval(syncTimer);
+            syncTimer = 0;
+        }
+        if (wakeLock) {
+            wakeLock.release().catch(function () {});
+            wakeLock = null;
+        }
+        syncSensor(true);
+        paintListeningState();
+        setStatus(t("steps_paused", "Шагомер остановлен"));
     }
 
     async function requestListen() {
@@ -508,6 +550,15 @@
             var day = event.target.closest("[data-date]");
             if (day) openDay(day.getAttribute("data-date"));
         });
+        if (toggleButton) {
+            toggleButton.addEventListener("click", function () {
+                if (listening) {
+                    stopListen();
+                } else {
+                    requestListen();
+                }
+            });
+        }
         if (goalForm) {
             goalForm.addEventListener("submit", async function (event) {
                 event.preventDefault();
@@ -540,8 +591,6 @@
             } else if (listening) {
                 holdScreen();
                 syncSensor(true);
-            } else {
-                requestListen();
             }
         });
         window.addEventListener("pagehide", function () {
@@ -558,6 +607,7 @@
         }
         readLocal();
         paint();
+        paintListeningState();
         bindClicks();
         try {
             var response = await fetch(
@@ -572,13 +622,11 @@
         }
         if (localCount > 0) syncSensor(true);
         if (notifyReady()) updateLivePanel(true);
-        requestListen();
-        document.addEventListener(
-            "pointerdown",
-            function () {
-                requestListen();
-            },
-            { once: true, passive: true }
+        setStatus(
+            t(
+                "steps_tap_start",
+                "Нажмите «Запустить» и разрешите доступ к движению"
+            )
         );
     }
 
