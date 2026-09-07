@@ -53,7 +53,8 @@ fn load_recent_chat_messages(
                 COALESCE(messages.edited_at, 0),
                 COALESCE(messages.deleted_at, 0),
                 COALESCE(messages.attachment_kind, ''),
-                COALESCE(messages.attachment_path, '')
+                COALESCE(messages.attachment_path, ''),
+                COALESCE(messages.client_message_id, '')
              FROM (
                 SELECT id
                 FROM messages
@@ -96,7 +97,7 @@ fn load_recent_chat_messages(
                     },
                     reactions: Vec::new(),
                     sender_name: String::new(),
-                    client_message_id: String::new(),
+                    client_message_id: row.get(14)?,
                 })
             })?
             .collect::<Result<Vec<_>, _>>()
@@ -456,7 +457,8 @@ mod tests {
                 edited_at INTEGER,
                 deleted_at INTEGER,
                 attachment_kind TEXT,
-                attachment_path TEXT
+                attachment_path TEXT,
+                client_message_id TEXT NOT NULL DEFAULT ''
              );
              INSERT INTO messages (
                 id, conversation_id, sender_user_id, message
@@ -469,5 +471,37 @@ mod tests {
         assert_eq!(messages[0].id, 11);
         assert_eq!(messages[0].message, "Привет");
         assert_eq!(messages[0].reply_to_message_id, 0);
+        assert_eq!(messages[0].client_message_id, "");
+    }
+
+    #[test]
+    fn page_keeps_client_message_identity_after_reload() {
+        let db = rusqlite::Connection::open_in_memory().expect("database");
+        db.execute_batch(
+            "CREATE TABLE messages (
+                id INTEGER PRIMARY KEY,
+                conversation_id INTEGER NOT NULL,
+                sender_user_id INTEGER NOT NULL,
+                message TEXT NOT NULL,
+                is_read INTEGER NOT NULL DEFAULT 0,
+                created_at INTEGER NOT NULL DEFAULT 0,
+                delivered_at INTEGER,
+                read_at INTEGER,
+                reply_to_message_id INTEGER,
+                edited_at INTEGER,
+                deleted_at INTEGER,
+                attachment_kind TEXT,
+                attachment_path TEXT,
+                client_message_id TEXT NOT NULL DEFAULT ''
+             );
+             INSERT INTO messages (
+                id, conversation_id, sender_user_id, message, client_message_id
+             ) VALUES (12, 4, 7, 'Сохранено', 'client-message-123456');",
+        )
+        .expect("schema");
+
+        let messages = load_recent_chat_messages(&db, 4);
+        assert_eq!(messages.len(), 1);
+        assert_eq!(messages[0].client_message_id, "client-message-123456");
     }
 }
