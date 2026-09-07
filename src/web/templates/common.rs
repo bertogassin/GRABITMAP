@@ -29,7 +29,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = "5.0.19";
+pub const STATIC_ASSET_VERSION: &str = "5.0.20";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -4301,7 +4301,6 @@ pub(crate) fn page_document(
 {body_after}
 
 <script src="{i18n_boot_js}" defer></script>
-<script type="module" src="{paraglide_boot_js}"></script>
 <script src="{chat_sounds_js}" defer></script>
 <script src="{splash_js}" defer></script>
 <script src="{nav_badge_js}" defer></script>
@@ -4319,7 +4318,6 @@ pub(crate) fn page_document(
         footer_rules = crate::i18n::t("common_rules"),
         footer_privacy = crate::i18n::t("common_privacy"),
         i18n_boot_js = static_asset("i18n-boot.js"),
-        paraglide_boot_js = static_asset("i18n-runtime.js"),
         title = escape_html(title),
         asset_version = STATIC_ASSET_VERSION,
         site_head = site_head_links(),

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import vm from "node:vm";
 
 const root = new URL("../", import.meta.url);
 const locales = ["ru","en","fr","es","zh","zh-TW","hi","ar","pt","de","ja","ko","it","tr","pl","uk","nl","vi","id","ms","th","fa","ur","bn","pa","sw","el","cs","ro","hu","sv","he"];
@@ -124,4 +125,20 @@ test("mobile diagnostics probes session chat microphone and motion", async () =>
   assert.match(diagnostics, /getUserMedia/);
   assert.match(diagnostics, /DeviceMotionEvent\.requestPermission/);
   assert.match(diagnostics, /\/api\/steps\?today=/);
+});
+
+test("browser i18n fallback cannot recurse and generated bare imports are not loaded", async () => {
+  const [boot, common] = await Promise.all([
+    readFile(new URL("static/i18n-boot.js", root), "utf8"),
+    readFile(new URL("src/web/templates/common.rs", root), "utf8"),
+  ]);
+  assert.doesNotMatch(boot, /window\.m && typeof window\.m\[key\]/);
+  assert.match(boot, /return t\(String\(key\), vars\)/);
+  assert.doesNotMatch(common, /type="module" src="\{paraglide_boot_js\}"/);
+  const browser = {
+    resursmapI18n: { messages: { greeting: "Привет, {name}" } },
+  };
+  vm.runInNewContext(boot, { window: browser });
+  assert.equal(browser.rmT("greeting", { name: "Амир" }), "Привет, Амир");
+  assert.equal(browser.m.greeting({ name: "Амир" }), "Привет, Амир");
 });
