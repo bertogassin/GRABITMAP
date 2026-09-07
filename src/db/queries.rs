@@ -148,6 +148,14 @@ pub fn init_db() -> Result<Connection> {
         )?;
     }
 
+    // Verification always scopes by purpose and takes the newest code.
+    // Keep the legacy lookup index for older cleanup queries.
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_email_login_codes_verify
+         ON email_login_codes(email, purpose, id DESC)",
+        [],
+    )?;
+
     conn.execute(
         "CREATE TABLE IF NOT EXISTS user_sessions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,

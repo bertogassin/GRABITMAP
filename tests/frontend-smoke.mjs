@@ -21,3 +21,15 @@ test("RTL runtime and mobile PWA metadata are present", async () => {
   assert.ok(manifest.icons?.length > 0);
 });
 
+test("locale switching validates and canonicalizes locale tags", async () => {
+  const runtime = await readFile(new URL("static/i18n-runtime.js", root), "utf8");
+  assert.match(runtime, /normalizeLocale/);
+  assert.match(runtime, /if \(!normalized\)/);
+  assert.match(runtime, /zh-hant/);
+});
+
+test("service worker keeps partial shell caches and caches static responses", async () => {
+  const serviceWorker = await readFile(new URL("static/resursmap-sw.js", root), "utf8");
+  assert.match(serviceWorker, /Promise\.all\(STATIC_ASSETS\.map/);
+  assert.match(serviceWorker, /cache\.put\(cacheKey\.toString\(\), response\.clone\(\)\)/);
+});

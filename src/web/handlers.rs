@@ -88,6 +88,7 @@ mod invite;
 pub use invite::join_invite;
 
 mod common;
+pub(crate) use common::security_headers;
 
 mod auth;
 pub use auth::{

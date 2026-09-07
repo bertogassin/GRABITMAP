@@ -1,10 +1,38 @@
 use crate::state::app_state::AppState;
 use axum::{
+    extract::Request,
     http::{header, HeaderMap, StatusCode},
-    response::{IntoResponse, Response},
+    middleware::Next,
+    response::IntoResponse,
+    response::Response,
     Json,
 };
 use serde_json::json;
+
+/// Apply browser hardening headers to every response, including error responses.
+pub(crate) async fn security_headers(request: Request, next: Next) -> Response {
+    let mut response = next.run(request).await;
+    let headers = response.headers_mut();
+    headers.insert(
+        header::X_CONTENT_TYPE_OPTIONS,
+        "nosniff".parse().expect("valid header"),
+    );
+    headers.insert(
+        header::X_FRAME_OPTIONS,
+        "DENY".parse().expect("valid header"),
+    );
+    headers.insert(
+        header::REFERRER_POLICY,
+        "strict-origin-when-cross-origin".parse().expect("valid header"),
+    );
+    headers.insert(
+        "permissions-policy",
+        "camera=(), geolocation=(), microphone=()"
+            .parse()
+            .expect("valid header"),
+    );
+    response
+}
 
 pub(super) fn resource_owner_user_id(client_id: &str) -> Option<i64> {
     if let Some(value) = client_id.strip_prefix("user:") {

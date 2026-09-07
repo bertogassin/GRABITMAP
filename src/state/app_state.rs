@@ -9,6 +9,20 @@ use std::{
 };
 use tokio::sync::{broadcast, Mutex};
 
+// Realtime cursors are persisted by browsers.  Starting the in-memory
+// counter at zero would let a process restart reuse old cursor values and
+// cause clients to suppress valid events as duplicates.
+fn initial_realtime_sequence() -> u64 {
+    let millis = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|duration| duration.as_millis().min(u64::MAX as u128) as u64)
+        .unwrap_or(0);
+
+    // Leave room for many events in the same millisecond while staying below
+    // JavaScript's safe integer limit for current epoch timestamps.
+    millis.saturating_mul(1_024)
+}
+
 fn serialize_realtime_user_id<S>(value: &i64, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: serde::Serializer,
@@ -101,6 +115,7 @@ impl AppState {
     pub fn new(db_pool: DbPool, bot_token: Option<String>, admin_key: String) -> Self {
         let (chat_events, _) = broadcast::channel(2_048);
         let (chat_typing_events, _) = broadcast::channel(1_024);
+        let initial_sequence = initial_realtime_sequence();
 
         Self {
             db_pool,
@@ -108,9 +123,9 @@ impl AppState {
             admin_key,
             rate_limits: Arc::new(Mutex::new(HashMap::new())),
             chat_events,
-            chat_event_sequence: Arc::new(AtomicU64::new(0)),
+            chat_event_sequence: Arc::new(AtomicU64::new(initial_sequence)),
             chat_typing_events,
-            chat_typing_sequence: Arc::new(AtomicU64::new(0)),
+            chat_typing_sequence: Arc::new(AtomicU64::new(initial_sequence)),
             chat_typing_rate: Arc::new(StdMutex::new(HashMap::new())),
         }
     }
@@ -238,7 +253,14 @@ impl AppState {
 
 #[cfg(test)]
 mod tests {
-    use super::{ChatRealtimeEvent, ChatTypingEvent};
+    use super::{initial_realtime_sequence, ChatRealtimeEvent, ChatTypingEvent};
+
+    #[test]
+    fn realtime_sequence_is_monotonic_and_javascript_safe() {
+        let sequence = initial_realtime_sequence();
+        assert!(sequence > 0);
+        assert!(sequence < 9_007_199_254_740_991);
+    }
 
     #[test]
     fn typing_event_is_hidden_from_actor() {

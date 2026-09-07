@@ -54,7 +54,12 @@ self.addEventListener("install", function (event) {
     event.waitUntil(
         caches.open(CACHE_VERSION)
             .then(function (cache) {
-                return cache.addAll(STATIC_ASSETS);
+                // A single unavailable asset must not prevent the shell from
+                // installing; successful assets still provide useful offline
+                // behavior and missing assets can be fetched on demand.
+                return Promise.all(STATIC_ASSETS.map(function (asset) {
+                    return cache.add(asset).catch(function () {});
+                }));
             })
             .then(function () {
                 return self.skipWaiting();
@@ -167,7 +172,14 @@ self.addEventListener("fetch", function (event) {
         var cacheKey = new URL(request.url);
         cacheKey.search = "";
         event.respondWith(
-            fetch(request).catch(function () {
+            fetch(request).then(function (response) {
+                if (response.ok) {
+                    caches.open(CACHE_VERSION).then(function (cache) {
+                        return cache.put(cacheKey.toString(), response.clone());
+                    }).catch(function () {});
+                }
+                return response;
+            }).catch(function () {
                 return caches.match(cacheKey.toString());
             })
         );

@@ -960,6 +960,16 @@ pub async fn api_profile_avatar_set(
                 .into_response();
         }
     };
+    if let Some(retry_after) =
+        rate_limit_retry_after(&state, user_id, "profile_avatar_upload", 5, 300).await
+    {
+        return (
+            StatusCode::TOO_MANY_REQUESTS,
+            [(header::RETRY_AFTER, retry_after.to_string())],
+            Json(json!({"ok": false, "error": "rate_limited", "retry_after": retry_after})),
+        )
+            .into_response();
+    }
     let mut file_bytes: Option<Vec<u8>> = None;
     while let Ok(Some(field)) = multipart.next_field().await {
         let name = field.name().unwrap_or("").to_string();

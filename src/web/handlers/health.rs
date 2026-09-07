@@ -19,6 +19,43 @@ pub async fn health(State(state): State<AppState>) -> Response {
     }
 }
 
+/// Readiness is deliberately stricter than liveness: it verifies that a
+/// pooled SQLite connection can execute a query before traffic is sent here.
+pub async fn ready(State(state): State<AppState>) -> Response {
+    let connection = match state.db_pool.get() {
+        Ok(connection) => connection,
+        Err(_) => return (StatusCode::SERVICE_UNAVAILABLE, "db_unavailable").into_response(),
+    };
+
+    match connection.query_row("SELECT 1", [], |_| Ok(())) {
+        Ok(()) => "ready".into_response(),
+        Err(_) => (StatusCode::SERVICE_UNAVAILABLE, "db_error").into_response(),
+    }
+}
+
+pub async fn metrics(State(state): State<AppState>) -> Response {
+    let pool = &state.db_pool;
+    let body = format!(
+        "# HELP grabitmap_db_connections SQLite connections in the pool\n\
+         # TYPE grabitmap_db_connections gauge\n\
+         grabitmap_db_connections {}\n\
+         # HELP grabitmap_db_idle_connections Idle SQLite connections in the pool\n\
+         # TYPE grabitmap_db_idle_connections gauge\n\
+         grabitmap_db_idle_connections {}\n",
+        pool.state().connections,
+        pool.state().idle_connections
+    );
+
+    (
+        [(
+            header::CONTENT_TYPE,
+            "text/plain; version=0.0.4; charset=utf-8",
+        )],
+        body,
+    )
+        .into_response()
+}
+
 pub async fn robots_txt() -> Response {
     (
         [(header::CONTENT_TYPE, "text/plain; charset=utf-8")],

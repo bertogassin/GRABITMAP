@@ -1,14 +1,41 @@
 import * as messages from "./paraglide/messages.js";
-import { getLocale, setLocale, getTextDirection } from "./paraglide/runtime.js";
+import { getLocale, locales, setLocale, getTextDirection } from "./paraglide/runtime.js";
 
 window.m = messages;
 window.rmGetLocale = getLocale;
 window.rmGetTextDirection = getTextDirection;
-document.documentElement.dir = getTextDirection();
+function normalizeLocale(value) {
+    if (typeof value !== "string") {
+        return null;
+    }
+    var candidate = value.trim();
+    var exact = locales.find(function (locale) {
+        return locale.toLowerCase() === candidate.toLowerCase();
+    });
+    if (exact) {
+        return exact;
+    }
+    var lower = candidate.toLowerCase();
+    if (lower === "zh-hant" || lower === "zh-hk" || lower === "zh-mo") {
+        return "zh-TW";
+    }
+    var base = lower.split(/[-_]/)[0];
+    return locales.find(function (locale) {
+        return locale.toLowerCase() === base;
+    }) || null;
+}
+
+var initialLocale = normalizeLocale(getLocale()) || "ru";
+document.documentElement.lang = initialLocale;
+document.documentElement.dir = getTextDirection(initialLocale);
 window.rmSetLocale = function (locale) {
-    document.documentElement.lang = locale;
-    document.documentElement.dir = getTextDirection(locale);
-    return setLocale(locale, { reload: true });
+    var normalized = normalizeLocale(locale);
+    if (!normalized) {
+        return;
+    }
+    document.documentElement.lang = normalized;
+    document.documentElement.dir = getTextDirection(normalized);
+    return setLocale(normalized, { reload: true });
 };
 
 window.rmT = function (key, vars) {
