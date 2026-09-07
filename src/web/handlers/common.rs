@@ -29,7 +29,7 @@ pub(crate) async fn security_headers(request: Request, next: Next) -> Response {
     );
     headers.insert(
         "permissions-policy",
-        "camera=(), geolocation=(), microphone=()"
+        "camera=(), geolocation=(), microphone=(self), accelerometer=(self), gyroscope=(self)"
             .parse()
             .expect("valid header"),
     );
