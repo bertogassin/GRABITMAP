@@ -1,9 +1,9 @@
 use std::env;
 
 mod catalog;
-mod i18n;
 mod db;
 mod geography;
+mod i18n;
 mod resource_publisher;
 mod resource_screening;
 mod state;
@@ -13,6 +13,35 @@ mod telegram_notify;
 mod web;
 
 use state::app_state::AppState;
+
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        if let Err(error) = tokio::signal::ctrl_c().await {
+            eprintln!("Не удалось установить обработчик Ctrl+C: {error}");
+        }
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        match tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate()) {
+            Ok(mut signal) => {
+                signal.recv().await;
+            }
+            Err(error) => {
+                eprintln!("Не удалось установить обработчик SIGTERM: {error}");
+                std::future::pending::<()>().await;
+            }
+        }
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => {}
+        _ = terminate => {}
+    }
+}
 
 #[tokio::main]
 async fn main() {
@@ -59,6 +88,7 @@ async fn main() {
     );
 
     axum::serve(listener, app)
+        .with_graceful_shutdown(shutdown_signal())
         .await
         .expect("Ошибка HTTP сервера");
 }

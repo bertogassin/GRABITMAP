@@ -84,10 +84,7 @@ fn inbox_unread_caption(total_unread: i64) -> String {
             "непрочитанных",
         )
     } else {
-        crate::i18n::tf(
-            "inbox_unread_many",
-            &[("n", &total_unread.to_string())],
-        )
+        crate::i18n::tf("inbox_unread_many", &[("n", &total_unread.to_string())])
     }
 }
 
@@ -620,6 +617,7 @@ pub fn render_group_chat(
     )
 }
 
+#[allow(clippy::too_many_arguments)]
 fn render_chat_thread(
     authenticated: bool,
     viewer_user_id: i64,
@@ -930,11 +928,7 @@ fn render_chat_thread(
     )
 }
 
-pub fn render_new_group(
-    authenticated: bool,
-    partners: Vec<(i64, String)>,
-    error: &str,
-) -> String {
+pub fn render_new_group(authenticated: bool, partners: Vec<(i64, String)>, error: &str) -> String {
     let content = if !authenticated {
         guest_locked_section("Группа", "/app/groups/new")
     } else {

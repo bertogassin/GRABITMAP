@@ -42,17 +42,16 @@ fn today_start_unix() -> i64 {
     chrono_tz::Europe::Paris
         .from_local_datetime(&midnight)
         .earliest()
-        .or_else(|| chrono_tz::Europe::Paris.from_local_datetime(&midnight).latest())
+        .or_else(|| {
+            chrono_tz::Europe::Paris
+                .from_local_datetime(&midnight)
+                .latest()
+        })
         .map(|value| value.timestamp())
         .unwrap_or(0)
 }
 
-fn already_nudged_today(
-    db: &rusqlite::Connection,
-    user_id: i64,
-    kind: &str,
-    since: i64,
-) -> bool {
+fn already_nudged_today(db: &rusqlite::Connection, user_id: i64, kind: &str, since: i64) -> bool {
     db.query_row(
         "SELECT EXISTS(
             SELECT 1
@@ -86,10 +85,7 @@ fn insert_nudge(db: &rusqlite::Connection, user_id: i64, nudge: &DailyNudge) -> 
         == 1
 }
 
-pub fn ensure_daily_nudges(
-    db: &rusqlite::Connection,
-    user_id: i64,
-) -> Vec<DailyNudge> {
+pub fn ensure_daily_nudges(db: &rusqlite::Connection, user_id: i64) -> Vec<DailyNudge> {
     if user_id <= 0 {
         return Vec::new();
     }
@@ -119,25 +115,23 @@ pub fn ensure_daily_nudges(
         )
         .unwrap_or(0);
 
-    if steps_today < 10_000 && !already_nudged_today(db, user_id, STEP_NUDGE.kind, since) {
-        if insert_nudge(db, user_id, &STEP_NUDGE) {
-            created.push(STEP_NUDGE);
-        }
+    if steps_today < 10_000
+        && !already_nudged_today(db, user_id, STEP_NUDGE.kind, since)
+        && insert_nudge(db, user_id, &STEP_NUDGE)
+    {
+        created.push(STEP_NUDGE);
     }
 
-    if !already_nudged_today(db, user_id, WORK_NUDGE.kind, since) {
-        if insert_nudge(db, user_id, &WORK_NUDGE) {
-            created.push(WORK_NUDGE);
-        }
+    if !already_nudged_today(db, user_id, WORK_NUDGE.kind, since)
+        && insert_nudge(db, user_id, &WORK_NUDGE)
+    {
+        created.push(WORK_NUDGE);
     }
 
     created
 }
 
-pub fn list_unread_daily_nudges(
-    db: &rusqlite::Connection,
-    user_id: i64,
-) -> Vec<DailyNudge> {
+pub fn list_unread_daily_nudges(db: &rusqlite::Connection, user_id: i64) -> Vec<DailyNudge> {
     if user_id <= 0 {
         return Vec::new();
     }

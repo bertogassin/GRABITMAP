@@ -7,7 +7,12 @@ pub fn escape_html(value: &str) -> String {
         .replace('\'', "&#39;")
 }
 
-pub(crate) fn ru_plural(n: i64, one: &'static str, few: &'static str, many: &'static str) -> &'static str {
+pub(crate) fn ru_plural(
+    n: i64,
+    one: &'static str,
+    few: &'static str,
+    many: &'static str,
+) -> &'static str {
     let n = n.abs();
     let n10 = n % 10;
     let n100 = n % 100;
@@ -24,7 +29,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = "5.0.13";
+pub const STATIC_ASSET_VERSION: &str = "5.0.9";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -4224,6 +4229,12 @@ pub(crate) fn page_document(
     bottom_nav_html: &str,
     body_after_html: &str,
 ) -> String {
+    let i18n_boot = format!(
+        "{{\"locale\":{locale},\"dir\":{dir},\"messages\":{messages}}}",
+        locale = serde_json::to_string(crate::i18n::locale()).unwrap_or_else(|_| "\"ru\"".into()),
+        dir = serde_json::to_string(crate::i18n::dir()).unwrap_or_else(|_| "\"ltr\"".into()),
+        messages = crate::i18n::messages_json(),
+    );
     format!(
         r#"<!DOCTYPE html>
 <html lang="{html_lang}" dir="{html_dir}">
@@ -4301,12 +4312,7 @@ pub(crate) fn page_document(
 </html>"#,
         html_lang = crate::i18n::locale(),
         html_dir = crate::i18n::dir(),
-        i18n_boot = format!(
-            "{{\"locale\":{locale},\"dir\":{dir},\"messages\":{messages}}}",
-            locale = serde_json::to_string(crate::i18n::locale()).unwrap_or_else(|_| "\"ru\"".into()),
-            dir = serde_json::to_string(crate::i18n::dir()).unwrap_or_else(|_| "\"ltr\"".into()),
-            messages = crate::i18n::messages_json(),
-        ),
+        i18n_boot = i18n_boot,
         footer_aria = crate::i18n::t("footer_aria"),
         footer_rules = crate::i18n::t("common_rules"),
         footer_privacy = crate::i18n::t("common_privacy"),
@@ -4795,12 +4801,28 @@ pub(crate) fn intent_kind_chips(
     let mut chips = String::new();
 
     if include_all {
-        chips.push_str(&kind_chip(active.is_empty(), all_href, &crate::i18n::t("common_all")));
+        chips.push_str(&kind_chip(
+            active.is_empty(),
+            all_href,
+            &crate::i18n::t("common_all"),
+        ));
     }
 
-    chips.push_str(&kind_chip(active == "work", work_href, &crate::i18n::t("common_work")));
-    chips.push_str(&kind_chip(active == "workers", workers_href, &crate::i18n::t("common_workers")));
-    chips.push_str(&kind_chip(active == "business", business_href, &crate::i18n::t("common_business")));
+    chips.push_str(&kind_chip(
+        active == "work",
+        work_href,
+        &crate::i18n::t("common_work"),
+    ));
+    chips.push_str(&kind_chip(
+        active == "workers",
+        workers_href,
+        &crate::i18n::t("common_workers"),
+    ));
+    chips.push_str(&kind_chip(
+        active == "business",
+        business_href,
+        &crate::i18n::t("common_business"),
+    ));
 
     format!(
         r#"<nav class="rm-kind-chips" aria-label="{aria}">{chips}</nav>"#,
@@ -5027,12 +5049,12 @@ pub(crate) fn status_page(
 pub(crate) fn premium_badge_html(variant: &str) -> String {
     let label = crate::i18n::t("common_premium");
     match variant {
-        "compact" => format!(
-            r#"<span class="rm-premium-badge rm-premium-badge--compact">★ {label}</span>"#
-        ),
-        "admin" => format!(
-            r#"<span class="rm-premium-badge rm-premium-badge--admin">★ {label}</span>"#
-        ),
+        "compact" => {
+            format!(r#"<span class="rm-premium-badge rm-premium-badge--compact">★ {label}</span>"#)
+        }
+        "admin" => {
+            format!(r#"<span class="rm-premium-badge rm-premium-badge--admin">★ {label}</span>"#)
+        }
         _ => format!(r#"<span class="rm-premium-badge">★ {label}</span>"#),
     }
 }
@@ -5040,9 +5062,7 @@ pub(crate) fn premium_badge_html(variant: &str) -> String {
 pub(crate) fn verified_badge_html(compact: bool) -> String {
     let label = crate::i18n::t("common_verified");
     if compact {
-        format!(
-            r#"<span class="rm-verified-badge rm-verified-badge--compact">✓ {label}</span>"#
-        )
+        format!(r#"<span class="rm-verified-badge rm-verified-badge--compact">✓ {label}</span>"#)
     } else {
         format!(r#"<span class="rm-verified-badge">✓ {label}</span>"#)
     }
@@ -6084,10 +6104,7 @@ pub(crate) fn section_head(title: &str, caption: &str, margin_top: Option<u32>) 
     let caption_html = if caption.trim().is_empty() {
         String::new()
     } else {
-        format!(
-            r#"<p class="section-caption">{}</p>"#,
-            escape_html(caption)
-        )
+        format!(r#"<p class="section-caption">{}</p>"#, escape_html(caption))
     };
 
     format!(

@@ -1,8 +1,8 @@
 use super::super::handlers::{
-    api_chat_block, api_chat_block_status, api_chat_conversations, api_chat_delete, api_chat_edit,
-    api_chat_media, api_chat_messages, api_chat_peer, api_chat_react, api_chat_realtime,
-    api_chat_send, api_chat_send_image, api_chat_send_voice, api_chat_unblock,
-    add_group_members, api_group_delete, api_group_edit, api_group_media, api_group_messages,
+    add_group_members, api_chat_block, api_chat_block_status, api_chat_conversations,
+    api_chat_delete, api_chat_edit, api_chat_media, api_chat_messages, api_chat_peer,
+    api_chat_react, api_chat_realtime, api_chat_send, api_chat_send_image, api_chat_send_voice,
+    api_chat_unblock, api_group_delete, api_group_edit, api_group_media, api_group_messages,
     api_group_react, api_group_send, api_group_send_image, api_group_send_voice,
     api_start_direct_chat, chat_page, contact_requests_page, create_group, group_chat_page,
     group_members_page, leave_group, messages_page, new_group_page, retired_contact_decision,

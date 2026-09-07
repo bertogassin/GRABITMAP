@@ -13,9 +13,9 @@ use std::sync::OnceLock;
 pub const COOKIE: &str = "resursmap_lang";
 pub const BASE_LOCALE: &str = "ru";
 pub const LOCALES: &[&str] = &[
-    "ru", "en", "fr", "es", "zh", "zh-TW", "hi", "ar", "pt", "de", "ja", "ko", "it",
-    "tr", "pl", "uk", "nl", "vi", "id", "ms", "th", "fa", "ur", "bn", "pa", "sw",
-    "el", "cs", "ro", "hu", "sv", "he",
+    "ru", "en", "fr", "es", "zh", "zh-TW", "hi", "ar", "pt", "de", "ja", "ko", "it", "tr", "pl",
+    "uk", "nl", "vi", "id", "ms", "th", "fa", "ur", "bn", "pa", "sw", "el", "cs", "ro", "hu", "sv",
+    "he",
 ];
 const RTL: &[&str] = &["ar", "fa", "ur", "he"];
 
@@ -64,8 +64,7 @@ fn tables() -> &'static HashMap<&'static str, HashMap<String, String>> {
         let mut all = HashMap::new();
         for (locale, raw) in RAW_MESSAGES {
             let cleaned = raw.strip_prefix('\u{feff}').unwrap_or(raw);
-            let parsed: HashMap<String, Value> =
-                serde_json::from_str(cleaned).unwrap_or_default();
+            let parsed: HashMap<String, Value> = serde_json::from_str(cleaned).unwrap_or_default();
             all.insert(
                 *locale,
                 parsed
@@ -178,14 +177,15 @@ pub fn tf(key: &str, pairs: &[(&str, &str)]) -> String {
 }
 
 pub fn messages_json() -> String {
-    let table = tables()
-        .get(locale())
-        .or_else(|| tables().get(BASE_LOCALE));
+    let table = tables().get(locale()).or_else(|| tables().get(BASE_LOCALE));
     serde_json::to_string(table.unwrap_or(&HashMap::new())).unwrap_or_else(|_| "{}".into())
 }
 
 pub fn detect(headers: &HeaderMap) -> &'static str {
-    if let Some(cookie) = headers.get(header::COOKIE).and_then(|value| value.to_str().ok()) {
+    if let Some(cookie) = headers
+        .get(header::COOKIE)
+        .and_then(|value| value.to_str().ok())
+    {
         for part in cookie.split(';') {
             if let Some(value) = part.trim().strip_prefix("resursmap_lang=") {
                 if let Some(locale) = canonicalize(value) {
@@ -222,7 +222,9 @@ pub fn detect(headers: &HeaderMap) -> &'static str {
 }
 
 pub async fn locale_middleware(request: Request, next: Next) -> Response {
-    LOCALE.scope(detect(request.headers()), next.run(request)).await
+    LOCALE
+        .scope(detect(request.headers()), next.run(request))
+        .await
 }
 
 fn escape_attr(value: &str) -> String {
@@ -242,11 +244,7 @@ pub fn language_picker_html(next_path: &str) -> String {
     };
     let mut buttons = String::new();
     for code in LOCALES {
-        let selected = if *code == current {
-            " is-selected"
-        } else {
-            ""
-        };
+        let selected = if *code == current { " is-selected" } else { "" };
         let pressed = if *code == current { "true" } else { "false" };
         buttons.push_str(&format!(
             r#"<button type="submit" name="locale" value="{code}" class="rm-lang-btn{selected}" lang="{code}" aria-pressed="{pressed}"><span>{name}</span><small>{code}</small></button>"#,
@@ -299,7 +297,11 @@ pub async fn set_locale(headers: HeaderMap, Form(form): Form<LocaleForm>) -> Res
         headers
             .get(header::REFERER)
             .and_then(|value| value.to_str().ok())
-            .and_then(|referer| url::Url::parse(referer).ok().map(|url| url.path().to_string()))
+            .and_then(|referer| {
+                url::Url::parse(referer)
+                    .ok()
+                    .map(|url| url.path().to_string())
+            })
             .filter(|path| path.starts_with('/'))
             .unwrap_or_else(|| "/app/menu".to_string())
     };

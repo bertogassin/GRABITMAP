@@ -112,13 +112,7 @@ fn city_manager_context(
     headers: &HeaderMap,
 ) -> Result<AdminContext, Box<Response>> {
     let user = verify_authenticated_user(state, headers).ok_or_else(|| {
-        Box::new(
-            (
-                StatusCode::UNAUTHORIZED,
-                "Требуется вход в аккаунт GRABIT",
-            )
-                .into_response(),
-        )
+        Box::new((StatusCode::UNAUTHORIZED, "Требуется вход в аккаунт GRABIT").into_response())
     })?;
 
     let context = load_admin_context(state, user.user_id).ok_or_else(|| {

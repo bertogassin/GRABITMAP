@@ -2,7 +2,7 @@ use super::common::{
     back_hero, back_link, bottom_nav, bottom_nav_with_badges, empty_state_action,
     empty_state_card_with_actions, escape_html, guest_locked_section, guest_mode_panel, icon,
     is_generic_profession_key, moderator_level_badge, navigation_card, page_document, page_shell,
-    premium_badge_html, ru_count, ru_plural, profession_label, profile_resource_card, section_head,
+    premium_badge_html, profession_label, profile_resource_card, ru_count, ru_plural, section_head,
     simple_hero, topbar, verified_badge_html,
 };
 
@@ -48,7 +48,9 @@ fn home_city_select_html(continent: i64, country: i64, city: i64) -> String {
                 let zi = zi as i64;
                 let selected = if continent == ci && country == si && city == zi {
                     " selected"
-                } else { "" };
+                } else {
+                    ""
+                };
                 options.push_str(&format!(
                     r#"<option value="{ci}:{si}:{zi}"{selected}>{} · {}</option>"#,
                     escape_html(city_name),
@@ -111,7 +113,9 @@ fn render_user_sessions_panel(sessions: &[crate::web::view_models::UserSessionRo
             };
             let current = if session.is_current {
                 r#"<span class="rm-session-current">Это устройство</span>"#
-            } else { "" };
+            } else {
+                ""
+            };
             let revoke_form = if session.is_current {
                 String::new()
             } else {
@@ -278,9 +282,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
 </div>
 "#,
             avatar_html = if has_avatar {
-                format!(
-                    r#"<img class="rm-me-avatar-img" src="/api/avatars/{user_id}" alt="">"#
-                )
+                format!(r#"<img class="rm-me-avatar-img" src="/api/avatars/{user_id}" alt="">"#)
             } else {
                 icon("user").to_string()
             },
@@ -1077,9 +1079,7 @@ body.light-theme .rm-command-icon {{
         language_picker = crate::i18n::language_picker_html("/app/me"),
         intent_status_text = intent_status_text,
         status_avatar = if has_avatar {
-            format!(
-                r#"<img class="rm-me-avatar-img" src="/api/avatars/{user_id}" alt="">"#
-            )
+            format!(r#"<img class="rm-me-avatar-img" src="/api/avatars/{user_id}" alt="">"#)
         } else {
             icon("user").to_string()
         },
@@ -1436,11 +1436,7 @@ body.light-theme .rm-command-icon {{
         "",
         "",
         &main_html,
-        &bottom_nav_with_badges(
-            "menu",
-            unread_messages_count,
-            unread_notifications_count,
-        ),
+        &bottom_nav_with_badges("menu", unread_messages_count, unread_notifications_count),
         &body_after_html,
     )
 }
@@ -1475,21 +1471,59 @@ pub fn render_notifications(
                     let safe_message = escape_html(message);
 
                     let (icon_html, card_class, icon_class) = match kind.as_str() {
-                        "resource_approved" => (icon("check"), "rm-notif-card--approved", "rm-notif-icon--approved"),
-                        "resource_rejected" => (icon("x"), "rm-notif-card--rejected", "rm-notif-icon--rejected"),
-                        "promotion_published" => (icon("star"), "rm-notif-card--approved", "rm-notif-icon--approved"),
-                        "promotion_moderation" => (icon("clock"), "rm-notif-card--contact", "rm-notif-icon--contact"),
-                        "promotion_publish_failed" => (icon("alert-triangle"), "rm-notif-card--rejected", "rm-notif-icon--rejected"),
-                        "promotion_rejected" => (icon("x"), "rm-notif-card--rejected", "rm-notif-icon--rejected"),
-                        "admin_assignment" => (icon("shield"), "rm-notif-card--contact", "rm-notif-icon--contact"),
-                        "step_nudge" => (icon("footprints"), "rm-notif-card--contact", "rm-notif-icon--contact"),
-                        "work_nudge" => (icon("search"), "rm-notif-card--approved", "rm-notif-icon--approved"),
+                        "resource_approved" => (
+                            icon("check"),
+                            "rm-notif-card--approved",
+                            "rm-notif-icon--approved",
+                        ),
+                        "resource_rejected" => (
+                            icon("x"),
+                            "rm-notif-card--rejected",
+                            "rm-notif-icon--rejected",
+                        ),
+                        "promotion_published" => (
+                            icon("star"),
+                            "rm-notif-card--approved",
+                            "rm-notif-icon--approved",
+                        ),
+                        "promotion_moderation" => (
+                            icon("clock"),
+                            "rm-notif-card--contact",
+                            "rm-notif-icon--contact",
+                        ),
+                        "promotion_publish_failed" => (
+                            icon("alert-triangle"),
+                            "rm-notif-card--rejected",
+                            "rm-notif-icon--rejected",
+                        ),
+                        "promotion_rejected" => (
+                            icon("x"),
+                            "rm-notif-card--rejected",
+                            "rm-notif-icon--rejected",
+                        ),
+                        "admin_assignment" => (
+                            icon("shield"),
+                            "rm-notif-card--contact",
+                            "rm-notif-icon--contact",
+                        ),
+                        "step_nudge" => (
+                            icon("footprints"),
+                            "rm-notif-card--contact",
+                            "rm-notif-icon--contact",
+                        ),
+                        "work_nudge" => (
+                            icon("search"),
+                            "rm-notif-card--approved",
+                            "rm-notif-icon--approved",
+                        ),
                         _ => (icon("bell"), "", "rm-notif-icon--default"),
                     };
 
                     let unread_badge = if *is_read == 0 {
                         r#"<span class="rm-notif-new">Новое</span>"#
-                    } else { "" };
+                    } else {
+                        ""
+                    };
 
                     format!(
                         r#"
@@ -1731,11 +1765,15 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
 
                     let verified_badge = if *verified != 0 {
                         verified_badge_html(true)
-                    } else { String::new() };
+                    } else {
+                        String::new()
+                    };
 
                     let premium_badge = if *premium != 0 {
                         premium_badge_html("compact")
-                    } else { String::new() };
+                    } else {
+                        String::new()
+                    };
 
                     profile_resource_card(super::common::ProfileResourceCardParams {
                         href: &format!("/app/resource/{}", id),
@@ -1802,9 +1840,7 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
     {cards}
 </section>"####,
         profile_avatar = if has_avatar && profile_user_id > 0 {
-            format!(
-                r#"<img class="rm-me-avatar-img" src="/api/avatars/{profile_user_id}" alt="">"#
-            )
+            format!(r#"<img class="rm-me-avatar-img" src="/api/avatars/{profile_user_id}" alt="">"#)
         } else {
             icon("user").to_string()
         },
@@ -1814,7 +1850,12 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
         } else {
             person_line.clone()
         },
-        resource_word = ru_count(resource_count as i64, "объявление", "объявления", "объявлений"),
+        resource_word = ru_count(
+            resource_count as i64,
+            "объявление",
+            "объявления",
+            "объявлений"
+        ),
         contact_html = contact_html,
         intent_html = intent_html,
         internal_contact_html = internal_contact_html,
@@ -1898,11 +1939,15 @@ pub fn render_favorites(
                 |(id, title, category, description, address, rating, votes, verified, premium)| {
                     let premium_badge = if *premium != 0 {
                         premium_badge_html("compact")
-                    } else { String::new() };
+                    } else {
+                        String::new()
+                    };
 
                     let verified_badge = if *verified != 0 {
                         verified_badge_html(true)
-                    } else { String::new() };
+                    } else {
+                        String::new()
+                    };
 
                     profile_resource_card(super::common::ProfileResourceCardParams {
                         href: &format!("/app/resource/{}", id),
