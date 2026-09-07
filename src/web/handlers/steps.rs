@@ -86,7 +86,10 @@ pub async fn steps_page(State(state): State<AppState>, headers: HeaderMap) -> Ht
             } else {
                 public_id
             };
-            (load_snapshot(&db, user_id, &today_local()).ok(), storage_key)
+            (
+                load_snapshot(&db, user_id, &today_local()).ok(),
+                storage_key,
+            )
         }
         Err(_) => (None, String::new()),
     };

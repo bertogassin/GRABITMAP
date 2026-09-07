@@ -809,7 +809,11 @@ fn render_chat_thread(
             chat_js = static_asset("chat-v2.js"),
             chat_blocks_js = static_asset("chat-blocks.js"),
             other_user_id = other_user_id,
-            group_id_attr = if group_id > 0 { group_id.to_string() } else { String::new() },
+            group_id_attr = if group_id > 0 {
+                group_id.to_string()
+            } else {
+                String::new()
+            },
             viewer_user_id = viewer_user_id,
             first_message_id = first_message_id,
             last_message_id = last_message_id,
