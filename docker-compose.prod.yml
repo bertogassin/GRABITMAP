@@ -3,27 +3,49 @@ services:
     build:
       context: .
       target: runtime
-    ports:
-      - "3000:3000"
+    env_file:
+      - .env
     environment:
-      ADMIN_KEY: ${ADMIN_KEY:?ADMIN_KEY must be set}
       PORT: "3000"
-      DATABASE_URL: ${DATABASE_URL:-sqlite:data/votes.db}
-      CHAT_MEDIA_DIR: ${CHAT_MEDIA_DIR:-data/chat-media}
-      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:?PUBLIC_BASE_URL must be set}
+      PUBLIC_BASE_URL: "https://grabitmap.com"
       GRABIT_COOKIE_SECURE: "1"
-      GRABIT_MAIL_FROM: ${GRABIT_MAIL_FROM:-GRABIT <noreply@grabitmap.com>}
-      RESEND_API_KEY: ${RESEND_API_KEY:-}
-      OWNER_BOOTSTRAP_EMAIL: ${OWNER_BOOTSTRAP_EMAIL:-}
-      OWNER_BOOTSTRAP_PASSWORD: ${OWNER_BOOTSTRAP_PASSWORD:-}
     volumes:
       - grabit-data:/app/data
+    expose:
+      - "3000"
+    networks:
+      - app-net
     restart: unless-stopped
+    init: true
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3000/health"]
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 20s
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      grabit:
+        condition: service_healthy
+    networks:
+      - app-net
 
 volumes:
   grabit-data:
+  caddy-data:
+  caddy-config:
+
+networks:
+  app-net:
+    driver: bridge

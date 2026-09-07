@@ -60,3 +60,17 @@ test("frontend navigation only accepts same-origin app hrefs", async () => {
   }
   assert.match(inbox, /escapeHtml\(href\)/);
 });
+
+test("production compose keeps Caddy in front of the private app", async () => {
+  const compose = await readFile(new URL("docker-compose.prod.yml", root), "utf8");
+  const app = compose.split(/\n  caddy:\s*\n/, 1)[0];
+
+  assert.match(compose, /\n  caddy:\s*\n/);
+  assert.match(compose, /env_file:\s*\n\s*- \.env/);
+  assert.match(app, /expose:\s*\n\s*- "3000"/);
+  assert.doesNotMatch(app, /ports:\s*\n\s*- "3000:3000"/);
+  assert.match(compose, /reverse_proxy grabit:3000|\.\/Caddyfile:\/etc\/caddy\/Caddyfile/);
+  assert.match(compose, /\nnetworks:\s*\n\s*app-net:/);
+  assert.match(compose, /\n  caddy-data:/);
+  assert.match(compose, /\n  caddy-config:/);
+});
