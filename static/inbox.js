@@ -9,6 +9,18 @@
         }
     }
 
+    function internalHref(value, fallback) {
+        try {
+            var url = new URL(String(value || ""), window.location.origin);
+            if (url.origin !== window.location.origin || !url.pathname.startsWith("/app/")) {
+                return fallback;
+            }
+            return url.pathname + url.search + url.hash;
+        } catch (_) {
+            return fallback;
+        }
+    }
+
     ready(function () {
         var list = document.getElementById("chat-dialog-list");
 
@@ -120,10 +132,10 @@
             var userId = String(conversation.other_user_id || "").trim();
             var groupId = String(conversation.group_id || "").trim();
             var isGroup = Boolean(conversation.is_group);
-            var href = String(conversation.href || "").trim() ||
-                (isGroup && groupId
+            var fallbackHref = isGroup && groupId
                     ? "/app/group/" + encodeURIComponent(groupId)
-                    : "/app/chat/" + encodeURIComponent(userId));
+                    : "/app/chat/" + encodeURIComponent(userId);
+            var href = internalHref(conversation.href, fallbackHref);
             var username = String(conversation.username || "").trim();
             var usernameHtml = !isGroup && username
                 ? '<div class="card-meta rm-dialog-username">@'
@@ -157,7 +169,7 @@
 
             return (
                 '<a href="'
-                + href
+                + escapeHtml(href)
                 + '#chat-end" class="card chat-dialog-card" data-other-user-id="'
                 + escapeHtml(userId)
                 + '" data-group-id="'

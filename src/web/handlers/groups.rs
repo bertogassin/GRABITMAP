@@ -783,9 +783,9 @@ pub async fn api_group_send(
             .into_response();
         }
     }
-    if db
+    let inserted = db
         .execute(
-            "INSERT INTO group_messages (
+            "INSERT OR IGNORE INTO group_messages (
                 group_id, sender_user_id, message, created_at, client_message_id, reply_to_message_id
              ) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
             rusqlite::params![
@@ -797,8 +797,8 @@ pub async fn api_group_send(
                 payload.reply_to_message_id.max(0)
             ],
         )
-        .is_err()
-    {
+        .unwrap_or(0);
+    if inserted == 0 {
         if !client_message_id.is_empty() {
             if let Some(existing) =
                 find_group_message_by_client_id(&db, group_id, user_id, &client_message_id)
@@ -932,9 +932,9 @@ pub async fn api_group_send_image(
         Err(_) => return json_error(StatusCode::INTERNAL_SERVER_ERROR, "media_store_failed"),
     }
     let now = unix_now();
-    if db
+    let inserted = db
         .execute(
-            "INSERT INTO group_messages (
+            "INSERT OR IGNORE INTO group_messages (
                 group_id, sender_user_id, message, created_at, client_message_id,
                 attachment_kind, attachment_path, attachment_mime, attachment_size
              ) VALUES (?1, ?2, ?3, ?4, ?5, 'image', ?6, ?7, ?8)",
@@ -949,8 +949,21 @@ pub async fn api_group_send_image(
                 bytes.len() as i64
             ],
         )
-        .is_err()
-    {
+        .unwrap_or(0);
+    if inserted == 0 {
+        if !client_message_id.is_empty() {
+            if let Some(existing) =
+                find_group_message_by_client_id(&db, group_id, user_id, &client_message_id)
+            {
+                let _ = fs::remove_file(&absolute);
+                return Json(json!({
+                    "ok": true,
+                    "message": message_json(&existing, user_id),
+                    "deduped": true
+                }))
+                .into_response();
+            }
+        }
         let _ = fs::remove_file(&absolute);
         return json_error(StatusCode::INTERNAL_SERVER_ERROR, "message_store_failed");
     }
@@ -1121,9 +1134,9 @@ pub async fn api_group_send_voice(
         return json_error(StatusCode::INTERNAL_SERVER_ERROR, "media_store_failed");
     }
     let now = unix_now();
-    if db
+    let inserted = db
         .execute(
-            "INSERT INTO group_messages (
+            "INSERT OR IGNORE INTO group_messages (
                 group_id, sender_user_id, message, created_at, client_message_id,
                 attachment_kind, attachment_path, attachment_mime, attachment_size
              ) VALUES (?1, ?2, '', ?3, ?4, 'voice', ?5, ?6, ?7)",
@@ -1137,8 +1150,21 @@ pub async fn api_group_send_voice(
                 bytes.len() as i64
             ],
         )
-        .is_err()
-    {
+        .unwrap_or(0);
+    if inserted == 0 {
+        if !client_message_id.is_empty() {
+            if let Some(existing) =
+                find_group_message_by_client_id(&db, group_id, user_id, &client_message_id)
+            {
+                let _ = fs::remove_file(&absolute);
+                return Json(json!({
+                    "ok": true,
+                    "message": message_json(&existing, user_id),
+                    "deduped": true
+                }))
+                .into_response();
+            }
+        }
         let _ = fs::remove_file(&absolute);
         return json_error(StatusCode::INTERNAL_SERVER_ERROR, "message_store_failed");
     }

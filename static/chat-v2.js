@@ -1,6 +1,18 @@
 (function () {
     "use strict";
 
+    function internalHref(value, fallback) {
+        try {
+            var url = new URL(String(value || ""), window.location.origin);
+            if (url.origin !== window.location.origin || !url.pathname.startsWith("/app/")) {
+                return fallback;
+            }
+            return url.pathname + url.search + url.hash;
+        } catch (_) {
+            return fallback;
+        }
+    }
+
     function compressImageFile(file, maxEdge, quality) {
         return new Promise(function (resolve) {
             if (!file || !file.type || file.type.indexOf("image/") !== 0) {
@@ -2666,7 +2678,7 @@
                                     }
 
                                     window.location.href =
-                                        (href || "/app/messages") +
+                                        internalHref(href, "/app/messages") +
                                         "#chat-end";
                                 }
                             );

@@ -5,7 +5,7 @@ use rusqlite::{Connection, OptionalExtension, Result};
 pub const DEFAULT_GOAL: i64 = 10_000;
 const MIN_GOAL: i64 = 1_000;
 const MAX_GOAL: i64 = 50_000;
-const MAX_DAY_STEPS: i64 = 200_000;
+pub const MAX_DAY_STEPS: i64 = 200_000;
 #[allow(dead_code)]
 const MAX_ADD: i64 = 50_000;
 

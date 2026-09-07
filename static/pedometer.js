@@ -4,7 +4,9 @@
     var root = document.getElementById("rm-steps");
     if (!root) return;
 
-    var STORAGE_KEY = "resursmap:steps";
+    var userNamespace = root.getAttribute("data-user-id") || "anonymous";
+    var STORAGE_KEY = "resursmap:steps:" + userNamespace;
+    var MAX_DAY_STEPS = Number(root.getAttribute("data-max-day-steps")) || 200000;
     var CIRC = 2 * Math.PI * 46;
     var DEFAULT_GOAL = 10000;
     var MIN_STEP_GAP_MS = 280;
@@ -43,6 +45,16 @@
     var wakeLock = null;
     var lastPanelAt = 0;
     var lastPanelCount = -1;
+    var diagnostics = {
+        date: localToday,
+        motionTicks: 0,
+        registeredSteps: 0,
+        syncs: 0,
+        lastSyncAt: 0,
+        lastError: "",
+    };
+
+    if (window.__RM_STEPS_DEBUG__ === true) window.__RM_STEPS_DIAGNOSTICS__ = diagnostics;
 
     function t(key, fallback, params) {
         if (window.m && typeof window.m[key] === "function") {
@@ -168,7 +180,7 @@
             if (!raw) return;
             var data = JSON.parse(raw);
             if (data && data.date === localToday && typeof data.count === "number") {
-                localCount = Math.max(0, Math.floor(data.count));
+                localCount = Math.min(MAX_DAY_STEPS, Math.max(0, Math.floor(data.count)));
             }
         } catch (_) {}
     }
@@ -185,6 +197,18 @@
                 })
             );
         } catch (_) {}
+    }
+
+    function checkMidnight() {
+        var date = localDate();
+        if (date === localToday) return false;
+        localToday = date;
+        localCount = 0;
+        pendingSync = 0;
+        diagnostics.date = date;
+        readLocal();
+        paint();
+        return true;
     }
 
     function ringOffset(steps, goal) {
@@ -257,7 +281,7 @@
         if (!data || !data.ok) return;
         snapshot = data;
         if (!Array.isArray(snapshot.days)) snapshot.days = [];
-        localCount = Math.max(localCount, serverTodaySteps());
+        localCount = Math.min(MAX_DAY_STEPS, Math.max(localCount, serverTodaySteps()));
         writeLocal();
         paint();
         if (localCount >= (snapshot.goal || DEFAULT_GOAL) && listening) {
@@ -373,19 +397,23 @@
                 body: JSON.stringify(body),
             });
             if (!response.ok) {
+                diagnostics.lastError = "http_" + response.status;
                 if (response.status === 401) {
                     setStatus(t("common_login", "Войти"));
                 }
                 return null;
             }
+            diagnostics.lastError = "";
             return response.json();
         } catch (_) {
+            diagnostics.lastError = "network";
             setStatus(t("chat_no_network", "Нет сети"));
             return null;
         }
     }
 
     async function syncSensor(force) {
+        checkMidnight();
         if (!force && pendingSync < SYNC_EVERY) return;
         if (syncInFlight) {
             syncQueued = true;
@@ -393,6 +421,8 @@
         }
         pendingSync = 0;
         syncInFlight = true;
+        diagnostics.syncs += 1;
+        diagnostics.lastSyncAt = Date.now();
         try {
             var data = await send({
                 date: localToday,
@@ -410,10 +440,13 @@
     }
 
     function registerStep() {
+        checkMidnight();
         var now = Date.now();
         if (now - lastStepAt < MIN_STEP_GAP_MS) return;
+        if (localCount >= MAX_DAY_STEPS) return;
         lastStepAt = now;
-        localCount += 1;
+        localCount = Math.min(MAX_DAY_STEPS, localCount + 1);
+        diagnostics.registeredSteps += 1;
         pendingSync += 1;
         writeLocal();
         paint();
@@ -433,6 +466,7 @@
         var acc = event.accelerationIncludingGravity || event.acceleration;
         if (!acc) return;
         motionTicks += 1;
+        diagnostics.motionTicks = motionTicks;
         var mag =
             Math.sqrt(
                 (acc.x || 0) * (acc.x || 0) +
@@ -475,6 +509,7 @@
                 updateLivePanel(false);
             }, 6000);
         }
+
         syncSensor(true);
         updateLivePanel(true);
         window.setTimeout(function () {
@@ -487,6 +522,21 @@
                 );
             }
         }, 5000);
+    }
+
+    function stopListen() {
+        if (listening) {
+            window.removeEventListener("devicemotion", onMotion);
+            listening = false;
+        }
+        if (syncTimer) {
+            window.clearInterval(syncTimer);
+            syncTimer = 0;
+        }
+        if (wakeLock && typeof wakeLock.release === "function") {
+            wakeLock.release().catch(function () {});
+            wakeLock = null;
+        }
     }
 
     async function requestListen() {
@@ -560,6 +610,10 @@
         });
         window.addEventListener("pagehide", function () {
             syncSensor(true);
+            stopListen();
+        });
+        window.addEventListener("unload", function () {
+            stopListen();
         });
         window.addEventListener("online", function () {
             syncSensor(true);
@@ -570,6 +624,7 @@
         if (navigator.storage && navigator.storage.persist) {
             navigator.storage.persist().catch(function () {});
         }
+        checkMidnight();
         readLocal();
         paint();
         bindClicks();

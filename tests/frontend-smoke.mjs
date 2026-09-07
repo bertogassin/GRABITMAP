@@ -32,4 +32,31 @@ test("service worker keeps partial shell caches and caches static responses", as
   const serviceWorker = await readFile(new URL("static/resursmap-sw.js", root), "utf8");
   assert.match(serviceWorker, /Promise\.all\(STATIC_ASSETS\.map/);
   assert.match(serviceWorker, /cache\.put\(cacheKey\.toString\(\), response\.clone\(\)\)/);
+  assert.match(serviceWorker, /const CACHE_PREFIX = "grabit-shell-"/);
+  assert.match(serviceWorker, /key\.startsWith\(CACHE_PREFIX\)/);
+  assert.match(serviceWorker, /internalNavigationTarget\(event\.notification\.data\.url, target\)/);
+  assert.match(serviceWorker, /internalNavigationTarget\(nudge\.href, "\/app"\)/);
+});
+
+test("stepper namespaces local state and bounds lifecycle updates", async () => {
+  const pedometer = await readFile(new URL("static/pedometer.js", root), "utf8");
+  assert.match(pedometer, /data-user-id/);
+  assert.match(pedometer, /resursmap:steps:" \+ userNamespace/);
+  assert.match(pedometer, /MAX_DAY_STEPS/);
+  assert.match(pedometer, /checkMidnight/);
+  assert.match(pedometer, /clearInterval\(syncTimer\)/);
+  assert.match(pedometer, /__RM_STEPS_DEBUG__ === true/);
+});
+
+test("frontend navigation only accepts same-origin app hrefs", async () => {
+  const [home, inbox, chat] = await Promise.all([
+    readFile(new URL("static/home-explorer.js", root), "utf8"),
+    readFile(new URL("static/inbox.js", root), "utf8"),
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+  ]);
+  for (const source of [home, inbox, chat]) {
+    assert.match(source, /url\.origin !== window\.location\.origin/);
+    assert.match(source, /url\.pathname\.startsWith\("\/app\/"\)/);
+  }
+  assert.match(inbox, /escapeHtml\(href\)/);
 });

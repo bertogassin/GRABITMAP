@@ -333,8 +333,8 @@ pub async fn api_chat_send_image(
             }
         };
 
-    if transaction.execute(
-        "INSERT INTO messages (
+    let inserted = transaction.execute(
+        "INSERT OR IGNORE INTO messages (
             conversation_id, sender_user_id, message, is_read, delivered_at, read_at, created_at,
             reply_to_message_id, client_message_id, attachment_kind, attachment_mime, attachment_size, attachment_path
          ) VALUES (?1,?2,?3,0,0,0,?4,?5,?6,?7,?8,?9,?10)",
@@ -342,7 +342,35 @@ pub async fn api_chat_send_image(
             conversation_id, user_id, caption, now, reply_to_message_id, client_message_id,
             kind, mime, file_bytes.len() as i64, relative
         ],
-    ).unwrap_or(0) != 1 {
+    ).unwrap_or(0);
+    if inserted == 0 {
+        let existing_id: Option<i64> = transaction
+            .query_row(
+                "SELECT id
+                 FROM messages
+                 WHERE conversation_id = ?1
+                   AND sender_user_id = ?2
+                   AND client_message_id = ?3
+                 LIMIT 1",
+                rusqlite::params![conversation_id, user_id, client_message_id],
+                |row| row.get(0),
+            )
+            .ok();
+        if let Some(existing_id) = existing_id {
+            if transaction.commit().is_err() {
+                let _ = fs::remove_file(&absolute);
+                return json_error(StatusCode::INTERNAL_SERVER_ERROR, "message_store_failed");
+            }
+            let _ = fs::remove_file(&absolute);
+            if let Some(message) = load_message(&connection, conversation_id, existing_id, user_id)
+            {
+                return (
+                    StatusCode::OK,
+                    Json(json!({"ok": true, "duplicate": true, "message": message})),
+                )
+                    .into_response();
+            }
+        }
         let _ = fs::remove_file(&absolute);
         return json_error(StatusCode::INTERNAL_SERVER_ERROR, "message_store_failed");
     }

@@ -1,6 +1,8 @@
 "use strict";
 
-const CACHE_VERSION = "grabit-shell-v5.0.9";
+const CACHE_PREFIX = "grabit-shell-";
+const LEGACY_CACHE_PREFIX = "resursmap-shell-";
+const CACHE_VERSION = CACHE_PREFIX + "v5.0.10";
 
 const STATIC_ASSETS = [
     "/static/manifest.webmanifest",
@@ -115,6 +117,18 @@ function refreshSwLang() {
 
 refreshSwLang();
 
+function internalNavigationTarget(value, fallback) {
+    try {
+        var target = new URL(String(value || ""), self.location.origin);
+        if (target.origin !== self.location.origin || !target.pathname.startsWith("/app/")) {
+            return fallback;
+        }
+        return target.pathname + target.search + target.hash;
+    } catch (_) {
+        return fallback;
+    }
+}
+
 self.addEventListener("activate", function (event) {
     event.waitUntil(
         refreshSwLang().then(function () {
@@ -122,10 +136,7 @@ self.addEventListener("activate", function (event) {
             .then(function (keys) {
                 var stale = keys.filter(function (key) {
                     return (
-                        (
-                            key.startsWith("resursmap-shell-") ||
-                            key.startsWith("grabit-shell-")
-                        ) &&
+                        (key.startsWith(CACHE_PREFIX) || key.startsWith(LEGACY_CACHE_PREFIX)) &&
                         key !== CACHE_VERSION
                     );
                 });
@@ -199,7 +210,7 @@ self.addEventListener("notificationclick", function (event) {
     if (event.action === "open-steps") {
         target = "/app/steps";
     } else if (event.notification && event.notification.data && event.notification.data.url) {
-        target = event.notification.data.url;
+        target = internalNavigationTarget(event.notification.data.url, target);
     }
     event.waitUntil(
         self.clients.matchAll({
@@ -266,7 +277,7 @@ function remindIfNeeded() {
                     body: nudge.body || "",
                     icon: "/static/app-icon-192.png",
                     tag: "grabit-nudge-" + String(nudge.kind || "day"),
-                    data: { url: nudge.href || "/app" }
+                    data: { url: internalNavigationTarget(nudge.href, "/app") }
                 }));
             });
         }
