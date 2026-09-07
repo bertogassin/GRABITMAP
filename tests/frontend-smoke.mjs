@@ -74,3 +74,9 @@ test("production compose keeps Caddy in front of the private app", async () => {
   assert.match(compose, /\n  caddy-data:/);
   assert.match(compose, /\n  caddy-config:/);
 });
+
+test("Docker build includes Rust compile-time locale sources", async () => {
+  const dockerfile = await readFile(new URL("Dockerfile", root), "utf8");
+  assert.match(dockerfile, /COPY messages \.\/messages/);
+  assert.match(dockerfile, /RUN cargo build --release --locked/);
+});

@@ -14,6 +14,7 @@ COPY Cargo.toml Cargo.lock ./
 COPY src ./src
 COPY data ./data
 COPY static ./static
+COPY messages ./messages
 COPY --from=frontend-build /app/static/paraglide ./static/paraglide
 
 RUN cargo build --release --locked
