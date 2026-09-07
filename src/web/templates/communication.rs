@@ -531,6 +531,7 @@ fn render_chat_message_row(
      data-delivered-at="{delivered_at}"
      data-created-at="{created_at}"
      data-message-text="{message_text}"
+     data-client-message-id="{client_message_id}"
      data-attachment-kind="{attachment_kind}"
      data-attachment-url="{attachment_url}">
 
@@ -561,6 +562,7 @@ fn render_chat_message_row(
         delivered_at = message.delivered_at,
         created_at = message.created_at,
         message_text = safe_message_text,
+        client_message_id = escape_html(&message.client_message_id),
         bubble_class = bubble_class,
         author_html = author_html,
         reply_html = reply_html,
@@ -775,6 +777,7 @@ fn render_chat_thread(
     <div id="chat-messages"
          data-other-user-id="{other_user_id}"
          data-group-id="{group_id_attr}"
+         data-viewer-user-id="{viewer_user_id}"
          data-first-message-id="{first_message_id}"
          data-last-message-id="{last_message_id}"
          data-may-have-older="{may_have_older}"
@@ -809,6 +812,7 @@ fn render_chat_thread(
             chat_blocks_js = static_asset("chat-blocks.js"),
             other_user_id = other_user_id,
             group_id_attr = if group_id > 0 { group_id.to_string() } else { String::new() },
+            viewer_user_id = viewer_user_id,
             first_message_id = first_message_id,
             last_message_id = last_message_id,
             may_have_older = may_have_older,

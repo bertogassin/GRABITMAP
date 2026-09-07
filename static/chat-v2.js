@@ -147,6 +147,9 @@
             history.dataset.groupId || ""
         ).trim();
         var isGroup = /^[1-9][0-9]{0,18}$/.test(groupId);
+        var viewerUserId = String(
+            history.dataset.viewerUserId || ""
+        ).trim();
 
         if (
             !isGroup &&
@@ -174,12 +177,11 @@
         var sending = false;
         var loadingOlder = false;
         var pollTimer = null;
-        var             draftKey =
-            "resursmap-chat-draft:" + (isGroup ? "g" + groupId : otherUserId);
+        var storageScope =
+            viewerUserId + ":" + (isGroup ? "g" + groupId : "d" + otherUserId);
+        var draftKey = "grabit-chat-draft:" + storageScope;
         var pendingSendKey =
-            "resursmap-chat-outbox:" + (isGroup ? "g" + groupId : otherUserId);
-        var legacyPendingSendKey =
-            "resursmap-chat-pending:" + (isGroup ? "g" + groupId : otherUserId);
+            "grabit-chat-outbox:" + storageScope;
         var pendingQueue = [];
         var peerOnline = false;
         var peerLastSeenAt = 0;
@@ -221,9 +223,6 @@
                     );
                 }
 
-                localStorage.removeItem(
-                    legacyPendingSendKey
-                );
             } catch (_) {
                 // Storage may be disabled.
             }
@@ -510,8 +509,8 @@
                 nearBottom()
             ) {
                 window.requestAnimationFrame(function () {
-                    messages.scrollTop =
-                        messages.scrollHeight;
+                    history.scrollTop =
+                        history.scrollHeight;
                 });
             }
         }
@@ -642,6 +641,9 @@
 
             row.dataset.messageId = String(message.id);
             row.dataset.mine = mine ? "1" : "0";
+            row.dataset.clientMessageId = String(
+                message.client_message_id || ""
+            );
 
             if (animate) {
                 row.classList.add("is-new");
@@ -858,6 +860,17 @@
             ));
         }
 
+        function storedClientMessageExists(clientMessageId) {
+            if (!clientMessageId) {
+                return false;
+            }
+            return Array.from(
+                history.querySelectorAll(".chat-message-row[data-client-message-id]")
+            ).some(function (row) {
+                return row.dataset.clientMessageId === clientMessageId;
+            });
+        }
+
         function updateReadStatuses(readThroughId) {
             if (!Number.isSafeInteger(readThroughId) ||
                 readThroughId <= 0) {
@@ -994,6 +1007,7 @@
                 ) {
                     window.playNotificationSound();
                 }
+                markReadAtBottomDebounced();
             }
 
             updateScrollBottomButton();
@@ -2062,11 +2076,6 @@
 
             var storedQueue =
                 localStorage.getItem(pendingSendKey);
-            var legacyPending =
-                localStorage.getItem(
-                    legacyPendingSendKey
-                );
-
             if (storedQueue) {
                 var parsedQueue =
                     JSON.parse(storedQueue);
@@ -2081,40 +2090,13 @@
                                         "string" &&
                                     typeof item
                                         .clientMessageId ===
-                                        "string"
+                                        "string" &&
+                                    !storedClientMessageExists(
+                                        item.clientMessageId
+                                    )
                                 );
                             }
                         );
-                }
-            } else if (legacyPending) {
-                var parsedLegacy =
-                    JSON.parse(legacyPending);
-
-                if (
-                    parsedLegacy &&
-                    typeof parsedLegacy.message ===
-                        "string" &&
-                    typeof parsedLegacy
-                        .clientMessageId === "string"
-                ) {
-                    pendingQueue = [{
-                        clientMessageId:
-                            parsedLegacy
-                                .clientMessageId,
-                        message:
-                            parsedLegacy.message,
-                        replyToMessageId:
-                            parsedLegacy
-                                .replyToMessageId ||
-                            null,
-                        replyMessage: "",
-                        replySenderUserId: null,
-                        createdAt:
-                            Math.floor(
-                                Date.now() / 1000
-                            ),
-                        state: "queued"
-                    }];
                 }
             }
 
