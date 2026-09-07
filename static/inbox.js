@@ -49,7 +49,20 @@
         var retryTimer = null;
         var heartbeatTimer = null;
         var retryAttempt = 0;
+        var cursorKey = "resursmap:inbox-event-cursor";
         var lastEventId = 0;
+        try {
+            lastEventId = Number(window.localStorage.getItem(cursorKey)) || 0;
+        } catch (_) {}
+
+        function rememberEventCursor(value) {
+            var cursor = Number(value);
+            if (!Number.isSafeInteger(cursor) || cursor <= lastEventId) return;
+            lastEventId = cursor;
+            try {
+                window.localStorage.setItem(cursorKey, String(cursor));
+            } catch (_) {}
+        }
         var stopped = false;
         var lastSnapshot = "";
         var activeTyping = Object.create(null);
@@ -433,7 +446,10 @@
                     return;
                 }
                 if (payload.event && Number(payload.event.event_id) > lastEventId) {
-                    lastEventId = Number(payload.event.event_id);
+                    rememberEventCursor(payload.event.event_id);
+                }
+                if (payload.type === "sync_required") {
+                    rememberEventCursor(payload.after_event_id);
                 }
 
                 handleTypingPayload(payload);

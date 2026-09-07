@@ -4131,7 +4131,22 @@
         var heartbeatTimer = null;
         var stopped = false;
         var retryAttempt = 0;
+        var cursorKey = "resursmap:chat-event-cursor:" +
+            (history.dataset.groupId || history.dataset.otherUserId || "chat");
         var lastEventId = 0;
+        var seenEventIds = new Set();
+        try {
+            lastEventId = Number(window.localStorage.getItem(cursorKey)) || 0;
+        } catch (_) {}
+
+        function rememberEventCursor(value) {
+            var cursor = Number(value);
+            if (!Number.isSafeInteger(cursor) || cursor <= lastEventId) return;
+            lastEventId = cursor;
+            try {
+                window.localStorage.setItem(cursorKey, String(cursor));
+            } catch (_) {}
+        }
 
         function websocketUrl() {
             var scheme =
@@ -4257,6 +4272,20 @@
                         payload.type === "sync_required" ||
                         payload.type === "ready"
                     ) {
+                        if (payload.event) rememberEventCursor(payload.event.event_id);
+                        if (payload.type === "sync_required") {
+                            rememberEventCursor(payload.after_event_id);
+                        }
+                        if (payload.type === "chat_event" && payload.event) {
+                            var eventId = Number(payload.event.event_id);
+                            if (Number.isSafeInteger(eventId)) {
+                                if (seenEventIds.has(eventId)) return;
+                                seenEventIds.add(eventId);
+                                if (seenEventIds.size > 4096) {
+                                    seenEventIds.delete(seenEventIds.values().next().value);
+                                }
+                            }
+                        }
                         if (
                             payload.type === "chat_event" &&
                             payload.event &&
