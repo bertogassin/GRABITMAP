@@ -284,7 +284,10 @@
                     if (!href) {
                         return;
                     }
-                    window.location.href = href;
+                    var target = new URL(href, window.location.origin);
+                    window.location.pathname = target.pathname;
+                    window.location.search = target.search;
+                    window.location.hash = target.hash;
                     return;
                 }
 
