@@ -32,8 +32,10 @@
     var localToday = localDate();
     var localCount = 0;
     var listening = false;
-    var lastMag = 0;
-    var peakMag = 0;
+    var gravityMag = 1;
+    var motionPeak = 0;
+    var motionFloor = 0.035;
+    var motionMean = 0;
     var lastStepAt = 0;
     var syncTimer = 0;
     var pendingSync = 0;
@@ -434,18 +436,26 @@
                     (acc.y || 0) * (acc.y || 0) +
                     (acc.z || 0) * (acc.z || 0)
             ) / 9.81;
-        // Ignore wild shakes / vehicle jolts.
-        if (mag > 3.4) {
-            lastMag = mag;
-            peakMag = 0;
+
+        // Separate gravity and device orientation from the short pulse made
+        // by a step. The adaptive threshold works for a phone held in a hand,
+        // pocket or bag instead of expecting one fixed acceleration value.
+        gravityMag = gravityMag * 0.9 + mag * 0.1;
+        var motion = Math.abs(mag - gravityMag);
+        motionMean = motionMean * 0.97 + motion * 0.03;
+        var trigger = Math.max(0.055, Math.min(0.22, motionMean * 2.15));
+        var release = Math.max(motionFloor, trigger * 0.48);
+
+        // Ignore impacts too strong to be a normal walking step.
+        if (motion > 1.7) {
+            motionPeak = 0;
             return;
         }
-        if (mag > peakMag) peakMag = mag;
-        if (lastMag && peakMag > 1.18 && mag < 1.05 && lastMag >= 1.05) {
+        if (motion > motionPeak) motionPeak = motion;
+        if (motionPeak >= trigger && motion <= release) {
             registerStep();
-            peakMag = 0;
+            motionPeak = 0;
         }
-        lastMag = mag;
     }
 
     async function holdScreen() {

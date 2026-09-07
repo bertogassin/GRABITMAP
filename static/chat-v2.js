@@ -1478,7 +1478,11 @@
                 !event.isComposing
             ) {
                 event.preventDefault();
-                sendMessage();
+                if (typeof form.requestSubmit === "function") {
+                    form.requestSubmit();
+                } else {
+                    send.click();
+                }
             }
         });
 
@@ -4144,9 +4148,8 @@
             "submit",
             function (event) {
                 event.preventDefault();
-                if (form.dataset.chatCoreReady !== "1") {
-                    fallbackSend();
-                }
+                event.stopImmediatePropagation();
+                fallbackSend();
             },
             true
         );
