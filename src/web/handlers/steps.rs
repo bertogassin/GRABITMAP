@@ -117,7 +117,19 @@ pub async fn api_steps_get(
         }
     };
 
-    let today = resolved_date(query.today.as_deref()).unwrap_or_else(today_local);
+    let today = match query.today.as_deref() {
+        Some(value) if !value.trim().is_empty() => match resolved_date(Some(value)) {
+            Some(date) => date,
+            None => {
+                return (
+                    StatusCode::BAD_REQUEST,
+                    Json(json!({ "ok": false, "error": "bad_date" })),
+                )
+                    .into_response();
+            }
+        },
+        _ => today_local(),
+    };
 
     match load_snapshot(&db, user_id, &today) {
         Ok(snapshot) => Json(snapshot_json(&snapshot)).into_response(),

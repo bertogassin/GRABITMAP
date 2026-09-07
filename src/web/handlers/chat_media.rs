@@ -270,8 +270,12 @@ pub async fn api_chat_send_image(
 
     if !client_message_id.is_empty() {
         if let Ok(existing_id) = connection.query_row(
-            "SELECT id FROM messages WHERE sender_user_id = ?1 AND client_message_id = ?2 LIMIT 1",
-            rusqlite::params![user_id, client_message_id],
+            "SELECT id FROM messages
+             WHERE conversation_id = ?1
+               AND sender_user_id = ?2
+               AND client_message_id = ?3
+             LIMIT 1",
+            rusqlite::params![conversation_id, user_id, client_message_id],
             |row| row.get::<_, i64>(0),
         ) {
             if let Some(message) = load_message(&connection, conversation_id, existing_id, user_id)
@@ -510,8 +514,12 @@ pub async fn api_chat_send_voice(
 
     if !client_message_id.is_empty() {
         if let Ok(existing_id) = connection.query_row(
-            "SELECT id FROM messages WHERE sender_user_id = ?1 AND client_message_id = ?2 LIMIT 1",
-            rusqlite::params![user_id, client_message_id],
+            "SELECT id FROM messages
+             WHERE conversation_id = ?1
+               AND sender_user_id = ?2
+               AND client_message_id = ?3
+             LIMIT 1",
+            rusqlite::params![conversation_id, user_id, client_message_id],
             |row| row.get::<_, i64>(0),
         ) {
             if let Some(message) = load_message(&connection, conversation_id, existing_id, user_id)

@@ -89,7 +89,10 @@ pub fn initialize(conn: &Connection) -> Result<()> {
 
 pub fn parse_step_date(value: &str) -> Option<NaiveDate> {
     let value = value.trim();
-    if value.len() != 10 || value.as_bytes().get(4) != Some(&b'-') || value.as_bytes().get(7) != Some(&b'-') {
+    if value.len() != 10
+        || value.as_bytes().get(4) != Some(&b'-')
+        || value.as_bytes().get(7) != Some(&b'-')
+    {
         return None;
     }
     NaiveDate::parse_from_str(value, "%Y-%m-%d").ok()
@@ -264,9 +267,7 @@ pub fn apply_steps(
             return Ok((current, 0));
         }
         _ => {
-            let absolute = absolute
-                .map(clamp_day_steps)
-                .unwrap_or(current);
+            let absolute = absolute.map(clamp_day_steps).unwrap_or(current);
             let next = current.max(absolute);
             let applied = next - current;
             let log_delta = if applied >= 200 { applied } else { 0 };
@@ -307,7 +308,9 @@ mod tests {
         let date = parse_step_date("2026-09-06").unwrap();
         assert!(date_is_allowed(date));
         assert!(parse_step_date("26-9-6").is_none());
-        assert!(!date_is_allowed(NaiveDate::from_ymd_opt(1900, 1, 1).unwrap()));
+        assert!(!date_is_allowed(
+            NaiveDate::from_ymd_opt(1900, 1, 1).unwrap()
+        ));
     }
 
     #[test]
@@ -338,7 +341,8 @@ mod tests {
         let conn = Connection::open_in_memory().unwrap();
         initialize(&conn).unwrap();
         assert!(valid_add(500));
-        let (count, delta) = apply_steps(&conn, 1, "2026-09-06", "manual", None, Some(500)).unwrap();
+        let (count, delta) =
+            apply_steps(&conn, 1, "2026-09-06", "manual", None, Some(500)).unwrap();
         assert_eq!((count, delta), (0, 0));
         let (count, delta) =
             apply_steps(&conn, 1, "2026-09-06", "sensor", Some(500), None).unwrap();
