@@ -29,7 +29,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = "5.0.18";
+pub const STATIC_ASSET_VERSION: &str = "5.0.19";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -4296,6 +4296,8 @@ pub(crate) fn page_document(
 
 {bottom_nav}
 
+<script src="{mobile_diagnostics_js}" defer></script>
+
 {body_after}
 
 <script src="{i18n_boot_js}" defer></script>
@@ -4334,6 +4336,7 @@ pub(crate) fn page_document(
         place_memory_js = static_asset("place-memory.js"),
         share_js = static_asset("share.js"),
         pwa_install_js = static_asset("pwa-install.js"),
+        mobile_diagnostics_js = static_asset("mobile-diagnostics.js"),
     )
 }
 

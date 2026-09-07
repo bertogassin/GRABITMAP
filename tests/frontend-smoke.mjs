@@ -116,3 +116,12 @@ test("pedometer falls back to the Android Generic Sensor API", async () => {
   assert.match(pedometer, /processAcceleration\(accelerometer\.x/);
   assert.match(pedometer, /accelerometer\.stop\(\)/);
 });
+
+test("mobile diagnostics probes session chat microphone and motion", async () => {
+  const diagnostics = await readFile(new URL("static/mobile-diagnostics.js", root), "utf8");
+  assert.match(diagnostics, /grabit-mobile-diagnostic/);
+  assert.match(diagnostics, /chatCoreReady/);
+  assert.match(diagnostics, /getUserMedia/);
+  assert.match(diagnostics, /DeviceMotionEvent\.requestPermission/);
+  assert.match(diagnostics, /\/api\/steps\?today=/);
+});
