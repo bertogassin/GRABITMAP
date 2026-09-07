@@ -139,7 +139,7 @@ fn ring_offset(steps: i64, goal: i64) -> f64 {
     circ * (1.0 - ratio)
 }
 
-fn authenticated_body(snapshot: &StepSnapshot) -> String {
+fn authenticated_body(snapshot: &StepSnapshot, user_key: &str) -> String {
     let circ = 2.0 * std::f64::consts::PI * 46.0;
     let pct = if snapshot.goal > 0 {
         ((snapshot.today_steps as f64 / snapshot.goal as f64) * 100.0)
@@ -150,7 +150,7 @@ fn authenticated_body(snapshot: &StepSnapshot) -> String {
     };
     let km = (snapshot.today_steps as f64 * 0.75 / 1000.0).max(0.0);
     format!(
-        r#"<section class="rm-steps" id="rm-steps" data-today="{today}" data-goal="{goal}">
+        r#"<section class="rm-steps" id="rm-steps" data-today="{today}" data-goal="{goal}" data-user-key="{user_key}">
     <div class="rm-step-toolbar">
         {back}
     </div>
@@ -199,6 +199,7 @@ fn authenticated_body(snapshot: &StepSnapshot) -> String {
 </section>"#,
         today = escape_html(&snapshot.today),
         goal = snapshot.goal,
+        user_key = escape_html(user_key),
         back = back_link("/app/me", &crate::i18n::t("common_profile"), "arrow-left"),
         circ = circ,
         offset = ring_offset(snapshot.today_steps, snapshot.goal),
@@ -230,9 +231,9 @@ fn authenticated_body(snapshot: &StepSnapshot) -> String {
     )
 }
 
-pub fn render_steps(snapshot: Option<&StepSnapshot>, _invite_public_id: &str) -> String {
+pub fn render_steps(snapshot: Option<&StepSnapshot>, invite_public_id: &str) -> String {
     let content = match snapshot {
-        Some(snapshot) => authenticated_body(snapshot),
+        Some(snapshot) => authenticated_body(snapshot, invite_public_id),
         None => guest_locked_section(&crate::i18n::t("steps_title"), "/app/steps"),
     };
 
@@ -308,5 +309,6 @@ mod tests {
         assert!(html.contains("rm-step-goal-form"));
         assert!(html.contains("rm-step-hero"));
         assert!(html.contains("rm-step-week"));
+        assert!(html.contains("data-user-key=\"abc123\""));
     }
 }

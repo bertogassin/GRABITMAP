@@ -4,7 +4,8 @@
     var root = document.getElementById("rm-steps");
     if (!root) return;
 
-    var STORAGE_KEY = "resursmap:steps";
+    var userKey = String(root.dataset.userKey || "").trim();
+    var STORAGE_KEY = "grabit:steps:" + (userKey || "anonymous");
     var CIRC = 2 * Math.PI * 46;
     var DEFAULT_GOAL = 10000;
     var MIN_STEP_GAP_MS = 280;
@@ -353,19 +354,30 @@
     }
 
     async function send(body) {
-        var response = await fetch("/api/steps", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "same-origin",
-            body: JSON.stringify(body),
-        });
-        if (!response.ok) {
-            if (response.status === 401) {
-                setStatus(t("common_login", "Войти"));
+        try {
+            var response = await fetch("/api/steps", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "same-origin",
+                body: JSON.stringify(body),
+            });
+            if (!response.ok) {
+                if (response.status === 401) {
+                    setStatus(t("common_login", "Войти"));
+                } else if (response.status === 429) {
+                    setStatus(
+                        t("common_too_many_requests", "Слишком много запросов")
+                    );
+                } else {
+                    setStatus(t("steps_save_failed", "Не удалось сохранить шаги"));
+                }
+                return null;
             }
+            return await response.json();
+        } catch (_) {
+            setStatus(t("chat_no_network", "Нет сети"));
             return null;
         }
-        return response.json();
     }
 
     async function syncSensor(force) {
@@ -499,8 +511,12 @@
         if (goalForm) {
             goalForm.addEventListener("submit", async function (event) {
                 event.preventDefault();
-                var nextGoal = Number(goalInput.value || DEFAULT_GOAL);
-                if (!Number.isFinite(nextGoal)) {
+                var nextGoal = Number(goalInput ? goalInput.value : DEFAULT_GOAL);
+                if (
+                    !Number.isFinite(nextGoal) ||
+                    nextGoal < 1000 ||
+                    nextGoal > 50000
+                ) {
                     setStatus(t("steps_goal_bad", "Проверьте цель"));
                     return;
                 }
