@@ -1,4 +1,5 @@
 use chrono::{Duration, NaiveDate, Utc};
+use chrono_tz::Europe::Paris;
 use rusqlite::{Connection, OptionalExtension, Result};
 
 pub const DEFAULT_GOAL: i64 = 10_000;
@@ -95,7 +96,7 @@ pub fn parse_step_date(value: &str) -> Option<NaiveDate> {
 }
 
 pub fn date_is_allowed(date: NaiveDate) -> bool {
-    let today = Utc::now().date_naive();
+    let today = Utc::now().with_timezone(&Paris).date_naive();
     let earliest = today - Duration::days(365 * 40);
     let latest = today + Duration::days(1);
     date >= earliest && date <= latest
@@ -103,7 +104,7 @@ pub fn date_is_allowed(date: NaiveDate) -> bool {
 
 pub fn today_local() -> String {
     Utc::now()
-        .with_timezone(&chrono_tz::Europe::Paris)
+        .with_timezone(&Paris)
         .date_naive()
         .format("%Y-%m-%d")
         .to_string()

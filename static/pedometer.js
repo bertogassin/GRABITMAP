@@ -37,6 +37,8 @@
     var lastStepAt = 0;
     var syncTimer = 0;
     var pendingSync = 0;
+    var syncInFlight = false;
+    var syncQueued = false;
     var motionTicks = 0;
     var wakeLock = null;
     var lastPanelAt = 0;
@@ -71,14 +73,24 @@
     }
 
     function localDate() {
-        var now = new Date();
-        return (
-            now.getFullYear() +
-            "-" +
-            String(now.getMonth() + 1).padStart(2, "0") +
-            "-" +
-            String(now.getDate()).padStart(2, "0")
-        );
+        try {
+            var parts = new Intl.DateTimeFormat("en-CA", {
+                timeZone: "Europe/Paris",
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+            }).formatToParts(new Date());
+            var values = {};
+            parts.forEach(function (part) {
+                values[part.type] = part.value;
+            });
+            return values.year + "-" + values.month + "-" + values.day;
+        } catch (_) {
+            var now = new Date();
+            return now.getFullYear() + "-" +
+                String(now.getMonth() + 1).padStart(2, "0") + "-" +
+                String(now.getDate()).padStart(2, "0");
+        }
     }
 
     function stepWord(n) {
@@ -353,30 +365,48 @@
     }
 
     async function send(body) {
-        var response = await fetch("/api/steps", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "same-origin",
-            body: JSON.stringify(body),
-        });
-        if (!response.ok) {
-            if (response.status === 401) {
-                setStatus(t("common_login", "Войти"));
+        try {
+            var response = await fetch("/api/steps", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "same-origin",
+                body: JSON.stringify(body),
+            });
+            if (!response.ok) {
+                if (response.status === 401) {
+                    setStatus(t("common_login", "Войти"));
+                }
+                return null;
             }
+            return response.json();
+        } catch (_) {
+            setStatus(t("chat_no_network", "Нет сети"));
             return null;
         }
-        return response.json();
     }
 
     async function syncSensor(force) {
         if (!force && pendingSync < SYNC_EVERY) return;
+        if (syncInFlight) {
+            syncQueued = true;
+            return;
+        }
         pendingSync = 0;
-        var data = await send({
-            date: localToday,
-            steps: localCount,
-            source: "sensor",
-        });
-        if (data) applySnapshot(data);
+        syncInFlight = true;
+        try {
+            var data = await send({
+                date: localToday,
+                steps: localCount,
+                source: "sensor",
+            });
+            if (data) applySnapshot(data);
+        } finally {
+            syncInFlight = false;
+            if (syncQueued) {
+                syncQueued = false;
+                syncSensor(true);
+            }
+        }
     }
 
     function registerStep() {
