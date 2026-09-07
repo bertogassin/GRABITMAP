@@ -108,18 +108,11 @@ fn steps_style() -> &'static str {
 .rm-step-sensor{display:flex;align-items:center;gap:7px;width:max-content;max-width:100%;padding:5px 9px;border:1px solid var(--line);border-radius:999px;background:rgba(0,0,0,.08);font-size:11px;color:var(--muted)}
 .rm-step-sensor-dot{width:7px;height:7px;border-radius:50%;background:#8490a0;box-shadow:0 0 0 4px rgba(132,144,160,.12)}
 .rm-steps.is-listening .rm-step-sensor-dot{background:#4ee1a0;box-shadow:0 0 0 4px rgba(78,225,160,.13),0 0 12px rgba(78,225,160,.75)}
-.rm-step-controls{display:grid;grid-template-columns:minmax(0,1fr);gap:7px}
-.rm-step-toggle{min-height:48px;border:0;border-radius:15px;background:linear-gradient(135deg,#4cc9f0,#6d72ff 55%,#b45cff);color:#fff;font:inherit;font-weight:800;letter-spacing:.01em;box-shadow:0 10px 28px rgba(76,123,240,.28);cursor:pointer}
-.rm-steps.is-listening .rm-step-toggle{background:color-mix(in srgb,var(--bg-soft) 82%,#14243d);color:var(--text);border:1px solid var(--line);box-shadow:none}
 .rm-step-runtime-note{margin:0;text-align:center;color:var(--muted);font-size:11px}
 .rm-step-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .rm-step-stat{display:grid;gap:2px;padding:8px;border-radius:12px;background:color-mix(in srgb,var(--bg) 70%,transparent);border:1px solid var(--line);text-align:center}
 .rm-step-stat strong{font-size:15px;font-variant-numeric:tabular-nums}
 .rm-step-stat small{color:var(--muted);font-size:11px}
-.rm-step-goal{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}
-.rm-step-goal label{color:var(--muted);font-size:13px}
-.rm-step-goal input{width:100%;min-width:0;border:1px solid var(--line);background:transparent;color:var(--text);border-radius:12px;padding:8px 10px;font:inherit}
-.rm-step-goal button{min-width:52px}
 .rm-step-hint{margin:0;color:var(--muted);font-size:12px;line-height:1.4}
 .rm-step-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
 .rm-step-bead{display:grid;gap:2px;padding:8px 2px;border:1px solid var(--line);border-radius:12px;background:var(--bg-soft);color:var(--text);font:inherit}
@@ -189,20 +182,12 @@ fn authenticated_body(snapshot: &StepSnapshot, user_key: &str) -> String {
                 <p class="rm-step-hint" id="rm-step-status">{status}</p>
             </div>
         </div>
-        <div class="rm-step-controls">
-            <button id="rm-step-toggle" type="button" class="rm-step-toggle">Запустить шагомер</button>
-            <p class="rm-step-runtime-note">Считает, пока эта страница открыта. Для фонового режима понадобится приложение Android.</p>
-        </div>
+        <p class="rm-step-runtime-note">Шагомер запускается автоматически. Оставьте приложение открытым во время ходьбы.</p>
         <div class="rm-step-stats">
             <div class="rm-step-stat"><strong id="rm-step-streak">{streak}</strong><small>{streak_label}</small></div>
             <div class="rm-step-stat"><strong id="rm-step-best">{best}</strong><small>{best_label}</small></div>
             <div class="rm-step-stat"><strong id="rm-step-life">{life}</strong><small>{life_label}</small></div>
         </div>
-        <form class="rm-step-goal" id="rm-step-goal-form">
-            <label for="rm-step-goal">{goal_label}</label>
-            <input id="rm-step-goal" type="number" min="1000" max="50000" value="{goal}" inputmode="numeric">
-            <button type="submit" class="ui-button rm-step-add-btn">{ok}</button>
-        </form>
     </article>
 
     <section>
@@ -243,8 +228,6 @@ fn authenticated_body(snapshot: &StepSnapshot, user_key: &str) -> String {
         streak_label = escape_html(&crate::i18n::t("steps_streak")),
         best_label = escape_html(&crate::i18n::t("steps_best")),
         life_label = escape_html(&crate::i18n::t("steps_life")),
-        goal_label = escape_html(&crate::i18n::t("steps_goal_label")),
-        ok = escape_html(&crate::i18n::t("steps_ok")),
         week_label = escape_html(&crate::i18n::t("steps_week")),
         week = render_week(&snapshot.days, &snapshot.today, snapshot.goal),
     )
@@ -325,10 +308,10 @@ mod tests {
         assert!(html.contains("/static/pedometer.js"));
         assert!(!html.contains("resursmap-install-pwa"));
         assert!(!html.contains("rm-step-pin"));
-        assert!(html.contains("rm-step-goal-form"));
+        assert!(!html.contains("rm-step-goal-form"));
         assert!(html.contains("rm-step-hero"));
         assert!(html.contains("rm-step-week"));
         assert!(html.contains("data-user-key=\"abc123\""));
-        assert!(html.contains("rm-step-toggle"));
+        assert!(!html.contains("rm-step-toggle"));
     }
 }
