@@ -79,7 +79,12 @@ pub async fn steps_page(State(state): State<AppState>, headers: HeaderMap) -> Ht
                     |row| row.get::<_, String>(0),
                 )
                 .unwrap_or_default();
-            (load_snapshot(&db, user_id, &today_local()).ok(), public_id)
+            let storage_key = if public_id.is_empty() {
+                format!("user-{user_id}")
+            } else {
+                public_id
+            };
+            (load_snapshot(&db, user_id, &today_local()).ok(), storage_key)
         }
         Err(_) => (None, String::new()),
     };

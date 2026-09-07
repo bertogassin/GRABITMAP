@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_VERSION = "grabit-shell-v5.0.8";
+const CACHE_VERSION = "grabit-shell-v5.0.9";
 
 const STATIC_ASSETS = [
     "/static/manifest.webmanifest",
