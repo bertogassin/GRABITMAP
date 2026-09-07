@@ -1,6 +1,8 @@
 "use strict";
 
-const CACHE_VERSION = "grabit-shell-v5.0.13";
+const CACHE_PREFIX = "grabit-shell-";
+const LEGACY_CACHE_PREFIX = "resursmap-shell-";
+const CACHE_VERSION = CACHE_PREFIX + "v5.0.15";
 
 const STATIC_ASSETS = [
     "/static/manifest.webmanifest",
@@ -11,13 +13,55 @@ const STATIC_ASSETS = [
     "/static/app-icon-512.png",
     "/static/apple-touch-icon.png",
     "/static/nav-badge.js",
+    "/static/i18n-boot.js",
+    "/static/i18n-runtime.js",
+    "/static/paraglide/messages.js",
+    "/static/paraglide/runtime.js",
+    "/static/paraglide/messages/_index.js",
+    "/static/paraglide/messages/ru.js",
+    "/static/paraglide/messages/en.js",
+    "/static/paraglide/messages/fr.js",
+    "/static/paraglide/messages/es.js",
+    "/static/paraglide/messages/zh.js",
+    "/static/paraglide/messages/zh-TW.js",
+    "/static/paraglide/messages/hi.js",
+    "/static/paraglide/messages/ar.js",
+    "/static/paraglide/messages/pt.js",
+    "/static/paraglide/messages/de.js",
+    "/static/paraglide/messages/ja.js",
+    "/static/paraglide/messages/ko.js",
+    "/static/paraglide/messages/it.js",
+    "/static/paraglide/messages/tr.js",
+    "/static/paraglide/messages/pl.js",
+    "/static/paraglide/messages/uk.js",
+    "/static/paraglide/messages/nl.js",
+    "/static/paraglide/messages/vi.js",
+    "/static/paraglide/messages/id.js",
+    "/static/paraglide/messages/ms.js",
+    "/static/paraglide/messages/th.js",
+    "/static/paraglide/messages/fa.js",
+    "/static/paraglide/messages/ur.js",
+    "/static/paraglide/messages/bn.js",
+    "/static/paraglide/messages/pa.js",
+    "/static/paraglide/messages/sw.js",
+    "/static/paraglide/messages/el.js",
+    "/static/paraglide/messages/cs.js",
+    "/static/paraglide/messages/ro.js",
+    "/static/paraglide/messages/hu.js",
+    "/static/paraglide/messages/sv.js",
+    "/static/paraglide/messages/he.js",
 ];
 
 self.addEventListener("install", function (event) {
     event.waitUntil(
         caches.open(CACHE_VERSION)
             .then(function (cache) {
-                return cache.addAll(STATIC_ASSETS);
+                // A single unavailable asset must not prevent the shell from
+                // installing; successful assets still provide useful offline
+                // behavior and missing assets can be fetched on demand.
+                return Promise.all(STATIC_ASSETS.map(function (asset) {
+                    return cache.add(asset).catch(function () {});
+                }));
             })
             .then(function () {
                 return self.skipWaiting();
@@ -73,6 +117,18 @@ function refreshSwLang() {
 
 refreshSwLang();
 
+function internalNavigationTarget(value, fallback) {
+    try {
+        var target = new URL(String(value || ""), self.location.origin);
+        if (target.origin !== self.location.origin || !target.pathname.startsWith("/app/")) {
+            return fallback;
+        }
+        return target.pathname + target.search + target.hash;
+    } catch (_) {
+        return fallback;
+    }
+}
+
 self.addEventListener("activate", function (event) {
     event.waitUntil(
         refreshSwLang().then(function () {
@@ -80,10 +136,7 @@ self.addEventListener("activate", function (event) {
             .then(function (keys) {
                 var stale = keys.filter(function (key) {
                     return (
-                        (
-                            key.startsWith("resursmap-shell-") ||
-                            key.startsWith("grabit-shell-")
-                        ) &&
+                        (key.startsWith(CACHE_PREFIX) || key.startsWith(LEGACY_CACHE_PREFIX)) &&
                         key !== CACHE_VERSION
                     );
                 });
@@ -127,11 +180,18 @@ self.addEventListener("fetch", function (event) {
     }
 
     if (url.pathname.startsWith("/static/")) {
+        var cacheKey = new URL(request.url);
+        cacheKey.search = "";
         event.respondWith(
-            fetch(request).catch(function () {
-                return caches.match(request, {
-                    ignoreSearch: true
-                });
+            fetch(request).then(function (response) {
+                if (response.ok) {
+                    caches.open(CACHE_VERSION).then(function (cache) {
+                        return cache.put(cacheKey.toString(), response.clone());
+                    }).catch(function () {});
+                }
+                return response;
+            }).catch(function () {
+                return caches.match(cacheKey.toString());
             })
         );
     }
@@ -150,7 +210,7 @@ self.addEventListener("notificationclick", function (event) {
     if (event.action === "open-steps") {
         target = "/app/steps";
     } else if (event.notification && event.notification.data && event.notification.data.url) {
-        target = event.notification.data.url;
+        target = internalNavigationTarget(event.notification.data.url, target);
     }
     event.waitUntil(
         self.clients.matchAll({
@@ -217,7 +277,7 @@ function remindIfNeeded() {
                     body: nudge.body || "",
                     icon: "/static/app-icon-192.png",
                     tag: "grabit-nudge-" + String(nudge.kind || "day"),
-                    data: { url: nudge.href || "/app" }
+                    data: { url: internalNavigationTarget(nudge.href, "/app") }
                 }));
             });
         }

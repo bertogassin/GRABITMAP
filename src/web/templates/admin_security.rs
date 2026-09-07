@@ -174,12 +174,5 @@ input{{
         masked_email = escape_html(&data.masked_email),
     );
 
-    super::common::page_document(
-        "Безопасность владельца · GRABIT",
-        head,
-        "",
-        &main,
-        "",
-        "",
-    )
+    super::common::page_document("Безопасность владельца · GRABIT", head, "", &main, "", "")
 }

@@ -1,8 +1,8 @@
 use super::common::{
     back_navigation_card, bottom_nav, empty_state_action, empty_state_card_with_actions,
-    escape_html, guest_mode_hint, icon, is_generic_profession_key, ru_count, ru_plural,
-    intent_kind_chips, kind_chip, navigation_card, page_document, page_shell, premium_badge_html,
-    profession_label, resource_listing_label, resource_result_card, search_form_hero,
+    escape_html, guest_mode_hint, icon, intent_kind_chips, is_generic_profession_key, kind_chip,
+    navigation_card, page_document, page_shell, premium_badge_html, profession_label,
+    resource_listing_label, resource_result_card, ru_count, ru_plural, search_form_hero,
     search_people_cards, section_head, simple_hero, static_asset, topbar, verified_badge_html,
 };
 use crate::geography::world;
@@ -231,10 +231,7 @@ pub fn render_geo_root(
                 &if crate::i18n::locale() == "ru" {
                     ru_count(*countries, "страна", "страны", "стран")
                 } else {
-                    crate::i18n::tf(
-                        "map_n_countries",
-                        &[("n", &countries.to_string())],
-                    )
+                    crate::i18n::tf("map_n_countries", &[("n", &countries.to_string())])
                 },
             )
         })
@@ -251,13 +248,7 @@ pub fn render_geo_root(
         crate::i18n::t("map_stat_members")
     };
     let resources_word = if crate::i18n::locale() == "ru" {
-        ru_plural(
-            resources_count,
-            "объявление",
-            "объявления",
-            "объявлений",
-        )
-        .to_string()
+        ru_plural(resources_count, "объявление", "объявления", "объявлений").to_string()
     } else {
         crate::i18n::t("map_stat_listings")
     };
@@ -346,10 +337,7 @@ pub fn render_geo_continent(
     let countries_caption = if crate::i18n::locale() == "ru" {
         ru_count(countries.len() as i64, "страна", "страны", "стран")
     } else {
-        crate::i18n::tf(
-            "map_n_countries",
-            &[("n", &countries.len().to_string())],
-        )
+        crate::i18n::tf("map_n_countries", &[("n", &countries.len().to_string())])
     };
     let content = format!(
         r#"{back}{head}{search}<div class="grid" id="rm-map-country-grid">{cards}</div><div class="rm-catalog-search-status" id="rm-map-country-status" aria-live="polite"></div><script src="{script}" defer></script>"#,
@@ -420,11 +408,7 @@ pub fn render_geo_country(
             continent,
             &crate::i18n::t("map_back_to_countries"),
         ),
-        head = section_head(
-            &crate::i18n::t("map_cities"),
-            &cities_caption,
-            Some(22)
-        ),
+        head = section_head(&crate::i18n::t("map_cities"), &cities_caption, Some(22)),
         search = city_search,
         script = static_asset("map-cities.js"),
     );
@@ -483,6 +467,13 @@ pub fn render_geo_city(
         placeholder = crate::i18n::t("map_find_in_city"),
         clear = crate::i18n::t("map_clear_search"),
     );
+    let add = format!(
+        r#"<div class="rm-city-add">{action}</div>"#,
+        action = empty_state_action(
+            &format!("/app/add/city/{city_id}"),
+            &crate::i18n::t("menu_add_card"),
+        ),
+    );
     let content = format!(
         r#"{back}{search}{search_status}{section_head}{add}<div class="grid" id="rm-city-category-grid">{work}{services}{business}{housing}{transport}{education}{help}{other}</div>{profession_head}<div class="grid" id="rm-city-sector-grid">{sector_cards}</div><div class="grid" id="rm-city-profession-results"></div><script src="{catalog_script}" defer></script>"#,
         back = back_navigation_card(
@@ -492,13 +483,7 @@ pub fn render_geo_city(
         ),
         search = catalog_search,
         search_status = r#"<div class="rm-catalog-search-status" id="rm-city-catalog-status" aria-live="polite"></div>"#,
-        add = format!(
-            r#"<div class="rm-city-add">{action}</div>"#,
-            action = empty_state_action(
-                &format!("/app/add/city/{city_id}"),
-                &crate::i18n::t("menu_add_card"),
-            ),
-        ),
+        add = add,
         section_head = section_head(
             &crate::i18n::t("map_need_title"),
             &crate::i18n::t("map_need_lead"),
@@ -641,10 +626,7 @@ pub fn render_continents(
                 &format!("/app/{}/{}", ci, si),
                 "building",
                 country,
-                &crate::i18n::tf(
-                    "map_country_dot",
-                    &[("continent", continent)],
-                ),
+                &crate::i18n::tf("map_country_dot", &[("continent", continent)]),
             ));
         }
     }
@@ -1014,13 +996,7 @@ pub fn render_continents(
             crate::i18n::t("map_stat_members")
         },
         resources_word = if crate::i18n::locale() == "ru" {
-            ru_plural(
-                resources_count,
-                "объявление",
-                "объявления",
-                "объявлений",
-            )
-            .to_string()
+            ru_plural(resources_count, "объявление", "объявления", "объявлений").to_string()
         } else {
             crate::i18n::t("map_stat_listings")
         },
@@ -1148,12 +1124,11 @@ pub fn render_country(ci: usize, si: usize) -> String {
                 ));
             }
 
-            let section_head_cities =
-                section_head(
-                    "Города",
-                    &ru_count(cities.len() as i64, "город", "города", "городов"),
-                    None,
-                );
+            let section_head_cities = section_head(
+                "Города",
+                &ru_count(cities.len() as i64, "город", "города", "городов"),
+                None,
+            );
 
             let content = format!(
                 r#"
@@ -1243,12 +1218,7 @@ pub fn render_city(ci: usize, si: usize, zi: usize) -> String {
                 return page_shell(
                     city,
                     &topbar(&crate::i18n::t("map_cities"), "globe"),
-                    &simple_hero(
-                        "map-pin",
-                        country,
-                        city,
-                        &crate::i18n::t("map_home_lead"),
-                    ),
+                    &simple_hero("map-pin", country, city, &crate::i18n::t("map_home_lead")),
                     &content,
                     &bottom_nav("map"),
                 );
@@ -1263,6 +1233,7 @@ pub fn render_city(ci: usize, si: usize, zi: usize) -> String {
 // SEARCH
 // ============================================================
 
+#[allow(clippy::too_many_arguments)]
 pub fn render_search(
     q: &str,
     kind: &str,
@@ -1309,10 +1280,7 @@ pub fn render_search(
                         &format!("/app/{}/{}", ci, si),
                         "building",
                         country,
-                        &crate::i18n::tf(
-                            "map_country_dot",
-                            &[("continent", continent)],
-                        ),
+                        &crate::i18n::tf("map_country_dot", &[("continent", continent)]),
                     ));
                 }
 
@@ -1377,7 +1345,7 @@ pub fn render_search(
     let city_label = city_name
         .map(str::trim)
         .filter(|value| !value.is_empty())
-        .or(Some("этот город").filter(|_| city_id.is_some()));
+        .or(city_id.is_some().then_some("этот город"));
 
     let has_criteria =
         !q.trim().is_empty() || !kind.is_empty() || active_rubric.is_some() || city_id.is_some();
@@ -1497,11 +1465,15 @@ pub fn render_search(
 
                     let premium_badge = if *premium != 0 {
                         premium_badge_html("default")
-                    } else { String::new() };
+                    } else {
+                        String::new()
+                    };
 
                     let verified_badge = if *verified != 0 {
                         verified_badge_html(true)
-                    } else { String::new() };
+                    } else {
+                        String::new()
+                    };
 
                     let write_href = if *owner_user_id > 0 {
                         format!("/app/chat/{owner_user_id}")
@@ -1934,11 +1906,7 @@ mod search_catalog_tests {
 
     #[test]
     fn continent_has_country_search_like_cities() {
-        let html = render_geo_continent(
-            1,
-            "Европа",
-            vec![(7, "Франция".to_string(), 12)],
-        );
+        let html = render_geo_continent(1, "Европа", vec![(7, "Франция".to_string(), 12)]);
         assert!(html.contains("id=\"rm-map-country-search\""));
         assert!(html.contains("Найти страну"));
         assert!(html.contains("/app/map/country/7"));

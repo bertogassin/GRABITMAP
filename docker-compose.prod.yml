@@ -1,15 +1,17 @@
 services:
   grabit:
-    build: .
+    build:
+      context: .
+      target: runtime
     ports:
       - "3000:3000"
     environment:
-      ADMIN_KEY: ${ADMIN_KEY:-change-me}
+      ADMIN_KEY: ${ADMIN_KEY:?ADMIN_KEY must be set}
       PORT: "3000"
-      DATABASE_URL: sqlite:data/votes.db
+      DATABASE_URL: ${DATABASE_URL:-sqlite:data/votes.db}
       CHAT_MEDIA_DIR: ${CHAT_MEDIA_DIR:-data/chat-media}
-      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://127.0.0.1:3000}
-      GRABIT_COOKIE_SECURE: ${GRABIT_COOKIE_SECURE:-0}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:?PUBLIC_BASE_URL must be set}
+      GRABIT_COOKIE_SECURE: "1"
       GRABIT_MAIL_FROM: ${GRABIT_MAIL_FROM:-GRABIT <noreply@grabitmap.com>}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       OWNER_BOOTSTRAP_EMAIL: ${OWNER_BOOTSTRAP_EMAIL:-}
@@ -17,6 +19,11 @@ services:
     volumes:
       - grabit-data:/app/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
 volumes:
   grabit-data:

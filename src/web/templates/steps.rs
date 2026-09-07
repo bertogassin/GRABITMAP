@@ -1,8 +1,7 @@
 use super::common::{
-    back_link, bottom_nav, escape_html, guest_locked_section, page_document, static_asset,
-    topbar,
+    back_link, bottom_nav, escape_html, guest_locked_section, page_document, static_asset, topbar,
 };
-use crate::db::steps::{StepDay, StepSnapshot};
+use crate::db::steps::{StepDay, StepSnapshot, MAX_DAY_STEPS};
 use chrono::{Datelike, Duration, NaiveDate};
 use std::collections::HashMap;
 
@@ -146,7 +145,7 @@ fn ring_offset(steps: i64, goal: i64) -> f64 {
     circ * (1.0 - ratio)
 }
 
-fn authenticated_body(snapshot: &StepSnapshot, user_key: &str) -> String {
+fn authenticated_body(snapshot: &StepSnapshot, user_id: i64) -> String {
     let circ = 2.0 * std::f64::consts::PI * 46.0;
     let pct = if snapshot.goal > 0 {
         ((snapshot.today_steps as f64 / snapshot.goal as f64) * 100.0)
@@ -156,8 +155,9 @@ fn authenticated_body(snapshot: &StepSnapshot, user_key: &str) -> String {
         0
     };
     let km = (snapshot.today_steps as f64 * 0.75 / 1000.0).max(0.0);
+    let km_label = format!("{km:.1} km");
     format!(
-        r#"<section class="rm-steps" id="rm-steps" data-today="{today}" data-goal="{goal}" data-user-key="{user_key}">
+        r#"<section class="rm-steps" id="rm-steps" data-today="{today}" data-goal="{goal}" data-user-id="{user_id}" data-max-day-steps="{max_day_steps}">
     <div class="rm-step-toolbar">
         {back}
     </div>
@@ -203,7 +203,8 @@ fn authenticated_body(snapshot: &StepSnapshot, user_key: &str) -> String {
 </section>"#,
         today = escape_html(&snapshot.today),
         goal = snapshot.goal,
-        user_key = escape_html(user_key),
+        user_id = user_id,
+        max_day_steps = MAX_DAY_STEPS,
         back = back_link("/app/me", &crate::i18n::t("common_profile"), "arrow-left"),
         circ = circ,
         offset = ring_offset(snapshot.today_steps, snapshot.goal),
@@ -216,7 +217,7 @@ fn authenticated_body(snapshot: &StepSnapshot, user_key: &str) -> String {
             "steps_today_pct",
             &[("pct", &pct.to_string())],
         )),
-        km_label = format!("{km:.1} km"),
+        km_label = km_label,
         status = escape_html(&crate::i18n::t("steps_lead")),
         streak = snapshot.streak,
         best = if snapshot.best_steps > 0 {
@@ -233,9 +234,13 @@ fn authenticated_body(snapshot: &StepSnapshot, user_key: &str) -> String {
     )
 }
 
-pub fn render_steps(snapshot: Option<&StepSnapshot>, invite_public_id: &str) -> String {
+pub fn render_steps(
+    snapshot: Option<&StepSnapshot>,
+    _invite_public_id: &str,
+    user_id: i64,
+) -> String {
     let content = match snapshot {
-        Some(snapshot) => authenticated_body(snapshot, invite_public_id),
+        Some(snapshot) => authenticated_body(snapshot, user_id),
         None => guest_locked_section(&crate::i18n::t("steps_title"), "/app/steps"),
     };
 
@@ -291,14 +296,14 @@ mod tests {
 
     #[test]
     fn guest_sees_lock() {
-        let html = render_steps(None, "");
+        let html = render_steps(None, "", 0);
         assert!(html.contains("Нужен аккаунт") || html.contains("Account"));
         assert!(html.contains("/login?next="));
     }
 
     #[test]
     fn compact_controls_render() {
-        let html = render_steps(Some(&empty_snapshot()), "abc123");
+        let html = render_steps(Some(&empty_snapshot()), "abc123", 42);
         assert!(!html.contains("/app/join/"));
         assert!(!html.contains("data-year="));
         assert!(!html.contains("data-month="));
@@ -311,7 +316,7 @@ mod tests {
         assert!(!html.contains("rm-step-goal-form"));
         assert!(html.contains("rm-step-hero"));
         assert!(html.contains("rm-step-week"));
-        assert!(html.contains("data-user-key=\"abc123\""));
-        assert!(!html.contains("rm-step-toggle"));
+        assert!(html.contains(r#"data-user-id="42""#));
+        assert!(html.contains(r#"data-max-day-steps="200000""#));
     }
 }

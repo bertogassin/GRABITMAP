@@ -916,10 +916,11 @@ pub async fn api_chat_send(
             .query_row(
                 "SELECT id
                  FROM messages
-                 WHERE sender_user_id = ?1
-                   AND client_message_id = ?2
+                 WHERE conversation_id = ?1
+                   AND sender_user_id = ?2
+                   AND client_message_id = ?3
                  LIMIT 1",
-                rusqlite::params![user_id, client_message_id],
+                rusqlite::params![conversation_id, user_id, client_message_id],
                 |row| row.get(0),
             )
             .ok();
@@ -977,9 +978,9 @@ pub async fn api_chat_send(
             }
         };
 
-    if transaction
+    let inserted = transaction
         .execute(
-            "INSERT INTO messages (
+            "INSERT OR IGNORE INTO messages (
                 conversation_id,
                 sender_user_id,
                 message,
@@ -1002,9 +1003,35 @@ pub async fn api_chat_send(
                 client_message_id
             ],
         )
-        .unwrap_or(0)
-        != 1
-    {
+        .unwrap_or(0);
+
+    if inserted == 0 {
+        let existing_id: Option<i64> = transaction
+            .query_row(
+                "SELECT id
+                 FROM messages
+                 WHERE conversation_id = ?1
+                   AND sender_user_id = ?2
+                   AND client_message_id = ?3
+                 LIMIT 1",
+                rusqlite::params![conversation_id, user_id, client_message_id],
+                |row| row.get(0),
+            )
+            .ok();
+        if let Some(existing_id) = existing_id {
+            if transaction.commit().is_err() {
+                return json_error(StatusCode::INTERNAL_SERVER_ERROR, "transaction_failed");
+            }
+            if let Some(existing) =
+                load_api_message_by_id(&connection, conversation_id, existing_id, user_id)
+            {
+                return (
+                    StatusCode::OK,
+                    Json(json!({"ok": true, "duplicate": true, "message": existing})),
+                )
+                    .into_response();
+            }
+        }
         return json_error(StatusCode::INTERNAL_SERVER_ERROR, "message_store_failed");
     }
 
@@ -1705,6 +1732,66 @@ mod tests {
         assert!(!client_message_id_is_valid(""));
         assert!(!client_message_id_is_valid("short"));
         assert!(!client_message_id_is_valid("identity with spaces"));
+    }
+
+    #[test]
+    fn duplicate_client_message_inserts_are_idempotent_under_concurrency() {
+        use std::sync::{Arc, Barrier};
+        use std::thread;
+
+        let uri = "file:chat-idempotency-test?mode=memory&cache=shared";
+        let flags = rusqlite::OpenFlags::SQLITE_OPEN_URI
+            | rusqlite::OpenFlags::SQLITE_OPEN_READ_WRITE
+            | rusqlite::OpenFlags::SQLITE_OPEN_CREATE;
+        let anchor = rusqlite::Connection::open_with_flags(uri, flags).unwrap();
+        anchor
+            .execute_batch(
+                "CREATE TABLE messages (
+                    id INTEGER PRIMARY KEY,
+                    conversation_id INTEGER NOT NULL,
+                    sender_user_id INTEGER NOT NULL,
+                    client_message_id TEXT NOT NULL,
+                    UNIQUE(conversation_id, sender_user_id, client_message_id)
+                );",
+            )
+            .unwrap();
+
+        let start = Arc::new(Barrier::new(8));
+        let workers: Vec<_> = (0..8)
+            .map(|_| {
+                let start = Arc::clone(&start);
+                thread::spawn(move || {
+                    let connection = rusqlite::Connection::open_with_flags(uri, flags).unwrap();
+                    connection
+                        .busy_timeout(std::time::Duration::from_secs(2))
+                        .unwrap();
+                    start.wait();
+                    connection
+                        .execute(
+                            "INSERT OR IGNORE INTO messages
+                             (conversation_id, sender_user_id, client_message_id)
+                             VALUES (1, 2, 'same-client-id')",
+                            [],
+                        )
+                        .unwrap()
+                })
+            })
+            .collect();
+
+        let inserted: Vec<_> = workers
+            .into_iter()
+            .map(|worker| worker.join().unwrap())
+            .collect();
+        assert_eq!(inserted.iter().filter(|&&count| count == 1).count(), 1);
+        assert_eq!(inserted.iter().filter(|&&count| count == 0).count(), 7);
+        assert_eq!(
+            anchor
+                .query_row("SELECT COUNT(*) FROM messages", [], |row| {
+                    row.get::<_, i64>(0)
+                })
+                .unwrap(),
+            1
+        );
     }
 
     #[test]

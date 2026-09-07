@@ -89,10 +89,7 @@ mod tests {
 
     #[test]
     fn invite_links_stay_inside_app() {
-        assert_eq!(
-            invite_path("abc123", "steps"),
-            "/app/join/abc123?to=steps"
-        );
+        assert_eq!(invite_path("abc123", "steps"), "/app/join/abc123?to=steps");
         let html = render_invite_landing("Анна", "abc123", "chat");
         assert!(html.contains("/login?next="));
         assert!(html.contains("/register?next="));

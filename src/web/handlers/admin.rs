@@ -758,7 +758,9 @@ pub async fn admin_resources(
 
         let premium_badge = if premium == 1 {
             templates::premium_badge_html("admin")
-        } else { String::new() };
+        } else {
+            String::new()
+        };
 
         let active_badge = templates::resource_visibility_badge(active);
 
@@ -1465,7 +1467,10 @@ pub async fn admin_reject_resource(
 
         if let Some((client_id, resource_title)) = owner {
             if let Some(user_id) = resource_owner_user_id(&client_id) {
-                let message = format!("Объявление «{}» отклонено. Причина: {}", resource_title, reason);
+                let message = format!(
+                    "Объявление «{}» отклонено. Причина: {}",
+                    resource_title, reason
+                );
 
                 let _ = db.execute(
                     "INSERT INTO user_notifications (
@@ -1625,7 +1630,10 @@ pub async fn moderate_resource(
                 (
                     "resource_rejected",
                     "Объявление отклонено",
-                    format!("Ваше объявление «{}» отклонено модератором.", resource_title),
+                    format!(
+                        "Ваше объявление «{}» отклонено модератором.",
+                        resource_title
+                    ),
                 )
             };
 

@@ -3,9 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "i18n": "node scripts/compile-i18n.mjs"
+    "i18n": "node scripts/compile-i18n.mjs",
+    "test": "npm run test:frontend",
+    "test:frontend": "node --test tests/frontend-smoke.mjs"
   },
   "devDependencies": {
-    "@inlang/paraglide-js": "^2.4.0"
+    "@inlang/paraglide-js": "^2.4.0",
+    "@inlang/plugin-m-function-matcher": "2.2.13",
+    "@inlang/plugin-message-format": "4.4.4"
   }
 }

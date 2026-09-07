@@ -148,6 +148,14 @@ pub fn init_db() -> Result<Connection> {
         )?;
     }
 
+    // Verification always scopes by purpose and takes the newest code.
+    // Keep the legacy lookup index for older cleanup queries.
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_email_login_codes_verify
+         ON email_login_codes(email, purpose, id DESC)",
+        [],
+    )?;
+
     conn.execute(
         "CREATE TABLE IF NOT EXISTS user_sessions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -622,10 +630,14 @@ pub fn init_db() -> Result<Connection> {
         [],
     )?;
 
+    // Client ids are unique within a conversation, not globally per sender.
+    // Replace the earlier pre-V4 index shape on existing databases.
+    let _ = conn.execute("DROP INDEX IF EXISTS idx_messages_client_identity", []);
     conn.execute(
         "CREATE UNIQUE INDEX IF NOT EXISTS
              idx_messages_client_identity
          ON messages(
+             conversation_id,
              sender_user_id,
              client_message_id
          )

@@ -27,6 +27,18 @@
             .replace(/'/g, "&#39;");
     }
 
+    function internalHref(value) {
+        try {
+            var url = new URL(String(value || ""), window.location.origin);
+            if (url.origin !== window.location.origin || !url.pathname.startsWith("/app/")) {
+                return "";
+            }
+            return url.pathname + url.search + url.hash;
+        } catch (_) {
+            return "";
+        }
+    }
+
     function t(key, fallback, params) {
         if (window.m && typeof window.m[key] === "function") {
             try {
@@ -126,11 +138,15 @@
 
             results.innerHTML = hits
                 .map(function (hit, index) {
+                    var href = internalHref(hit.h);
+                    if (!href) {
+                        return "";
+                    }
                     return (
                         '<a class="rm-explore-hit' +
                         (index === activeIndex ? " is-active" : "") +
                         '" href="' +
-                        hit.h +
+                        escapeHtml(href) +
                         '" data-index="' +
                         index +
                         '">' +
@@ -264,7 +280,14 @@
             if (event.key === "Enter") {
                 if (activeIndex >= 0 && visibleHits[activeIndex]) {
                     event.preventDefault();
-                    window.location.href = visibleHits[activeIndex].h;
+                    var href = internalHref(visibleHits[activeIndex].h);
+                    if (!href) {
+                        return;
+                    }
+                    var target = new URL(href, window.location.origin);
+                    window.location.pathname = target.pathname;
+                    window.location.search = target.search;
+                    window.location.hash = target.hash;
                     return;
                 }
 

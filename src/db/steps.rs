@@ -1,10 +1,11 @@
 use chrono::{Duration, NaiveDate, Utc};
+use chrono_tz::Europe::Paris;
 use rusqlite::{Connection, OptionalExtension, Result};
 
 pub const DEFAULT_GOAL: i64 = 10_000;
 const MIN_GOAL: i64 = 1_000;
 const MAX_GOAL: i64 = 50_000;
-const MAX_DAY_STEPS: i64 = 200_000;
+pub const MAX_DAY_STEPS: i64 = 200_000;
 #[allow(dead_code)]
 const MAX_ADD: i64 = 50_000;
 
@@ -88,14 +89,17 @@ pub fn initialize(conn: &Connection) -> Result<()> {
 
 pub fn parse_step_date(value: &str) -> Option<NaiveDate> {
     let value = value.trim();
-    if value.len() != 10 || value.as_bytes().get(4) != Some(&b'-') || value.as_bytes().get(7) != Some(&b'-') {
+    if value.len() != 10
+        || value.as_bytes().get(4) != Some(&b'-')
+        || value.as_bytes().get(7) != Some(&b'-')
+    {
         return None;
     }
     NaiveDate::parse_from_str(value, "%Y-%m-%d").ok()
 }
 
 pub fn date_is_allowed(date: NaiveDate) -> bool {
-    let today = Utc::now().date_naive();
+    let today = Utc::now().with_timezone(&Paris).date_naive();
     let earliest = today - Duration::days(365 * 40);
     let latest = today + Duration::days(1);
     date >= earliest && date <= latest
@@ -103,7 +107,7 @@ pub fn date_is_allowed(date: NaiveDate) -> bool {
 
 pub fn today_local() -> String {
     Utc::now()
-        .with_timezone(&chrono_tz::Europe::Paris)
+        .with_timezone(&Paris)
         .date_naive()
         .format("%Y-%m-%d")
         .to_string()
@@ -263,9 +267,7 @@ pub fn apply_steps(
             return Ok((current, 0));
         }
         _ => {
-            let absolute = absolute
-                .map(clamp_day_steps)
-                .unwrap_or(current);
+            let absolute = absolute.map(clamp_day_steps).unwrap_or(current);
             let next = current.max(absolute);
             let applied = next - current;
             let log_delta = if applied >= 200 { applied } else { 0 };
@@ -306,7 +308,9 @@ mod tests {
         let date = parse_step_date("2026-09-06").unwrap();
         assert!(date_is_allowed(date));
         assert!(parse_step_date("26-9-6").is_none());
-        assert!(!date_is_allowed(NaiveDate::from_ymd_opt(1900, 1, 1).unwrap()));
+        assert!(!date_is_allowed(
+            NaiveDate::from_ymd_opt(1900, 1, 1).unwrap()
+        ));
     }
 
     #[test]
@@ -337,7 +341,8 @@ mod tests {
         let conn = Connection::open_in_memory().unwrap();
         initialize(&conn).unwrap();
         assert!(valid_add(500));
-        let (count, delta) = apply_steps(&conn, 1, "2026-09-06", "manual", None, Some(500)).unwrap();
+        let (count, delta) =
+            apply_steps(&conn, 1, "2026-09-06", "manual", None, Some(500)).unwrap();
         assert_eq!((count, delta), (0, 0));
         let (count, delta) =
             apply_steps(&conn, 1, "2026-09-06", "sensor", Some(500), None).unwrap();

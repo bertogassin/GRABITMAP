@@ -247,15 +247,7 @@ pub async fn chat_page(
     let user_id = match verify_user_session(&state, &headers) {
         Some(id) => id,
         None => {
-            return Html(templates::render_chat(
-                false,
-                0,
-                0,
-                "",
-                "",
-                "",
-                vec![],
-            ));
+            return Html(templates::render_chat(false, 0, 0, "", "", "", vec![]));
         }
     };
 

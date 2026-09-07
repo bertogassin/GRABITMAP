@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      # Keep the repository-wide check visible without blocking on legacy
+      # formatting outside the files touched by this workflow.
+      - run: cargo fmt --all -- --check
+        continue-on-error: true
+      - run: rustfmt --edition 2021 --check src/web/handlers/chat_media.rs src/web/handlers/chat_realtime.rs
+      - run: cargo test --all-targets
+      - run: cargo build --release --locked
+      - run: cargo clippy --all-targets
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run i18n
+      - run: npm run test:frontend
+      - run: node --check static/chat-v2.js
+      - run: node --check static/inbox.js
+      - run: node --check static/i18n-runtime.js

@@ -9,6 +9,18 @@
         }
     }
 
+    function internalHref(value, fallback) {
+        try {
+            var url = new URL(String(value || ""), window.location.origin);
+            if (url.origin !== window.location.origin || !url.pathname.startsWith("/app/")) {
+                return fallback;
+            }
+            return url.pathname + url.search + url.hash;
+        } catch (_) {
+            return fallback;
+        }
+    }
+
     ready(function () {
         var list = document.getElementById("chat-dialog-list");
 
@@ -49,6 +61,20 @@
         var retryTimer = null;
         var heartbeatTimer = null;
         var retryAttempt = 0;
+        var cursorKey = "resursmap:inbox-event-cursor";
+        var lastEventId = 0;
+        try {
+            lastEventId = Number(window.localStorage.getItem(cursorKey)) || 0;
+        } catch (_) {}
+
+        function rememberEventCursor(value) {
+            var cursor = Number(value);
+            if (!Number.isSafeInteger(cursor) || cursor <= lastEventId) return;
+            lastEventId = cursor;
+            try {
+                window.localStorage.setItem(cursorKey, String(cursor));
+            } catch (_) {}
+        }
         var stopped = false;
         var lastSnapshot = "";
         var activeTyping = Object.create(null);
@@ -106,10 +132,10 @@
             var userId = String(conversation.other_user_id || "").trim();
             var groupId = String(conversation.group_id || "").trim();
             var isGroup = Boolean(conversation.is_group);
-            var href = String(conversation.href || "").trim() ||
-                (isGroup && groupId
+            var fallbackHref = isGroup && groupId
                     ? "/app/group/" + encodeURIComponent(groupId)
-                    : "/app/chat/" + encodeURIComponent(userId));
+                    : "/app/chat/" + encodeURIComponent(userId);
+            var href = internalHref(conversation.href, fallbackHref);
             var username = String(conversation.username || "").trim();
             var usernameHtml = !isGroup && username
                 ? '<div class="card-meta rm-dialog-username">@'
@@ -143,7 +169,7 @@
 
             return (
                 '<a href="'
-                + href
+                + escapeHtml(href)
                 + '#chat-end" class="card chat-dialog-card" data-other-user-id="'
                 + escapeHtml(userId)
                 + '" data-group-id="'
@@ -337,7 +363,8 @@
                 window.location.protocol === "https:" ? "wss:" : "ws:";
 
             return (
-                scheme + "//" + window.location.host + "/api/chat/realtime"
+                scheme + "//" + window.location.host + "/api/chat/realtime?last_event_id=" +
+                encodeURIComponent(String(lastEventId))
             );
         }
 
@@ -429,6 +456,12 @@
                     payload = JSON.parse(event.data);
                 } catch (_) {
                     return;
+                }
+                if (payload.event && Number(payload.event.event_id) > lastEventId) {
+                    rememberEventCursor(payload.event.event_id);
+                }
+                if (payload.type === "sync_required") {
+                    rememberEventCursor(payload.after_event_id);
                 }
 
                 handleTypingPayload(payload);

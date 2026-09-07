@@ -2597,6 +2597,26 @@ html[data-page="chat"] body.chat-keyboard-open .chat-shell {
     box-shadow: 0 18px 40px rgba(0, 0, 0, .28);
 }
 
+html[dir="rtl"] .chat-header-menu {
+    right: auto;
+    left: 0;
+}
+
+html[dir="rtl"] .chat-header-presence-dot {
+    right: auto;
+    left: -1px;
+}
+
+html[dir="rtl"] .chat-scroll-bottom {
+    right: auto;
+    left: 14px;
+}
+
+html[dir="rtl"] .chat-message-more {
+    right: auto;
+    left: 6px;
+}
+
 .chat-header-menu[hidden] {
     display: none;
 }
