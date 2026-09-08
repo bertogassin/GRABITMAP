@@ -47,7 +47,6 @@ fn display_name(username: &str, first: &str, last: &str) -> String {
 
 fn destination(kind: &str, inviter_user_id: i64) -> String {
     match kind {
-        "steps" => "/app/steps".to_string(),
         "work" => "/app/search?kind=work".to_string(),
         _ => format!("/app/chat/{inviter_user_id}"),
     }

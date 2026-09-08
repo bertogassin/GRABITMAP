@@ -1,6 +1,5 @@
 use super::auth::verify_authenticated_user;
 use super::auth::verify_user_session;
-use crate::db::steps::today_local;
 use crate::state::app_state::AppState;
 use crate::web::templates;
 use axum::{
@@ -19,13 +18,6 @@ pub struct DailyNudge {
     pub message: &'static str,
     pub href: &'static str,
 }
-
-const STEP_NUDGE: DailyNudge = DailyNudge {
-    kind: "step_nudge",
-    title: "10 000 шагов",
-    message: "Сделайте хотя бы 10 000 шагов сегодня.",
-    href: "/app/steps",
-};
 
 const WORK_NUDGE: DailyNudge = DailyNudge {
     kind: "work_nudge",
@@ -91,36 +83,17 @@ pub fn ensure_daily_nudges(db: &rusqlite::Connection, user_id: i64) -> Vec<Daily
     }
 
     let since = today_start_unix();
-    let today = today_local();
     let mut created = Vec::new();
 
     let _ = db.execute(
         "UPDATE user_notifications
          SET is_read = 1
          WHERE user_id = ?1
-           AND kind IN ('step_nudge', 'work_nudge')
+           AND kind = 'work_nudge'
            AND is_read = 0
            AND created_at < ?2",
         rusqlite::params![user_id, since],
     );
-
-    let steps_today: i64 = db
-        .query_row(
-            "SELECT step_count
-             FROM user_step_days
-             WHERE user_id = ?1
-               AND step_date = ?2",
-            rusqlite::params![user_id, today],
-            |row| row.get(0),
-        )
-        .unwrap_or(0);
-
-    if steps_today < 10_000
-        && !already_nudged_today(db, user_id, STEP_NUDGE.kind, since)
-        && insert_nudge(db, user_id, &STEP_NUDGE)
-    {
-        created.push(STEP_NUDGE);
-    }
 
     if !already_nudged_today(db, user_id, WORK_NUDGE.kind, since)
         && insert_nudge(db, user_id, &WORK_NUDGE)
@@ -137,7 +110,7 @@ pub fn list_unread_daily_nudges(db: &rusqlite::Connection, user_id: i64) -> Vec<
     }
     let since = today_start_unix();
     let mut out = Vec::new();
-    for nudge in [STEP_NUDGE, WORK_NUDGE] {
+    for nudge in [WORK_NUDGE] {
         let exists: i64 = db
             .query_row(
                 "SELECT COUNT(*)
@@ -268,8 +241,6 @@ pub async fn open_notification(
         } else {
             format!("/app/resource/{resource_id}")
         }
-    } else if kind == "step_nudge" {
-        "/app/steps".to_string()
     } else if kind == "work_nudge" {
         "/app/search?kind=work".to_string()
     } else if kind == "admin_assignment" {
@@ -334,10 +305,9 @@ pub async fn unread_count(State(state): State<AppState>, headers: HeaderMap) -> 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::db::steps::{initialize, today_local};
 
     #[test]
-    fn daily_nudges_insert_once_and_skip_after_goal() {
+    fn daily_work_nudge_inserts_once() {
         let db = rusqlite::Connection::open_in_memory().expect("database");
         db.execute_batch(
             "CREATE TABLE user_notifications (
@@ -352,19 +322,10 @@ mod tests {
              );",
         )
         .expect("notifications");
-        initialize(&db).expect("steps");
-
         let first = ensure_daily_nudges(&db, 9);
-        assert_eq!(first.len(), 2);
+        assert_eq!(first.len(), 1);
         let second = ensure_daily_nudges(&db, 9);
         assert!(second.is_empty());
-
-        db.execute(
-            "INSERT INTO user_step_days (user_id, step_date, step_count)
-             VALUES (9, ?1, 10000)",
-            rusqlite::params![today_local()],
-        )
-        .expect("steps row");
 
         let count: i64 = db
             .query_row(
@@ -373,6 +334,6 @@ mod tests {
                 |row| row.get(0),
             )
             .expect("count");
-        assert_eq!(count, 2);
+        assert_eq!(count, 1);
     }
 }

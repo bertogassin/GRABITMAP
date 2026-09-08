@@ -1654,7 +1654,6 @@ pub fn render_menu(invite_public_id: &str) -> String {
 
     <div class="grid">
         {profile_card}
-        {steps_card}
         {add_card}
     </div>
 
@@ -1733,12 +1732,6 @@ pub fn render_menu(invite_public_id: &str) -> String {
             "user",
             &crate::i18n::t("menu_profile_card"),
             &crate::i18n::t("menu_profile_meta")
-        ),
-        steps_card = navigation_card(
-            "/app/steps",
-            "footprints",
-            &crate::i18n::t("menu_steps_card"),
-            &crate::i18n::t("menu_steps_meta")
         ),
         add_card = navigation_card(
             "/app/add",

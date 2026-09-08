@@ -1,9 +1,6 @@
 mod favorites;
 pub use favorites::*;
 
-mod steps;
-pub use steps::{api_steps_get, api_steps_write, steps_page};
-
 mod notifications;
 pub use notifications::*;
 

@@ -39,16 +39,6 @@ test("service worker keeps partial shell caches and caches static responses", as
   assert.match(serviceWorker, /internalNavigationTarget\(nudge\.href, "\/app"\)/);
 });
 
-test("stepper namespaces local state and bounds lifecycle updates", async () => {
-  const pedometer = await readFile(new URL("static/pedometer.js", root), "utf8");
-  assert.match(pedometer, /data-user-id/);
-  assert.match(pedometer, /resursmap:steps:" \+ userNamespace/);
-  assert.match(pedometer, /MAX_DAY_STEPS/);
-  assert.match(pedometer, /checkMidnight/);
-  assert.match(pedometer, /clearInterval\(syncTimer\)/);
-  assert.match(pedometer, /__RM_STEPS_DEBUG__ === true/);
-});
-
 test("frontend navigation only accepts same-origin app hrefs", async () => {
   const [home, inbox, chat] = await Promise.all([
     readFile(new URL("static/home-explorer.js", root), "utf8"),
@@ -110,21 +100,13 @@ test("chat has one active submit owner and accepts practical voice sizes", async
   assert.match(groups, /bytes\.len\(\) > MAX_VOICE_BYTES/);
 });
 
-test("pedometer falls back to the Android Generic Sensor API", async () => {
-  const pedometer = await readFile(new URL("static/pedometer.js", root), "utf8");
-  assert.match(pedometer, /new Accelerometer\(\{ frequency: 30 \}\)/);
-  assert.match(pedometer, /startAccelerometerFallback/);
-  assert.match(pedometer, /processAcceleration\(accelerometer\.x/);
-  assert.match(pedometer, /accelerometer\.stop\(\)/);
-});
-
 test("mobile diagnostics probes session chat microphone and motion", async () => {
   const diagnostics = await readFile(new URL("static/mobile-diagnostics.js", root), "utf8");
   assert.match(diagnostics, /grabit-mobile-diagnostic/);
   assert.match(diagnostics, /chatCoreReady/);
   assert.match(diagnostics, /getUserMedia/);
   assert.match(diagnostics, /DeviceMotionEvent\.requestPermission/);
-  assert.match(diagnostics, /\/api\/steps\?today=/);
+  assert.match(diagnostics, /\/api\/account\/attention-count/);
 });
 
 test("browser i18n fallback cannot recurse and generated bare imports are not loaded", async () => {
