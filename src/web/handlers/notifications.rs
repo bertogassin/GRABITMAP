@@ -110,22 +110,21 @@ pub fn list_unread_daily_nudges(db: &rusqlite::Connection, user_id: i64) -> Vec<
     }
     let since = today_start_unix();
     let mut out = Vec::new();
-    for nudge in [WORK_NUDGE] {
-        let exists: i64 = db
-            .query_row(
-                "SELECT COUNT(*)
+    let nudge = WORK_NUDGE;
+    let exists: i64 = db
+        .query_row(
+            "SELECT COUNT(*)
                  FROM user_notifications
                  WHERE user_id = ?1
                    AND kind = ?2
                    AND is_read = 0
                    AND created_at >= ?3",
-                rusqlite::params![user_id, nudge.kind, since],
-                |row| row.get(0),
-            )
-            .unwrap_or(0);
-        if exists > 0 {
-            out.push(nudge);
-        }
+            rusqlite::params![user_id, nudge.kind, since],
+            |row| row.get(0),
+        )
+        .unwrap_or(0);
+    if exists > 0 {
+        out.push(nudge);
     }
     out
 }
