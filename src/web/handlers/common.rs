@@ -147,15 +147,6 @@ pub(super) fn request_is_cross_site(headers: &HeaderMap) -> bool {
         return false;
     }
 
-    // Некоторые Android WebView отправляют Origin: null
-    // для формы, открытой внутри доверенного приложения.
-    //
-    // Такой запрос разрешается только если браузер не
-    // обозначил его как настоящий cross-site запрос.
-    if origin.is_some_and(|value| value.eq_ignore_ascii_case("null")) {
-        return fetch_is_cross_site;
-    }
-
     // Любой другой явно указанный Origin не доверен.
     if origin.is_some() {
         return true;
@@ -182,22 +173,14 @@ mod request_origin_tests {
     use super::*;
 
     #[test]
-    fn opaque_android_origin_is_allowed_only_when_not_cross_site() {
-        let mut same_origin = HeaderMap::new();
+    fn opaque_origin_is_always_rejected() {
+        for fetch_site in ["same-origin", "same-site", "none", "cross-site"] {
+            let mut headers = HeaderMap::new();
+            headers.insert(header::ORIGIN, "null".parse().expect("origin"));
+            headers.insert("sec-fetch-site", fetch_site.parse().expect("fetch site"));
 
-        same_origin.insert(header::ORIGIN, "null".parse().expect("origin"));
-
-        same_origin.insert("sec-fetch-site", "same-origin".parse().expect("fetch site"));
-
-        assert!(!request_is_cross_site(&same_origin));
-
-        let mut cross_site = HeaderMap::new();
-
-        cross_site.insert(header::ORIGIN, "null".parse().expect("origin"));
-
-        cross_site.insert("sec-fetch-site", "cross-site".parse().expect("fetch site"));
-
-        assert!(request_is_cross_site(&cross_site));
+            assert!(request_is_cross_site(&headers));
+        }
     }
 
     #[test]
