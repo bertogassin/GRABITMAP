@@ -266,6 +266,16 @@ pub fn apply_steps(
         "manual" => {
             return Ok((current, 0));
         }
+        "health_connect" => {
+            let next = absolute.map(clamp_day_steps).unwrap_or(current);
+            let applied = next - current;
+            let log_delta = if applied.unsigned_abs() >= 200 {
+                applied
+            } else {
+                0
+            };
+            (next, applied, log_delta)
+        }
         _ => {
             let absolute = absolute.map(clamp_day_steps).unwrap_or(current);
             let next = current.max(absolute);
@@ -275,7 +285,7 @@ pub fn apply_steps(
         }
     };
 
-    if delta <= 0 {
+    if delta == 0 {
         return Ok((current, 0));
     }
 
@@ -337,7 +347,7 @@ mod tests {
     }
 
     #[test]
-    fn manual_adds_are_ignored_and_sensor_never_lowers() {
+    fn manual_adds_are_ignored_sensor_never_lowers_and_health_connect_corrects() {
         let conn = Connection::open_in_memory().unwrap();
         initialize(&conn).unwrap();
         assert!(valid_add(500));
@@ -353,5 +363,8 @@ mod tests {
         let (count, delta) =
             apply_steps(&conn, 1, "2026-09-06", "sensor", Some(900), None).unwrap();
         assert_eq!((count, delta), (900, 400));
+        let (count, delta) =
+            apply_steps(&conn, 1, "2026-09-06", "health_connect", Some(640), None).unwrap();
+        assert_eq!((count, delta), (640, -260));
     }
 }
