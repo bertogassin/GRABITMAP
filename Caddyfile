@@ -1,0 +1,10 @@
+grabitmap.com, www.grabitmap.com {
+    encode gzip
+    reverse_proxy grabit:3000 {
+        lb_try_duration 15s
+        lb_try_interval 250ms
+        health_uri /ready
+        health_interval 10s
+        health_timeout 3s
+    }
+}

@@ -11,7 +11,7 @@ jobs:
   rust:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
@@ -23,14 +23,16 @@ jobs:
   frontend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
       - run: npm ci
       - run: npm run i18n
       - run: npm run test:frontend
+      - name: Validate Caddy configuration
+        run: docker run --rm -v "$PWD/Caddyfile:/etc/caddy/Caddyfile:ro" caddy:2 caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
       - name: Check handwritten JavaScript syntax
         run: |
           find static -type f -name '*.js' ! -path 'static/paraglide/*' -print0 | xargs -0 -n1 node --check
