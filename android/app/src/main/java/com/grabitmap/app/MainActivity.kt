@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
@@ -32,7 +33,7 @@ class MainActivity : AppCompatActivity() {
     private var cachedSteps = 0L
     private val appOrigin = "https://grabitmap.com"
     private val readSteps = HealthPermission.getReadPermission(StepsRecord::class)
-    private val permissions = registerForActivityResult(
+    private val permissions: ActivityResultLauncher<Set<String>> = registerForActivityResult(
         PermissionController.createRequestPermissionResultContract()
     ) { granted ->
         status.text = if (readSteps in granted) getString(R.string.access_granted) else getString(R.string.access_denied)
