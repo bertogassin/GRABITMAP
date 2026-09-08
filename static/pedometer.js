@@ -46,6 +46,8 @@
     var wakeLock = null;
     var accelerometer = null;
     var accelerometerTimer = 0;
+    var nativeHealth = window.GrabitHealth &&
+        typeof window.GrabitHealth.requestTodaySteps === "function";
     var lastPanelAt = 0;
     var lastPanelCount = -1;
     var diagnostics = {
@@ -438,7 +440,7 @@
             var data = await send({
                 date: localToday,
                 steps: localCount,
-                source: "sensor",
+                source: nativeHealth ? "health_connect" : "sensor",
             });
             if (data) applySnapshot(data);
         } finally {
@@ -634,6 +636,17 @@
     }
 
     function bindClicks() {
+        window.addEventListener("grabit-native-steps", function (event) {
+            var detail = event && event.detail ? event.detail : {};
+            var count = Number(detail.steps);
+            if (detail.date !== localToday || !Number.isFinite(count) || count < 0) return;
+            localCount = Math.min(MAX_DAY_STEPS, Math.floor(count));
+            pendingSync = SYNC_EVERY;
+            writeLocal();
+            paint();
+            setStatus(t("steps_health_connect", "Health Connect синхронизирован"));
+            syncSensor(true);
+        });
         root.addEventListener("click", function (event) {
             var day = event.target.closest("[data-date]");
             if (day) openDay(day.getAttribute("data-date"));
@@ -681,7 +694,10 @@
         }
         if (localCount > 0) syncSensor(true);
         if (notifyReady()) updateLivePanel(true);
-        if (typeof DeviceMotionEvent !== "undefined" &&
+        if (nativeHealth) {
+            setStatus(t("steps_health_connect", "Синхронизация с Health Connect"));
+            window.GrabitHealth.requestTodaySteps();
+        } else if (typeof DeviceMotionEvent !== "undefined" &&
             typeof DeviceMotionEvent.requestPermission === "function") {
             setStatus(t("steps_need_motion", "Коснитесь экрана для доступа к движению"));
             document.addEventListener("pointerdown", requestListen, {

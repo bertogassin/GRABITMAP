@@ -3,4 +3,14 @@
     <string name="health_title">GRABIT · Health Connect</string>
     <string name="allow_health_connect">Разрешить Health Connect</string>
     <string name="refresh_steps">Обновить шаги</string>
+    <string name="open_grabit">Открыть GRABIT</string>
+    <string name="checking_health_connect">Проверяем Health Connect…</string>
+    <string name="health_connect_available">Health Connect доступен</string>
+    <string name="update_health_connect">Обновите Health Connect</string>
+    <string name="health_connect_unavailable">Health Connect недоступен</string>
+    <string name="access_granted">Доступ получен</string>
+    <string name="access_denied">Доступ к шагам не предоставлен</string>
+    <string name="allow_steps_first">Сначала разрешите чтение шагов</string>
+    <string name="steps_today">Сегодня: %1$d шагов</string>
+    <string name="read_error">Ошибка чтения: %1$s</string>
 </resources>
