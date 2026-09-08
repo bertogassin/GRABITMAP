@@ -226,8 +226,17 @@ pub async fn api_steps_write(
         }
     }
 
+    let source = payload.source.as_deref().unwrap_or("");
+    if payload.steps.is_some() && source != "health_connect" {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "ok": false, "error": "health_connect_required" })),
+        )
+            .into_response();
+    }
+
     if payload.steps.is_some()
-        && apply_steps(&db, user_id, &date, "sensor", payload.steps, None).is_err()
+        && apply_steps(&db, user_id, &date, "health_connect", payload.steps, None).is_err()
     {
         return (
             StatusCode::INTERNAL_SERVER_ERROR,

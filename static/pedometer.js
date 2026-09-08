@@ -692,20 +692,13 @@
         } catch (_) {
             setStatus(t("chat_no_network", "Нет сети"));
         }
-        if (localCount > 0) syncSensor(true);
+        if (localCount > 0 && nativeHealth) syncSensor(true);
         if (notifyReady()) updateLivePanel(true);
         if (nativeHealth) {
             setStatus(t("steps_health_connect", "Синхронизация с Health Connect"));
             window.GrabitHealth.requestTodaySteps();
-        } else if (typeof DeviceMotionEvent !== "undefined" &&
-            typeof DeviceMotionEvent.requestPermission === "function") {
-            setStatus(t("steps_need_motion", "Коснитесь экрана для доступа к движению"));
-            document.addEventListener("pointerdown", requestListen, {
-                once: true,
-                passive: true,
-            });
         } else {
-            requestListen();
+            setStatus(t("steps_health_connect_app", "Шаги синхронизируются приложением GRABIT для Android"));
         }
     }
 
