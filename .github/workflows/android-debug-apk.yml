@@ -3,7 +3,6 @@ name: Android debug APK
 on:
   workflow_dispatch:
   push:
-    branches: [feat/android-health-connect]
     paths: ["android/**", ".github/workflows/android-debug-apk.yml"]
   pull_request:
     paths: ["android/**", ".github/workflows/android-debug-apk.yml"]

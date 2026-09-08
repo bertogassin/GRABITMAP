@@ -2,7 +2,7 @@
 
 const CACHE_PREFIX = "grabit-shell-";
 const LEGACY_CACHE_PREFIX = "resursmap-shell-";
-const CACHE_VERSION = CACHE_PREFIX + "v5.0.20";
+const CACHE_VERSION = CACHE_PREFIX + "v5.0.21";
 
 const STATIC_ASSETS = [
     "/static/manifest.webmanifest",
