@@ -6,6 +6,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.permission.HealthPermission
+import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.time.TimeRangeFilter
@@ -19,17 +20,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var status: TextView
     private val readSteps = HealthPermission.getReadPermission(StepsRecord::class)
     private val permissions = registerForActivityResult(
-        HealthConnectClient.createRequestPermissionResultContract()
+        PermissionController.createRequestPermissionResultContract()
     ) { granted -> status.text = if (readSteps in granted) "Доступ получен" else "Доступ к шагам не предоставлен" }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val layout = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(48, 72, 48, 48) }
-        layout.addView(TextView(this).apply { text = "GRABIT · Health Connect"; textSize = 26f })
+        layout.addView(TextView(this).apply { text = getString(R.string.health_title); textSize = 26f })
         status = TextView(this).apply { text = "Проверяем Health Connect…"; textSize = 18f; setPadding(0, 32, 0, 32) }
         layout.addView(status)
-        val allow = Button(this).apply { text = "Разрешить Health Connect" }
-        val refresh = Button(this).apply { text = "Обновить шаги" }
+        val allow = Button(this).apply { text = getString(R.string.allow_health_connect) }
+        val refresh = Button(this).apply { text = getString(R.string.refresh_steps) }
         layout.addView(allow); layout.addView(refresh); setContentView(layout)
 
         when (HealthConnectClient.getSdkStatus(this)) {
