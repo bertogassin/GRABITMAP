@@ -1,10 +1,10 @@
 use super::super::handlers::{
     api_attention_count, api_open_count, api_profile_avatar_get, api_profile_avatar_set,
-    api_profile_get, api_profile_set, api_steps_get, api_steps_write, app_logout, app_me,
-    app_revoke_other_sessions, app_revoke_session, email_auth_request, email_auth_verify,
-    favorites_page, forgot_password_page, forgot_password_request, join_invite, login_code_page,
-    login_email, login_page, mark_all_notifications_read, notifications_page, open_notification,
-    public_user_profile, register_email, register_page, reset_password, steps_page, unread_count,
+    api_profile_get, api_profile_set, app_logout, app_me, app_revoke_other_sessions,
+    app_revoke_session, email_auth_request, email_auth_verify, favorites_page,
+    forgot_password_page, forgot_password_request, join_invite, login_code_page, login_email,
+    login_page, mark_all_notifications_read, notifications_page, open_notification,
+    public_user_profile, register_email, register_page, reset_password, unread_count,
 };
 use crate::state::app_state::AppState;
 use axum::{
@@ -35,9 +35,7 @@ pub(super) fn routes() -> Router<AppState> {
         .route("/app/locale", post(crate::i18n::set_locale))
         .route("/app/me", get(app_me))
         .route("/app/favorites", get(favorites_page))
-        .route("/app/steps", get(steps_page))
         .route("/app/join/{public_id}", get(join_invite))
-        .route("/api/steps", get(api_steps_get).post(api_steps_write))
         .route("/app/notifications", get(notifications_page))
         .route(
             "/app/notifications/read-all",

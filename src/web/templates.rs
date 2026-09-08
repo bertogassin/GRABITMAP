@@ -24,9 +24,6 @@ pub use resources::*;
 mod profile_account;
 pub use profile_account::*;
 
-mod steps;
-pub use steps::*;
-
 mod legal;
 pub use legal::*;
 

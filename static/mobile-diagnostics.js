@@ -108,7 +108,7 @@
             add(list, "HTTPS", window.isSecureContext, window.isSecureContext ? "да" : "нет");
             add(list, "JavaScript", runtimeErrors.length === 0,
                 runtimeErrors.length ? runtimeErrors.join(" | ") : "ошибок запуска нет");
-            var session = await responseStatus("/api/steps?today=" + encodeURIComponent(localDate()));
+            var session = await responseStatus("/api/account/attention-count");
             add(list, "Сессия/API", session.ok, session.detail);
             var form = document.getElementById("chat-form");
             add(list, "Страница чата", !!form, form ? "форма найдена" : "откройте конкретный диалог");

@@ -2,7 +2,7 @@
 
 const CACHE_PREFIX = "grabit-shell-";
 const LEGACY_CACHE_PREFIX = "resursmap-shell-";
-const CACHE_VERSION = CACHE_PREFIX + "v5.0.22";
+const CACHE_VERSION = CACHE_PREFIX + "v5.0.23";
 
 const STATIC_ASSETS = [
     "/static/manifest.webmanifest",
@@ -75,22 +75,19 @@ function swT(key) {
             notify_new_message: "Новое сообщение",
             notify_open_chat: "Откройте чат в GRABIT.",
             notify_generic: "Есть новое уведомление.",
-            pwa_updated: "GRABIT обновлён",
-            pwa_open_app_steps: "Откройте приложение. Шагомер на панели — сразу считать шаги."
+            pwa_updated: "GRABIT обновлён"
         },
         en: {
             notify_new_message: "New message",
             notify_open_chat: "Open the chat in GRABIT.",
             notify_generic: "You have a new notification.",
-            pwa_updated: "GRABIT updated",
-            pwa_open_app_steps: "Open the app. Pedometer is on the panel — start counting steps."
+            pwa_updated: "GRABIT updated"
         },
         uk: {
             notify_new_message: "Нове повідомлення",
             notify_open_chat: "Відкрийте чат у GRABIT.",
             notify_generic: "Є нове сповіщення.",
-            pwa_updated: "GRABIT оновлено",
-            pwa_open_app_steps: "Відкрийте застосунок. Крокомір на панелі — одразу рахувати кроки."
+            pwa_updated: "GRABIT оновлено"
         }
     };
     var locale = "ru";
@@ -156,7 +153,7 @@ self.addEventListener("activate", function (event) {
                     return;
                 }
                 return self.registration.showNotification(swT("pwa_updated"), {
-                    body: swT("pwa_open_app_steps"),
+                    body: swT("notify_generic"),
                     icon: "/static/app-icon-192.png",
                     tag: "grabit-update",
                     data: { url: "/app" }
@@ -207,9 +204,7 @@ self.addEventListener("periodicsync", function (event) {
 self.addEventListener("notificationclick", function (event) {
     event.notification.close();
     var target = "/app";
-    if (event.action === "open-steps") {
-        target = "/app/steps";
-    } else if (event.notification && event.notification.data && event.notification.data.url) {
+    if (event.notification && event.notification.data && event.notification.data.url) {
         target = internalNavigationTarget(event.notification.data.url, target);
     }
     event.waitUntil(
