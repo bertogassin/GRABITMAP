@@ -171,6 +171,25 @@ pub fn init_promotion_schema(connection: &Connection) -> Result<()> {
             id
         );
 
+        CREATE TABLE IF NOT EXISTS resource_internal_promotions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            resource_id INTEGER NOT NULL,
+            requester_user_id INTEGER NOT NULL,
+            starts_at INTEGER NOT NULL,
+            ends_at INTEGER NOT NULL CHECK(ends_at > starts_at),
+            discount_percent INTEGER NOT NULL DEFAULT 100
+                CHECK(discount_percent BETWEEN 0 AND 100),
+            price_minor INTEGER NOT NULL DEFAULT 0 CHECK(price_minor >= 0),
+            status TEXT NOT NULL DEFAULT 'active'
+                CHECK(status IN ('active', 'expired', 'cancelled')),
+            created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+            FOREIGN KEY(resource_id) REFERENCES resources(id),
+            FOREIGN KEY(requester_user_id) REFERENCES users(id)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_internal_promotions_resource
+        ON resource_internal_promotions(resource_id, ends_at DESC, id DESC);
+
         CREATE TRIGGER IF NOT EXISTS
             resource_promotion_events_no_update
         BEFORE UPDATE ON resource_promotion_events
@@ -219,6 +238,12 @@ fn add_column_if_missing(
 }
 
 fn apply_promotion_flow_migrations(connection: &Connection) -> Result<()> {
+    add_column_if_missing(
+        connection,
+        "resources",
+        "internal_promotion_until",
+        "ALTER TABLE resources ADD COLUMN internal_promotion_until INTEGER NOT NULL DEFAULT 0",
+    )?;
     add_column_if_missing(
         connection,
         "resource_promotion_requests",
