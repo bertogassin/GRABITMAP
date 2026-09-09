@@ -156,3 +156,24 @@ test("staged deploy keeps a ready backend during replacement", async () => {
   assert.doesNotMatch(deploy, /images -q "\$APP_SERVICE"/);
   assert.doesNotMatch(deploy, /docker compose[^\n]* down/);
 });
+
+test("production monitor is independent and stateful", async () => {
+  const [monitor, service, timer] = await Promise.all([
+    readFile(new URL("scripts/monitor_production.sh", root), "utf8"),
+    readFile(new URL("ops/systemd/grabit-monitor.service", root), "utf8"),
+    readFile(new URL("ops/systemd/grabit-monitor.timer", root), "utf8"),
+  ]);
+
+  assert.match(monitor, /check_url health \/health/);
+  assert.match(monitor, /check_url ready \/ready/);
+  assert.match(monitor, /docker compose/);
+  assert.match(monitor, /DISK_LIMIT/);
+  assert.match(monitor, /MemAvailable/);
+  assert.match(monitor, /previous=.*STATE_FILE/);
+  assert.match(monitor, /logger -t grabit-monitor/);
+  assert.doesNotMatch(monitor, /TELEGRAM|WHATSAPP|FACEBOOK/i);
+
+  assert.match(service, /ExecStart=\/opt\/grabit\/scripts\/monitor_production\.sh/);
+  assert.match(timer, /OnUnitActiveSec=1min/);
+  assert.match(timer, /Persistent=true/);
+});

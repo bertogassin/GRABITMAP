@@ -1,0 +1,10 @@
+[Unit]
+Description=GRABIT production health monitor
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/grabit
+ExecStart=/opt/grabit/scripts/monitor_production.sh
+User=root
