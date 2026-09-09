@@ -117,8 +117,6 @@ fn trusted_request_origin(origin: &str) -> bool {
         origin.trim_end_matches('/'),
         "https://grabitmap.com"
             | "https://www.grabitmap.com"
-            | "https://resursmap.de"
-            | "https://www.resursmap.de"
             | "http://127.0.0.1:3000"
             | "http://localhost:3000"
     )
@@ -130,8 +128,6 @@ fn trusted_request_referer(referer: &str) -> bool {
     [
         "https://grabitmap.com",
         "https://www.grabitmap.com",
-        "https://resursmap.de",
-        "https://www.resursmap.de",
         "http://127.0.0.1:3000",
         "http://localhost:3000",
     ]
@@ -266,9 +262,18 @@ mod request_origin_tests {
     }
 
     #[test]
-    fn trusted_origins_are_strict() {
+    fn only_grabit_and_local_development_origins_are_trusted() {
         assert!(trusted_request_origin("https://grabitmap.com"));
-        assert!(trusted_request_origin("https://resursmap.de"));
+        assert!(trusted_request_origin("https://www.grabitmap.com"));
+        assert!(trusted_request_origin("http://localhost:3000"));
+
+        assert!(!trusted_request_origin("https://resursmap.de"));
+        assert!(!trusted_request_origin("https://www.resursmap.de"));
+        assert!(!trusted_request_referer("https://resursmap.de/app/me"));
+        assert!(!trusted_request_referer(
+            "https://www.resursmap.de/app/center"
+        ));
+
         assert!(!trusted_request_origin("https://t.me"));
         assert!(!trusted_request_origin("https://web.telegram.org"));
         assert!(!trusted_request_origin("https://evil.example"));
