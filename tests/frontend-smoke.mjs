@@ -62,6 +62,10 @@ test("production compose keeps Caddy in front of the private app", async () => {
   assert.match(compose, /\n  caddy:\s*\n/);
   assert.match(compose, /env_file:\s*\n\s*- \.env/);
   assert.match(app, /expose:\s*\n\s*- "3000"/);
+  assert.match(
+    app,
+    /\/var\/lib\/grabit-monitor:\/run\/grabit-monitor:ro/,
+  );
   assert.doesNotMatch(app, /ports:\s*\n\s*- "3000:3000"/);
   assert.match(compose, /\.\/Caddyfile:\/etc\/caddy\/Caddyfile/);
   assert.match(caddy, /reverse_proxy grabit:3000/);
