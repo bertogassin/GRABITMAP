@@ -11,6 +11,96 @@ use axum::{
     response::{Html, IntoResponse, Response},
 };
 use rusqlite::params;
+use std::{env, fs};
+
+const DEFAULT_MONITOR_STATE_PATH: &str = "/run/grabit-monitor/current";
+const MAX_MONITOR_STATE_BYTES: usize = 4_096;
+const MONITOR_STALE_SECONDS: i64 = 180;
+
+struct ProductionStatus {
+    status: String,
+    checked_at: String,
+    details: String,
+    disk_used_percent: i64,
+    memory_available_percent: i64,
+}
+
+impl Default for ProductionStatus {
+    fn default() -> Self {
+        Self {
+            status: "unavailable".to_string(),
+            checked_at: "Нет данных".to_string(),
+            details: "monitor_state_unavailable".to_string(),
+            disk_used_percent: 0,
+            memory_available_percent: 0,
+        }
+    }
+}
+
+fn parse_production_status(raw: &str, now: i64) -> ProductionStatus {
+    if raw.len() > MAX_MONITOR_STATE_BYTES {
+        return ProductionStatus::default();
+    }
+
+    let value = |key: &str| -> Option<&str> {
+        raw.lines()
+            .find_map(|line| line.strip_prefix(&format!("{key}=")))
+            .map(str::trim)
+    };
+
+    let mut status = match value("status") {
+        Some("healthy") => "healthy".to_string(),
+        Some("failed") => "failed".to_string(),
+        _ => "unavailable".to_string(),
+    };
+
+    let checked_at = value("checked_at").unwrap_or("Нет данных").to_string();
+    let mut details = value("details")
+        .unwrap_or("monitor_state_unavailable")
+        .to_string();
+
+    let disk_used_percent = value("disk_used_percent")
+        .and_then(|item| item.parse::<i64>().ok())
+        .unwrap_or(0)
+        .clamp(0, 100);
+
+    let memory_available_percent = value("memory_available_percent")
+        .and_then(|item| item.parse::<i64>().ok())
+        .unwrap_or(0)
+        .clamp(0, 100);
+
+    let checked_timestamp = chrono::DateTime::parse_from_rfc3339(&checked_at)
+        .ok()
+        .map(|checked| checked.timestamp());
+
+    if status != "unavailable"
+        && checked_timestamp
+            .map(|checked| now.saturating_sub(checked) > MONITOR_STALE_SECONDS)
+            .unwrap_or(true)
+    {
+        status = "stale".to_string();
+        details = "monitor_data_stale".to_string();
+    }
+
+    ProductionStatus {
+        status,
+        checked_at,
+        details,
+        disk_used_percent,
+        memory_available_percent,
+    }
+}
+
+fn load_production_status() -> ProductionStatus {
+    let path =
+        env::var("MONITOR_STATE_PATH").unwrap_or_else(|_| DEFAULT_MONITOR_STATE_PATH.to_string());
+
+    let Ok(raw) = fs::read_to_string(path) else {
+        return ProductionStatus::default();
+    };
+
+    parse_production_status(&raw, chrono::Utc::now().timestamp())
+}
 
 pub async fn center_panel(State(state): State<AppState>, headers: HeaderMap) -> Response {
     let authenticated_user = match verify_authenticated_user(&state, &headers) {
@@ -239,6 +329,8 @@ pub async fn center_panel(State(state): State<AppState>, headers: HeaderMap) -> 
         )
         .unwrap_or_else(|_| "Владелец GRABIT".to_string());
 
+    let production = load_production_status();
+
     let data = AdminDashboardData {
         owner_name: &owner_display_name,
         level: context.level.number(),
@@ -257,6 +349,11 @@ pub async fn center_panel(State(state): State<AppState>, headers: HeaderMap) -> 
         security_warnings,
         audit_events,
         level_counts: levels,
+        production_status: &production.status,
+        production_checked_at: &production.checked_at,
+        production_details: &production.details,
+        disk_used_percent: production.disk_used_percent,
+        memory_available_percent: production.memory_available_percent,
     };
 
     drop(connection);
@@ -298,4 +395,57 @@ pub async fn center_panel(State(state): State<AppState>, headers: HeaderMap) -> 
     );
 
     response
+}
+
+#[cfg(test)]
+mod production_status_tests {
+    use super::*;
+
+    const HEALTHY: &str = "status=healthy
+checked_at=2026-09-09T07:28:50Z
+details=all_checks_passed
+disk_used_percent=8
+memory_available_percent=81
+";
+
+    fn checked_timestamp() -> i64 {
+        chrono::DateTime::parse_from_rfc3339("2026-09-09T07:28:50Z")
+            .expect("timestamp")
+            .timestamp()
+    }
+
+    #[test]
+    fn fresh_monitor_state_is_renderable() {
+        let state = parse_production_status(HEALTHY, checked_timestamp() + 60);
+
+        assert_eq!(state.status, "healthy");
+        assert_eq!(state.details, "all_checks_passed");
+        assert_eq!(state.disk_used_percent, 8);
+        assert_eq!(state.memory_available_percent, 81);
+    }
+
+    #[test]
+    fn old_monitor_state_is_marked_stale() {
+        let state =
+            parse_production_status(HEALTHY, checked_timestamp() + MONITOR_STALE_SECONDS + 1);
+
+        assert_eq!(state.status, "stale");
+        assert_eq!(state.details, "monitor_data_stale");
+    }
+
+    #[test]
+    fn malformed_monitor_state_is_not_trusted() {
+        let state = parse_production_status(
+            "status=unknown
+checked_at=broken
+disk_used_percent=900
+memory_available_percent=-20
+",
+            checked_timestamp(),
+        );
+
+        assert_eq!(state.status, "unavailable");
+        assert_eq!(state.disk_used_percent, 100);
+        assert_eq!(state.memory_available_percent, 0);
+    }
 }

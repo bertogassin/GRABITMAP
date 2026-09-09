@@ -11,6 +11,7 @@ services:
       GRABIT_COOKIE_SECURE: "1"
     volumes:
       - grabit-data:/app/data
+      - /var/lib/grabit-monitor:/run/grabit-monitor:ro
     expose:
       - "3000"
     networks:

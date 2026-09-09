@@ -18,12 +18,43 @@ pub(crate) struct AdminDashboardData<'a> {
     pub security_warnings: i64,
     pub audit_events: i64,
     pub level_counts: [i64; 5],
+    pub production_status: &'a str,
+    pub production_checked_at: &'a str,
+    pub production_details: &'a str,
+    pub disk_used_percent: i64,
+    pub memory_available_percent: i64,
 }
 
 pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     let owner_name = escape_html(data.owner_name);
     let level_title = escape_html(data.level_title);
     let territory = escape_html(data.territory);
+    let production_checked_at = escape_html(data.production_checked_at);
+
+    let (production_status, production_class, production_details) = match data.production_status {
+        "healthy" => ("● НОРМА", "", "Все автоматические проверки пройдены"),
+        "failed" => ("● СБОЙ", "admin-warning", "Обнаружена проблема production"),
+        "stale" => (
+            "● НЕТ СВЕЖИХ ДАННЫХ",
+            "admin-warning",
+            "Монитор давно не передавал новое состояние",
+        ),
+        _ => (
+            "● НЕДОСТУПНО",
+            "admin-warning",
+            "Состояние системного монитора пока недоступно",
+        ),
+    };
+
+    let production_details = if data.production_details == "all_checks_passed" {
+        production_details.to_string()
+    } else {
+        format!(
+            "{} · {}",
+            production_details,
+            escape_html(data.production_details)
+        )
+    };
 
     let head = r#"
 <style>
@@ -541,8 +572,8 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
                 🌍 {territory}
             </span>
 
-            <span class="admin-owner-badge safe">
-                ● Система работает
+            <span class="admin-owner-badge {production_badge_class}">
+                {production_status}
             </span>
 
             <span class="admin-owner-badge">
@@ -597,6 +628,19 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     </div>
 
     <section class="admin-command-grid">
+        <article class="admin-command-card {production_class}">
+            <div class="admin-command-header">
+                <div class="admin-command-name">Production</div>
+                <div class="admin-command-status">{production_status}</div>
+            </div>
+            <div class="admin-command-meta">
+                Проверено: {production_checked_at}<br>
+                Диск: {disk_used_percent}% ·
+                Свободная память: {memory_available_percent}%<br>
+                {production_details}
+            </div>
+        </article>
+
         <article class="admin-command-card">
             <div class="admin-command-header">
                 <div class="admin-command-name">База данных</div>
@@ -648,6 +692,17 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
         scope_id = data.scope_id,
         enabled_permissions = data.enabled_permissions,
         owner_name = owner_name,
+        production_status = production_status,
+        production_class = production_class,
+        production_badge_class = if data.production_status == "healthy" {
+            "safe"
+        } else {
+            ""
+        },
+        production_checked_at = production_checked_at,
+        production_details = production_details,
+        disk_used_percent = data.disk_used_percent,
+        memory_available_percent = data.memory_available_percent,
         security_warnings = data.security_warnings,
         security_status = if data.security_warnings == 0 {
             "● НОРМА"
