@@ -791,7 +791,7 @@ pub(crate) struct GroupSendPayload {
     #[serde(default)]
     client_message_id: String,
     #[serde(default)]
-    reply_to_message_id: i64,
+    reply_to_message_id: Option<i64>,
 }
 
 pub async fn api_group_send(
@@ -818,12 +818,13 @@ pub async fn api_group_send(
     if group_id <= 0 || !is_member(&db, group_id, user_id) {
         return json_error(StatusCode::FORBIDDEN, "not_a_member");
     }
-    if payload.reply_to_message_id > 0
+    let reply_to_message_id = payload.reply_to_message_id.unwrap_or(0).max(0);
+    if reply_to_message_id > 0
         && db
             .query_row(
                 "SELECT 1 FROM group_messages
                  WHERE id = ?1 AND group_id = ?2 AND deleted_at = 0",
-                rusqlite::params![payload.reply_to_message_id, group_id],
+                rusqlite::params![reply_to_message_id, group_id],
                 |_| Ok(()),
             )
             .is_err()
@@ -858,7 +859,7 @@ pub async fn api_group_send(
                 message,
                 now,
                 client_message_id,
-                payload.reply_to_message_id.max(0)
+                reply_to_message_id
             ],
         )
         .unwrap_or(0);
@@ -1745,5 +1746,15 @@ mod tests {
         assert_eq!(messages[1].reactions.len(), 1);
         assert_eq!(messages[1].reactions[0].count, 2);
         assert!(messages[1].reactions[0].mine);
+    }
+
+    #[test]
+    fn group_send_accepts_an_explicit_null_reply() {
+        let payload: GroupSendPayload = serde_json::from_str(
+            r#"{"message":"Обычное сообщение","client_message_id":"1234567890abcdef","reply_to_message_id":null}"#,
+        )
+        .expect("group send payload with no reply");
+
+        assert_eq!(payload.reply_to_message_id, None);
     }
 }
