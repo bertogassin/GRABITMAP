@@ -36,6 +36,9 @@ CADDY_ID="$(docker compose -f "$COMPOSE_FILE" ps -q "$CADDY_SERVICE")"
 test -n "$CURRENT_ID"
 test -n "$CADDY_ID"
 
+IMAGE_REF="$(docker inspect "$CURRENT_ID" --format '{{.Config.Image}}')"
+test -n "$IMAGE_REF"
+
 NETWORK="$(
     docker inspect "$CURRENT_ID" \
         --format '{{range $name, $_ := .NetworkSettings.Networks}}{{println $name}}{{end}}' |
@@ -74,7 +77,7 @@ echo "BACKUP=$BACKUP_DIR"
 echo "=== BUILD NEW IMAGE ==="
 docker compose -f "$COMPOSE_FILE" build "$APP_SERVICE"
 
-IMAGE_ID="$(docker compose -f "$COMPOSE_FILE" images -q "$APP_SERVICE" | head -1)"
+IMAGE_ID="$(docker image inspect "$IMAGE_REF" --format '{{.Id}}')"
 test -n "$IMAGE_ID"
 
 echo "=== START STAGED BACKEND ==="
