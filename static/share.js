@@ -9,8 +9,13 @@
 
         event.preventDefault();
 
-        var title = button.getAttribute("data-share-title") || document.title;
-        var text = button.getAttribute("data-share-text") || "";
+        var scope = button.closest("[data-share-scope]") || document;
+        var sourceTitle = scope.querySelector("[data-share-source-title]");
+        var sourceText = scope.querySelector("[data-share-source-text]");
+        var title = button.getAttribute("data-share-title") ||
+            (sourceTitle && sourceTitle.textContent.trim()) || document.title;
+        var text = button.getAttribute("data-share-text") ||
+            (sourceText && sourceText.textContent.trim()) || "";
         var url = button.getAttribute("data-share-url") || window.location.href;
         if (url.indexOf("/") === 0) {
             url = window.location.origin + url;
@@ -25,16 +30,25 @@
             }
         }
 
+        var payload = [title, text, url].filter(Boolean).join("\n\n");
+
         if (navigator.share) {
             navigator
                 .share({ title: title, text: text, url: url })
-                .catch(function () {});
+                .then(function () {
+                    done("Отправлено");
+                })
+                .catch(function (error) {
+                    if (!error || error.name !== "AbortError") {
+                        done("Не удалось поделиться");
+                    }
+                });
             return;
         }
 
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard
-                .writeText(url)
+                .writeText(payload)
                 .then(function () {
                     done("Ссылка скопирована");
                 })
