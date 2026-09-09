@@ -130,3 +130,26 @@ test("browser i18n fallback cannot recurse and generated bare imports are not lo
   assert.equal(browser.rmT("greeting", { name: "Амир" }), "Привет, Амир");
   assert.equal(browser.m.greeting({ name: "Амир" }), "Привет, Амир");
 });
+
+test("staged deploy keeps a ready backend during replacement", async () => {
+  const deploy = await readFile(
+    new URL("scripts/deploy_staged.sh", root),
+    "utf8",
+  );
+
+  const start = deploy.indexOf("=== START STAGED BACKEND ===");
+  const switchToStaged = deploy.indexOf("=== SWITCH TRAFFIC TO STAGED BACKEND ===");
+  const replacePrimary = deploy.indexOf("=== REPLACE PRIMARY BACKEND ===");
+  const switchToPrimary = deploy.indexOf("=== SWITCH TRAFFIC BACK TO PRIMARY ===");
+
+  assert.ok(start >= 0);
+  assert.ok(start < switchToStaged);
+  assert.ok(switchToStaged < replacePrimary);
+  assert.ok(replacePrimary < switchToPrimary);
+  assert.match(deploy, /test "\$STATUS" = "healthy"/);
+  assert.match(deploy, /trap cleanup EXIT/);
+  assert.match(deploy, /\.backup '\$BACKUP_DIR\/votes\.db'/);
+  assert.match(deploy, /PRAGMA integrity_check/);
+  assert.match(deploy, /returning to staged backend/);
+  assert.doesNotMatch(deploy, /docker compose[^\n]* down/);
+});

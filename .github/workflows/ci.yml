@@ -33,6 +33,8 @@ jobs:
       - run: npm run test:frontend
       - name: Validate Caddy configuration
         run: docker run --rm -v "$PWD/Caddyfile:/etc/caddy/Caddyfile:ro" caddy:2 caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+      - name: Validate staged deployment script
+        run: bash -n scripts/deploy_staged.sh
       - name: Check handwritten JavaScript syntax
         run: |
           find static -type f -name '*.js' ! -path 'static/paraglide/*' -print0 | xargs -0 -n1 node --check
