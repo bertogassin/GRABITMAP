@@ -201,3 +201,20 @@ test("core browser and chat flows do not depend on Telegram", async () => {
   assert.doesNotMatch(telegramAdapter, /notify_telegram_user/);
   assert.match(telegramAdapter, /publish_to_telegram_group/);
 });
+
+test("public resources use one universal share flow", async () => {
+  const [share, common, resources] = await Promise.all([
+    readFile(new URL("static/share.js", root), "utf8"),
+    readFile(new URL("src/web/templates/common.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/resources.rs", root), "utf8"),
+  ]);
+
+  assert.match(share, /navigator\.share/);
+  assert.match(share, /navigator\.clipboard/);
+  assert.match(share, /data-share-source-title/);
+  assert.match(share, /\[title, text, url\]/);
+  assert.match(common, /fn share_button/);
+  assert.match(common, /data-share-scope/);
+  assert.match(resources, /data-share-url="\/app\/resource\/\{id\}"/);
+  assert.doesNotMatch(share, /t\.me|telegram|whatsapp|facebook/i);
+});

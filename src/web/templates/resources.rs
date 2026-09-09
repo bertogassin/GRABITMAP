@@ -3,7 +3,7 @@ use super::common::{
     escape_html, guest_locked_section, icon, is_generic_profession_key, kind_chip,
     my_resource_moderation_badge, navigation_card, page_document, page_shell, premium_badge_html,
     profession_label, resource_card_link_class, resource_detail_section_class,
-    resource_listing_label, ru_count, search_people_cards, section_head, topbar,
+    resource_listing_label, ru_count, search_people_cards, section_head, share_button, topbar,
     verified_badge_html,
 };
 
@@ -190,10 +190,12 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                             write = crate::i18n::t("common_write"),
                         )
                     };
+                    let resource_href = format!("/app/resource/{id}");
+                    let share_html = share_button(&resource_href, "Поделиться");
 
                     format!(
                         r#"
-                    <div class="{card_class} card--listing">
+                    <div class="{card_class} card--listing" data-share-scope>
                         {premium_shine}
                         <a href="/app/resource/{id}" class="rm-person-main">
                         <div class="card-icon">{map_icon}</div>
@@ -201,7 +203,7 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                         <div class="card-content">
 
                             <div class="rm-resource-title-row">
-                                <div class="card-title">
+                                <div class="card-title" data-share-source-title>
                                     {title}
                                 </div>
                                 {premium_badge}
@@ -209,7 +211,7 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
 
                             {listing_label}
 
-                            <div class="card-meta">
+                            <div class="card-meta" data-share-source-text>
                                 {description}
                             </div>
 
@@ -230,6 +232,7 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                         <div class="card-arrow">›</div>
                         </a>
                         {write_html}
+                        {share_html}
                     </div>
                     "#,
                         id = id,
@@ -245,6 +248,7 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                         address = safe_address,
                         verified_badge = verified_badge,
                         write_html = write_html,
+                        share_html = share_html,
                     )
                 },
             )
@@ -565,7 +569,9 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
         type="button"
         class="ui-button"
         data-share
-        data-share-title="Объявление GRABIT"
+        data-share-title="{share_title}"
+        data-share-text="{share_text}"
+        data-share-url="/app/resource/{id}"
         data-share-status="share-status">
         Поделиться
     </button>
@@ -592,6 +598,9 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
     </div>"#,
             favorite_label = favorite_label,
             stars_html = stars_html,
+            share_title = escape_html(title),
+            share_text = escape_html(&format!("{listing_label} · {rubric_label}")),
+            id = id,
         )
     };
 

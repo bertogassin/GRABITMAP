@@ -29,7 +29,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = "5.0.28";
+pub const STATIC_ASSET_VERSION: &str = "5.0.29";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -4869,6 +4869,7 @@ pub(crate) fn resource_result_card(params: ResourceResultCardParams<'_>) -> Stri
             write = crate::i18n::t("common_write"),
         )
     };
+    let share_html = share_button(href, "Поделиться");
     let rating_line = crate::i18n::tf(
         "common_rating",
         &[
@@ -4878,7 +4879,7 @@ pub(crate) fn resource_result_card(params: ResourceResultCardParams<'_>) -> Stri
     );
     format!(
         r#"
-<div class="card card--result card--listing">
+<div class="card card--result card--listing" data-share-scope>
 <a href="{href}" class="rm-person-main">
 
     <div class="card-icon">{resource_icon}</div>
@@ -4886,7 +4887,7 @@ pub(crate) fn resource_result_card(params: ResourceResultCardParams<'_>) -> Stri
     <div class="card-content">
 
         <div class="rm-card-header">
-            <div class="card-title card-title--lg">
+            <div class="card-title card-title--lg" data-share-source-title>
                 {title}
             </div>
 
@@ -4899,7 +4900,7 @@ pub(crate) fn resource_result_card(params: ResourceResultCardParams<'_>) -> Stri
             {category}
         </div>
 
-        <div class="card-meta card-meta--desc">
+        <div class="card-meta card-meta--desc" data-share-source-text>
             {description}
         </div>
 
@@ -4921,6 +4922,7 @@ pub(crate) fn resource_result_card(params: ResourceResultCardParams<'_>) -> Stri
     <div class="card-arrow">{arrow}</div>
 </a>
 {write_html}
+{share_html}
 </div>
 "#,
         href = escape_html(href),
@@ -4935,6 +4937,15 @@ pub(crate) fn resource_result_card(params: ResourceResultCardParams<'_>) -> Stri
         verified_badge = verified_badge_html,
         arrow = icon("chevron"),
         write_html = write_html,
+        share_html = share_html,
+    )
+}
+
+pub(crate) fn share_button(href: &str, label: &str) -> String {
+    format!(
+        r#"<button type="button" class="ui-button rm-share-button" data-share data-share-url="{href}" aria-label="{label}">{label}</button>"#,
+        href = escape_html(href),
+        label = escape_html(label),
     )
 }
 
@@ -4976,16 +4987,19 @@ pub(crate) fn profile_resource_card(params: ProfileResourceCardParams<'_>) -> St
         _ => String::new(),
     };
 
+    let share_html = share_button(href, "Поделиться");
+
     format!(
-        r#"<a href="{href}" class="card card--result">
+        r#"<div class="card card--result card--listing" data-share-scope>
+<a href="{href}" class="rm-person-main">
     <div class="card-icon">{resource_icon}</div>
 
     <div class="card-content">
-        <div class="card-title">{title}</div>
+        <div class="card-title" data-share-source-title>{title}</div>
 
         <div class="card-meta card-meta--mt-4">{category}</div>
 
-        <div class="card-meta card-meta--desc">{description}</div>
+        <div class="card-meta card-meta--desc" data-share-source-text>{description}</div>
 
         {address_html}
         <div class="card-meta card-meta--mt-8">{rating_line}</div>
@@ -4997,7 +5011,9 @@ pub(crate) fn profile_resource_card(params: ProfileResourceCardParams<'_>) -> St
     </div>
 
     <div class="card-arrow">{arrow}</div>
-</a>"#,
+</a>
+{share_html}
+</div>"#,
         href = escape_html(href),
         resource_icon = icon(icon_name),
         title = escape_html(title),
@@ -5021,6 +5037,7 @@ pub(crate) fn profile_resource_card(params: ProfileResourceCardParams<'_>) -> St
         premium_badge = premium_badge_html,
         verified_badge = verified_badge_html,
         arrow = icon("chevron"),
+        share_html = share_html,
     )
 }
 
