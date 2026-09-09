@@ -2,7 +2,7 @@ use super::auth::verify_user_session;
 use crate::state::app_state::AppState;
 use crate::web::templates;
 use axum::{
-    extract::{Path, State},
+    extract::{Path, Query, State},
     http::HeaderMap,
     response::Html,
 };
@@ -213,12 +213,20 @@ pub(super) fn load_user_conversations(
     .unwrap_or_else(|_| vec![])
 }
 
-pub async fn messages_page(State(state): State<AppState>, headers: HeaderMap) -> Html<String> {
+pub async fn messages_page(
+    State(state): State<AppState>,
+    Query(params): Query<std::collections::BTreeMap<String, String>>,
+    headers: HeaderMap,
+) -> Html<String> {
+    let share_listing_id = params
+        .get("share")
+        .and_then(|value| value.parse::<i64>().ok())
+        .filter(|value| *value > 0);
     let user_id = match verify_user_session(&state, &headers) {
         Some(id) => id,
 
         None => {
-            return Html(templates::render_messages(false, vec![]));
+            return Html(templates::render_messages(false, vec![], None));
         }
     };
 
@@ -236,7 +244,11 @@ pub async fn messages_page(State(state): State<AppState>, headers: HeaderMap) ->
 
     drop(db);
 
-    Html(templates::render_messages(true, conversations))
+    Html(templates::render_messages(
+        true,
+        conversations,
+        share_listing_id,
+    ))
 }
 
 pub async fn chat_page(

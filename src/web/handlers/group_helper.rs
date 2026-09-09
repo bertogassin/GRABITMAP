@@ -163,7 +163,7 @@ fn render_page(
 
     let report_cards = if reports.is_empty() {
         r#"<div class="empty">
-            Жалоб на ресурсы этого города пока нет.
+            Жалоб на объявления этого города пока нет.
         </div>"#
             .to_string()
     } else {

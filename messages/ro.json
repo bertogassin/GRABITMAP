@@ -285,5 +285,20 @@
   "profile_login_write": "Sign in to message",
   "profile_share_text": "Join GRABIT with my link. Chat and find work nearby.",
   "common_share": "Share",
-  "common_rating": "Rating {rating} · {votes}"
+  "common_rating": "Rating {rating} · {votes}",
+  "share_tagline": "OAMENI · LOCURI DE MUNCĂ · SERVICII · AFACERI",
+  "share_open_details": "Deschide detaliile complete",
+  "share_card_sent": "Card trimis",
+  "share_sent": "Trimis",
+  "share_failed": "Distribuirea a eșuat",
+  "share_link_copied": "Link copiat",
+  "share_copy_address": "Copiați adresa paginii",
+  "share_external": "Distribuie",
+  "share_internal": "Trimite în GRABIT",
+  "chat_share_choose_title": "Unde trimiteți anunțul?",
+  "chat_share_choose_body": "Alegeți un chat sau un grup.",
+  "chat_share_cancel": "Anulează distribuirea",
+  "chat_share_ready": "Cardul anunțului este gata",
+  "chat_listing_verified": "Verificat",
+  "chat_listing_open": "Deschide"
 }

@@ -285,5 +285,20 @@
   "profile_login_write": "Sign in to message",
   "profile_share_text": "Join GRABIT with my link. Chat and find work nearby.",
   "common_share": "Share",
-  "common_rating": "Rating {rating} · {votes}"
+  "common_rating": "Rating {rating} · {votes}",
+  "share_tagline": "افراد · کار · خدمات · کسب‌وکار",
+  "share_open_details": "مشاهده جزئیات کامل",
+  "share_card_sent": "کارت ارسال شد",
+  "share_sent": "ارسال شد",
+  "share_failed": "اشتراک‌گذاری نشد",
+  "share_link_copied": "پیوند کپی شد",
+  "share_copy_address": "نشانی صفحه را کپی کنید",
+  "share_external": "اشتراک‌گذاری",
+  "share_internal": "ارسال در GRABIT",
+  "chat_share_choose_title": "آگهی کجا ارسال شود؟",
+  "chat_share_choose_body": "گفت‌وگو یا گروه را انتخاب کنید.",
+  "chat_share_cancel": "لغو اشتراک‌گذاری",
+  "chat_share_ready": "کارت آگهی آماده ارسال است",
+  "chat_listing_verified": "تأییدشده",
+  "chat_listing_open": "باز کردن"
 }

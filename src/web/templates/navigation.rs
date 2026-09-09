@@ -1482,7 +1482,7 @@ pub fn render_search(
                     };
 
                     resource_result_card(crate::web::templates::common::ResourceResultCardParams {
-                        href: &format!("/app/resource/{}", id),
+                        href: &format!("/app/listing/{}", id),
                         title_html: &escape_html(title),
                         category_html: &escape_html(&category_line),
                         description_html: &escape_html(&description_preview),

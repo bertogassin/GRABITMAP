@@ -285,5 +285,20 @@
   "profile_login_write": "로그인하고 메시지",
   "profile_share_text": "내 링크로 GRABIT 가입. 채팅, 걸음, 근처 일자리.",
   "common_share": "공유",
-  "common_rating": "평점 {rating} · {votes}"
+  "common_rating": "평점 {rating} · {votes}",
+  "share_tagline": "사람 · 일자리 · 서비스 · 비즈니스",
+  "share_open_details": "전체 정보 열기",
+  "share_card_sent": "카드를 보냈습니다",
+  "share_sent": "보냈습니다",
+  "share_failed": "공유하지 못했습니다",
+  "share_link_copied": "링크를 복사했습니다",
+  "share_copy_address": "페이지 주소를 복사하세요",
+  "share_external": "공유",
+  "share_internal": "GRABIT에서 보내기",
+  "chat_share_choose_title": "이 게시물을 어디로 보낼까요?",
+  "chat_share_choose_body": "채팅 또는 그룹을 선택하세요.",
+  "chat_share_cancel": "공유 취소",
+  "chat_share_ready": "게시물 카드가 전송 준비되었습니다",
+  "chat_listing_verified": "인증됨",
+  "chat_listing_open": "열기"
 }

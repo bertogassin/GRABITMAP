@@ -2248,6 +2248,7 @@
         }
 
         var messageCache = new Map();
+        var listingPreviewCache = new Map();
         var selectedMessage = null;
         var refreshDebounceTimer = null;
         var refreshFallbackTimer = null;
@@ -3079,9 +3080,130 @@
             bubble.appendChild(bar);
         }
 
+        function listingIdFromText(value) {
+            var match = String(value || "").match(
+                /(?:https?:\/\/(?:www\.)?grabitmap\.com)?\/app\/(?:listing|resource)\/(\d+)(?:[/?#]|$)/i
+            );
+            if (!match) {
+                return 0;
+            }
+            var id = Number(match[1]);
+            return Number.isSafeInteger(id) && id > 0 ? id : 0;
+        }
+
+        function listingPreview(id) {
+            if (!listingPreviewCache.has(id)) {
+                if (listingPreviewCache.size >= 100) {
+                    listingPreviewCache.delete(listingPreviewCache.keys().next().value);
+                }
+                listingPreviewCache.set(
+                    id,
+                    requestJson("/api/listing/" + id + "/preview")
+                        .then(function (data) { return data.listing || null; })
+                        .catch(function () { return null; })
+                );
+            }
+            return listingPreviewCache.get(id);
+        }
+
+        function renderListingCard(body, listing, originalText) {
+            var card = document.createElement("a");
+            card.className = "chat-listing-card";
+            card.href = internalHref(listing.url, "/app");
+
+            var brand = document.createElement("div");
+            brand.className = "chat-listing-brand";
+            var mascot = document.createElement("img");
+            mascot.src = "/static/grabit-mascot-v2.png";
+            mascot.alt = "";
+            mascot.width = 88;
+            mascot.height = 53;
+            brand.appendChild(mascot);
+            var brandName = document.createElement("strong");
+            brandName.textContent = "GRABIT";
+            brand.appendChild(brandName);
+
+            var title = document.createElement("strong");
+            title.className = "chat-listing-title";
+            title.textContent = String(listing.title || "");
+
+            var meta = document.createElement("span");
+            meta.className = "chat-listing-meta";
+            var typeLabel = listing.listing_type === "seeker"
+                ? t("common_seeker", "Ищу работу")
+                : listing.listing_type === "offer"
+                    ? t("common_offer", "Предлагаю")
+                    : t("common_listing", "Объявление");
+            meta.textContent = [typeLabel, listing.rubric, listing.address]
+                .filter(Boolean)
+                .join(" · ");
+
+            var description = document.createElement("span");
+            description.className = "chat-listing-description";
+            description.textContent = shortText(listing.description, 150);
+
+            var footer = document.createElement("span");
+            footer.className = "chat-listing-footer";
+            var badges = [];
+            if (listing.verified) {
+                badges.push(t("chat_listing_verified", "Проверено"));
+            }
+            if (listing.premium) {
+                badges.push("Premium");
+            }
+            var badge = document.createElement("span");
+            badge.textContent = badges.join(" · ");
+            var open = document.createElement("span");
+            open.textContent = t("chat_listing_open", "Открыть");
+            footer.appendChild(badge);
+            footer.appendChild(open);
+
+            card.appendChild(brand);
+            card.appendChild(title);
+            card.appendChild(meta);
+            if (description.textContent) {
+                card.appendChild(description);
+            }
+            card.appendChild(footer);
+
+            body.innerHTML = "";
+            body.classList.add("chat-message-body--listing");
+            var caption = String(originalText || "")
+                .replace(/(?:https?:\/\/(?:www\.)?grabitmap\.com)?\/app\/(?:listing|resource)\/\d+(?:[/?#][^\s]*)?/i, "")
+                .trim();
+            if (caption) {
+                var captionElement = document.createElement("div");
+                captionElement.className = "chat-listing-caption";
+                captionElement.textContent = caption;
+                body.appendChild(captionElement);
+            }
+            body.appendChild(card);
+        }
+
+        function enhanceListingBody(body, message) {
+            var originalText = String(message.message || "");
+            var id = listingIdFromText(originalText);
+            if (!id || Number(message.deleted_at) > 0 || message.attachment_kind) {
+                return;
+            }
+            body.dataset.listingPreviewId = String(id);
+            listingPreview(id).then(function (listing) {
+                if (
+                    listing &&
+                    body.dataset.listingPreviewId === String(id) &&
+                    body.isConnected
+                ) {
+                    renderListingCard(body, listing, originalText);
+                }
+            });
+        }
+
         function applyMessageBody(body, message) {
             body.classList.remove("is-deleted");
             body.classList.remove("chat-message-body--voice");
+            body.classList.remove("chat-message-body--image");
+            body.classList.remove("chat-message-body--listing");
+            delete body.dataset.listingPreviewId;
             body.innerHTML = "";
 
             if (Number(message.deleted_at) > 0) {
@@ -3133,6 +3255,19 @@
             }
 
             body.textContent = String(message.message || "");
+            enhanceListingBody(body, message);
+        }
+
+        function prepareSharedListingDraft() {
+            var value = new URLSearchParams(window.location.search).get("share");
+            var listingId = Number(value || 0);
+            if (!Number.isSafeInteger(listingId) || listingId <= 0 || input.value.trim()) {
+                return;
+            }
+            input.value = window.location.origin + "/app/listing/" + listingId;
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+            setSendState(t("chat_share_ready", "Карточка объявления готова к отправке"));
+            input.focus();
         }
 
         function copyMessageText(message) {
@@ -3985,6 +4120,7 @@
             }
         );
 
+        prepareSharedListingDraft();
         hydrateSsrMessages();
 
         refreshFallbackTimer = window.setInterval(

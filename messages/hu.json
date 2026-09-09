@@ -285,5 +285,20 @@
   "profile_login_write": "Sign in to message",
   "profile_share_text": "Join GRABIT with my link. Chat and find work nearby.",
   "common_share": "Share",
-  "common_rating": "Rating {rating} · {votes}"
+  "common_rating": "Rating {rating} · {votes}",
+  "share_tagline": "EMBEREK · MUNKA · SZOLGÁLTATÁSOK · ÜZLET",
+  "share_open_details": "Teljes részletek megnyitása",
+  "share_card_sent": "Kártya elküldve",
+  "share_sent": "Elküldve",
+  "share_failed": "Nem sikerült megosztani",
+  "share_link_copied": "Hivatkozás másolva",
+  "share_copy_address": "Másolja az oldal címét",
+  "share_external": "Megosztás",
+  "share_internal": "Küldés a GRABIT-ben",
+  "chat_share_choose_title": "Hová küldjük a hirdetést?",
+  "chat_share_choose_body": "Válasszon csevegést vagy csoportot.",
+  "chat_share_cancel": "Megosztás megszakítása",
+  "chat_share_ready": "A hirdetéskártya küldésre kész",
+  "chat_listing_verified": "Ellenőrzött",
+  "chat_listing_open": "Megnyitás"
 }

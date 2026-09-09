@@ -285,5 +285,20 @@
   "profile_login_write": "Sign in to message",
   "profile_share_text": "Join GRABIT with my link. Chat and find work nearby.",
   "common_share": "Share",
-  "common_rating": "Rating {rating} · {votes}"
+  "common_rating": "Rating {rating} · {votes}",
+  "share_tagline": "MÄNNISKOR · JOBB · TJÄNSTER · FÖRETAG",
+  "share_open_details": "Öppna fullständig information",
+  "share_card_sent": "Kort skickat",
+  "share_sent": "Skickat",
+  "share_failed": "Det gick inte att dela",
+  "share_link_copied": "Länk kopierad",
+  "share_copy_address": "Kopiera sidans adress",
+  "share_external": "Dela",
+  "share_internal": "Skicka i GRABIT",
+  "chat_share_choose_title": "Vart ska annonsen skickas?",
+  "chat_share_choose_body": "Välj en chatt eller grupp.",
+  "chat_share_cancel": "Avbryt delning",
+  "chat_share_ready": "Annonskortet är klart att skicka",
+  "chat_listing_verified": "Verifierad",
+  "chat_listing_open": "Öppna"
 }

@@ -285,5 +285,20 @@
   "profile_login_write": "Sign in to message",
   "profile_share_text": "Join GRABIT with my link. Chat and find work nearby.",
   "common_share": "Share",
-  "common_rating": "Rating {rating} · {votes}"
+  "common_rating": "Rating {rating} · {votes}",
+  "share_tagline": "ΑΝΘΡΩΠΟΙ · ΕΡΓΑΣΙΑ · ΥΠΗΡΕΣΙΕΣ · ΕΠΙΧΕΙΡΗΣΕΙΣ",
+  "share_open_details": "Άνοιγμα πλήρων πληροφοριών",
+  "share_card_sent": "Η κάρτα στάλθηκε",
+  "share_sent": "Στάλθηκε",
+  "share_failed": "Η κοινοποίηση απέτυχε",
+  "share_link_copied": "Ο σύνδεσμος αντιγράφηκε",
+  "share_copy_address": "Αντιγράψτε τη διεύθυνση της σελίδας",
+  "share_external": "Κοινοποίηση",
+  "share_internal": "Αποστολή στο GRABIT",
+  "chat_share_choose_title": "Πού να σταλεί η αγγελία;",
+  "chat_share_choose_body": "Επιλέξτε συνομιλία ή ομάδα.",
+  "chat_share_cancel": "Ακύρωση κοινοποίησης",
+  "chat_share_ready": "Η κάρτα αγγελίας είναι έτοιμη",
+  "chat_listing_verified": "Επαληθευμένο",
+  "chat_listing_open": "Άνοιγμα"
 }

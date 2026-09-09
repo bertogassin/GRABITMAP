@@ -285,5 +285,20 @@
   "profile_login_write": "تسجيل الدخول والكتابة",
   "profile_share_text": "انضم إلى GRABIT عبر رابطي. دردشة وخطوات وعمل قريب.",
   "common_share": "مشاركة",
-  "common_rating": "التقييم {rating} · {votes}"
+  "common_rating": "التقييم {rating} · {votes}",
+  "share_tagline": "أشخاص · عمل · خدمات · أعمال",
+  "share_open_details": "فتح التفاصيل الكاملة",
+  "share_card_sent": "تم إرسال البطاقة",
+  "share_sent": "تم الإرسال",
+  "share_failed": "تعذرت المشاركة",
+  "share_link_copied": "تم نسخ الرابط",
+  "share_copy_address": "انسخ عنوان الصفحة",
+  "share_external": "مشاركة",
+  "share_internal": "إرسال في GRABIT",
+  "chat_share_choose_title": "أين تريد إرسال الإعلان؟",
+  "chat_share_choose_body": "اختر محادثة أو مجموعة.",
+  "chat_share_cancel": "إلغاء المشاركة",
+  "chat_share_ready": "بطاقة الإعلان جاهزة للإرسال",
+  "chat_listing_verified": "موثّق",
+  "chat_listing_open": "فتح"
 }

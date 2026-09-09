@@ -285,5 +285,20 @@
   "profile_login_write": "Sign in to message",
   "profile_share_text": "Join GRABIT with my link. Chat and find work nearby.",
   "common_share": "Share",
-  "common_rating": "Rating {rating} · {votes}"
+  "common_rating": "Rating {rating} · {votes}",
+  "share_tagline": "ผู้คน · งาน · บริการ · ธุรกิจ",
+  "share_open_details": "เปิดข้อมูลทั้งหมด",
+  "share_card_sent": "ส่งการ์ดแล้ว",
+  "share_sent": "ส่งแล้ว",
+  "share_failed": "แชร์ไม่ได้",
+  "share_link_copied": "คัดลอกลิงก์แล้ว",
+  "share_copy_address": "คัดลอกที่อยู่หน้าเว็บ",
+  "share_external": "แชร์",
+  "share_internal": "ส่งใน GRABIT",
+  "chat_share_choose_title": "จะส่งประกาศนี้ไปที่ไหน?",
+  "chat_share_choose_body": "เลือกแชตหรือกลุ่ม",
+  "chat_share_cancel": "ยกเลิกการแชร์",
+  "chat_share_ready": "การ์ดประกาศพร้อมส่งแล้ว",
+  "chat_listing_verified": "ยืนยันแล้ว",
+  "chat_listing_open": "เปิด"
 }

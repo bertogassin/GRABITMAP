@@ -124,12 +124,12 @@
     }
 
     function listingFromPath(path) {
-        var match = String(path || "").match(/^\/app\/resource\/(\d+)\/?$/);
+        var match = String(path || "").match(/^\/app\/(?:listing|resource)\/(\d+)\/?$/);
         if (!match) {
             return null;
         }
         return {
-            href: "/app/resource/" + match[1],
+            href: "/app/listing/" + match[1],
             label: heroName() || "Объявление"
         };
     }

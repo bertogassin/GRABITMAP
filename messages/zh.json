@@ -285,5 +285,20 @@
   "profile_login_write": "登录并留言",
   "profile_share_text": "用我的链接加入 GRABIT。聊天、计步和附近工作。",
   "common_share": "分享",
-  "common_rating": "评分 {rating} · {votes}"
+  "common_rating": "评分 {rating} · {votes}",
+  "share_tagline": "人才 · 工作 · 服务 · 商业",
+  "share_open_details": "查看完整信息",
+  "share_card_sent": "卡片已发送",
+  "share_sent": "已发送",
+  "share_failed": "无法分享",
+  "share_link_copied": "链接已复制",
+  "share_copy_address": "请复制页面地址",
+  "share_external": "分享",
+  "share_internal": "发送到 GRABIT",
+  "chat_share_choose_title": "将此信息发送到哪里？",
+  "chat_share_choose_body": "选择私聊或群组。",
+  "chat_share_cancel": "取消分享",
+  "chat_share_ready": "信息卡片已可发送",
+  "chat_listing_verified": "已认证",
+  "chat_listing_open": "打开"
 }

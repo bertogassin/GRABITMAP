@@ -285,5 +285,20 @@
   "profile_login_write": "Zaloguj się i napisz",
   "profile_share_text": "Wejdź do GRABIT przez mój link. Czat, kroki i praca w pobliżu.",
   "common_share": "Udostępnij",
-  "common_rating": "Ocena {rating} · {votes}"
+  "common_rating": "Ocena {rating} · {votes}",
+  "share_tagline": "LUDZIE · PRACA · USŁUGI · BIZNES",
+  "share_open_details": "Otwórz pełne informacje",
+  "share_card_sent": "Karta wysłana",
+  "share_sent": "Wysłano",
+  "share_failed": "Nie udało się udostępnić",
+  "share_link_copied": "Link skopiowany",
+  "share_copy_address": "Skopiuj adres strony",
+  "share_external": "Udostępnij",
+  "share_internal": "Wyślij w GRABIT",
+  "chat_share_choose_title": "Gdzie wysłać ogłoszenie?",
+  "chat_share_choose_body": "Wybierz czat lub grupę.",
+  "chat_share_cancel": "Anuluj udostępnianie",
+  "chat_share_ready": "Karta ogłoszenia jest gotowa",
+  "chat_listing_verified": "Zweryfikowano",
+  "chat_listing_open": "Otwórz"
 }

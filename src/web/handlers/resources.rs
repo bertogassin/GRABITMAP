@@ -764,7 +764,7 @@ pub async fn add_resource(
     match result {
         Ok(_) => {
             let preview_href = if inserted_id > 0 {
-                format!("/app/resource/{inserted_id}")
+                format!("/app/listing/{inserted_id}")
             } else {
                 "/app/my-resources".to_string()
             };

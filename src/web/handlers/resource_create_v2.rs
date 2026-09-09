@@ -830,7 +830,7 @@ pub async fn resource_create_city_submit(
                 &format!(
                     "{}{}",
                     templates::navigation_card(
-                        &format!("/app/resource/{id}"),
+                        &format!("/app/listing/{id}"),
                         "map-pin",
                         "Открыть объявление",
                         "Предварительный просмотр",

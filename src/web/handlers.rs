@@ -35,6 +35,9 @@ pub use professions::*;
 mod resources;
 pub use resources::*;
 
+mod listing_preview;
+pub use listing_preview::api_listing_preview;
+
 mod resource_create_v2;
 pub use resource_create_v2::{
     resource_create_city_page, resource_create_city_submit, resource_create_continent,

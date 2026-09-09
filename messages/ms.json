@@ -285,5 +285,20 @@
   "profile_login_write": "Sign in to message",
   "profile_share_text": "Join GRABIT with my link. Chat and find work nearby.",
   "common_share": "Share",
-  "common_rating": "Rating {rating} · {votes}"
+  "common_rating": "Rating {rating} · {votes}",
+  "share_tagline": "ORANG · KERJA · PERKHIDMATAN · PERNIAGAAN",
+  "share_open_details": "Buka maklumat penuh",
+  "share_card_sent": "Kad dihantar",
+  "share_sent": "Dihantar",
+  "share_failed": "Tidak dapat berkongsi",
+  "share_link_copied": "Pautan disalin",
+  "share_copy_address": "Salin alamat halaman",
+  "share_external": "Kongsi",
+  "share_internal": "Hantar dalam GRABIT",
+  "chat_share_choose_title": "Hantar iklan ini ke mana?",
+  "chat_share_choose_body": "Pilih sembang atau kumpulan.",
+  "chat_share_cancel": "Batalkan perkongsian",
+  "chat_share_ready": "Kad iklan sedia dihantar",
+  "chat_listing_verified": "Disahkan",
+  "chat_listing_open": "Buka"
 }

@@ -253,7 +253,7 @@ pub async fn admin_reports(State(state): State<AppState>, headers: HeaderMap) ->
             </button>
         </form>
 
-        <a href="/app/resource/{resource_id}"
+        <a href="/app/listing/{resource_id}"
            target="_blank"
            class="rm-mod-link">
             Открыть объявление
@@ -561,7 +561,7 @@ pub async fn admin_reject_reported_resource(
             drop(db);
             return (
                 StatusCode::INTERNAL_SERVER_ERROR,
-                format!("Ошибка отклонения ресурса по жалобе: {}", err),
+                format!("Ошибка отклонения объявления по жалобе: {}", err),
             )
                 .into_response();
         }
@@ -848,7 +848,7 @@ pub async fn admin_resources(
             </button>
         </form>
 
-        <a href="/app/resource/{id}"
+        <a href="/app/listing/{id}"
            target="_blank"
            class="rm-mod-link">
             Открыть объявление
@@ -1395,7 +1395,7 @@ pub async fn admin_approve_resource(
             .into_response(),
         Err(err) => (
             StatusCode::INTERNAL_SERVER_ERROR,
-            format!("Ошибка одобрения ресурса: {}", err),
+            format!("Ошибка одобрения объявления: {}", err),
         )
             .into_response(),
     }
@@ -1508,7 +1508,7 @@ pub async fn admin_reject_resource(
             .into_response(),
         Err(err) => (
             StatusCode::INTERNAL_SERVER_ERROR,
-            format!("Ошибка отклонения ресурса: {}", err),
+            format!("Ошибка отклонения объявления: {}", err),
         )
             .into_response(),
     }

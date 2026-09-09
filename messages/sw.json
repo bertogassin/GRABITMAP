@@ -285,5 +285,20 @@
   "profile_login_write": "Sign in to message",
   "profile_share_text": "Join GRABIT with my link. Chat and find work nearby.",
   "common_share": "Share",
-  "common_rating": "Rating {rating} · {votes}"
+  "common_rating": "Rating {rating} · {votes}",
+  "share_tagline": "WATU · KAZI · HUDUMA · BIASHARA",
+  "share_open_details": "Fungua maelezo kamili",
+  "share_card_sent": "Kadi imetumwa",
+  "share_sent": "Imetumwa",
+  "share_failed": "Imeshindikana kushiriki",
+  "share_link_copied": "Kiungo kimenakiliwa",
+  "share_copy_address": "Nakili anwani ya ukurasa",
+  "share_external": "Shiriki",
+  "share_internal": "Tuma ndani ya GRABIT",
+  "chat_share_choose_title": "Tangazo litumwe wapi?",
+  "chat_share_choose_body": "Chagua gumzo au kikundi.",
+  "chat_share_cancel": "Ghairi kushiriki",
+  "chat_share_ready": "Kadi ya tangazo iko tayari kutumwa",
+  "chat_listing_verified": "Imethibitishwa",
+  "chat_listing_open": "Fungua"
 }
