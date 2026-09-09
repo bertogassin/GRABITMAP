@@ -1065,9 +1065,9 @@ pub async fn api_chat_send(
         )
         .unwrap_or(0);
 
-    let should_notify_telegram = existing_notification == 0;
+    let should_create_notification = existing_notification == 0;
 
-    if should_notify_telegram
+    if should_create_notification
         && transaction
             .execute(
                 "INSERT INTO user_notifications (
@@ -1108,34 +1108,7 @@ pub async fn api_chat_send(
         other_user_id,
     );
 
-    let telegram_id: Option<i64> = if should_notify_telegram {
-        connection
-            .query_row(
-                "SELECT telegram_id
-                 FROM users
-                 WHERE id = ?1
-                   AND is_active = 1",
-                rusqlite::params![other_user_id],
-                |row| row.get(0),
-            )
-            .ok()
-    } else {
-        None
-    };
-
     drop(connection);
-
-    if let Some(telegram_id) = telegram_id {
-        if telegram_id > 0 {
-            crate::telegram_notify::notify_telegram_user(
-                state.bot_token.as_deref(),
-                telegram_id,
-                &format!(
-                    "📩 У вас новое сообщение в GRABIT!\n\nОткройте чат: https://grabitmap.com/app/chat/{user_id}"
-                ),
-            );
-        }
-    }
 
     (
         StatusCode::CREATED,

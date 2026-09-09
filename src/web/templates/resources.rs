@@ -1738,7 +1738,7 @@ pub fn render_edit_resource(params: RenderEditResourceParams<'_>) -> String {
     </label>
 
     <label class="ui-field">
-        <span class="ui-field-label">Телефон или Telegram</span>
+        <span class="ui-field-label">Контакт или ссылка</span>
         <input
             name="contact"
             maxlength="120"
@@ -1988,7 +1988,7 @@ pub fn render_add_resource(
     </label>
 
     <label class="ui-field">
-        <span class="ui-field-label">Телефон или Telegram</span>
+        <span class="ui-field-label">Контакт или ссылка</span>
         <input
             name="contact"
             required

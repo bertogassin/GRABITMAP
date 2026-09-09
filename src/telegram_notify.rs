@@ -1,22 +1,3 @@
-pub fn notify_telegram_user(bot_token: Option<&str>, telegram_id: i64, text: &str) {
-    if telegram_id <= 0 {
-        return;
-    }
-
-    let Some(token) = bot_token.filter(|value| !value.is_empty()) else {
-        return;
-    };
-
-    let token = token.to_string();
-    let text = text.to_string();
-
-    tokio::spawn(async move {
-        if let Err(error) = send_telegram_message_http(&token, telegram_id, &text).await {
-            eprintln!("telegram notification failed: {error}");
-        }
-    });
-}
-
 pub async fn publish_to_telegram_group(
     bot_token: Option<&str>,
     chat_id: i64,

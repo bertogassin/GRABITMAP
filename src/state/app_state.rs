@@ -89,7 +89,7 @@ pub struct AppState {
     // Быстрый process-local rate limiter.
     //
     // Ключ:
-    //     "<action>:<telegram_user_id>"
+    //     "<action>:<internal_user_id>"
     //
     // Значение:
     //     timestamps последних запросов в sliding window.
