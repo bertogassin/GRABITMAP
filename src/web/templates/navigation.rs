@@ -1643,7 +1643,32 @@ pub fn render_search(
     )
 }
 
-pub fn render_menu(invite_public_id: &str) -> String {
+pub fn render_menu(invite_public_id: &str, admin_level: i64) -> String {
+    let owner_center = if admin_level == 5 {
+        format!(
+            r#"<a class="card rm-owner-center-entry" href="/app/center" data-owner-center-entry>
+    <div class="card-icon">{shield}</div>
+    <div class="card-content">
+        <div class="card-title">Центр владельца</div>
+        <div class="card-meta">Глобальное управление, безопасность и production</div>
+    </div>
+    <span class="rm-owner-center-level">УРОВЕНЬ 5</span>
+    {chevron}
+</a>"#,
+            shield = icon("shield"),
+            chevron = icon("chevron"),
+        )
+    } else if admin_level > 0 {
+        navigation_card(
+            "/app/center",
+            "shield",
+            "Центр управления",
+            &format!("Административный уровень {admin_level}"),
+        )
+    } else {
+        String::new()
+    };
+
     let content = format!(
         r#"        <section>
     {section_head_settings}
@@ -1651,6 +1676,8 @@ pub fn render_menu(invite_public_id: &str) -> String {
     <div id="rm-continue-menu" class="grid" hidden></div>
 
     {invite}
+
+    {owner_center}
 
     <div class="grid">
         {profile_card}
@@ -1752,6 +1779,7 @@ pub fn render_menu(invite_public_id: &str) -> String {
         menu_theme = crate::i18n::t("menu_theme"),
         menu_theme_dark = crate::i18n::t("menu_theme_dark"),
         invite = super::invite::invite_share_block(invite_public_id),
+        owner_center = owner_center,
         volume_icon = icon("volume"),
         phone_icon = icon("smartphone"),
         play_icon = icon("play"),
@@ -1885,7 +1913,7 @@ mod search_catalog_tests {
 
     #[test]
     fn menu_and_home_keep_continue_hosts() {
-        let menu = render_menu("abc123");
+        let menu = render_menu("abc123", 0);
         assert!(menu.contains("id=\"rm-continue-menu\""));
         assert!(menu.contains("/app/join/abc123?to=steps"));
         assert!(menu.contains("theme-toggle-btn"));
@@ -1909,7 +1937,7 @@ mod search_catalog_tests {
 
     #[test]
     fn menu_has_working_theme_toggle() {
-        let html = render_menu("");
+        let html = render_menu("", 0);
         assert!(html.contains("theme-toggle-btn"));
         assert!(html.contains("<strong>День и ночь</strong>"));
         assert!(html.contains("<strong>Звук</strong>"));
@@ -1917,5 +1945,17 @@ mod search_catalog_tests {
         assert!(html.contains("name=\"locale\""));
         assert!(html.contains("value=\"zh-TW\""));
         assert!(html.contains("/app/locale"));
+    }
+
+    #[test]
+    fn owner_center_is_visible_only_to_administrators() {
+        let owner = render_menu("", 5);
+        assert!(owner.contains("data-owner-center-entry"));
+        assert!(owner.contains("Центр владельца"));
+        assert!(owner.contains("УРОВЕНЬ 5"));
+
+        let regular = render_menu("", 0);
+        assert!(!regular.contains("data-owner-center-entry"));
+        assert!(!regular.contains("Центр владельца"));
     }
 }

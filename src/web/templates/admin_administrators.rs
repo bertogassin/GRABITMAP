@@ -945,5 +945,12 @@ h1 {{
         sessions_html = sessions_html,
     );
 
-    super::common::page_document("Все администраторы · GRABIT", head, "", &main, "", "")
+    super::common::page_document(
+        "Все администраторы · GRABIT",
+        head,
+        &super::common::topbar("Администраторы", "shield"),
+        &main,
+        &super::common::bottom_nav("menu"),
+        "",
+    )
 }

@@ -52,15 +52,6 @@ fn destination(kind: &str, inviter_user_id: i64) -> String {
     }
 }
 
-fn load_public_id(db: &rusqlite::Connection, user_id: i64) -> String {
-    db.query_row(
-        "SELECT COALESCE(public_id, '') FROM profiles WHERE user_id = ?1",
-        rusqlite::params![user_id],
-        |row| row.get(0),
-    )
-    .unwrap_or_default()
-}
-
 fn ensure_friend_conversation(
     db: &rusqlite::Connection,
     joiner_user_id: i64,
@@ -128,16 +119,6 @@ fn ensure_friend_conversation(
     );
 
     Ok(())
-}
-
-pub fn current_user_public_id(state: &AppState, headers: &HeaderMap) -> String {
-    let Some(user_id) = verify_user_session(state, headers) else {
-        return String::new();
-    };
-    match crate::db::pool::get_connection(&state.db_pool) {
-        Ok(db) => load_public_id(&db, user_id),
-        Err(_) => String::new(),
-    }
 }
 
 pub async fn join_invite(

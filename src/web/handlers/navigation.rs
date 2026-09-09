@@ -15,9 +15,33 @@ pub async fn home() -> Redirect {
 }
 
 pub async fn app_menu(State(state): State<AppState>, headers: HeaderMap) -> Html<String> {
-    Html(templates::render_menu(
-        &super::invite::current_user_public_id(&state, &headers),
-    ))
+    let (invite_public_id, admin_level) = verify_authenticated_user(&state, &headers)
+        .and_then(|user| {
+            let db = crate::db::pool::get_connection(&state.db_pool).ok()?;
+            db.query_row(
+                "SELECT COALESCE(profile.public_id, ''),
+                        COALESCE((
+                            SELECT MAX(assignment.role_level)
+                            FROM admin_assignments AS assignment
+                            WHERE assignment.user_id = profile.user_id
+                              AND assignment.status = 'active'
+                              AND assignment.valid_from <= strftime('%s','now')
+                              AND (
+                                  assignment.valid_until IS NULL
+                                  OR assignment.valid_until > strftime('%s','now')
+                              )
+                        ), 0)
+                 FROM profiles AS profile
+                 WHERE profile.user_id = ?1
+                 LIMIT 1",
+                rusqlite::params![user.user_id],
+                |row| Ok((row.get::<_, String>(0)?, row.get::<_, i64>(1)?)),
+            )
+            .ok()
+        })
+        .unwrap_or_else(|| (String::new(), 0));
+
+    Html(templates::render_menu(&invite_public_id, admin_level))
 }
 
 pub async fn app_root(State(state): State<AppState>, headers: HeaderMap) -> Html<String> {

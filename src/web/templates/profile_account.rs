@@ -408,21 +408,36 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
             .unwrap_or("Направление не выбрано");
 
         let admin_navigation = if moderator_level > 0 {
+            let (title, description, level_label) = if moderator_level == 5 {
+                (
+                    "Центр владельца",
+                    "Глобальное управление, безопасность и production",
+                    "ВЛАДЕЛЕЦ · УРОВЕНЬ 5".to_string(),
+                )
+            } else {
+                (
+                    "Центр управления",
+                    "Модерация и управление вашей территорией",
+                    format!("АДМИНИСТРАТОР · УРОВЕНЬ {moderator_level}"),
+                )
+            };
+
             format!(
                 r#"<a class="rm-command-card rm-admin-command"
-                       href="/app/center">
+                       href="/app/center" data-owner-center-entry>
                     <span class="rm-command-icon">{}</span>
                     <span class="rm-command-copy">
-                        <strong>Центр управления</strong>
-                        <small>
-                            Административный уровень {}
-                        </small>
+                        <strong>{title}</strong>
+                        <small>{description}</small>
                     </span>
+                    <span class="rm-command-badge">{level_label}</span>
                     <span class="rm-command-arrow">{}</span>
                 </a>"#,
                 icon("shield"),
-                moderator_level,
                 icon("chevron"),
+                title = title,
+                description = description,
+                level_label = level_label,
             )
         } else {
             String::new()
@@ -2021,6 +2036,21 @@ mod personal_center_tests {
 
         assert!(!html.contains("RESURSMAP · PERSONAL COMMAND"));
         assert!(html.contains("Войдите в аккаунт"));
+    }
+
+    #[test]
+    fn owner_profile_exposes_protected_center_entry() {
+        let mut owner = params(true);
+        owner.moderator_level = 5;
+
+        let html = render_me(owner);
+        assert!(html.contains("data-owner-center-entry"));
+        assert!(html.contains("Центр владельца"));
+        assert!(html.contains("ВЛАДЕЛЕЦ · УРОВЕНЬ 5"));
+        assert!(html.contains("/app/center"));
+
+        let regular = render_me(params(true));
+        assert!(!regular.contains("data-owner-center-entry"));
     }
 
     #[test]

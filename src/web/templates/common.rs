@@ -29,7 +29,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = "5.0.32";
+pub const STATIC_ASSET_VERSION: &str = "5.0.33";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -3118,6 +3118,43 @@ a.feature.rm-feature-add {
 .rm-menu-list {
     display: grid;
     gap: 0;
+}
+
+.rm-owner-center-entry {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 14px;
+    border-color: rgba(232, 204, 150, .34);
+    background:
+        radial-gradient(circle at 90% 10%, rgba(137, 116, 255, .16), transparent 38%),
+        linear-gradient(145deg, rgba(232, 204, 150, .09), rgba(8, 10, 14, .96));
+    box-shadow: 0 18px 48px rgba(0, 0, 0, .22);
+}
+
+.rm-owner-center-entry::before {
+    content: "";
+    position: absolute;
+    width: 108px;
+    height: 108px;
+    right: -54px;
+    top: -54px;
+    border: 1px solid rgba(232, 204, 150, .24);
+    border-radius: 50%;
+    box-shadow: 0 0 0 18px rgba(232, 204, 150, .025);
+    pointer-events: none;
+}
+
+.rm-owner-center-level {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 auto;
+    padding: 6px 8px;
+    border: 1px solid rgba(232, 204, 150, .30);
+    border-radius: 999px;
+    color: var(--gold-light);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: .08em;
 }
 
 .rm-menu-row,
