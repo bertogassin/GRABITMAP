@@ -285,5 +285,20 @@
   "profile_login_write": "Sign in to message",
   "profile_share_text": "Join GRABIT with my link. Chat and find work nearby.",
   "common_share": "Share",
-  "common_rating": "Rating {rating} · {votes}"
+  "common_rating": "Rating {rating} · {votes}",
+  "share_tagline": "CON NGƯỜI · VIỆC LÀM · DỊCH VỤ · KINH DOANH",
+  "share_open_details": "Mở đầy đủ thông tin",
+  "share_card_sent": "Đã gửi thẻ",
+  "share_sent": "Đã gửi",
+  "share_failed": "Không thể chia sẻ",
+  "share_link_copied": "Đã sao chép liên kết",
+  "share_copy_address": "Hãy sao chép địa chỉ trang",
+  "share_external": "Chia sẻ",
+  "share_internal": "Gửi trong GRABIT",
+  "chat_share_choose_title": "Gửi tin đăng này đến đâu?",
+  "chat_share_choose_body": "Chọn cuộc trò chuyện hoặc nhóm.",
+  "chat_share_cancel": "Hủy chia sẻ",
+  "chat_share_ready": "Thẻ tin đăng đã sẵn sàng gửi",
+  "chat_listing_verified": "Đã xác minh",
+  "chat_listing_open": "Mở"
 }

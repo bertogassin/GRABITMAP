@@ -37,6 +37,9 @@
     var lastNotifications = 0;
     var lastMessages = 0;
     var baselineReady = false;
+    var attentionTimer = null;
+    var attentionRequest = null;
+    var attentionStopped = false;
 
     function notifyReady() {
         return "Notification" in window && Notification.permission === "granted";
@@ -134,7 +137,14 @@
     }
 
     function refreshAttention() {
-        return fetch("/api/account/attention-count", {
+        if (attentionStopped || document.hidden) {
+            return Promise.resolve();
+        }
+        if (attentionRequest) {
+            return attentionRequest;
+        }
+
+        attentionRequest = fetch("/api/account/attention-count", {
             credentials: "same-origin",
             headers: { Accept: "application/json" },
         })
@@ -182,19 +192,42 @@
                     window.resursmapOnAttentionCount(data);
                 }
             })
-            .catch(function () {});
+            .catch(function () {})
+            .finally(function () {
+                attentionRequest = null;
+            });
+        return attentionRequest;
     }
 
     window.resursmapRefreshAttentionBadge = refreshAttention;
 
+    function scheduleAttentionRefresh(delay) {
+        window.clearTimeout(attentionTimer);
+        if (attentionStopped || document.hidden) {
+            return;
+        }
+        attentionTimer = window.setTimeout(function () {
+            attentionTimer = null;
+            refreshAttention().finally(function () {
+                scheduleAttentionRefresh(8000);
+            });
+        }, delay);
+    }
+
     document.addEventListener("visibilitychange", function () {
         if (!document.hidden) {
-            refreshAttention();
+            scheduleAttentionRefresh(0);
+        } else {
+            window.clearTimeout(attentionTimer);
         }
     });
 
-    setInterval(refreshAttention, 8000);
-    setTimeout(refreshAttention, 400);
+    window.addEventListener("pagehide", function () {
+        attentionStopped = true;
+        window.clearTimeout(attentionTimer);
+    }, { once: true });
+
+    scheduleAttentionRefresh(400);
     askNotifyPermission();
     document.addEventListener("pointerdown", function () {
         askNotifyPermission();

@@ -1769,7 +1769,7 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
                     };
 
                     profile_resource_card(super::common::ProfileResourceCardParams {
-                        href: &format!("/app/resource/{}", id),
+                        href: &format!("/app/listing/{}", id),
                         icon_name: "map-pin",
                         title: &title,
                         category: &category,
@@ -1943,7 +1943,7 @@ pub fn render_favorites(
                     };
 
                     profile_resource_card(super::common::ProfileResourceCardParams {
-                        href: &format!("/app/resource/{}", id),
+                        href: &format!("/app/listing/{}", id),
                         icon_name: "heart",
                         title,
                         category,

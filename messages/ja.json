@@ -285,5 +285,20 @@
   "profile_login_write": "ログインして書く",
   "profile_share_text": "私のリンクでGRABITへ。チャット、歩数、近くの仕事。",
   "common_share": "共有",
-  "common_rating": "評価 {rating} · {votes}"
+  "common_rating": "評価 {rating} · {votes}",
+  "share_tagline": "人材 · 仕事 · サービス · ビジネス",
+  "share_open_details": "詳細を開く",
+  "share_card_sent": "カードを送信しました",
+  "share_sent": "送信しました",
+  "share_failed": "共有できませんでした",
+  "share_link_copied": "リンクをコピーしました",
+  "share_copy_address": "ページのアドレスをコピーしてください",
+  "share_external": "共有",
+  "share_internal": "GRABITで送信",
+  "chat_share_choose_title": "この掲載をどこに送りますか？",
+  "chat_share_choose_body": "チャットまたはグループを選択してください。",
+  "chat_share_cancel": "共有をキャンセル",
+  "chat_share_ready": "掲載カードを送信できます",
+  "chat_listing_verified": "確認済み",
+  "chat_listing_open": "開く"
 }

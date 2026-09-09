@@ -59,7 +59,7 @@
         ].join(";");
 
         var logo = document.createElement("img");
-        logo.src = "/static/app-icon.svg?v=" + assetVersion();
+        logo.src = "/static/app-icon-192.png?v=" + assetVersion();
         logo.alt = "GRABIT";
         logo.style.cssText = [
             "width:104px",

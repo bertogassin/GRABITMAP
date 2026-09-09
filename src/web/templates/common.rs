@@ -29,7 +29,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = "5.0.35";
+pub const STATIC_ASSET_VERSION: &str = "5.1.0";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -215,11 +215,9 @@ pub(crate) fn site_head_links() -> String {
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="GRABIT">
 <link rel="icon" href="{favicon}" type="image/png" sizes="32x32">
-<link rel="icon" href="{icon_svg}" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{apple_icon}" sizes="180x180">
 <link rel="manifest" href="{manifest}">"##,
         favicon = static_asset("favicon-32.png"),
-        icon_svg = static_asset("app-icon.svg"),
         apple_icon = static_asset("apple-touch-icon.png"),
         manifest = static_asset("manifest.webmanifest"),
     )
@@ -562,11 +560,14 @@ body::before { display: none; }
 .brand-logo-img {
     display: block;
     height: 40px;
-    width: auto;
-    max-width: min(52vw, 188px);
+    width: 66px;
     object-fit: contain;
     border-radius: 0;
     background: transparent;
+}
+
+.brand-copy {
+    min-width: 0;
 }
 
 .brand-name {
@@ -4220,7 +4221,7 @@ body.light-theme .card:hover {
 
 html.light-theme .brand-logo-img,
 body.light-theme .brand-logo-img {
-    background: #fff;
+    filter: drop-shadow(0 5px 10px rgba(26, 29, 33, .16));
 }
 
 html.light-theme .rm-menu-row-icon,
@@ -4531,8 +4532,11 @@ pub(crate) fn topbar(subtitle: &str, _icon_name: &str) -> String {
         r#"
 <header class="topbar">
     <a class="brand" href="/app">
-        <img class="brand-logo-img" src="{logo_src}" alt="GRABIT" width="188" height="40">
-        <div class="brand-sub">{subtitle}</div>
+        <img class="brand-logo-img" src="{logo_src}" alt="" width="66" height="40">
+        <div class="brand-copy">
+            <div class="brand-name">GRABIT</div>
+            <div class="brand-sub">{subtitle}</div>
+        </div>
     </a>
 
     <a class="topbar-account"
@@ -4547,7 +4551,7 @@ pub(crate) fn topbar(subtitle: &str, _icon_name: &str) -> String {
     </a>
 </header>
 "#,
-        logo_src = static_asset("brand-logo.png"),
+        logo_src = static_asset("grabit-mascot-v2.png"),
         user_icon = icon("user"),
         subtitle = escape_html(subtitle),
         profile_aria = crate::i18n::t("common_open_profile"),
@@ -6373,7 +6377,7 @@ mod public_entry_tests {
         assert!(html.contains("href=\"/app/me\""));
         assert!(html.contains("Профиль"));
         assert!(html.contains("brand-logo-img"));
-        assert!(html.contains("brand-logo.png"));
+        assert!(html.contains("grabit-mascot-v2.png"));
         assert!(html.contains("GRABIT"));
         assert!(!html.contains("/app/auth"));
     }

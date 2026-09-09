@@ -2,16 +2,17 @@
 
 const CACHE_PREFIX = "grabit-shell-";
 const LEGACY_CACHE_PREFIX = "resursmap-shell-";
-const CACHE_VERSION = CACHE_PREFIX + "v5.0.35";
+const CACHE_VERSION = CACHE_PREFIX + "v5.1.0";
 
 const STATIC_ASSETS = [
     "/static/manifest.webmanifest",
     "/static/map-catalog-search.js",
     "/static/map-countries.js",
-    "/static/app-icon.svg",
     "/static/app-icon-192.png",
     "/static/app-icon-512.png",
     "/static/apple-touch-icon.png",
+    "/static/grabit-mascot-v2.png",
+    "/static/grabit-share-cover.png",
     "/static/nav-badge.js",
     "/static/i18n-boot.js",
     "/static/i18n-runtime.js",

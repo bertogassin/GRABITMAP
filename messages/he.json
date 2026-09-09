@@ -285,5 +285,20 @@
   "profile_login_write": "Sign in to message",
   "profile_share_text": "Join GRABIT with my link. Chat and find work nearby.",
   "common_share": "Share",
-  "common_rating": "Rating {rating} · {votes}"
+  "common_rating": "Rating {rating} · {votes}",
+  "share_tagline": "אנשים · עבודה · שירותים · עסקים",
+  "share_open_details": "פתיחת כל הפרטים",
+  "share_card_sent": "הכרטיס נשלח",
+  "share_sent": "נשלח",
+  "share_failed": "השיתוף נכשל",
+  "share_link_copied": "הקישור הועתק",
+  "share_copy_address": "העתיקו את כתובת הדף",
+  "share_external": "שיתוף",
+  "share_internal": "שליחה ב-GRABIT",
+  "chat_share_choose_title": "לאן לשלוח את המודעה?",
+  "chat_share_choose_body": "בחרו צ׳אט או קבוצה.",
+  "chat_share_cancel": "ביטול השיתוף",
+  "chat_share_ready": "כרטיס המודעה מוכן לשליחה",
+  "chat_listing_verified": "מאומת",
+  "chat_listing_open": "פתיחה"
 }

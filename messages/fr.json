@@ -285,5 +285,20 @@
   "profile_login_write": "Se connecter et écrire",
   "profile_share_text": "Rejoins GRABIT avec mon lien. Chat, pas et travail près de toi.",
   "common_share": "Partager",
-  "common_rating": "Note {rating} · {votes}"
+  "common_rating": "Note {rating} · {votes}",
+  "share_tagline": "PERSONNES · EMPLOI · SERVICES · ENTREPRISES",
+  "share_open_details": "Voir tous les détails",
+  "share_card_sent": "Carte envoyée",
+  "share_sent": "Envoyé",
+  "share_failed": "Partage impossible",
+  "share_link_copied": "Lien copié",
+  "share_copy_address": "Copiez l’adresse de la page",
+  "share_external": "Partager",
+  "share_internal": "Envoyer dans GRABIT",
+  "chat_share_choose_title": "Où envoyer cette annonce ?",
+  "chat_share_choose_body": "Choisissez une discussion ou un groupe.",
+  "chat_share_cancel": "Annuler le partage",
+  "chat_share_ready": "La carte de l’annonce est prête à envoyer",
+  "chat_listing_verified": "Vérifié",
+  "chat_listing_open": "Ouvrir"
 }

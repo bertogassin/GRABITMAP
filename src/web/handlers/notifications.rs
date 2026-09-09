@@ -238,7 +238,7 @@ pub async fn open_notification(
         } else if kind == "group_message" {
             format!("/app/group/{resource_id}")
         } else {
-            format!("/app/resource/{resource_id}")
+            format!("/app/listing/{resource_id}")
         }
     } else if kind == "work_nudge" {
         "/app/search?kind=work".to_string()

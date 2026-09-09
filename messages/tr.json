@@ -285,5 +285,20 @@
   "profile_login_write": "Giriş yap ve yaz",
   "profile_share_text": "Bağlantımla GRABIT’e gel. Sohbet, adımlar ve yakındaki iş.",
   "common_share": "Paylaş",
-  "common_rating": "Puan {rating} · {votes}"
+  "common_rating": "Puan {rating} · {votes}",
+  "share_tagline": "İNSANLAR · İŞ · HİZMETLER · TİCARET",
+  "share_open_details": "Tüm ayrıntıları aç",
+  "share_card_sent": "Kart gönderildi",
+  "share_sent": "Gönderildi",
+  "share_failed": "Paylaşılamadı",
+  "share_link_copied": "Bağlantı kopyalandı",
+  "share_copy_address": "Sayfa adresini kopyalayın",
+  "share_external": "Paylaş",
+  "share_internal": "GRABIT'te gönder",
+  "chat_share_choose_title": "İlan nereye gönderilsin?",
+  "chat_share_choose_body": "Bir sohbet veya grup seçin.",
+  "chat_share_cancel": "Paylaşımı iptal et",
+  "chat_share_ready": "İlan kartı gönderilmeye hazır",
+  "chat_listing_verified": "Doğrulandı",
+  "chat_listing_open": "Aç"
 }

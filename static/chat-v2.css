@@ -2676,3 +2676,133 @@ html[dir="rtl"] .chat-message-more {
     padding: 0 12px;
     font-size: 13px;
 }
+
+.chat-share-notice {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr) 34px;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    border: 1px solid rgba(245, 166, 35, .35);
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(245, 166, 35, .12), rgba(20, 25, 34, .94));
+}
+
+.chat-share-notice img {
+    width: 72px;
+    height: 44px;
+    object-fit: contain;
+}
+
+.chat-share-notice div {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+}
+
+.chat-share-notice strong {
+    font-size: 14px;
+    color: var(--text);
+}
+
+.chat-share-notice span {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.chat-share-notice > a {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 24px;
+}
+
+.chat-message-body--listing {
+    display: grid;
+    gap: 8px;
+    min-width: min(72vw, 310px);
+}
+
+.chat-listing-caption {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.chat-listing-card {
+    display: grid;
+    gap: 7px;
+    padding: 13px;
+    border: 1px solid rgba(245, 166, 35, .32);
+    border-radius: 17px;
+    background:
+        radial-gradient(circle at 100% 0, rgba(245, 166, 35, .15), transparent 42%),
+        linear-gradient(145deg, #111720, #191f29);
+    color: #fffdf8;
+    text-decoration: none;
+    overflow: hidden;
+}
+
+.chat-listing-brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 42px;
+    color: #f5a623;
+    font-size: 12px;
+    letter-spacing: .12em;
+}
+
+.chat-listing-brand img {
+    width: 88px;
+    height: 53px;
+    object-fit: contain;
+}
+
+.chat-listing-title {
+    font-size: 17px;
+    line-height: 1.2;
+}
+
+.chat-listing-meta,
+.chat-listing-description {
+    display: block;
+    color: rgba(255, 255, 255, .72);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.chat-listing-description {
+    color: rgba(255, 255, 255, .86);
+}
+
+.chat-listing-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, .09);
+    color: #f5a623;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+@media (max-width: 420px) {
+    .chat-share-notice {
+        grid-template-columns: 58px minmax(0, 1fr) 32px;
+    }
+
+    .chat-share-notice img {
+        width: 58px;
+        height: 36px;
+    }
+
+    .chat-message-body--listing {
+        min-width: min(76vw, 290px);
+    }
+}

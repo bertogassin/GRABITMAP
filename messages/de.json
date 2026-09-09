@@ -285,5 +285,20 @@
   "profile_login_write": "Anmelden und schreiben",
   "profile_share_text": "Komm mit meinem Link zu GRABIT. Chat, Schritte und Arbeit in der Nähe.",
   "common_share": "Teilen",
-  "common_rating": "Bewertung {rating} · {votes}"
+  "common_rating": "Bewertung {rating} · {votes}",
+  "share_tagline": "MENSCHEN · ARBEIT · DIENSTE · GESCHÄFT",
+  "share_open_details": "Alle Details öffnen",
+  "share_card_sent": "Karte gesendet",
+  "share_sent": "Gesendet",
+  "share_failed": "Teilen nicht möglich",
+  "share_link_copied": "Link kopiert",
+  "share_copy_address": "Seitenadresse kopieren",
+  "share_external": "Teilen",
+  "share_internal": "In GRABIT senden",
+  "chat_share_choose_title": "Wohin soll die Anzeige?",
+  "chat_share_choose_body": "Direktchat oder Gruppe wählen.",
+  "chat_share_cancel": "Teilen abbrechen",
+  "chat_share_ready": "Anzeigenkarte ist versandbereit",
+  "chat_listing_verified": "Geprüft",
+  "chat_listing_open": "Öffnen"
 }

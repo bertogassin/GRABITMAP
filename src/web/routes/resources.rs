@@ -1,10 +1,10 @@
 use super::super::handlers::{
-    add_resource, add_resource_page, api_favorite_status, api_favorite_toggle, api_report_resource,
-    api_resource_vote, app_cat, app_city_all, confirm_promotion_payment, edit_resource,
-    edit_resource_page, my_resources, promotion_payment_page, promotion_payment_return,
-    request_resource_promotion, resource_create_city_page, resource_create_city_submit,
-    resource_create_continent, resource_create_country, resource_create_start, resource_profile,
-    resource_promotion_page, retry_promotion_publish,
+    add_resource, add_resource_page, api_favorite_status, api_favorite_toggle, api_listing_preview,
+    api_report_resource, api_resource_vote, app_cat, app_city_all, confirm_promotion_payment,
+    edit_resource, edit_resource_page, my_resources, promotion_payment_page,
+    promotion_payment_return, request_resource_promotion, resource_create_city_page,
+    resource_create_city_submit, resource_create_continent, resource_create_country,
+    resource_create_start, resource_profile, resource_promotion_page, retry_promotion_publish,
 };
 use crate::state::app_state::AppState;
 use axum::{
@@ -29,6 +29,7 @@ pub(super) fn routes() -> Router<AppState> {
         )
         .route("/app/my-resources", get(my_resources))
         .route("/app/resource/{id}", get(resource_profile))
+        .route("/app/listing/{id}", get(resource_profile))
         .route("/app/resource/{id}/promote", get(resource_promotion_page))
         .route(
             "/app/resource/{id}/promote/request",
@@ -57,6 +58,7 @@ pub(super) fn routes() -> Router<AppState> {
             get(add_resource_page).post(add_resource),
         )
         .route("/api/resource/{id}/vote", post(api_resource_vote))
+        .route("/api/listing/{id}/preview", get(api_listing_preview))
         .route(
             "/api/resource/{id}/favorite",
             post(api_favorite_toggle).get(api_favorite_status),

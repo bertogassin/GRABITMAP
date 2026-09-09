@@ -190,14 +190,14 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                             write = crate::i18n::t("common_write"),
                         )
                     };
-                    let resource_href = format!("/app/resource/{id}");
+                    let resource_href = format!("/app/listing/{id}");
                     let share_html = share_button(&resource_href, "Поделиться");
 
                     format!(
                         r#"
                     <div class="{card_class} card--listing" data-share-scope>
                         {premium_shine}
-                        <a href="/app/resource/{id}" class="rm-person-main">
+                        <a href="/app/listing/{id}" class="rm-person-main">
                         <div class="card-icon">{map_icon}</div>
 
                         <div class="card-content">
@@ -430,6 +430,46 @@ pub struct RenderResourceProfileParams<'a> {
     pub viewer_favorite: bool,
 }
 
+fn listing_meta_description(description: &str) -> String {
+    let normalized = description.split_whitespace().collect::<Vec<_>>().join(" ");
+    let mut result: String = normalized.chars().take(180).collect();
+    if normalized.chars().count() > 180 {
+        result.push('…');
+    }
+    result
+}
+
+fn listing_share_meta(id: i64, title: &str, description: &str, owner_preview: bool) -> String {
+    if owner_preview {
+        return r#"<meta name="robots" content="noindex, nofollow">"#.to_string();
+    }
+
+    let base = crate::stripe_payments::public_base_url();
+    let url = format!("{base}/app/listing/{id}");
+    let image = format!("{base}/static/grabit-share-cover.png");
+    let safe_title = escape_html(title);
+    let safe_description = escape_html(&listing_meta_description(description));
+    let safe_url = escape_html(&url);
+    let safe_image = escape_html(&image);
+
+    format!(
+        r#"<link rel="canonical" href="{safe_url}">
+<meta name="description" content="{safe_description}">
+<meta property="og:site_name" content="GRABIT">
+<meta property="og:type" content="article">
+<meta property="og:title" content="{safe_title}">
+<meta property="og:description" content="{safe_description}">
+<meta property="og:url" content="{safe_url}">
+<meta property="og:image" content="{safe_image}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{safe_title}">
+<meta name="twitter:description" content="{safe_description}">
+<meta name="twitter:image" content="{safe_image}">"#,
+    )
+}
+
 pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> String {
     let RenderResourceProfileParams {
         id,
@@ -571,10 +611,15 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
         data-share
         data-share-title="{share_title}"
         data-share-text="{share_text}"
-        data-share-url="/app/resource/{id}"
+        data-share-url="/app/listing/{id}"
         data-share-status="share-status">
-        Поделиться
+        {share_external}
     </button>
+
+    <a class="ui-button rm-share-internal"
+       href="/app/messages?share={id}">
+        {share_internal}
+    </a>
     <div id="share-status" class="ui-status"></div>
     <div id="favorite-status" class="ui-status rm-resource-favorite-status"></div>
 
@@ -600,6 +645,8 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
             stars_html = stars_html,
             share_title = escape_html(title),
             share_text = escape_html(&format!("{listing_label} · {rubric_label}")),
+            share_external = crate::i18n::t("share_external"),
+            share_internal = crate::i18n::t("share_internal"),
             id = id,
         )
     };
@@ -1005,11 +1052,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
 
     page_document(
         &format!("{} · GRABIT", title),
-        if owner_preview {
-            r#"<meta name="robots" content="noindex, nofollow">"#
-        } else {
-            ""
-        },
+        &listing_share_meta(id, title, description, owner_preview),
         "",
         &format!(
             "{topbar}\n\n{hero}\n\n{content}",
@@ -1701,7 +1744,7 @@ pub fn render_my_resources(
 
                                     {promotion_button}
 
-                                    <a href="/app/resource/{id}"
+                                    <a href="/app/listing/{id}"
                                        class="rm-my-resource-action rm-my-resource-action--neutral">
                                         Открыть
                                     </a>
@@ -1885,7 +1928,7 @@ pub fn render_edit_resource(params: RenderEditResourceParams<'_>) -> String {
         &topbar("Редактирование", "map"),
         &back_hero(
             &back_link(
-                &format!("/app/resource/{}", id),
+                &format!("/app/listing/{}", id),
                 "Назад к объявлению",
                 "arrow-left",
             ),
@@ -2216,5 +2259,40 @@ mod catalog_publish_tests {
         assert!(!html.contains("В избранное"));
         assert!(!html.contains("Пожаловаться"));
         assert!(html.contains("noindex"));
+    }
+
+    #[test]
+    fn public_listing_has_external_and_internal_share_metadata() {
+        let html = render_resource_profile(RenderResourceProfileParams {
+            id: 7,
+            title: "Охранник в Ницце",
+            description: "Ночная смена",
+            contact: "@owner",
+            address: "Nice",
+            rating: 0.0,
+            votes: 0,
+            premium: 0,
+            verified: 1,
+            category: "work",
+            listing_type: "seeker",
+            continent_index: 0,
+            country_index: 0,
+            city_index: 0,
+            city_id: Some(13),
+            _created_at: 0,
+            owner_public_id: "abc",
+            owner_user_id: 9,
+            rubric: "security",
+            owner_preview: false,
+            moderation_status: "approved",
+            is_active: 1,
+            viewer_score: 0,
+            viewer_favorite: false,
+        });
+
+        assert!(html.contains("property=\"og:title\" content=\"Охранник в Ницце\""));
+        assert!(html.contains("property=\"og:image\""));
+        assert!(html.contains("/app/messages?share=7"));
+        assert!(html.contains("data-share-url=\"/app/listing/7\""));
     }
 }

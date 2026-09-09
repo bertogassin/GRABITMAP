@@ -285,5 +285,20 @@
   "profile_login_write": "Sign in to message",
   "profile_share_text": "Join GRABIT with my link. Chat and find work nearby.",
   "common_share": "Share",
-  "common_rating": "Rating {rating} · {votes}"
+  "common_rating": "Rating {rating} · {votes}",
+  "share_tagline": "PEOPLE · WORK · SERVICES · BUSINESS",
+  "share_open_details": "Open full details",
+  "share_card_sent": "Card sent",
+  "share_sent": "Sent",
+  "share_failed": "Could not share",
+  "share_link_copied": "Link copied",
+  "share_copy_address": "Copy the page address",
+  "share_external": "Share",
+  "share_internal": "Send in GRABIT",
+  "chat_share_choose_title": "Where should this listing go?",
+  "chat_share_choose_body": "Choose a direct chat or group.",
+  "chat_share_cancel": "Cancel sharing",
+  "chat_share_ready": "Listing card is ready to send",
+  "chat_listing_verified": "Verified",
+  "chat_listing_open": "Open"
 }

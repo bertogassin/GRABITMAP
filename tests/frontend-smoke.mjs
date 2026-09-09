@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 import vm from "node:vm";
 
@@ -50,6 +50,23 @@ test("frontend navigation only accepts same-origin app hrefs", async () => {
     assert.match(source, /url\.pathname\.startsWith\("\/app\/"\)/);
   }
   assert.match(inbox, /escapeHtml\(href\)/);
+});
+
+test("background chat polling pauses without overlapping requests", async () => {
+  const [badge, inbox, chat] = await Promise.all([
+    readFile(new URL("static/nav-badge.js", root), "utf8"),
+    readFile(new URL("static/inbox.js", root), "utf8"),
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+  ]);
+
+  assert.match(badge, /if \(attentionRequest\)/);
+  assert.match(badge, /attentionStopped \|\| document\.hidden/);
+  assert.doesNotMatch(badge, /setInterval\(refreshAttention/);
+  assert.match(inbox, /stopped \|\| suspended/);
+  assert.match(inbox, /document\.visibilityState === "hidden"/);
+  assert.match(chat, /document\.visibilityState === "hidden"/);
+  assert.match(inbox, /socket !== currentSocket/);
+  assert.match(chat, /socket !== currentSocket/);
 });
 
 test("production compose keeps Caddy in front of the private app", async () => {
@@ -215,7 +232,7 @@ test("public resources use one universal share flow", async () => {
   assert.match(share, /\[title, text, url\]/);
   assert.match(common, /fn share_button/);
   assert.match(common, /data-share-scope/);
-  assert.match(resources, /data-share-url="\/app\/resource\/\{id\}"/);
+  assert.match(resources, /data-share-url="\/app\/listing\/\{id\}"/);
   assert.doesNotMatch(
     share,
     /https?:\/\/(?:t\.me|telegram\.)|\btelegram\b|\bwhatsapp\b|\bfacebook\b/i,
@@ -227,10 +244,48 @@ test("universal sharing creates a branded image with a safe fallback", async () 
 
   assert.match(share, /canvas\.width = 1200/);
   assert.match(share, /canvas\.height = 630/);
-  assert.match(share, /new File\(\[bytes\], "grabit-card\.png"/);
+  assert.match(share, /grabit-mascot-v2\.png/);
+  assert.match(share, /new File\(\[bytes\], "grabit-listing\.png"/);
   assert.match(share, /navigator\.canShare\(cardPayload\)/);
   assert.match(share, /\{ title: title, text: text, url: url \}/);
   assert.doesNotMatch(share, /https:\/\/api\.|TELEGRAM_BOT_TOKEN/);
+});
+
+test("listing links become safe cards in direct and group chats", async () => {
+  const [chat, routes, preview, template] = await Promise.all([
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("src/web/routes/resources.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/listing_preview.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+  ]);
+
+  assert.match(routes, /\/api\/listing\/\{id\}\/preview/);
+  assert.match(routes, /\/app\/listing\/\{id\}/);
+  assert.match(preview, /moderation_status = 'approved'/);
+  assert.match(preview, /is_active = 1/);
+  assert.match(chat, /chat-listing-card/);
+  assert.match(chat, /\/api\/listing\//);
+  assert.match(chat, /URLSearchParams\(window\.location\.search\)\.get\("share"\)/);
+  assert.match(template, /chat-share-notice/);
+  assert.doesNotMatch(chat, /fetch\(\s*listing\.url/);
+});
+
+test("user-facing copy no longer calls listings resources", async () => {
+  const visibleFiles = [
+    "static/share.js",
+    "src/web/handlers/admin.rs",
+    "src/web/handlers/group_helper.rs",
+    ...(
+      await readdir(new URL("messages", root))
+    ).filter((name) => name.endsWith(".json")).map((name) => `messages/${name}`),
+  ];
+  const contents = await Promise.all(
+    visibleFiles.map((name) => readFile(new URL(name, root), "utf8")),
+  );
+
+  for (const content of contents) {
+    assert.doesNotMatch(content, /ресурс(?:ы|а|ов|ом|у|ами|ах)?/iu);
+  }
 });
 
 test("new promotions are free and internal until 2028", async () => {

@@ -285,5 +285,20 @@
   "profile_login_write": "Accedi e scrivi",
   "profile_share_text": "Entra in GRABIT con il mio link. Chat, passi e lavoro vicino.",
   "common_share": "Condividi",
-  "common_rating": "Valutazione {rating} · {votes}"
+  "common_rating": "Valutazione {rating} · {votes}",
+  "share_tagline": "PERSONE · LAVORO · SERVIZI · IMPRESE",
+  "share_open_details": "Apri tutti i dettagli",
+  "share_card_sent": "Scheda inviata",
+  "share_sent": "Inviato",
+  "share_failed": "Condivisione non riuscita",
+  "share_link_copied": "Link copiato",
+  "share_copy_address": "Copia l’indirizzo della pagina",
+  "share_external": "Condividi",
+  "share_internal": "Invia in GRABIT",
+  "chat_share_choose_title": "Dove inviare l’annuncio?",
+  "chat_share_choose_body": "Scegli una chat o un gruppo.",
+  "chat_share_cancel": "Annulla condivisione",
+  "chat_share_ready": "La scheda dell’annuncio è pronta",
+  "chat_listing_verified": "Verificato",
+  "chat_listing_open": "Apri"
 }

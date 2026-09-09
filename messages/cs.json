@@ -285,5 +285,20 @@
   "profile_login_write": "Sign in to message",
   "profile_share_text": "Join GRABIT with my link. Chat and find work nearby.",
   "common_share": "Share",
-  "common_rating": "Rating {rating} · {votes}"
+  "common_rating": "Rating {rating} · {votes}",
+  "share_tagline": "LIDÉ · PRÁCE · SLUŽBY · PODNIKÁNÍ",
+  "share_open_details": "Otevřít úplné informace",
+  "share_card_sent": "Karta odeslána",
+  "share_sent": "Odesláno",
+  "share_failed": "Sdílení se nezdařilo",
+  "share_link_copied": "Odkaz zkopírován",
+  "share_copy_address": "Zkopírujte adresu stránky",
+  "share_external": "Sdílet",
+  "share_internal": "Odeslat v GRABIT",
+  "chat_share_choose_title": "Kam odeslat tento inzerát?",
+  "chat_share_choose_body": "Vyberte chat nebo skupinu.",
+  "chat_share_cancel": "Zrušit sdílení",
+  "chat_share_ready": "Karta inzerátu je připravena",
+  "chat_listing_verified": "Ověřeno",
+  "chat_listing_open": "Otevřít"
 }

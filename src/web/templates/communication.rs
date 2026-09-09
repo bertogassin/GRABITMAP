@@ -91,6 +91,7 @@ fn inbox_unread_caption(total_unread: i64) -> String {
 pub fn render_messages(
     authenticated: bool,
     conversations: Vec<crate::web::view_models::ConversationRow>,
+    share_listing_id: Option<i64>,
 ) -> String {
     let total_unread: i64 = conversations.iter().map(|c| c.unread_count).sum();
 
@@ -121,10 +122,16 @@ pub fn render_messages(
 
                 let is_group = conversation.is_group;
                 let group_id = conversation.group_id;
-                let href = if is_group && group_id > 0 {
+                let base_href = if is_group && group_id > 0 {
                     format!("/app/group/{group_id}")
                 } else {
                     format!("/app/chat/{other_user_id}")
+                };
+                let href = match share_listing_id {
+                    Some(listing_id) if listing_id > 0 => {
+                        format!("{base_href}?share={listing_id}")
+                    }
+                    _ => base_href,
                 };
                 let kind = if is_group { "group" } else { "dm" };
                 let display_name = if is_group && !first_name.trim().is_empty() {
@@ -271,9 +278,29 @@ pub fn render_messages(
         String::new()
     };
 
+    let share_notice = match share_listing_id {
+        Some(listing_id) if authenticated && listing_id > 0 => format!(
+            r#"<aside class="chat-share-notice" role="status">
+    <img src="{mascot}" alt="" width="72" height="44">
+    <div>
+        <strong>{title}</strong>
+        <span>{body}</span>
+    </div>
+    <a href="/app/messages" aria-label="{cancel}">×</a>
+</aside>"#,
+            mascot = static_asset("grabit-mascot-v2.png"),
+            title = crate::i18n::t("chat_share_choose_title"),
+            body = crate::i18n::t("chat_share_choose_body"),
+            cancel = crate::i18n::t("chat_share_cancel"),
+        ),
+        _ => String::new(),
+    };
+
     let content_html = format!(
         r####"<link rel="stylesheet"
       href="{chat_css}">
+
+{share_notice}
 
 {section_head_dialogs}
 
@@ -286,6 +313,7 @@ pub fn render_messages(
 
 {inbox_script}"####,
         chat_css = static_asset("chat-v2.css"),
+        share_notice = share_notice,
         section_head_dialogs = section_head_dialogs,
         list_attributes = list_attributes,
         content = content,
