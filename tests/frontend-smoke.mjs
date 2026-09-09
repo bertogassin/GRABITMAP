@@ -151,5 +151,8 @@ test("staged deploy keeps a ready backend during replacement", async () => {
   assert.match(deploy, /\.backup '\$BACKUP_DIR\/votes\.db'/);
   assert.match(deploy, /PRAGMA integrity_check/);
   assert.match(deploy, /returning to staged backend/);
+  assert.match(deploy, /\.Config\.Image/);
+  assert.match(deploy, /docker image inspect "\$IMAGE_REF"/);
+  assert.doesNotMatch(deploy, /images -q "\$APP_SERVICE"/);
   assert.doesNotMatch(deploy, /docker compose[^\n]* down/);
 });
