@@ -124,6 +124,26 @@ fn trusted_request_origin(origin: &str) -> bool {
     )
 }
 
+fn trusted_request_referer(referer: &str) -> bool {
+    let referer = referer.trim();
+
+    [
+        "https://grabitmap.com",
+        "https://www.grabitmap.com",
+        "https://resursmap.de",
+        "https://www.resursmap.de",
+        "http://127.0.0.1:3000",
+        "http://localhost:3000",
+    ]
+    .iter()
+    .any(|origin| {
+        referer == *origin
+            || referer
+                .strip_prefix(origin)
+                .is_some_and(|path| path.starts_with('/'))
+    })
+}
+
 pub(super) fn request_is_cross_site(headers: &HeaderMap) -> bool {
     let origin = headers
         .get(header::ORIGIN)
@@ -138,12 +158,32 @@ pub(super) fn request_is_cross_site(headers: &HeaderMap) -> bool {
     let fetch_is_cross_site =
         fetch_site.is_some_and(|value| value.eq_ignore_ascii_case("cross-site"));
 
+    let fetch_is_first_party = fetch_site.is_some_and(|value| {
+        value.eq_ignore_ascii_case("same-origin") || value.eq_ignore_ascii_case("same-site")
+    });
+
     // Only first-party browser origins are trusted.
     if origin.is_some_and(trusted_request_origin) {
         return false;
     }
 
-    // Любой другой явно указанный Origin не доверен.
+    // Android PWA/WebView can send an opaque Origin for a legitimate form
+    // navigation. Accept it only when browser-controlled fetch metadata or a
+    // first-party Referer independently confirms the request source.
+    if origin == Some("null") {
+        if fetch_is_cross_site {
+            return true;
+        }
+
+        let trusted_referer = headers
+            .get(header::REFERER)
+            .and_then(|value| value.to_str().ok())
+            .is_some_and(trusted_request_referer);
+
+        return !(fetch_is_first_party || trusted_referer);
+    }
+
+    // Any other explicitly supplied Origin is untrusted.
     if origin.is_some() {
         return true;
     }
@@ -169,14 +209,51 @@ mod request_origin_tests {
     use super::*;
 
     #[test]
-    fn opaque_origin_is_always_rejected() {
-        for fetch_site in ["same-origin", "same-site", "none", "cross-site"] {
+    fn opaque_origin_accepts_browser_confirmed_first_party_requests() {
+        for fetch_site in ["same-origin", "same-site"] {
             let mut headers = HeaderMap::new();
             headers.insert(header::ORIGIN, "null".parse().expect("origin"));
             headers.insert("sec-fetch-site", fetch_site.parse().expect("fetch site"));
 
-            assert!(request_is_cross_site(&headers));
+            assert!(!request_is_cross_site(&headers));
         }
+    }
+
+    #[test]
+    fn opaque_origin_accepts_trusted_referer_fallback() {
+        let mut headers = HeaderMap::new();
+        headers.insert(header::ORIGIN, "null".parse().expect("origin"));
+        headers.insert(
+            header::REFERER,
+            "https://grabitmap.com/app/me".parse().expect("referer"),
+        );
+
+        assert!(!request_is_cross_site(&headers));
+    }
+
+    #[test]
+    fn opaque_origin_still_rejects_cross_site_requests() {
+        let mut headers = HeaderMap::new();
+        headers.insert(header::ORIGIN, "null".parse().expect("origin"));
+        headers.insert("sec-fetch-site", "cross-site".parse().expect("fetch site"));
+        headers.insert(
+            header::REFERER,
+            "https://grabitmap.com/app/me".parse().expect("referer"),
+        );
+
+        assert!(request_is_cross_site(&headers));
+    }
+
+    #[test]
+    fn opaque_origin_without_first_party_evidence_is_rejected() {
+        let mut headers = HeaderMap::new();
+        headers.insert(header::ORIGIN, "null".parse().expect("origin"));
+        headers.insert(
+            header::REFERER,
+            "https://evil.example/attack".parse().expect("referer"),
+        );
+
+        assert!(request_is_cross_site(&headers));
     }
 
     #[test]
