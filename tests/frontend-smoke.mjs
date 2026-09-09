@@ -52,6 +52,23 @@ test("frontend navigation only accepts same-origin app hrefs", async () => {
   assert.match(inbox, /escapeHtml\(href\)/);
 });
 
+test("background chat polling pauses without overlapping requests", async () => {
+  const [badge, inbox, chat] = await Promise.all([
+    readFile(new URL("static/nav-badge.js", root), "utf8"),
+    readFile(new URL("static/inbox.js", root), "utf8"),
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+  ]);
+
+  assert.match(badge, /if \(attentionRequest\)/);
+  assert.match(badge, /attentionStopped \|\| document\.hidden/);
+  assert.doesNotMatch(badge, /setInterval\(refreshAttention/);
+  assert.match(inbox, /stopped \|\| suspended/);
+  assert.match(inbox, /document\.visibilityState === "hidden"/);
+  assert.match(chat, /document\.visibilityState === "hidden"/);
+  assert.match(inbox, /socket !== currentSocket/);
+  assert.match(chat, /socket !== currentSocket/);
+});
+
 test("production compose keeps Caddy in front of the private app", async () => {
   const [compose, caddy] = await Promise.all([
     readFile(new URL("docker-compose.prod.yml", root), "utf8"),

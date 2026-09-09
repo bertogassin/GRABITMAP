@@ -75,31 +75,40 @@ fn notify_group_members(
     preview: &str,
 ) {
     let now = unix_now();
-    let members = group_member_ids(db, group_id);
-    for member_id in members {
-        if member_id <= 0 || member_id == sender_id {
-            continue;
-        }
-        let updated = db
-            .execute(
-                "UPDATE user_notifications
-                 SET title = ?3, message = ?4, created_at = ?5, is_read = 0
-                 WHERE user_id = ?1
-                   AND kind = 'group_message'
-                   AND resource_id = ?2
-                   AND is_read = 0",
-                rusqlite::params![member_id, group_id, title, preview, now],
-            )
-            .unwrap_or(0);
-        if updated == 0 {
-            let _ = db.execute(
-                "INSERT INTO user_notifications (
-                    user_id, resource_id, kind, title, message, is_read, created_at
-                 ) VALUES (?1, ?2, 'group_message', ?3, ?4, 0, ?5)",
-                rusqlite::params![member_id, group_id, title, preview, now],
-            );
-        }
-    }
+    let _ = db.execute(
+        "UPDATE user_notifications
+         SET title = ?3, message = ?4, created_at = ?5, is_read = 0
+         WHERE kind = 'group_message'
+           AND resource_id = ?1
+           AND is_read = 0
+           AND user_id <> ?2
+           AND user_id IN (
+                SELECT user_id
+                FROM chat_group_members
+                WHERE group_id = ?1
+           )",
+        rusqlite::params![group_id, sender_id, title, preview, now],
+    );
+
+    let _ = db.execute(
+        "INSERT INTO user_notifications (
+            user_id, resource_id, kind, title, message, is_read, created_at
+         )
+         SELECT member.user_id, ?1, 'group_message', ?3, ?4, 0, ?5
+         FROM chat_group_members AS member
+         WHERE member.group_id = ?1
+           AND member.user_id > 0
+           AND member.user_id <> ?2
+           AND NOT EXISTS (
+                SELECT 1
+                FROM user_notifications AS notification
+                WHERE notification.user_id = member.user_id
+                  AND notification.kind = 'group_message'
+                  AND notification.resource_id = ?1
+                  AND notification.is_read = 0
+           )",
+        rusqlite::params![group_id, sender_id, title, preview, now],
+    );
 }
 
 fn fanout_group_message(
@@ -225,28 +234,7 @@ fn apply_group_delivery_ticks(
     viewer_user_id: i64,
     messages: &mut [crate::web::view_models::ChatMessageRow],
 ) {
-    let others: Vec<i64> = group_member_ids(db, group_id)
-        .into_iter()
-        .filter(|id| *id > 0 && *id != viewer_user_id)
-        .collect();
-    if others.is_empty() {
-        return;
-    }
-    let mut max_other_read: i64 = 0;
-    for member_id in &others {
-        let read_id: i64 = db
-            .query_row(
-                "SELECT COALESCE(last_read_message_id, 0)
-                 FROM chat_group_members
-                 WHERE group_id = ?1 AND user_id = ?2",
-                rusqlite::params![group_id, member_id],
-                |row| row.get(0),
-            )
-            .unwrap_or(0);
-        if read_id > max_other_read {
-            max_other_read = read_id;
-        }
-    }
+    let max_other_read = group_peer_read_through(db, group_id, viewer_user_id);
     for message in messages.iter_mut() {
         if message.sender_user_id != viewer_user_id || message.deleted_at > 0 {
             continue;
@@ -298,42 +286,116 @@ fn decorate_group_messages(
     viewer_user_id: i64,
     messages: &mut [crate::web::view_models::ChatMessageRow],
 ) {
-    let mut names = std::collections::HashMap::<i64, String>::new();
-    for message in messages.iter_mut() {
-        if message.sender_user_id > 0 {
-            let name = names
-                .entry(message.sender_user_id)
-                .or_insert_with(|| profile_display_name(db, message.sender_user_id))
-                .clone();
-            message.sender_name = name;
-        }
-        if message.reply_to_message_id > 0 {
-            if let Ok((sender, text, deleted)) = db.query_row(
-                "SELECT sender_user_id, message, deleted_at
-                 FROM group_messages
-                 WHERE id = ?1 AND group_id = ?2",
-                rusqlite::params![message.reply_to_message_id, group_id],
-                |row| {
-                    Ok((
-                        row.get::<_, i64>(0)?,
-                        row.get::<_, String>(1)?,
-                        row.get::<_, i64>(2)?,
-                    ))
-                },
-            ) {
-                message.reply_sender_user_id = sender;
-                message.reply_message = if deleted > 0 {
-                    "__deleted__".to_string()
-                } else {
-                    text
-                };
+    if messages.is_empty() {
+        return;
+    }
+
+    let reply_ids = messages
+        .iter()
+        .filter_map(|message| {
+            (message.reply_to_message_id > 0).then_some(message.reply_to_message_id)
+        })
+        .collect::<std::collections::BTreeSet<_>>();
+    let mut replies = std::collections::HashMap::<i64, (i64, String)>::new();
+
+    if !reply_ids.is_empty() {
+        let placeholders = (0..reply_ids.len())
+            .map(|index| format!("?{}", index + 2))
+            .collect::<Vec<_>>()
+            .join(",");
+        let sql = format!(
+            "SELECT id, sender_user_id, message, deleted_at
+             FROM group_messages
+             WHERE group_id = ?1
+               AND id IN ({placeholders})"
+        );
+        let mut params = Vec::with_capacity(reply_ids.len() + 1);
+        params.push(rusqlite::types::Value::from(group_id));
+        params.extend(reply_ids.iter().copied().map(rusqlite::types::Value::from));
+
+        if let Ok(mut statement) = db.prepare(&sql) {
+            if let Ok(rows) = statement.query_map(rusqlite::params_from_iter(params), |row| {
+                let deleted_at = row.get::<_, i64>(3)?;
+                Ok((
+                    row.get::<_, i64>(0)?,
+                    row.get::<_, i64>(1)?,
+                    if deleted_at > 0 {
+                        "__deleted__".to_string()
+                    } else {
+                        row.get::<_, String>(2)?
+                    },
+                ))
+            }) {
+                for row in rows.flatten() {
+                    replies.insert(row.0, (row.1, row.2));
+                }
             }
         }
     }
-    let ids: Vec<i64> = messages.iter().map(|m| m.id).collect();
-    if ids.is_empty() {
-        return;
+
+    let mut sender_ids = messages
+        .iter()
+        .filter_map(|message| (message.sender_user_id > 0).then_some(message.sender_user_id))
+        .collect::<std::collections::BTreeSet<_>>();
+    sender_ids.extend(replies.values().map(|(sender_id, _)| *sender_id));
+
+    let mut names = std::collections::HashMap::<i64, String>::new();
+    if !sender_ids.is_empty() {
+        let placeholders = (1..=sender_ids.len())
+            .map(|index| format!("?{index}"))
+            .collect::<Vec<_>>()
+            .join(",");
+        let sql = format!(
+            "SELECT user_id, COALESCE(username, ''), COALESCE(first_name, ''),
+                    COALESCE(last_name, '')
+             FROM profiles
+             WHERE user_id IN ({placeholders})"
+        );
+        let params = sender_ids
+            .iter()
+            .copied()
+            .map(rusqlite::types::Value::from)
+            .collect::<Vec<_>>();
+
+        if let Ok(mut statement) = db.prepare(&sql) {
+            if let Ok(rows) = statement.query_map(rusqlite::params_from_iter(params), |row| {
+                Ok((
+                    row.get::<_, i64>(0)?,
+                    row.get::<_, String>(1)?,
+                    row.get::<_, String>(2)?,
+                    row.get::<_, String>(3)?,
+                ))
+            }) {
+                for row in rows.flatten() {
+                    names.insert(
+                        row.0,
+                        templates::conversation_display_name(row.0, &row.1, &row.2, &row.3),
+                    );
+                }
+            }
+        }
     }
+
+    for message in messages.iter_mut() {
+        if message.sender_user_id > 0 {
+            message.sender_name =
+                names
+                    .get(&message.sender_user_id)
+                    .cloned()
+                    .unwrap_or_else(|| {
+                        format!(
+                            "Участник · {:06}",
+                            message.sender_user_id.rem_euclid(1_000_000)
+                        )
+                    });
+        }
+        if let Some((sender_id, text)) = replies.get(&message.reply_to_message_id) {
+            message.reply_sender_user_id = *sender_id;
+            message.reply_message = text.clone();
+        }
+    }
+
+    let ids: Vec<i64> = messages.iter().map(|m| m.id).collect();
     let placeholders = ids.iter().map(|_| "?").collect::<Vec<_>>().join(",");
     let sql = format!(
         "SELECT message_id, emoji, user_id FROM group_message_reactions WHERE message_id IN ({placeholders})"
@@ -353,27 +415,27 @@ fn decorate_group_messages(
         Ok(rows) => rows.filter_map(Result::ok).collect::<Vec<_>>(),
         Err(_) => return,
     };
-    let mut grouped: std::collections::HashMap<(i64, String), (i64, bool)> =
+    let mut grouped: std::collections::HashMap<i64, Vec<crate::web::view_models::ChatReactionRow>> =
         std::collections::HashMap::new();
+    let mut counts = std::collections::HashMap::<(i64, String), (i64, bool)>::new();
     for (message_id, emoji, user_id) in rows {
-        let entry = grouped.entry((message_id, emoji)).or_insert((0, false));
+        let entry = counts.entry((message_id, emoji)).or_insert((0, false));
         entry.0 += 1;
         if user_id == viewer_user_id {
             entry.1 = true;
         }
     }
+    for ((message_id, emoji), (count, mine)) in counts {
+        grouped
+            .entry(message_id)
+            .or_default()
+            .push(crate::web::view_models::ChatReactionRow { emoji, count, mine });
+    }
     for message in messages.iter_mut() {
-        message.reactions = grouped
-            .iter()
-            .filter(|((id, _), _)| *id == message.id)
-            .map(
-                |((_, emoji), (count, mine))| crate::web::view_models::ChatReactionRow {
-                    emoji: emoji.clone(),
-                    count: *count,
-                    mine: *mine,
-                },
-            )
-            .collect();
+        message.reactions = grouped.remove(&message.id).unwrap_or_default();
+        message
+            .reactions
+            .sort_by_key(|reaction| std::cmp::Reverse(reaction.count));
     }
 }
 
@@ -1564,4 +1626,124 @@ pub fn load_user_groups(
         .collect::<Result<Vec<_>, _>>()
     })
     .unwrap_or_default()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn group_database() -> rusqlite::Connection {
+        let connection = rusqlite::Connection::open_in_memory().expect("group database");
+        connection
+            .execute_batch(
+                "CREATE TABLE chat_group_members (
+                    group_id INTEGER NOT NULL,
+                    user_id INTEGER NOT NULL,
+                    joined_at INTEGER NOT NULL DEFAULT 0,
+                    last_read_message_id INTEGER NOT NULL DEFAULT 0,
+                    PRIMARY KEY (group_id, user_id)
+                );
+                CREATE TABLE user_notifications (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    resource_id INTEGER,
+                    kind TEXT NOT NULL,
+                    title TEXT NOT NULL,
+                    message TEXT NOT NULL,
+                    is_read INTEGER NOT NULL DEFAULT 0,
+                    created_at INTEGER NOT NULL
+                );
+                CREATE TABLE profiles (
+                    user_id INTEGER PRIMARY KEY,
+                    username TEXT,
+                    first_name TEXT,
+                    last_name TEXT
+                );
+                CREATE TABLE group_messages (
+                    id INTEGER PRIMARY KEY,
+                    group_id INTEGER NOT NULL,
+                    sender_user_id INTEGER NOT NULL,
+                    message TEXT NOT NULL DEFAULT '',
+                    created_at INTEGER NOT NULL,
+                    edited_at INTEGER NOT NULL DEFAULT 0,
+                    deleted_at INTEGER NOT NULL DEFAULT 0,
+                    attachment_kind TEXT NOT NULL DEFAULT '',
+                    attachment_path TEXT NOT NULL DEFAULT '',
+                    client_message_id TEXT NOT NULL DEFAULT '',
+                    reply_to_message_id INTEGER NOT NULL DEFAULT 0
+                );
+                CREATE TABLE group_message_reactions (
+                    message_id INTEGER NOT NULL,
+                    user_id INTEGER NOT NULL,
+                    emoji TEXT NOT NULL,
+                    PRIMARY KEY (message_id, user_id)
+                );",
+            )
+            .expect("group schema");
+        connection
+    }
+
+    #[test]
+    fn group_notifications_are_coalesced_for_every_recipient() {
+        let connection = group_database();
+        connection
+            .execute_batch(
+                "INSERT INTO chat_group_members (group_id, user_id)
+                 VALUES (7, 1), (7, 2), (7, 3);
+                 INSERT INTO user_notifications (
+                    user_id, resource_id, kind, title, message, is_read, created_at
+                 ) VALUES (2, 7, 'group_message', 'Старое', 'Старое', 0, 1);",
+            )
+            .expect("notification fixtures");
+
+        notify_group_members(&connection, 7, 1, "Новое", "Первое");
+        notify_group_members(&connection, 7, 1, "Новое", "Второе");
+
+        let recipients: Vec<(i64, String)> = connection
+            .prepare(
+                "SELECT user_id, message
+                 FROM user_notifications
+                 WHERE kind = 'group_message' AND is_read = 0
+                 ORDER BY user_id",
+            )
+            .expect("notification query")
+            .query_map([], |row| Ok((row.get(0)?, row.get(1)?)))
+            .expect("notification rows")
+            .collect::<Result<_, _>>()
+            .expect("notification values");
+
+        assert_eq!(recipients, vec![(2, "Второе".into()), (3, "Второе".into())]);
+    }
+
+    #[test]
+    fn group_history_batches_names_replies_reactions_and_read_ticks() {
+        let connection = group_database();
+        connection
+            .execute_batch(
+                "INSERT INTO chat_group_members (group_id, user_id, last_read_message_id)
+                 VALUES (7, 1, 0), (7, 2, 11), (7, 3, 0);
+                 INSERT INTO profiles (user_id, username, first_name, last_name)
+                 VALUES (1, '', 'Амир', ''), (2, '', 'Лейла', 'А');
+                 INSERT INTO group_messages (
+                    id, group_id, sender_user_id, message, created_at, reply_to_message_id
+                 ) VALUES
+                    (10, 7, 1, 'Первое', 100, 0),
+                    (11, 7, 2, 'Ответ', 101, 10);
+                 INSERT INTO group_message_reactions (message_id, user_id, emoji)
+                 VALUES (11, 1, '👍'), (11, 2, '👍');",
+            )
+            .expect("history fixtures");
+
+        let messages = load_group_messages(&connection, 7, 1, 0, 0, 100);
+
+        assert_eq!(messages.len(), 2);
+        assert_eq!(messages[0].sender_name, "Амир");
+        assert_eq!(messages[0].read_at, 100);
+        assert_eq!(messages[1].sender_name, "Лейла А");
+        assert_eq!(messages[1].reply_sender_user_id, 1);
+        assert_eq!(messages[1].reply_message, "Первое");
+        assert_eq!(messages[1].reactions.len(), 1);
+        assert_eq!(messages[1].reactions[0].count, 2);
+        assert!(messages[1].reactions[0].mine);
+    }
 }

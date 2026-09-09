@@ -76,6 +76,7 @@
             } catch (_) {}
         }
         var stopped = false;
+        var suspended = document.visibilityState === "hidden";
         var lastSnapshot = "";
         var activeTyping = Object.create(null);
         var typingTimers = Object.create(null);
@@ -313,7 +314,7 @@
         }
 
         async function refreshInbox() {
-            if (fetching || stopped) {
+            if (fetching || stopped || suspended) {
                 return;
             }
 
@@ -376,7 +377,7 @@
         }
 
         function scheduleReconnect() {
-            if (stopped || retryTimer) {
+            if (stopped || suspended || retryTimer) {
                 return;
             }
 
@@ -413,7 +414,7 @@
         }
 
         function connectRealtime() {
-            if (stopped || !window.WebSocket) {
+            if (stopped || suspended || !window.WebSocket) {
                 setLiveState(false);
                 return;
             }
@@ -428,28 +429,37 @@
                 return;
             }
 
+            var currentSocket;
             try {
-                socket = new WebSocket(websocketUrl());
+                currentSocket = new WebSocket(websocketUrl());
+                socket = currentSocket;
             } catch (_) {
                 setLiveState(false);
                 scheduleReconnect();
                 return;
             }
 
-            socket.addEventListener("open", function () {
+            currentSocket.addEventListener("open", function () {
+                if (socket !== currentSocket || suspended || stopped) {
+                    currentSocket.close();
+                    return;
+                }
                 retryAttempt = 0;
                 setLiveState(true);
 
                 heartbeatTimer = window.setInterval(function () {
-                    if (!socket || socket.readyState !== WebSocket.OPEN) {
+                    if (socket !== currentSocket || currentSocket.readyState !== WebSocket.OPEN) {
                         return;
                     }
 
-                    socket.send(JSON.stringify({ type: "ping" }));
+                    currentSocket.send(JSON.stringify({ type: "ping" }));
                 }, 20000);
             });
 
-            socket.addEventListener("message", function (event) {
+            currentSocket.addEventListener("message", function (event) {
+                if (socket !== currentSocket || suspended || stopped) {
+                    return;
+                }
                 var payload;
 
                 try {
@@ -478,23 +488,33 @@
                 }
             });
 
-            socket.addEventListener("close", function () {
+            currentSocket.addEventListener("close", function () {
+                if (socket !== currentSocket) {
+                    return;
+                }
                 clearSocketTimers();
                 socket = null;
                 setLiveState(false);
 
-                if (!stopped) {
+                if (!stopped && !suspended) {
                     scheduleReconnect();
                 }
             });
 
-            socket.addEventListener("error", function () {
+            currentSocket.addEventListener("error", function () {
+                if (socket !== currentSocket) {
+                    return;
+                }
                 setLiveState(false);
             });
         }
 
         function startPollingFallback() {
             window.clearInterval(pollTimer);
+
+            if (stopped || suspended) {
+                return;
+            }
 
             // WebSocket gives immediate updates, but it must never
             // disable the reliable fallback. Mobile networks can keep a
@@ -506,7 +526,19 @@
 
         window.addEventListener("visibilitychange", function () {
             if (document.visibilityState === "visible") {
+                suspended = false;
                 refreshInbox();
+                connectRealtime();
+                startPollingFallback();
+            } else {
+                suspended = true;
+                window.clearInterval(pollTimer);
+                window.clearTimeout(syncTimer);
+                clearSocketTimers();
+                if (socket) {
+                    socket.close();
+                    socket = null;
+                }
             }
         });
 

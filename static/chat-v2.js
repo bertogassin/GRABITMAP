@@ -4386,7 +4386,11 @@
         }
 
         function scheduleReconnect() {
-            if (stopped || retryTimer) {
+            if (
+                stopped ||
+                document.visibilityState === "hidden" ||
+                retryTimer
+            ) {
                 return;
             }
 
@@ -4426,16 +4430,26 @@
                 return;
             }
 
+            var currentSocket;
             try {
-                socket = new WebSocket(websocketUrl());
+                currentSocket = new WebSocket(websocketUrl());
+                socket = currentSocket;
             } catch (_) {
                 scheduleReconnect();
                 return;
             }
 
-            socket.addEventListener(
+            currentSocket.addEventListener(
                 "open",
                 function () {
+                    if (
+                        socket !== currentSocket ||
+                        stopped ||
+                        document.visibilityState === "hidden"
+                    ) {
+                        currentSocket.close();
+                        return;
+                    }
                     retryAttempt = 0;
 
                     document.documentElement.dataset
@@ -4447,11 +4461,11 @@
                         window.setInterval(
                             function () {
                                 if (
-                                    socket &&
-                                    socket.readyState ===
+                                    socket === currentSocket &&
+                                    currentSocket.readyState ===
                                         WebSocket.OPEN
                                 ) {
-                                    socket.send(
+                                    currentSocket.send(
                                         JSON.stringify({
                                             type: "ping"
                                         })
@@ -4463,9 +4477,16 @@
                 }
             );
 
-            socket.addEventListener(
+            currentSocket.addEventListener(
                 "message",
                 function (event) {
+                    if (
+                        socket !== currentSocket ||
+                        stopped ||
+                        document.visibilityState === "hidden"
+                    ) {
+                        return;
+                    }
                     var payload;
 
                     try {
@@ -4584,9 +4605,12 @@
                 }
             );
 
-            socket.addEventListener(
+            currentSocket.addEventListener(
                 "close",
                 function () {
+                    if (socket !== currentSocket) {
+                        return;
+                    }
                     clearTimers();
 
                     delete document.documentElement.dataset
@@ -4598,11 +4622,11 @@
                 }
             );
 
-            socket.addEventListener(
+            currentSocket.addEventListener(
                 "error",
                 function () {
-                    if (socket) {
-                        socket.close();
+                    if (socket === currentSocket) {
+                        currentSocket.close();
                     }
                 }
             );
@@ -4638,7 +4662,12 @@
                     connect();
                     requestSync();
                 } else if (socket) {
-                    socket.close();
+                    clearTimers();
+                    var hiddenSocket = socket;
+                    socket = null;
+                    hiddenSocket.close();
+                    delete document.documentElement.dataset
+                        .chatRealtime;
                 }
             }
         );
@@ -4655,7 +4684,9 @@
                 clearTimers();
 
                 if (socket) {
-                    socket.close();
+                    var pageSocket = socket;
+                    socket = null;
+                    pageSocket.close();
                 }
             },
             { once: true }
