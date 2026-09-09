@@ -181,3 +181,23 @@ test("production monitor is independent and stateful", async () => {
   assert.match(timer, /OnUnitActiveSec=1min/);
   assert.match(timer, /Persistent=true/);
 });
+
+test("core browser and chat flows do not depend on Telegram", async () => {
+  const [common, pwa, chatApi, chatMedia, telegramAdapter] = await Promise.all([
+    readFile(new URL("src/web/handlers/common.rs", root), "utf8"),
+    readFile(new URL("static/pwa-install.js", root), "utf8"),
+    readFile(new URL("src/web/handlers/chat_api.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/chat_media.rs", root), "utf8"),
+    readFile(new URL("src/telegram_notify.rs", root), "utf8"),
+  ]);
+
+  assert.doesNotMatch(
+    common,
+    /\|\s*"https:\/\/(?:t\.me|telegram\.)/,
+  );
+  assert.doesNotMatch(pwa, /isTelegramBrowser|\/telegram\/i/);
+  assert.doesNotMatch(chatApi, /notify_telegram_user|should_notify_telegram/);
+  assert.doesNotMatch(chatMedia, /notify_telegram_user|should_notify_telegram/);
+  assert.doesNotMatch(telegramAdapter, /notify_telegram_user/);
+  assert.match(telegramAdapter, /publish_to_telegram_group/);
+});

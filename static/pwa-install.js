@@ -22,10 +22,6 @@
         return /iphone|ipad|ipod/i.test(navigator.userAgent);
     }
 
-    function isTelegramBrowser() {
-        return /telegram/i.test(navigator.userAgent);
-    }
-
     function assetVersion() {
         var meta = document.querySelector('meta[name="resursmap-asset-version"]');
         return meta && meta.content ? meta.content : "";
@@ -70,10 +66,6 @@
             } finally {
                 deferredPrompt = null;
             }
-            return;
-        }
-        if (isTelegramBrowser()) {
-            window.alert("Откройте в Chrome, затем снова нажмите «Скачать приложение».");
             return;
         }
         window.alert("Меню браузера ⋮ → «Установить приложение» или «Добавить на главный экран».");

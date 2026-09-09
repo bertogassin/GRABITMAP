@@ -603,7 +603,7 @@ pub async fn resource_create_city_page(
     </label>
 
     <label class="ui-field">
-        <span class="ui-field-label">Телефон или Telegram</span>
+        <span class="ui-field-label">Контакт или ссылка</span>
         <input class="ui-input"
                name="contact"
                required

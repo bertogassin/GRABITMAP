@@ -121,10 +121,6 @@ fn trusted_request_origin(origin: &str) -> bool {
             | "https://www.resursmap.de"
             | "http://127.0.0.1:3000"
             | "http://localhost:3000"
-            | "https://t.me"
-            | "https://telegram.me"
-            | "https://telegram.org"
-            | "https://web.telegram.org"
     )
 }
 
@@ -142,7 +138,7 @@ pub(super) fn request_is_cross_site(headers: &HeaderMap) -> bool {
     let fetch_is_cross_site =
         fetch_site.is_some_and(|value| value.eq_ignore_ascii_case("cross-site"));
 
-    // Обычный браузер и доверенные Telegram-контейнеры.
+    // Only first-party browser origins are trusted.
     if origin.is_some_and(trusted_request_origin) {
         return false;
     }
@@ -196,8 +192,8 @@ mod request_origin_tests {
     fn trusted_origins_are_strict() {
         assert!(trusted_request_origin("https://grabitmap.com"));
         assert!(trusted_request_origin("https://resursmap.de"));
-        assert!(trusted_request_origin("https://t.me"));
-        assert!(trusted_request_origin("https://web.telegram.org"));
+        assert!(!trusted_request_origin("https://t.me"));
+        assert!(!trusted_request_origin("https://web.telegram.org"));
         assert!(!trusted_request_origin("https://evil.example"));
         assert!(!trusted_request_origin(
             "https://grabitmap.com.evil.example"

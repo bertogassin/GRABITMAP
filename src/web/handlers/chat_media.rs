@@ -396,7 +396,7 @@ pub async fn api_chat_send_image(
         other_user_id,
     );
 
-    let should_notify_telegram = connection
+    let _ = connection
         .execute(
             "INSERT INTO user_notifications (
                 user_id,
@@ -418,35 +418,7 @@ pub async fn api_chat_send_image(
              )",
             rusqlite::params![other_user_id, user_id, now],
         )
-        .unwrap_or(0)
-        == 1;
-
-    let telegram_id: Option<i64> = if should_notify_telegram {
-        connection
-            .query_row(
-                "SELECT telegram_id
-                 FROM users
-                 WHERE id = ?1
-                   AND is_active = 1",
-                rusqlite::params![other_user_id],
-                |row| row.get(0),
-            )
-            .ok()
-    } else {
-        None
-    };
-
-    if let Some(telegram_id) = telegram_id {
-        if telegram_id > 0 {
-            crate::telegram_notify::notify_telegram_user(
-                state.bot_token.as_deref(),
-                telegram_id,
-                &format!(
-                    "📷 У вас новое фото в GRABIT!\n\nОткройте чат: https://grabitmap.com/app/chat/{user_id}"
-                ),
-            );
-        }
-    }
+        .unwrap_or(0);
 
     (
         StatusCode::OK,
@@ -640,7 +612,7 @@ pub async fn api_chat_send_voice(
         other_user_id,
     );
 
-    let should_notify_telegram = connection
+    let _ = connection
         .execute(
             "INSERT INTO user_notifications (
                 user_id,
@@ -662,35 +634,7 @@ pub async fn api_chat_send_voice(
              )",
             rusqlite::params![other_user_id, user_id, now],
         )
-        .unwrap_or(0)
-        == 1;
-
-    let telegram_id: Option<i64> = if should_notify_telegram {
-        connection
-            .query_row(
-                "SELECT telegram_id
-                 FROM users
-                 WHERE id = ?1
-                   AND is_active = 1",
-                rusqlite::params![other_user_id],
-                |row| row.get(0),
-            )
-            .ok()
-    } else {
-        None
-    };
-
-    if let Some(telegram_id) = telegram_id {
-        if telegram_id > 0 {
-            crate::telegram_notify::notify_telegram_user(
-                state.bot_token.as_deref(),
-                telegram_id,
-                &format!(
-                    "🎤 У вас новое голосовое в GRABIT!\n\nОткройте чат: https://grabitmap.com/app/chat/{user_id}"
-                ),
-            );
-        }
-    }
+        .unwrap_or(0);
 
     (
         StatusCode::OK,
