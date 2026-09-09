@@ -1,6 +1,7 @@
 use super::auth::verify_authenticated_user;
 use super::common::{rate_limit_retry_after, request_is_cross_site, unix_now};
 use super::types::PromotionRequestForm;
+use crate::internal_promotions::{self, ActivationOutcome, FREE_CAMPAIGN_END};
 use crate::resource_publisher::{
     finalize_paid_promotion, mark_promotion_paid_with_reference, promotion_price_label,
     promotion_price_minor, store_checkout_session_id, try_publish_promotion,
@@ -254,6 +255,65 @@ pub async fn resource_promotion_page(
     Path(resource_id): Path<i64>,
     headers: HeaderMap,
 ) -> Response {
+    let authenticated = match verify_authenticated_user(&state, &headers) {
+        Some(user) => user,
+        None => return Redirect::temporary("/login?next=/app/my-resources").into_response(),
+    };
+
+    let connection = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(connection) => connection,
+        Err(_) => {
+            return (StatusCode::SERVICE_UNAVAILABLE, "Сервис недоступен").into_response();
+        }
+    };
+
+    let Some(resource) = load_owned_resource(&connection, resource_id, &authenticated.client_id)
+    else {
+        return status_response(
+            "Продвижение · GRABIT",
+            "⚠ Доступ",
+            "Нет доступа",
+            "Продвигать объявление может только его владелец.",
+            resource_id,
+        );
+    };
+
+    if !resource_is_eligible(&resource.moderation_status, resource.is_active) {
+        return status_response(
+            "Продвижение · GRABIT",
+            "Модерация",
+            "Продвижение недоступно",
+            "Сначала объявление должно быть одобрено и опубликовано.",
+            resource_id,
+        );
+    }
+
+    let active_until: i64 = connection
+        .query_row(
+            "SELECT COALESCE(internal_promotion_until, 0) FROM resources WHERE id = ?1",
+            rusqlite::params![resource_id],
+            |row| row.get(0),
+        )
+        .unwrap_or(0);
+
+    Html(templates::render_internal_promotion(
+        resource.id,
+        &resource.title,
+        &resource.category,
+        &resource.description,
+        &resource.address,
+        active_until,
+        unix_now(),
+    ))
+    .into_response()
+}
+
+#[allow(dead_code)]
+async fn legacy_resource_promotion_page(
+    State(state): State<AppState>,
+    Path(resource_id): Path<i64>,
+    headers: HeaderMap,
+) -> Response {
     if resource_id <= 0 {
         return status_response(
             "Продвижение · GRABIT",
@@ -407,6 +467,91 @@ pub async fn resource_promotion_page(
 }
 
 pub async fn request_resource_promotion(
+    State(state): State<AppState>,
+    Path(resource_id): Path<i64>,
+    headers: HeaderMap,
+    Form(_form): Form<PromotionRequestForm>,
+) -> Response {
+    if request_is_cross_site(&headers) {
+        return (StatusCode::FORBIDDEN, "Запрос отклонён").into_response();
+    }
+
+    let authenticated = match verify_authenticated_user(&state, &headers) {
+        Some(user) => user,
+        None => return (StatusCode::UNAUTHORIZED, "Требуется вход").into_response(),
+    };
+
+    if let Some(retry_after) = rate_limit_retry_after(
+        &state,
+        authenticated.user_id,
+        "internal_promotion_request",
+        5,
+        3_600,
+    )
+    .await
+    {
+        return (
+            StatusCode::TOO_MANY_REQUESTS,
+            [(header::RETRY_AFTER, retry_after.to_string())],
+            "Слишком много запросов. Повторите попытку позже.",
+        )
+            .into_response();
+    }
+
+    if unix_now() > FREE_CAMPAIGN_END {
+        return status_response(
+            "Продвижение · GRABIT",
+            "Акция завершена",
+            "Автоматическая оплата не включена",
+            "Бесплатная акция завершилась. Новые условия появятся только после решения владельца GRABIT.",
+            resource_id,
+        );
+    }
+
+    let mut connection = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(connection) => connection,
+        Err(_) => return (StatusCode::SERVICE_UNAVAILABLE, "Сервис недоступен").into_response(),
+    };
+
+    match internal_promotions::activate(
+        &mut connection,
+        resource_id,
+        authenticated.user_id,
+        &authenticated.client_id,
+        unix_now(),
+    ) {
+        Ok(ActivationOutcome::Activated(until)) => status_response(
+            "Продвижение включено · GRABIT",
+            "100% скидка",
+            "Объявление поднято на 30 дней",
+            &format!(
+                "Внутреннее продвижение GRABIT активно до {}. Оплата не требуется.",
+                internal_promotions::format_until(until)
+            ),
+            resource_id,
+        ),
+        Ok(ActivationOutcome::AlreadyActive(until)) => status_response(
+            "Продвижение активно · GRABIT",
+            "✓ GRABIT",
+            "Объявление уже продвигается",
+            &format!(
+                "Продвижение действует до {}. Продлить его можно в последние 7 дней.",
+                internal_promotions::format_until(until)
+            ),
+            resource_id,
+        ),
+        Err(error) => status_response(
+            "Продвижение · GRABIT",
+            "⚠ GRABIT",
+            "Не удалось включить продвижение",
+            &format!("Запрос не выполнен ({error})."),
+            resource_id,
+        ),
+    }
+}
+
+#[allow(dead_code)]
+async fn legacy_request_resource_promotion(
     State(state): State<AppState>,
     Path(resource_id): Path<i64>,
     headers: HeaderMap,

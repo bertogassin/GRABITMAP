@@ -4,6 +4,7 @@ mod catalog;
 mod db;
 mod geography;
 mod i18n;
+mod internal_promotions;
 mod resource_publisher;
 mod resource_screening;
 mod state;
@@ -69,6 +70,8 @@ async fn main() {
     let admin_key = env::var("ADMIN_KEY").expect("ADMIN_KEY не задан");
 
     let state = AppState::new(db_pool.clone(), bot_token.clone(), admin_key);
+
+    internal_promotions::spawn_expiry_worker(db_pool.clone());
 
     let app = web::routes::routes(state);
 

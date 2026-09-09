@@ -1047,6 +1047,104 @@ pub struct RenderResourcePromotionParams<'a> {
     pub existing_failure_reason: Option<&'a str>,
 }
 
+pub fn render_internal_promotion(
+    resource_id: i64,
+    title: &str,
+    category: &str,
+    description: &str,
+    address: &str,
+    active_until: i64,
+    now: i64,
+) -> String {
+    let currently_active = active_until > now;
+    let renewal_open = !currently_active || active_until <= now + 7 * 24 * 60 * 60;
+    let state_html = if currently_active {
+        format!(
+            r#"<div class="card rm-promo-pending rm-promo-published">
+    <div class="card-title">Продвижение активно</div>
+    <div class="card-meta rm-promo-pending-copy">Действует до {}.</div>
+</div>"#,
+            escape_html(&crate::internal_promotions::format_until(active_until))
+        )
+    } else {
+        String::new()
+    };
+    let action_html = if renewal_open {
+        format!(
+            r#"<form method="post"
+      action="/app/resource/{resource_id}/promote/request"
+      class="ui-form rm-promo-form">
+    <input type="hidden" name="target_id" value="0">
+    <button type="submit" class="ui-button rm-promo-submit">
+        {label}
+    </button>
+</form>"#,
+            label = if currently_active {
+                "Продлить бесплатно на 30 дней"
+            } else {
+                "Продвинуть бесплатно на 30 дней"
+            },
+        )
+    } else {
+        r#"<div class="card rm-promo-pending">
+    <div class="card-title">Продление пока не требуется</div>
+    <div class="card-meta rm-promo-pending-copy">
+        Кнопка продления откроется за 7 дней до окончания.
+    </div>
+</div>"#
+            .to_string()
+    };
+
+    let content = format!(
+        r#"<section class="card rm-promo-preview">
+    <div class="rm-promo-preview-head">GRABIT · Внутреннее продвижение</div>
+    <div class="rm-promo-preview-body">
+        <div class="rm-promo-preview-category">{category}</div>
+        <h2 class="rm-promo-preview-title">{title}</h2>
+        <div class="rm-promo-preview-text">{description}</div>
+        <div class="rm-promo-preview-address">{address}</div>
+        <div class="rm-promo-preview-footer">Выше в городе и своей категории</div>
+        <div class="rm-promo-preview-domain">grabitmap.com</div>
+    </div>
+</section>
+
+<section class="card rm-promo-target-card">
+    <div class="card-title">100% скидка до 2028 года</div>
+    <div class="card-meta rm-promo-target-copy">
+        Продвижение внутри GRABIT бесплатно на 30 дней.
+    </div>
+    <div class="card-meta rm-promo-target-note">
+        Карта и платёж не требуются. Социальные сети и внешние группы не подключаются.
+    </div>
+</section>
+
+{state_html}
+{action_html}"#,
+        category = escape_html(category),
+        title = escape_html(title),
+        description = escape_html(description),
+        address = escape_html(address),
+    );
+
+    page_shell(
+        "Продвижение · GRABIT",
+        &topbar("Продвижение", "map-pin"),
+        &back_hero(
+            &back_link(
+                &format!("/app/resource/{resource_id}"),
+                "Объявление",
+                "arrow-left",
+            ),
+            "map-pin",
+            "Бесплатно до 2028 года",
+            "Продвижение внутри GRABIT",
+            "30 дней видимости выше в городе и категории.",
+        ),
+        &content,
+        "",
+    )
+}
+
 pub fn render_resource_promotion(params: RenderResourcePromotionParams<'_>) -> String {
     let title = escape_html(params.title);
     let category = escape_html(params.category);

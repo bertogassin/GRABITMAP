@@ -232,3 +232,22 @@ test("universal sharing creates a branded image with a safe fallback", async () 
   assert.match(share, /\{ title: title, text: text, url: url \}/);
   assert.doesNotMatch(share, /https:\/\/api\.|TELEGRAM_BOT_TOKEN/);
 });
+
+test("new promotions are free and internal until 2028", async () => {
+  const [handler, template, promotions, main] = await Promise.all([
+    readFile(new URL("src/web/handlers/resource_promotions.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/resources.rs", root), "utf8"),
+    readFile(new URL("src/internal_promotions.rs", root), "utf8"),
+    readFile(new URL("src/main.rs", root), "utf8"),
+  ]);
+
+  assert.match(handler, /internal_promotions::activate/);
+  assert.match(handler, /internal_promotion_request/);
+  assert.match(template, /100% скидка до 2028 года/);
+  assert.match(template, /Карта и платёж не требуются/);
+  assert.match(promotions, /discount_percent.*100/s);
+  assert.match(promotions, /price_minor.*0/s);
+  assert.match(promotions, /RENEWAL_WINDOW_SECONDS/);
+  assert.match(promotions, /spawn_expiry_worker/);
+  assert.match(main, /internal_promotions::spawn_expiry_worker/);
+});
