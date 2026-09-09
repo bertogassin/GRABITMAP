@@ -62,6 +62,14 @@
         var heartbeatTimer = null;
         var retryAttempt = 0;
         var cursorKey = "resursmap:inbox-event-cursor";
+        var shareListingValue = new URLSearchParams(
+            window.location.search
+        ).get("share");
+        var shareListingId = /^[1-9][0-9]{0,18}$/.test(
+            String(shareListingValue || "")
+        )
+            ? String(shareListingValue)
+            : "";
         var lastEventId = 0;
         try {
             lastEventId = Number(window.localStorage.getItem(cursorKey)) || 0;
@@ -137,6 +145,11 @@
                     ? "/app/group/" + encodeURIComponent(groupId)
                     : "/app/chat/" + encodeURIComponent(userId);
             var href = internalHref(conversation.href, fallbackHref);
+            if (shareListingId) {
+                var shareUrl = new URL(href, window.location.origin);
+                shareUrl.searchParams.set("share", shareListingId);
+                href = shareUrl.pathname + shareUrl.search + shareUrl.hash;
+            }
             var username = String(conversation.username || "").trim();
             var usernameHtml = !isGroup && username
                 ? '<div class="card-meta rm-dialog-username">@'

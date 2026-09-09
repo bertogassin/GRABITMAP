@@ -252,8 +252,9 @@ test("universal sharing creates a branded image with a safe fallback", async () 
 });
 
 test("listing links become safe cards in direct and group chats", async () => {
-  const [chat, routes, preview, template] = await Promise.all([
+  const [chat, inbox, routes, preview, template] = await Promise.all([
     readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("static/inbox.js", root), "utf8"),
     readFile(new URL("src/web/routes/resources.rs", root), "utf8"),
     readFile(new URL("src/web/handlers/listing_preview.rs", root), "utf8"),
     readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
@@ -266,6 +267,7 @@ test("listing links become safe cards in direct and group chats", async () => {
   assert.match(chat, /chat-listing-card/);
   assert.match(chat, /\/api\/listing\//);
   assert.match(chat, /URLSearchParams\(window\.location\.search\)\.get\("share"\)/);
+  assert.match(inbox, /shareUrl\.searchParams\.set\("share", shareListingId\)/);
   assert.match(template, /chat-share-notice/);
   assert.doesNotMatch(chat, /fetch\(\s*listing\.url/);
 });
