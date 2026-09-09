@@ -1,6 +1,6 @@
 [package]
 name = "grabitmap"
-version = "5.0.33"
+version = "5.0.34"
 edition = "2021"
 
 [dependencies]

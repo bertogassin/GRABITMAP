@@ -1,4 +1,4 @@
-use rusqlite::{params, Connection, Transaction, TransactionBehavior};
+use rusqlite::{params, Connection, OptionalExtension, Transaction, TransactionBehavior};
 use std::time::Duration;
 
 const ADMIN_V2_FOUNDATION_VERSION: i64 = 1;
@@ -346,7 +346,80 @@ pub fn initialize() -> rusqlite::Result<()> {
     connection.busy_timeout(Duration::from_secs(10))?;
     connection.pragma_update(None, "foreign_keys", "ON")?;
 
-    initialize_connection(&mut connection, INITIAL_OWNER_USER_ID)
+    let owner_user_id = configured_owner_user_id(&connection)?.unwrap_or(INITIAL_OWNER_USER_ID);
+
+    initialize_connection(&mut connection, owner_user_id)
+}
+
+fn configured_owner_user_id(connection: &Connection) -> rusqlite::Result<Option<i64>> {
+    let Some(email) = std::env::var("OWNER_BOOTSTRAP_EMAIL")
+        .ok()
+        .map(|value| value.trim().to_ascii_lowercase())
+        .filter(|value| value.len() >= 5 && value.len() <= 254 && value.contains('@'))
+    else {
+        return Ok(None);
+    };
+
+    verified_owner_user_id_for_email(connection, &email)
+}
+
+fn verified_owner_user_id_for_email(
+    connection: &Connection,
+    email: &str,
+) -> rusqlite::Result<Option<i64>> {
+    connection
+        .query_row(
+            "SELECT ai.user_id
+             FROM auth_identities AS ai
+             JOIN users AS u ON u.id = ai.user_id
+             WHERE ai.provider = 'email'
+               AND lower(ai.email) = ?1
+               AND ai.verified_at > 0
+               AND u.is_active = 1
+             ORDER BY ai.id
+             LIMIT 1",
+            params![email],
+            |row| row.get(0),
+        )
+        .optional()
+}
+
+fn reconcile_active_owner(
+    transaction: &Transaction<'_>,
+    owner_user_id: i64,
+) -> rusqlite::Result<()> {
+    transaction.execute(
+        "UPDATE admin_assignments
+         SET status = 'revoked',
+             valid_until = CASE
+                 WHEN valid_from >= strftime('%s','now') THEN valid_from + 1
+                 ELSE strftime('%s','now')
+             END,
+             last_change_reason = 'Владелец переназначен по OWNER_BOOTSTRAP_EMAIL',
+             updated_at = strftime('%s','now')
+         WHERE role_level = 5
+           AND scope_type = 'world'
+           AND status = 'active'
+           AND user_id <> ?1",
+        params![owner_user_id],
+    )?;
+
+    transaction.execute(
+        "UPDATE admin_sessions
+         SET revoked_at = strftime('%s','now'),
+             revoke_reason = 'owner_email_rebinding'
+         WHERE user_id <> ?1
+           AND revoked_at IS NULL
+           AND assignment_id IN (
+               SELECT id
+               FROM admin_assignments
+               WHERE role_level = 5
+                 AND scope_type = 'world'
+           )",
+        params![owner_user_id],
+    )?;
+
+    Ok(())
 }
 
 fn initialize_connection(connection: &mut Connection, owner_user_id: i64) -> rusqlite::Result<()> {
@@ -355,6 +428,8 @@ fn initialize_connection(connection: &mut Connection, owner_user_id: i64) -> rus
     transaction.execute_batch(ADMIN_V2_SCHEMA)?;
     seed_permissions(&transaction)?;
     seed_world_scope(&transaction)?;
+    transaction.execute_batch(ADMIN_V2_SECURITY_SCHEMA)?;
+    reconcile_active_owner(&transaction, owner_user_id)?;
     seed_initial_owner(&transaction, owner_user_id)?;
 
     transaction.execute(
@@ -362,8 +437,6 @@ fn initialize_connection(connection: &mut Connection, owner_user_id: i64) -> rus
          VALUES (?1, 'admin_v2_foundation')",
         params![ADMIN_V2_FOUNDATION_VERSION],
     )?;
-
-    transaction.execute_batch(ADMIN_V2_SECURITY_SCHEMA)?;
 
     transaction.execute(
         "INSERT OR IGNORE INTO schema_migrations (version, name)
@@ -798,6 +871,87 @@ mod tests {
             .expect("count");
 
         assert_eq!(assignments, 1);
+    }
+
+    #[test]
+    fn owner_lookup_requires_a_verified_email_identity() {
+        let connection = Connection::open_in_memory().expect("in-memory db");
+        connection
+            .execute_batch(
+                "CREATE TABLE users (
+                    id INTEGER PRIMARY KEY,
+                    is_active INTEGER NOT NULL DEFAULT 1
+                 );
+                 CREATE TABLE auth_identities (
+                    id INTEGER PRIMARY KEY,
+                    user_id INTEGER NOT NULL,
+                    provider TEXT NOT NULL,
+                    email TEXT NOT NULL,
+                    verified_at INTEGER NOT NULL DEFAULT 0
+                 );
+                 INSERT INTO users (id, is_active) VALUES
+                    (4000000000000000010, 1),
+                    (4000000000000000011, 1);
+                 INSERT INTO auth_identities (
+                    id, user_id, provider, email, verified_at
+                 ) VALUES
+                    (1, 4000000000000000010, 'email', 'pending@example.com', 0),
+                    (2, 4000000000000000011, 'email', 'owner@example.com', 1700000000);",
+            )
+            .expect("owner lookup schema");
+
+        assert_eq!(
+            verified_owner_user_id_for_email(&connection, "pending@example.com")
+                .expect("pending lookup"),
+            None
+        );
+        assert_eq!(
+            verified_owner_user_id_for_email(&connection, "owner@example.com")
+                .expect("verified lookup"),
+            Some(4_000_000_000_000_000_011)
+        );
+    }
+
+    #[test]
+    fn owner_rebinding_revokes_the_previous_global_owner() {
+        let mut connection = test_connection();
+        initialize_connection(&mut connection, INITIAL_OWNER_USER_ID).expect("first owner");
+
+        let replacement_owner = INITIAL_OWNER_USER_ID + 1;
+        connection
+            .execute(
+                "INSERT INTO users (id, is_active) VALUES (?1, 1)",
+                params![replacement_owner],
+            )
+            .expect("replacement user");
+
+        initialize_connection(&mut connection, replacement_owner).expect("owner rebinding");
+
+        let active_owner: i64 = connection
+            .query_row(
+                "SELECT user_id
+                 FROM admin_assignments
+                 WHERE role_level = 5
+                   AND scope_type = 'world'
+                   AND status = 'active'",
+                [],
+                |row| row.get(0),
+            )
+            .expect("active owner");
+        assert_eq!(active_owner, replacement_owner);
+
+        let previous_status: String = connection
+            .query_row(
+                "SELECT status
+                 FROM admin_assignments
+                 WHERE user_id = ?1
+                   AND role_level = 5
+                   AND scope_type = 'world'",
+                params![INITIAL_OWNER_USER_ID],
+                |row| row.get(0),
+            )
+            .expect("previous owner assignment");
+        assert_eq!(previous_status, "revoked");
     }
 
     #[test]
