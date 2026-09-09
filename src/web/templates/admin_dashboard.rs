@@ -1,4 +1,4 @@
-use super::common::{escape_html, page_document};
+use super::common::{bottom_nav, escape_html, page_document, topbar};
 
 pub(crate) struct AdminDashboardData<'a> {
     pub owner_name: &'a str,
@@ -404,6 +404,18 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     border-radius:50%;
     transform:rotate(-18deg);
 }
+.admin-orbit--outer {
+    width:242px;
+    height:122px;
+    border-color:rgba(100,168,255,.20);
+    transform:rotate(27deg);
+}
+.admin-orbit--vertical {
+    width:98px;
+    height:218px;
+    border-color:rgba(42,199,133,.22);
+    transform:rotate(9deg);
+}
 .admin-orbit-dot {
     position:absolute;
     width:9px;
@@ -413,6 +425,16 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     border-radius:50%;
     background:#69e6ae;
     box-shadow:0 0 18px rgba(105,230,174,.8);
+}
+.admin-orbit--outer .admin-orbit-dot {
+    left:calc(50% + 113px);
+    background:#64a8ff;
+    box-shadow:0 0 18px rgba(100,168,255,.8);
+}
+.admin-orbit--vertical .admin-orbit-dot {
+    left:calc(50% + 40px);
+    background:#f0d69c;
+    box-shadow:0 0 18px rgba(240,214,156,.75);
 }
 .admin-visual-label {
     position:absolute;
@@ -516,6 +538,13 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     .admin-orbit {
         animation:ownerOrbit 14s linear infinite;
     }
+    .admin-orbit--outer {
+        animation-duration:22s;
+        animation-direction:reverse;
+    }
+    .admin-orbit--vertical {
+        animation-duration:18s;
+    }
     .admin-globe {
         animation:ownerPulse 4s ease-in-out infinite;
     }
@@ -593,6 +622,14 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
              role="img"
              aria-label="Глобальная сеть GRABIT работает">
             <div class="admin-orbit">
+                <span class="admin-orbit-dot"></span>
+            </div>
+
+            <div class="admin-orbit admin-orbit--outer">
+                <span class="admin-orbit-dot"></span>
+            </div>
+
+            <div class="admin-orbit admin-orbit--vertical">
                 <span class="admin-orbit-dot"></span>
             </div>
 
@@ -718,7 +755,14 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
         level_rows = render_levels(data.level_counts),
     );
 
-    page_document("Центр управления · GRABIT", head, "", &main, "", "")
+    page_document(
+        "Центр управления · GRABIT",
+        head,
+        &topbar("Центр владельца", "shield"),
+        &main,
+        &bottom_nav("menu"),
+        "",
+    )
 }
 
 fn render_stats(data: &AdminDashboardData<'_>) -> String {

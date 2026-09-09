@@ -27,6 +27,21 @@
         return meta && meta.content ? meta.content : "";
     }
 
+    function showManualInstallHint() {
+        var hint = document.getElementById("resursmap-install-hint");
+        if (hint) {
+            hint.textContent = isIOSDevice()
+                ? "Safari → Поделиться → На экран Домой"
+                : "Откройте меню браузера ⋮ и выберите «Установить приложение»";
+            hint.setAttribute("role", "status");
+        }
+
+        document.querySelectorAll("#resursmap-install-pwa").forEach(function (button) {
+            button.textContent = "Открыть меню браузера";
+            button.disabled = true;
+        });
+    }
+
     function registerServiceWorker() {
         if (!("serviceWorker" in navigator)) {
             return;
@@ -51,12 +66,7 @@
             return;
         }
         if (isIOSDevice()) {
-            window.alert(
-                "На iPhone:\n\n" +
-                "1. Safari → Поделиться.\n" +
-                "2. «На экран Домой».\n" +
-                "3. «Добавить»."
-            );
+            showManualInstallHint();
             return;
         }
         if (deferredPrompt) {
@@ -68,7 +78,7 @@
             }
             return;
         }
-        window.alert("Меню браузера ⋮ → «Установить приложение» или «Добавить на главный экран».");
+        showManualInstallHint();
     }
 
     registerServiceWorker();

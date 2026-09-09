@@ -251,3 +251,16 @@ test("new promotions are free and internal until 2028", async () => {
   assert.match(promotions, /spawn_expiry_worker/);
   assert.match(main, /internal_promotions::spawn_expiry_worker/);
 });
+
+test("owner center uses the modern shell and install help is non-blocking", async () => {
+  const dashboard = await readFile("src/web/templates/admin_dashboard.rs", "utf8");
+  const navigation = await readFile("src/web/templates/navigation.rs", "utf8");
+  const install = await readFile("static/pwa-install.js", "utf8");
+
+  assert.match(dashboard, /admin-orbit--outer/);
+  assert.match(dashboard, /bottom_nav\("menu"\)/);
+  assert.match(navigation, /data-owner-center-entry/);
+  assert.match(navigation, /admin_level == 5/);
+  assert.doesNotMatch(install, /window\.alert/);
+  assert.match(install, /showManualInstallHint/);
+});
