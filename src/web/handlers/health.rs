@@ -1,7 +1,11 @@
+use super::admin_access::{
+    load_admin_context, record_denied_access, verify_admin_session, AdminPermission,
+};
+use super::auth::verify_authenticated_user;
 use crate::state::app_state::AppState;
 use axum::{
     extract::State,
-    http::{header, StatusCode},
+    http::{header, HeaderMap, HeaderValue, StatusCode},
     response::{IntoResponse, Response},
 };
 
@@ -33,7 +37,34 @@ pub async fn ready(State(state): State<AppState>) -> Response {
     }
 }
 
-pub async fn metrics(State(state): State<AppState>) -> Response {
+pub async fn metrics(State(state): State<AppState>, headers: HeaderMap) -> Response {
+    let Some(authenticated) = verify_authenticated_user(&state, &headers) else {
+        return (StatusCode::NOT_FOUND, "404").into_response();
+    };
+
+    let Some(context) = load_admin_context(&state, authenticated.user_id) else {
+        record_denied_access(
+            &state,
+            authenticated.user_id,
+            "metrics_access_denied",
+            "Нет активного административного назначения",
+        );
+        return (StatusCode::NOT_FOUND, "404").into_response();
+    };
+
+    if !context.is_owner()
+        || !context.has_permission(AdminPermission::InfrastructureRead)
+        || !verify_admin_session(&state, &headers, context.user_id, context.assignment_id)
+    {
+        record_denied_access(
+            &state,
+            authenticated.user_id,
+            "metrics_permission_denied",
+            "Недостаточно прав или отсутствует действующая административная сессия",
+        );
+        return (StatusCode::FORBIDDEN, "Доступ запрещён").into_response();
+    }
+
     let pool = &state.db_pool;
     let body = format!(
         "# HELP grabitmap_db_connections SQLite connections in the pool\n\
@@ -46,14 +77,23 @@ pub async fn metrics(State(state): State<AppState>) -> Response {
         pool.state().idle_connections
     );
 
-    (
-        [(
-            header::CONTENT_TYPE,
-            "text/plain; version=0.0.4; charset=utf-8",
-        )],
-        body,
-    )
-        .into_response()
+    let mut response = body.into_response();
+    let response_headers = response.headers_mut();
+
+    response_headers.insert(
+        header::CONTENT_TYPE,
+        HeaderValue::from_static("text/plain; version=0.0.4; charset=utf-8"),
+    );
+    response_headers.insert(
+        header::CACHE_CONTROL,
+        HeaderValue::from_static("no-store, private"),
+    );
+    response_headers.insert(
+        header::X_CONTENT_TYPE_OPTIONS,
+        HeaderValue::from_static("nosniff"),
+    );
+
+    response
 }
 
 pub async fn robots_txt() -> Response {
@@ -79,5 +119,17 @@ mod tests {
         let source = include_str!("health.rs");
         assert!(source.contains("Allow: /rules"));
         assert!(source.contains("Allow: /privacy"));
+    }
+
+    #[test]
+    fn metrics_require_owner_infrastructure_session() {
+        let source = include_str!("health.rs");
+
+        assert!(source.contains("verify_authenticated_user"));
+        assert!(source.contains("load_admin_context"));
+        assert!(source.contains("context.is_owner()"));
+        assert!(source.contains("AdminPermission::InfrastructureRead"));
+        assert!(source.contains("verify_admin_session"));
+        assert!(source.contains("no-store, private"));
     }
 }
