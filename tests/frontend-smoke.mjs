@@ -216,5 +216,19 @@ test("public resources use one universal share flow", async () => {
   assert.match(common, /fn share_button/);
   assert.match(common, /data-share-scope/);
   assert.match(resources, /data-share-url="\/app\/resource\/\{id\}"/);
-  assert.doesNotMatch(share, /t\.me|telegram|whatsapp|facebook/i);
+  assert.doesNotMatch(
+    share,
+    /https?:\/\/(?:t\.me|telegram\.)|\btelegram\b|\bwhatsapp\b|\bfacebook\b/i,
+  );
+});
+
+test("universal sharing creates a branded image with a safe fallback", async () => {
+  const share = await readFile(new URL("static/share.js", root), "utf8");
+
+  assert.match(share, /canvas\.width = 1200/);
+  assert.match(share, /canvas\.height = 630/);
+  assert.match(share, /new File\(\[bytes\], "grabit-card\.png"/);
+  assert.match(share, /navigator\.canShare\(cardPayload\)/);
+  assert.match(share, /\{ title: title, text: text, url: url \}/);
+  assert.doesNotMatch(share, /https:\/\/api\.|TELEGRAM_BOT_TOKEN/);
 });
