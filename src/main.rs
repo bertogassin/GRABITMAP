@@ -74,6 +74,7 @@ async fn main() {
     let state = AppState::new(db_pool.clone(), bot_token.clone(), admin_key);
 
     internal_promotions::spawn_expiry_worker(db_pool.clone());
+    db::group_member_search::spawn_backfill_worker(db_pool.clone());
 
     let app = web::routes::routes(state);
 
