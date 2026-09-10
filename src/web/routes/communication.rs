@@ -5,10 +5,10 @@ use super::super::handlers::{
     api_chat_send_voice, api_chat_unblock, api_group_delete, api_group_edit, api_group_media,
     api_group_messages, api_group_react, api_group_search, api_group_send, api_group_send_image,
     api_group_send_voice, api_start_direct_chat, chat_page, contact_requests_page, create_group,
-    create_group_invite, group_chat_page, group_invite_page, group_members_page, join_group_invite,
-    leave_group, messages_page, new_group_page, remove_group_member, rename_group,
-    retired_contact_decision, revoke_group_invite, transfer_group_ownership,
-    update_chat_preference, update_group_member_role,
+    create_group_invite, delete_group_avatar, get_group_avatar, group_chat_page, group_invite_page,
+    group_members_page, join_group_invite, leave_group, messages_page, new_group_page,
+    remove_group_member, rename_group, retired_contact_decision, revoke_group_invite,
+    set_group_avatar, transfer_group_ownership, update_chat_preference, update_group_member_role,
 };
 use crate::state::app_state::AppState;
 use axum::{
@@ -48,6 +48,11 @@ pub(super) fn routes() -> Router<AppState> {
         .route("/app/group/{group_id}/members", get(group_members_page))
         .route("/app/group/{group_id}/members", post(add_group_members))
         .route("/app/group/{group_id}/settings/name", post(rename_group))
+        .route("/app/group/{group_id}/avatar", post(set_group_avatar))
+        .route(
+            "/app/group/{group_id}/avatar/delete",
+            post(delete_group_avatar),
+        )
         .route(
             "/app/group/{group_id}/invite/create",
             post(create_group_invite),
@@ -70,6 +75,7 @@ pub(super) fn routes() -> Router<AppState> {
         )
         .route("/app/group/{group_id}/leave", post(leave_group))
         .route("/api/group/{group_id}/messages", get(api_group_messages))
+        .route("/api/group/{group_id}/avatar", get(get_group_avatar))
         .route("/api/group/{group_id}/search", get(api_group_search))
         .route("/api/group/{group_id}/send", post(api_group_send))
         .route(

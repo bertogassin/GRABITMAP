@@ -536,6 +536,27 @@ test("group invites are signed, revocable, expiring, and capacity bounded", asyn
   assert.match(template, /history\.replaceState/);
 });
 
+test("group identity supports private avatars and bounded descriptions", async () => {
+  const [database, handlers, routes, template, inbox] = await Promise.all([
+    readFile(new URL("src/db/chat_groups.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
+    readFile(new URL("src/web/routes/communication.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+    readFile(new URL("static/inbox.js", root), "utf8"),
+  ]);
+
+  assert.match(database, /description TEXT NOT NULL DEFAULT ''/);
+  assert.match(database, /avatar_path TEXT NOT NULL DEFAULT ''/);
+  assert.match(handlers, /MAX_GROUP_AVATAR_BYTES/);
+  assert.match(handlers, /detect_image\(&bytes\)/);
+  assert.match(handlers, /role_can_manage_members/);
+  assert.match(handlers, /is_member\(&db, group_id, user_id\)/);
+  assert.match(routes, /\/api\/group\/\{group_id\}\/avatar/);
+  assert.match(template, /name="description" maxlength="500"/);
+  assert.match(template, /name="image" accept="image\/jpeg,image\/png,image\/webp"/);
+  assert.match(inbox, /conversation\.has_avatar && groupId/);
+});
+
 test("user-facing copy no longer calls listings resources", async () => {
   const visibleFiles = [
     "static/share.js",
