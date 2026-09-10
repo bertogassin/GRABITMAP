@@ -120,6 +120,18 @@ fn notify_group_members(
 ) {
     let now = unix_now();
     let _ = db.execute(
+        "UPDATE chat_preferences
+         SET archived_at = 0, updated_at = ?3
+         WHERE chat_kind = 'group'
+           AND target_id = ?1
+           AND user_id <> ?2
+           AND archived_at > 0
+           AND user_id IN (
+                SELECT user_id FROM chat_group_members WHERE group_id = ?1
+           )",
+        rusqlite::params![group_id, sender_id, now],
+    );
+    let _ = db.execute(
         "UPDATE user_notifications
          SET title = ?3, message = ?4, created_at = ?5, is_read = 0
          WHERE kind = 'group_message'
@@ -130,6 +142,13 @@ fn notify_group_members(
                 SELECT user_id
                 FROM chat_group_members
                 WHERE group_id = ?1
+           )
+           AND NOT EXISTS (
+                SELECT 1 FROM chat_preferences AS preference
+                WHERE preference.user_id = user_notifications.user_id
+                  AND preference.chat_kind = 'group'
+                  AND preference.target_id = ?1
+                  AND preference.muted_until > ?5
            )",
         rusqlite::params![group_id, sender_id, title, preview, now],
     );
@@ -143,6 +162,13 @@ fn notify_group_members(
          WHERE member.group_id = ?1
            AND member.user_id > 0
            AND member.user_id <> ?2
+           AND NOT EXISTS (
+                SELECT 1 FROM chat_preferences AS preference
+                WHERE preference.user_id = member.user_id
+                  AND preference.chat_kind = 'group'
+                  AND preference.target_id = ?1
+                  AND preference.muted_until > ?5
+           )
            AND NOT EXISTS (
                 SELECT 1
                 FROM user_notifications AS notification
@@ -2081,11 +2107,18 @@ pub fn load_user_groups(
                   AND m.sender_user_id <> ?1
                   AND m.deleted_at = 0
                   AND m.id > COALESCE(mem.last_read_message_id, 0)
-            )
+            ),
+            COALESCE(pref.pinned_at, 0),
+            COALESCE(pref.archived_at, 0),
+            COALESCE(pref.muted_until, 0)
          FROM chat_groups g
          JOIN chat_group_members mem
            ON mem.group_id = g.id
           AND mem.user_id = ?1
+         LEFT JOIN chat_preferences pref
+           ON pref.user_id = ?1
+          AND pref.chat_kind = 'group'
+          AND pref.target_id = g.id
          ORDER BY 4 DESC
          LIMIT 100",
     )
@@ -2103,6 +2136,9 @@ pub fn load_user_groups(
                 is_group: true,
                 group_id: row.get(0)?,
                 has_avatar: false,
+                pinned_at: row.get(5)?,
+                archived_at: row.get(6)?,
+                muted_until: row.get(7)?,
             })
         })?
         .collect::<Result<Vec<_>, _>>()
@@ -2135,6 +2171,16 @@ mod tests {
                     message TEXT NOT NULL,
                     is_read INTEGER NOT NULL DEFAULT 0,
                     created_at INTEGER NOT NULL
+                );
+                CREATE TABLE chat_preferences (
+                    user_id INTEGER NOT NULL,
+                    chat_kind TEXT NOT NULL,
+                    target_id INTEGER NOT NULL,
+                    pinned_at INTEGER NOT NULL DEFAULT 0,
+                    archived_at INTEGER NOT NULL DEFAULT 0,
+                    muted_until INTEGER NOT NULL DEFAULT 0,
+                    updated_at INTEGER NOT NULL DEFAULT 0,
+                    PRIMARY KEY (user_id, chat_kind, target_id)
                 );
                 CREATE TABLE profiles (
                     user_id INTEGER PRIMARY KEY,
@@ -2345,6 +2391,9 @@ mod tests {
                  INSERT INTO chat_group_members (
                     group_id, user_id, joined_at, last_read_message_id
                  ) VALUES (7, 1, 100, 0);
+                 INSERT INTO chat_preferences (
+                    user_id, chat_kind, target_id, archived_at
+                 ) VALUES (1, 'group', 7, 150);
                  INSERT INTO group_messages (
                     id, group_id, sender_user_id, message, created_at, attachment_kind
                  ) VALUES (20, 7, 2, '', 101, 'image');",
@@ -2354,5 +2403,6 @@ mod tests {
         let conversations = load_user_groups(&connection, 1);
         assert_eq!(conversations.len(), 1);
         assert_eq!(conversations[0].last_message, "__image__");
+        assert_eq!(conversations[0].archived_at, 150);
     }
 }

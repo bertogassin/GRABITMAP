@@ -78,6 +78,7 @@ pub fn render_messages(
     viewer_user_id: i64,
     conversations: Vec<crate::web::view_models::ConversationRow>,
     share_listing_id: Option<i64>,
+    archived: bool,
 ) -> String {
     let total_unread: i64 = conversations.iter().map(|c| c.unread_count).sum();
 
@@ -166,9 +167,39 @@ pub fn render_messages(
                 } else {
                     String::new()
                 };
+                let target_id = if is_group { group_id } else { other_user_id };
+                let preference_kind = if is_group { "group" } else { "direct" };
+                let return_view = if archived { "archived" } else { "active" };
+                let muted = conversation.muted_until > chrono::Utc::now().timestamp();
+                let controls = format!(
+                    r#"<div class="chat-dialog-controls" aria-label="Действия с чатом">
+    <form method="post" action="/app/chat-preference/{preference_kind}/{target_id}">
+        <input type="hidden" name="action" value="{pin_action}"><input type="hidden" name="return_view" value="{return_view}">
+        <button type="submit" title="{pin_label}" aria-label="{pin_label}">{pin_icon}</button>
+    </form>
+    <form method="post" action="/app/chat-preference/{preference_kind}/{target_id}">
+        <input type="hidden" name="action" value="{mute_action}"><input type="hidden" name="return_view" value="{return_view}">
+        <button type="submit" title="{mute_label}" aria-label="{mute_label}">{mute_icon}</button>
+    </form>
+    <form method="post" action="/app/chat-preference/{preference_kind}/{target_id}">
+        <input type="hidden" name="action" value="{archive_action}"><input type="hidden" name="return_view" value="{return_view}">
+        <button type="submit" title="{archive_label}" aria-label="{archive_label}">{archive_icon}</button>
+    </form>
+</div>"#,
+                    pin_action = if conversation.pinned_at > 0 { "unpin" } else { "pin" },
+                    pin_label = if conversation.pinned_at > 0 { "Открепить" } else { "Закрепить" },
+                    pin_icon = if conversation.pinned_at > 0 { "★" } else { "☆" },
+                    mute_action = if muted { "unmute" } else { "mute" },
+                    mute_label = if muted { "Включить уведомления" } else { "Отключить уведомления" },
+                    mute_icon = if muted { "🔕" } else { "🔔" },
+                    archive_action = if archived { "unarchive" } else { "archive" },
+                    archive_label = if archived { "Вернуть из архива" } else { "В архив" },
+                    archive_icon = if archived { "↩" } else { "▣" },
+                );
 
                 format!(
                     r#"
+<article class="chat-dialog-entry" data-inbox-entry>
 <a href="{href}#chat-end"
    class="card chat-dialog-card"
    data-other-user-id="{other_user_id}"
@@ -208,6 +239,8 @@ pub fn render_messages(
     </div>
 
 </a>
+{controls}
+</article>
 "#,
                     href = href,
                     other_user_id = other_user_id,
@@ -226,6 +259,7 @@ pub fn render_messages(
                     last_time = last_time,
                     unread_html = unread_html,
                     arrow = icon("chevron"),
+                    controls = controls,
                 )
             })
             .collect::<Vec<_>>()
@@ -256,7 +290,8 @@ pub fn render_messages(
 
     let list_attributes = if authenticated {
         format!(
-            r#" id="chat-dialog-list" data-inbox-live="1" data-viewer-user-id="{viewer_user_id}""#
+            r#" id="chat-dialog-list" data-inbox-live="1" data-viewer-user-id="{viewer_user_id}" data-inbox-view="{}""#,
+            if archived { "archived" } else { "active" }
         )
     } else {
         String::new()
@@ -283,6 +318,18 @@ pub fn render_messages(
 </label>"#,
             placeholder = crate::i18n::t("search_what"),
             label = crate::i18n::t("nav_search"),
+        )
+    } else {
+        String::new()
+    };
+    let inbox_views = if authenticated {
+        format!(
+            r#"<nav class="inbox-views" aria-label="Разделы чатов">
+    <a href="/app/messages" class="{}">Активные</a>
+    <a href="/app/messages?view=archived" class="{}">Архив</a>
+</nav>"#,
+            if archived { "" } else { "is-active" },
+            if archived { "is-active" } else { "" },
         )
     } else {
         String::new()
@@ -314,6 +361,8 @@ pub fn render_messages(
 
 {section_head_dialogs}
 
+{inbox_views}
+
 {inbox_search}
 
 <section class="chat-dialog-list"{list_attributes}>
@@ -327,6 +376,7 @@ pub fn render_messages(
         share_notice = share_notice,
         section_head_dialogs = section_head_dialogs,
         inbox_search = inbox_search,
+        inbox_views = inbox_views,
         list_attributes = list_attributes,
         content = content,
         inbox_script = inbox_script,

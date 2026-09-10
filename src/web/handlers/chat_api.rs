@@ -1047,6 +1047,13 @@ pub async fn api_chat_send(
 
     let message_id = transaction.last_insert_rowid();
 
+    let _ = transaction.execute(
+        "UPDATE chat_preferences
+         SET archived_at = 0, updated_at = ?3
+         WHERE user_id = ?1 AND chat_kind = 'direct' AND target_id = ?2 AND archived_at > 0",
+        rusqlite::params![other_user_id, user_id, now],
+    );
+
     if transaction
         .execute(
             "UPDATE conversations
@@ -1063,17 +1070,28 @@ pub async fn api_chat_send(
         );
     }
 
-    let existing_notification = transaction
-        .execute(
-            "UPDATE user_notifications
+    let notifications_muted = crate::db::chat_preferences::notifications_muted(
+        &transaction,
+        other_user_id,
+        crate::db::chat_preferences::KIND_DIRECT,
+        user_id,
+        now,
+    );
+    let existing_notification = if notifications_muted {
+        1
+    } else {
+        transaction
+            .execute(
+                "UPDATE user_notifications
              SET created_at = ?2
              WHERE user_id = ?1
                AND kind = 'chat_message'
                AND is_read = 0
                AND (resource_id = ?3 OR resource_id IS NULL)",
-            rusqlite::params![other_user_id, now, user_id],
-        )
-        .unwrap_or(0);
+                rusqlite::params![other_user_id, now, user_id],
+            )
+            .unwrap_or(0)
+    };
 
     let should_create_notification = existing_notification == 0;
 
@@ -1402,7 +1420,11 @@ pub async fn api_chat_peer(
         .into_response()
 }
 
-pub async fn api_chat_conversations(State(state): State<AppState>, headers: HeaderMap) -> Response {
+pub async fn api_chat_conversations(
+    State(state): State<AppState>,
+    Query(params): Query<std::collections::BTreeMap<String, String>>,
+    headers: HeaderMap,
+) -> Response {
     let user_id = match verify_user_session(&state, &headers) {
         Some(user_id) => user_id,
         None => {
@@ -1434,7 +1456,8 @@ pub async fn api_chat_conversations(State(state): State<AppState>, headers: Head
     super::chat::mark_user_messages_delivered(&db, user_id);
     let mut conversations = load_user_conversations(&db, user_id);
     conversations.extend(super::groups::load_user_groups(&db, user_id));
-    conversations.sort_by(|a, b| b.updated_at.cmp(&a.updated_at).then(b._id.cmp(&a._id)));
+    let archived = params.get("view").is_some_and(|value| value == "archived");
+    let conversations = super::chat::organize_conversations(conversations, archived);
     let total_unread: i64 = conversations.iter().map(|row| row.unread_count).sum();
 
     let items: Vec<serde_json::Value> = conversations
@@ -1476,6 +1499,9 @@ pub async fn api_chat_conversations(State(state): State<AppState>, headers: Head
                 "is_group": conversation.is_group,
                 "group_id": conversation.group_id,
                 "has_avatar": conversation.has_avatar,
+                "pinned_at": conversation.pinned_at,
+                "archived_at": conversation.archived_at,
+                "muted_until": conversation.muted_until,
                 "href": if conversation.is_group && conversation.group_id > 0 {
                     format!("/app/group/{}", conversation.group_id)
                 } else {

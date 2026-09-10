@@ -10,6 +10,7 @@ pub use contacts::*;
 mod chat;
 mod chat_api;
 mod chat_media;
+mod chat_preferences;
 mod chat_realtime;
 mod direct_chat_start;
 mod groups;
@@ -19,6 +20,7 @@ pub use chat_api::{
     api_chat_react, api_chat_send,
 };
 pub use chat_media::{api_chat_media, api_chat_send_image, api_chat_send_voice};
+pub use chat_preferences::update_chat_preference;
 pub use chat_realtime::api_chat_realtime;
 pub use groups::{
     add_group_members, api_group_delete, api_group_edit, api_group_media, api_group_messages,

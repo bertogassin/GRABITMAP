@@ -177,7 +177,10 @@ pub(super) fn load_user_conversations(
             ) AS unread_count,
 
             c.updated_at,
-            CASE WHEN trim(COALESCE(p.avatar_path, '')) <> '' THEN 1 ELSE 0 END
+            CASE WHEN trim(COALESCE(p.avatar_path, '')) <> '' THEN 1 ELSE 0 END,
+            COALESCE(pref.pinned_at, 0),
+            COALESCE(pref.archived_at, 0),
+            COALESCE(pref.muted_until, 0)
 
          FROM conversations c
 
@@ -187,6 +190,13 @@ pub(super) fn load_user_conversations(
                 THEN c.user2_id
                 ELSE c.user1_id
            END
+
+         LEFT JOIN chat_preferences pref
+           ON pref.user_id = ?1
+          AND pref.chat_kind = 'direct'
+          AND pref.target_id = CASE
+                WHEN c.user1_id = ?1 THEN c.user2_id ELSE c.user1_id
+              END
 
          WHERE c.user1_id = ?1
             OR c.user2_id = ?1
@@ -211,11 +221,29 @@ pub(super) fn load_user_conversations(
                 is_group: false,
                 group_id: 0,
                 has_avatar: row.get::<_, i64>(8)? != 0,
+                pinned_at: row.get(9)?,
+                archived_at: row.get(10)?,
+                muted_until: row.get(11)?,
             })
         })?
         .collect::<Result<Vec<_>, _>>()
     })
     .unwrap_or_else(|_| vec![])
+}
+
+pub(super) fn organize_conversations(
+    mut conversations: Vec<crate::web::view_models::ConversationRow>,
+    archived: bool,
+) -> Vec<crate::web::view_models::ConversationRow> {
+    conversations.retain(|row| (row.archived_at > 0) == archived);
+    conversations.sort_by(|left, right| {
+        (right.pinned_at > 0)
+            .cmp(&(left.pinned_at > 0))
+            .then(right.pinned_at.cmp(&left.pinned_at))
+            .then(right.updated_at.cmp(&left.updated_at))
+            .then(right._id.cmp(&left._id))
+    });
+    conversations
 }
 
 pub async fn messages_page(
@@ -227,11 +255,12 @@ pub async fn messages_page(
         .get("share")
         .and_then(|value| value.parse::<i64>().ok())
         .filter(|value| *value > 0);
+    let archived = params.get("view").is_some_and(|value| value == "archived");
     let user_id = match verify_user_session(&state, &headers) {
         Some(id) => id,
 
         None => {
-            return Html(templates::render_messages(false, 0, vec![], None));
+            return Html(templates::render_messages(false, 0, vec![], None, false));
         }
     };
 
@@ -245,7 +274,7 @@ pub async fn messages_page(
     mark_user_messages_delivered(&db, user_id);
     let mut conversations = load_user_conversations(&db, user_id);
     conversations.extend(super::groups::load_user_groups(&db, user_id));
-    conversations.sort_by(|a, b| b.updated_at.cmp(&a.updated_at).then(b._id.cmp(&a._id)));
+    let conversations = organize_conversations(conversations, archived);
 
     drop(db);
 
@@ -254,6 +283,7 @@ pub async fn messages_page(
         user_id,
         conversations,
         share_listing_id,
+        archived,
     ))
 }
 
@@ -532,6 +562,16 @@ mod tests {
                 last_name TEXT,
                 avatar_path TEXT
              );
+             CREATE TABLE chat_preferences (
+                user_id INTEGER NOT NULL,
+                chat_kind TEXT NOT NULL,
+                target_id INTEGER NOT NULL,
+                pinned_at INTEGER NOT NULL DEFAULT 0,
+                archived_at INTEGER NOT NULL DEFAULT 0,
+                muted_until INTEGER NOT NULL DEFAULT 0,
+                updated_at INTEGER NOT NULL DEFAULT 0,
+                PRIMARY KEY (user_id, chat_kind, target_id)
+             );
              CREATE TABLE messages (
                 id INTEGER PRIMARY KEY,
                 conversation_id INTEGER NOT NULL,
@@ -545,6 +585,9 @@ mod tests {
              INSERT INTO conversations (id, user1_id, user2_id, updated_at)
              VALUES (1, 10, 20, 100);
              INSERT INTO profiles (user_id, first_name) VALUES (20, 'Друг');
+             INSERT INTO chat_preferences (
+                user_id, chat_kind, target_id, pinned_at, muted_until
+             ) VALUES (10, 'direct', 20, 150, 500);
              INSERT INTO messages (
                 id, conversation_id, sender_user_id, message, created_at, attachment_kind
              ) VALUES (1, 1, 20, '', 100, 'voice');",
@@ -554,5 +597,7 @@ mod tests {
         let conversations = load_user_conversations(&db, 10);
         assert_eq!(conversations.len(), 1);
         assert_eq!(conversations[0].last_message, "__voice__");
+        assert_eq!(conversations[0].pinned_at, 150);
+        assert_eq!(conversations[0].muted_until, 500);
     }
 }
