@@ -35,7 +35,9 @@ pub use groups::{
     rename_group, revoke_group_invite, set_group_avatar, transfer_group_ownership,
     update_group_member_mute, update_group_member_role,
 };
-pub use official_groups::{create_official_group, join_official_group, official_groups_page};
+pub use official_groups::{
+    claim_official_group_control, create_official_group, join_official_group, official_groups_page,
+};
 
 mod profiles;
 pub use profiles::*;

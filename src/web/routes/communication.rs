@@ -5,12 +5,13 @@ use super::super::handlers::{
     api_chat_send_image, api_chat_send_voice, api_chat_unblock, api_group_delete, api_group_edit,
     api_group_media, api_group_messages, api_group_pin, api_group_pinned, api_group_react,
     api_group_search, api_group_send, api_group_send_image, api_group_send_voice,
-    api_start_direct_chat, chat_page, contact_requests_page, create_group, create_group_invite,
-    create_official_group, delete_group_avatar, get_group_avatar, group_chat_page,
-    group_invite_page, group_members_page, join_group_invite, join_official_group, leave_group,
-    messages_page, new_group_page, official_groups_page, remove_group_member, rename_group,
-    retired_contact_decision, revoke_group_invite, set_group_avatar, transfer_group_ownership,
-    update_chat_preference, update_group_member_mute, update_group_member_role,
+    api_start_direct_chat, chat_page, claim_official_group_control, contact_requests_page,
+    create_group, create_group_invite, create_official_group, delete_group_avatar,
+    get_group_avatar, group_chat_page, group_invite_page, group_members_page, join_group_invite,
+    join_official_group, leave_group, messages_page, new_group_page, official_groups_page,
+    remove_group_member, rename_group, retired_contact_decision, revoke_group_invite,
+    set_group_avatar, transfer_group_ownership, update_chat_preference, update_group_member_mute,
+    update_group_member_role,
 };
 use crate::state::app_state::AppState;
 use axum::{
@@ -50,6 +51,10 @@ pub(super) fn routes() -> Router<AppState> {
         .route(
             "/app/official-groups/{scope_type}/{scope_id}/join",
             post(join_official_group),
+        )
+        .route(
+            "/app/group/{group_id}/official-control",
+            post(claim_official_group_control),
         )
         .route(
             "/app/group-invite/{token}",
