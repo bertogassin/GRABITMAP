@@ -1387,6 +1387,9 @@ pub struct GroupMembersPage<'a> {
     pub description: &'a str,
     pub viewer_role: &'a str,
     pub is_official: bool,
+    pub member_count: i64,
+    pub member_query: String,
+    pub next_after: Option<i64>,
     pub members: Vec<(i64, String, String, i64)>,
     pub candidates: Vec<(i64, String)>,
     pub error: &'a str,
@@ -1400,6 +1403,9 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
         description,
         viewer_role,
         is_official,
+        member_count,
+        member_query,
+        next_after,
         members,
         candidates,
         error,
@@ -1619,6 +1625,33 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
 </form>"#
             )
         };
+        let encoded_member_query = urlencoding::encode(&member_query);
+        let member_search = format!(
+            r#"<form method="get" action="/app/group/{group_id}/members" class="rm-group-member-search">
+    <label class="rm-profile-field">
+        <div class="rm-profile-field-label">Поиск участника</div>
+        <input class="ui-input" type="search" name="q" maxlength="80" value="{member_query}" placeholder="Имя, логин или ID" autocomplete="off">
+    </label>
+    <div class="rm-group-invite-actions">
+        <button type="submit" class="ui-button ui-button--secondary">Найти</button>
+        <a class="ui-button ui-button--secondary" href="/app/group/{group_id}/members">Сбросить</a>
+    </div>
+</form>"#,
+            member_query = escape_html(&member_query),
+        );
+        let next_members = next_after.map_or_else(String::new, |after| {
+            format!(r#"<a class="ui-button ui-button--secondary" href="/app/group/{group_id}/members?q={encoded_member_query}&after={after}">Показать следующих</a>"#)
+        });
+        let member_count_label = if is_official {
+            member_count.to_string()
+        } else {
+            format!("{member_count} / 250")
+        };
+        let empty_members = if members.is_empty() {
+            r#"<p class="card-meta">Участники не найдены.</p>"#
+        } else {
+            ""
+        };
         let governance = if !is_official {
             String::new()
         } else if can_manage {
@@ -1632,8 +1665,11 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
 {avatar}
 {invite}
 <section class="card rm-group-create">
-    <div class="rm-group-section-head"><div class="rm-profile-field-label">Участники</div><span class="rm-group-count">{member_count} / 250</span></div>
+    <div class="rm-group-section-head"><div class="rm-profile-field-label">Участники</div><span class="rm-group-count">{member_count_label}</span></div>
+    {member_search}
     <div class="rm-group-members">{list}</div>
+    {empty_members}
+    {next_members}
 </section>
 {add}
 {leave}
@@ -1679,7 +1715,10 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
             governance = governance,
             avatar = avatar,
             invite = invite,
-            member_count = members.len(),
+            member_count_label = member_count_label,
+            member_search = member_search,
+            empty_members = empty_members,
+            next_members = next_members,
             list = list,
             add = add,
             leave = leave,

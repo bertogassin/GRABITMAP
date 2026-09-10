@@ -8,7 +8,7 @@ use super::common::{input_text_is_valid, rate_limit_retry_after, request_is_cros
 use crate::state::app_state::AppState;
 use crate::web::templates;
 use axum::{
-    extract::{Multipart, Path, State},
+    extract::{Multipart, Path, Query, State},
     http::{header, HeaderMap, HeaderValue, StatusCode},
     response::{Html, IntoResponse, Redirect, Response},
     Form, Json,
@@ -1925,9 +1925,39 @@ pub(crate) struct GroupMembersForm {
     member_ids: String,
 }
 
+const GROUP_MEMBER_PAGE_SIZE: i64 = 50;
+const MAX_GROUP_MEMBER_QUERY_CHARS: usize = 80;
+
+type GroupMemberRow = (i64, String, String, i64);
+
+#[derive(Debug, Default, Deserialize)]
+pub struct GroupMembersQuery {
+    #[serde(default)]
+    q: String,
+    #[serde(default)]
+    after: i64,
+}
+
+fn normalized_group_member_query(value: &str) -> String {
+    let value = value.trim();
+    if value.chars().count() > MAX_GROUP_MEMBER_QUERY_CHARS {
+        String::new()
+    } else {
+        value.to_string()
+    }
+}
+
+fn escape_like_pattern(value: &str) -> String {
+    value
+        .replace('\\', "\\\\")
+        .replace('%', "\\%")
+        .replace('_', "\\_")
+}
+
 pub async fn group_members_page(
     State(state): State<AppState>,
     Path(group_id): Path<i64>,
+    Query(query): Query<GroupMembersQuery>,
     headers: HeaderMap,
 ) -> Html<String> {
     let user_id = match verify_user_session(&state, &headers) {
@@ -1941,6 +1971,9 @@ pub async fn group_members_page(
                     description: "",
                     viewer_role: "",
                     is_official: false,
+                    member_count: 0,
+                    member_query: String::new(),
+                    next_after: None,
                     members: vec![],
                     candidates: vec![],
                     error: "",
@@ -1961,6 +1994,9 @@ pub async fn group_members_page(
                 description: "",
                 viewer_role: "",
                 is_official: false,
+                member_count: 0,
+                member_query: String::new(),
+                next_after: None,
                 members: vec![],
                 candidates: vec![],
                 error: "Нет доступа",
@@ -1978,12 +2014,21 @@ pub async fn group_members_page(
     let viewer_role =
         super::official_groups::group_management_role(&state, &headers, &db, group_id, user_id)
             .unwrap_or_default();
-    let members = load_group_member_names(&db, group_id);
-    let current: std::collections::HashSet<i64> = members.iter().map(|(id, _, _, _)| *id).collect();
+    let member_query = normalized_group_member_query(&query.q);
+    let (members, next_after) =
+        load_group_member_names(&db, group_id, &member_query, query.after.max(0));
+    let member_count = db
+        .query_row(
+            "SELECT member_count FROM chat_groups WHERE id = ?1",
+            rusqlite::params![group_id],
+            |row| row.get::<_, i64>(0),
+        )
+        .unwrap_or(0)
+        .max(0);
     let candidates = if !is_official && role_can_manage_members(&viewer_role) {
         partners_for_picker(&db, user_id)
             .into_iter()
-            .filter(|(id, _)| !current.contains(id))
+            .filter(|(id, _)| !is_member(&db, group_id, *id))
             .collect()
     } else {
         vec![]
@@ -1996,6 +2041,9 @@ pub async fn group_members_page(
             description: &description,
             viewer_role: &viewer_role,
             is_official,
+            member_count,
+            member_query,
+            next_after,
             members,
             candidates,
             error: "",
@@ -2836,37 +2884,74 @@ pub async fn leave_group(
 fn load_group_member_names(
     db: &rusqlite::Connection,
     group_id: i64,
-) -> Vec<(i64, String, String, i64)> {
-    db.prepare(
-        "SELECT member.user_id, member.role, COALESCE(member.muted_until, 0),
-                COALESCE(profile.username, ''),
-                COALESCE(profile.first_name, ''),
-                COALESCE(profile.last_name, '')
-         FROM chat_group_members AS member
-         LEFT JOIN profiles AS profile ON profile.user_id = member.user_id
-         WHERE member.group_id = ?1
-         ORDER BY CASE member.role WHEN 'owner' THEN 0 WHEN 'admin' THEN 1 ELSE 2 END,
-                  member.joined_at ASC, member.user_id ASC
-         LIMIT 250",
-    )
-    .and_then(|mut stmt| {
-        stmt.query_map(rusqlite::params![group_id], |row| {
-            let id = row.get::<_, i64>(0)?;
-            let role = row.get::<_, String>(1)?;
-            let muted_until = row.get::<_, i64>(2)?;
-            let username = row.get::<_, String>(3)?;
-            let first_name = row.get::<_, String>(4)?;
-            let last_name = row.get::<_, String>(5)?;
-            Ok((
-                id,
-                templates::conversation_display_name(id, &username, &first_name, &last_name),
-                role,
-                muted_until,
-            ))
-        })?
-        .collect::<Result<Vec<_>, _>>()
-    })
-    .unwrap_or_default()
+    query: &str,
+    after_user_id: i64,
+) -> (Vec<GroupMemberRow>, Option<i64>) {
+    if group_id <= 0 {
+        return (vec![], None);
+    }
+    let pattern = format!("%{}%", escape_like_pattern(query));
+    let mut members = db
+        .prepare(
+            "SELECT member.user_id, member.role, COALESCE(member.muted_until, 0),
+                    COALESCE(profile.username, ''), COALESCE(profile.first_name, ''),
+                    COALESCE(profile.last_name, '')
+             FROM chat_group_members AS member
+             LEFT JOIN profiles AS profile ON profile.user_id = member.user_id
+             WHERE member.group_id = ?1 AND member.user_id > ?2
+               AND (?3 = ''
+                    OR CAST(member.user_id AS TEXT) LIKE ?4 ESCAPE '\\'
+                    OR lower(COALESCE(profile.username, '')) LIKE lower(?4) ESCAPE '\\'
+                    OR lower(COALESCE(profile.first_name, '')) LIKE lower(?4) ESCAPE '\\'
+                    OR lower(COALESCE(profile.last_name, '')) LIKE lower(?4) ESCAPE '\\'
+                    OR lower(trim(COALESCE(profile.first_name, '') || ' ' ||
+                                  COALESCE(profile.last_name, ''))) LIKE lower(?4) ESCAPE '\\')
+             ORDER BY member.user_id ASC
+             LIMIT ?5",
+        )
+        .and_then(|mut statement| {
+            statement
+                .query_map(
+                    rusqlite::params![
+                        group_id,
+                        after_user_id,
+                        query,
+                        pattern,
+                        GROUP_MEMBER_PAGE_SIZE + 1
+                    ],
+                    |row| {
+                        let id = row.get::<_, i64>(0)?;
+                        let role = row.get::<_, String>(1)?;
+                        let muted_until = row.get::<_, i64>(2)?;
+                        let username = row.get::<_, String>(3)?;
+                        let first_name = row.get::<_, String>(4)?;
+                        let last_name = row.get::<_, String>(5)?;
+                        Ok((
+                            id,
+                            templates::conversation_display_name(
+                                id,
+                                &username,
+                                &first_name,
+                                &last_name,
+                            ),
+                            role,
+                            muted_until,
+                        ))
+                    },
+                )?
+                .collect::<Result<Vec<_>, _>>()
+        })
+        .unwrap_or_default();
+    let has_more = members.len() > GROUP_MEMBER_PAGE_SIZE as usize;
+    if has_more {
+        members.truncate(GROUP_MEMBER_PAGE_SIZE as usize);
+    }
+    let next_after = if has_more {
+        members.last().map(|member| member.0)
+    } else {
+        None
+    };
+    (members, next_after)
 }
 
 pub fn load_user_groups(
@@ -3184,6 +3269,45 @@ mod tests {
         .expect("group send payload with no reply");
 
         assert_eq!(payload.reply_to_message_id, None);
+    }
+
+    #[test]
+    fn group_member_pages_are_bounded_searchable_and_cursor_based() {
+        let connection = group_database();
+        for user_id in 1_i64..=55 {
+            connection
+                .execute(
+                    "INSERT INTO chat_group_members (group_id, user_id, joined_at, role)
+                     VALUES (7, ?1, ?1, 'member')",
+                    rusqlite::params![user_id],
+                )
+                .expect("member fixture");
+            connection
+                .execute(
+                    "INSERT INTO profiles (user_id, username, first_name, last_name)
+                     VALUES (?1, ?2, '', '')",
+                    rusqlite::params![user_id, format!("member-{user_id}")],
+                )
+                .expect("profile fixture");
+        }
+
+        let (first, first_cursor) = load_group_member_names(&connection, 7, "", 0);
+        assert_eq!(first.len(), GROUP_MEMBER_PAGE_SIZE as usize);
+        assert_eq!(first.first().map(|member| member.0), Some(1));
+        assert_eq!(first.last().map(|member| member.0), Some(50));
+        assert_eq!(first_cursor, Some(50));
+
+        let (second, second_cursor) =
+            load_group_member_names(&connection, 7, "", first_cursor.unwrap_or_default());
+        assert_eq!(second.len(), 5);
+        assert_eq!(second.first().map(|member| member.0), Some(51));
+        assert_eq!(second.last().map(|member| member.0), Some(55));
+        assert_eq!(second_cursor, None);
+
+        let (found, found_cursor) = load_group_member_names(&connection, 7, "member-55", 0);
+        assert_eq!(found.len(), 1);
+        assert_eq!(found[0].0, 55);
+        assert_eq!(found_cursor, None);
     }
 
     #[test]
