@@ -1676,7 +1676,8 @@ pub fn load_user_groups(
             COALESCE((
                 SELECT CASE
                     WHEN m.deleted_at > 0 THEN '__deleted__'
-                    WHEN m.attachment_kind = 'image' THEN 'Фото'
+                    WHEN m.attachment_kind = 'image' AND trim(m.message) = '' THEN '__image__'
+                    WHEN m.attachment_kind = 'voice' THEN '__voice__'
                     ELSE m.message
                 END
                 FROM group_messages m
@@ -1877,5 +1878,31 @@ mod tests {
         assert!(group_reply_is_valid(&connection, 7, 10));
         assert!(!group_reply_is_valid(&connection, 7, 11));
         assert!(!group_reply_is_valid(&connection, 7, 12));
+    }
+
+    #[test]
+    fn group_inbox_uses_an_image_marker_for_image_only_messages() {
+        let connection = group_database();
+        connection
+            .execute_batch(
+                "CREATE TABLE chat_groups (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    created_at INTEGER NOT NULL
+                 );
+                 INSERT INTO chat_groups (id, name, created_at)
+                 VALUES (7, 'Команда', 100);
+                 INSERT INTO chat_group_members (
+                    group_id, user_id, joined_at, last_read_message_id
+                 ) VALUES (7, 1, 100, 0);
+                 INSERT INTO group_messages (
+                    id, group_id, sender_user_id, message, created_at, attachment_kind
+                 ) VALUES (20, 7, 2, '', 101, 'image');",
+            )
+            .expect("group inbox fixtures");
+
+        let conversations = load_user_groups(&connection, 1);
+        assert_eq!(conversations.len(), 1);
+        assert_eq!(conversations[0].last_message, "__image__");
     }
 }

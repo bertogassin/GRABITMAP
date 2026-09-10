@@ -3881,7 +3881,7 @@
                     event.preventDefault();
                     event.stopPropagation();
                     if (typeof window.resursmapOpenChatImage === "function") {
-                        window.resursmapOpenChatImage(image.src);
+                        window.resursmapOpenChatImage(image.src, image);
                     }
                     return;
                 }
@@ -4789,6 +4789,43 @@
 (function () {
     "use strict";
 
+    var lightboxTrigger = null;
+
+    function lightboxText(key, fallback) {
+        if (window.m && typeof window.m[key] === "function") {
+            try {
+                return window.m[key]({});
+            } catch (_) {
+                // Fall through to the shared runtime or fallback.
+            }
+        }
+        if (typeof window.rmT === "function") {
+            var translated = window.rmT(key);
+            if (translated && translated !== key) {
+                return translated;
+            }
+        }
+        return fallback;
+    }
+
+    function safeMediaUrl(value) {
+        try {
+            var url = new URL(String(value || ""), window.location.origin);
+            if (url.origin !== window.location.origin) {
+                return "";
+            }
+            if (
+                !url.pathname.startsWith("/api/chat/media/") &&
+                !url.pathname.startsWith("/api/group/media/")
+            ) {
+                return "";
+            }
+            return url.pathname + url.search;
+        } catch (_) {
+            return "";
+        }
+    }
+
     function ensureLightbox() {
         var existing = document.getElementById("chat-image-lightbox");
 
@@ -4800,9 +4837,29 @@
         lightbox.id = "chat-image-lightbox";
         lightbox.className = "chat-image-lightbox";
         lightbox.hidden = true;
+        lightbox.setAttribute("role", "dialog");
+        lightbox.setAttribute("aria-modal", "true");
+        lightbox.setAttribute("aria-label", lightboxText("chat_photo_label", "Фото"));
         lightbox.innerHTML =
-            '<button type="button" class="chat-lightbox-backdrop" aria-label="' + t("chat_close", "Закрыть") + '"></button>' +
+            '<button type="button" class="chat-lightbox-backdrop"></button>' +
+            '<div class="chat-lightbox-actions">' +
+                '<a class="chat-lightbox-download" download aria-label="">↓</a>' +
+                '<button type="button" class="chat-lightbox-close" aria-label="">×</button>' +
+            '</div>' +
             '<img class="chat-lightbox-image" alt="">';
+
+        lightbox.querySelector(".chat-lightbox-backdrop").setAttribute(
+            "aria-label",
+            lightboxText("chat_close", "Закрыть")
+        );
+        lightbox.querySelector(".chat-lightbox-close").setAttribute(
+            "aria-label",
+            lightboxText("chat_close", "Закрыть")
+        );
+        lightbox.querySelector(".chat-lightbox-download").setAttribute(
+            "aria-label",
+            lightboxText("menu_download", "Скачать")
+        );
 
         document.body.appendChild(lightbox);
         return lightbox;
@@ -4823,19 +4880,34 @@
         if (image) {
             image.removeAttribute("src");
         }
+
+        if (lightboxTrigger && typeof lightboxTrigger.focus === "function") {
+            lightboxTrigger.focus({ preventScroll: true });
+        }
+        lightboxTrigger = null;
     }
 
-    function openLightbox(src) {
+    function openLightbox(src, trigger) {
+        var mediaUrl = safeMediaUrl(src);
+        if (!mediaUrl) {
+            return;
+        }
         var lightbox = ensureLightbox();
         var image = lightbox.querySelector(".chat-lightbox-image");
+        var download = lightbox.querySelector(".chat-lightbox-download");
+        var close = lightbox.querySelector(".chat-lightbox-close");
 
-        if (!image || !src) {
+        if (!image || !download || !close) {
             return;
         }
 
-        image.src = src;
+        lightboxTrigger = trigger || document.activeElement;
+        image.src = mediaUrl;
+        image.alt = lightboxText("chat_photo_label", "Фото");
+        download.href = mediaUrl;
         lightbox.hidden = false;
         document.body.classList.add("chat-lightbox-open");
+        close.focus({ preventScroll: true });
     }
 
     window.resursmapOpenChatImage = openLightbox;
@@ -4848,12 +4920,19 @@
         }
 
         event.preventDefault();
-        openLightbox(thumb.src);
+        openLightbox(thumb.src, thumb);
     });
 
     document.addEventListener("keydown", function (event) {
         if (event.key === "Escape") {
             closeLightbox();
+            return;
+        }
+
+        var thumb = event.target.closest(".chat-message-image");
+        if (thumb && (event.key === "Enter" || event.key === " ")) {
+            event.preventDefault();
+            openLightbox(thumb.src, thumb);
         }
     });
 
@@ -4866,7 +4945,7 @@
 
         if (
             event.target.closest(".chat-lightbox-backdrop") ||
-            event.target.classList.contains("chat-lightbox-image")
+            event.target.closest(".chat-lightbox-close")
         ) {
             closeLightbox();
         }

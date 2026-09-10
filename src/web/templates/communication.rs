@@ -32,8 +32,6 @@ pub(crate) fn conversation_display_name(
 }
 
 pub(crate) fn format_inbox_time(updated_at: i64) -> String {
-    use chrono::Datelike;
-
     if updated_at <= 0 {
         return String::new();
     }
@@ -51,38 +49,25 @@ pub(crate) fn format_inbox_time(updated_at: i64) -> String {
 
     if date == today {
         dt.format("%H:%M").to_string()
-    } else if date == today - chrono::Duration::days(1) {
-        "Вчера".to_string()
-    } else if today.signed_duration_since(date).num_days() < 7 {
-        ru_weekday_short(dt.weekday())
     } else {
         dt.format("%d.%m").to_string()
     }
 }
 
-fn ru_weekday_short(weekday: chrono::Weekday) -> String {
-    match weekday {
-        chrono::Weekday::Mon => "пн",
-        chrono::Weekday::Tue => "вт",
-        chrono::Weekday::Wed => "ср",
-        chrono::Weekday::Thu => "чт",
-        chrono::Weekday::Fri => "пт",
-        chrono::Weekday::Sat => "сб",
-        chrono::Weekday::Sun => "вс",
+pub(crate) fn conversation_preview_text(value: &str) -> String {
+    match value {
+        "__deleted__" => crate::i18n::t("chat_deleted"),
+        "__image__" => crate::i18n::t("chat_photo"),
+        "__voice__" => crate::i18n::t("chat_voice"),
+        _ => value.to_string(),
     }
-    .to_string()
 }
 
 fn inbox_unread_caption(total_unread: i64) -> String {
     if total_unread <= 0 {
         crate::i18n::t("chat_all_read")
-    } else if crate::i18n::locale() == "ru" {
-        ru_count(
-            total_unread,
-            "непрочитанное",
-            "непрочитанных",
-            "непрочитанных",
-        )
+    } else if total_unread == 1 {
+        crate::i18n::tf("inbox_unread_one", &[("n", &total_unread.to_string())])
     } else {
         crate::i18n::tf("inbox_unread_many", &[("n", &total_unread.to_string())])
     }
@@ -90,6 +75,7 @@ fn inbox_unread_caption(total_unread: i64) -> String {
 
 pub fn render_messages(
     authenticated: bool,
+    viewer_user_id: i64,
     conversations: Vec<crate::web::view_models::ConversationRow>,
     share_listing_id: Option<i64>,
 ) -> String {
@@ -140,7 +126,7 @@ pub fn render_messages(
                     conversation_display_name(other_user_id, username, first_name, last_name)
                 };
 
-                let safe_last_message = escape_html(last_message);
+                let safe_last_message = escape_html(&conversation_preview_text(last_message));
 
                 let username_html = if !safe_username.is_empty() {
                     format!(
@@ -162,15 +148,20 @@ pub fn render_messages(
                 let last_message_html = if has_last_message {
                     safe_last_message
                 } else if is_group {
-                    "Новая группа".to_string()
+                    crate::i18n::t("chat_new_group_preview")
                 } else {
-                    "Новый диалог".to_string()
+                    crate::i18n::t("chat_new_dialog")
                 };
 
                 let unread_html = if unread_count > 0 {
                     format!(
-                        r#"<span class="chat-dialog-unread">{count}</span>"#,
-                        count = unread_count,
+                        r#"<span class="chat-dialog-unread" aria-label="{label}">{count}</span>"#,
+                        count = if unread_count > 99 {
+                            "99+".to_string()
+                        } else {
+                            unread_count.to_string()
+                        },
+                        label = escape_html(&inbox_unread_caption(unread_count)),
                     )
                 } else {
                     String::new()
@@ -264,15 +255,34 @@ pub fn render_messages(
     };
 
     let list_attributes = if authenticated {
-        r#" id="chat-dialog-list" data-inbox-live="1""#
+        format!(
+            r#" id="chat-dialog-list" data-inbox-live="1" data-viewer-user-id="{viewer_user_id}""#
+        )
     } else {
-        ""
+        String::new()
     };
 
     let inbox_script = if authenticated {
         format!(
             r#"<script src="{inbox_js}" defer></script>"#,
             inbox_js = static_asset("inbox.js"),
+        )
+    } else {
+        String::new()
+    };
+
+    let inbox_search = if authenticated {
+        format!(
+            r#"<label class="inbox-search" for="inbox-search-input">
+    <span class="inbox-search-icon" aria-hidden="true">⌕</span>
+    <input id="inbox-search-input"
+           type="search"
+           autocomplete="off"
+           placeholder="{placeholder}"
+           aria-label="{label}">
+</label>"#,
+            placeholder = crate::i18n::t("search_what"),
+            label = crate::i18n::t("nav_search"),
         )
     } else {
         String::new()
@@ -304,6 +314,7 @@ pub fn render_messages(
 
 {section_head_dialogs}
 
+{inbox_search}
 
 <section class="chat-dialog-list"{list_attributes}>
 
@@ -315,6 +326,7 @@ pub fn render_messages(
         chat_css = static_asset("chat-v2.css"),
         share_notice = share_notice,
         section_head_dialogs = section_head_dialogs,
+        inbox_search = inbox_search,
         list_attributes = list_attributes,
         content = content,
         inbox_script = inbox_script,
@@ -364,8 +376,9 @@ fn chat_message_body_html(message: &crate::web::view_models::ChatMessageRow) -> 
         };
 
         return format!(
-            r#"<div class="chat-message-body chat-message-body--image"><img class="chat-message-image" src="{url}" alt="Фото" loading="lazy" decoding="async" role="button" tabindex="0">{caption}</div>"#,
+            r#"<div class="chat-message-body chat-message-body--image"><img class="chat-message-image" src="{url}" alt="{photo}" loading="lazy" decoding="async" role="button" tabindex="0">{caption}</div>"#,
             url = escape_html(&message.attachment_url),
+            photo = crate::i18n::t("chat_photo_label"),
             caption = caption_html,
         );
     }
@@ -380,17 +393,17 @@ fn chat_reply_author_label(
     reply_sender_user_id: i64,
     viewer_user_id: i64,
     other_user_id: i64,
-) -> &'static str {
+) -> String {
     if reply_sender_user_id <= 0 {
-        return "Сообщение";
+        return crate::i18n::t("chat_message");
     }
 
     if reply_sender_user_id == viewer_user_id {
-        "Вы"
+        crate::i18n::t("chat_you")
     } else if reply_sender_user_id == other_user_id {
-        "Собеседник"
+        crate::i18n::t("chat_peer")
     } else {
-        "Сообщение"
+        crate::i18n::t("chat_message")
     }
 }
 
@@ -442,16 +455,7 @@ fn render_chat_message_row(
         .unwrap_or_default();
 
     let date_label = if let Some(dt) = datetime.as_ref() {
-        let date = dt.date_naive();
-        let today = chrono::Utc::now().with_timezone(&paris).date_naive();
-
-        if date == today {
-            "Сегодня".to_string()
-        } else if date == today - chrono::Duration::days(1) {
-            "Вчера".to_string()
-        } else {
-            dt.format("%d.%m.%Y").to_string()
-        }
+        dt.format("%d.%m.%Y").to_string()
     } else {
         String::new()
     };
@@ -504,7 +508,10 @@ fn render_chat_message_row(
     };
 
     let edited_html = if message.edited_at > 0 && !deleted {
-        r#"<span class="chat-edited-label">изменено</span>"#.to_string()
+        format!(
+            r#"<span class="chat-edited-label">{}</span>"#,
+            crate::i18n::t("chat_edited")
+        )
     } else {
         String::new()
     };
@@ -561,7 +568,7 @@ fn render_chat_message_row(
      data-attachment-url="{attachment_url}">
 
     <div class="{bubble_class}">
-        <button type="button" class="chat-message-more" aria-label="Действия с сообщением">⋮</button>
+        <button type="button" class="chat-message-more" aria-label="{actions_aria}">⋮</button>
         {author_html}
         {reply_html}
         {display_body}
@@ -589,6 +596,7 @@ fn render_chat_message_row(
         message_text = safe_message_text,
         client_message_id = escape_html(&message.client_message_id),
         bubble_class = bubble_class,
+        actions_aria = crate::i18n::t("chat_actions_aria"),
         author_html = author_html,
         reply_html = reply_html,
         display_body = display_body,
@@ -1136,3 +1144,18 @@ pub fn render_group_members(
 // ============================================================
 // PROFILE
 // ============================================================
+
+#[cfg(test)]
+mod communication_tests {
+    use super::conversation_preview_text;
+
+    #[test]
+    fn inbox_preview_never_exposes_internal_media_markers() {
+        for marker in ["__deleted__", "__image__", "__voice__"] {
+            let preview = conversation_preview_text(marker);
+            assert!(!preview.is_empty());
+            assert_ne!(preview, marker);
+        }
+        assert_eq!(conversation_preview_text("Обычный текст"), "Обычный текст");
+    }
+}

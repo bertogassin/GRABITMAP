@@ -152,6 +152,10 @@ pub(super) fn load_user_conversations(
                 SELECT CASE
                     WHEN m.deleted_at > 0
                     THEN '__deleted__'
+                    WHEN m.attachment_kind = 'image' AND trim(m.message) = ''
+                    THEN '__image__'
+                    WHEN m.attachment_kind = 'voice'
+                    THEN '__voice__'
                     ELSE m.message
                 END
                 FROM messages m
@@ -226,7 +230,7 @@ pub async fn messages_page(
         Some(id) => id,
 
         None => {
-            return Html(templates::render_messages(false, vec![], None));
+            return Html(templates::render_messages(false, 0, vec![], None));
         }
     };
 
@@ -246,6 +250,7 @@ pub async fn messages_page(
 
     Html(templates::render_messages(
         true,
+        user_id,
         conversations,
         share_listing_id,
     ))
@@ -507,5 +512,46 @@ mod tests {
         let messages = load_recent_chat_messages(&db, 4);
         assert_eq!(messages.len(), 1);
         assert_eq!(messages[0].client_message_id, "client-message-123456");
+    }
+
+    #[test]
+    fn inbox_uses_a_voice_marker_for_voice_only_messages() {
+        let db = rusqlite::Connection::open_in_memory().expect("database");
+        db.execute_batch(
+            "CREATE TABLE conversations (
+                id INTEGER PRIMARY KEY,
+                user1_id INTEGER NOT NULL,
+                user2_id INTEGER NOT NULL,
+                updated_at INTEGER NOT NULL
+             );
+             CREATE TABLE profiles (
+                user_id INTEGER PRIMARY KEY,
+                username TEXT,
+                first_name TEXT,
+                last_name TEXT,
+                avatar_path TEXT
+             );
+             CREATE TABLE messages (
+                id INTEGER PRIMARY KEY,
+                conversation_id INTEGER NOT NULL,
+                sender_user_id INTEGER NOT NULL,
+                message TEXT NOT NULL DEFAULT '',
+                is_read INTEGER NOT NULL DEFAULT 0,
+                created_at INTEGER NOT NULL,
+                deleted_at INTEGER NOT NULL DEFAULT 0,
+                attachment_kind TEXT NOT NULL DEFAULT ''
+             );
+             INSERT INTO conversations (id, user1_id, user2_id, updated_at)
+             VALUES (1, 10, 20, 100);
+             INSERT INTO profiles (user_id, first_name) VALUES (20, 'Друг');
+             INSERT INTO messages (
+                id, conversation_id, sender_user_id, message, created_at, attachment_kind
+             ) VALUES (1, 1, 20, '', 100, 'voice');",
+        )
+        .expect("schema");
+
+        let conversations = load_user_conversations(&db, 10);
+        assert_eq!(conversations.len(), 1);
+        assert_eq!(conversations[0].last_message, "__voice__");
     }
 }
