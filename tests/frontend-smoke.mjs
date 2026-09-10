@@ -422,6 +422,38 @@ test("group management preserves ownership and limits privileged actions", async
   assert.match(common, /rm-group-member--managed/);
 });
 
+test("inbox organization is account scoped and controls notifications", async () => {
+  const [schema, handler, chat, api, groups, media, template, inbox, routes] = await Promise.all([
+    readFile(new URL("src/db/chat_preferences.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/chat_preferences.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/chat.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/chat_api.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/chat_media.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+    readFile(new URL("static/inbox.js", root), "utf8"),
+    readFile(new URL("src/web/routes/communication.rs", root), "utf8"),
+  ]);
+
+  assert.match(schema, /PRIMARY KEY \(user_id, chat_kind, target_id\)/);
+  assert.match(schema, /pinned_at INTEGER NOT NULL DEFAULT 0/);
+  assert.match(schema, /archived_at INTEGER NOT NULL DEFAULT 0/);
+  assert.match(schema, /muted_until INTEGER NOT NULL DEFAULT 0/);
+  assert.match(handler, /fn target_is_accessible/);
+  assert.match(handler, /"pin"/);
+  assert.match(handler, /"archive"/);
+  assert.match(handler, /"mute"/);
+  assert.match(chat, /fn organize_conversations/);
+  assert.match(api, /conversation\.pinned_at/);
+  assert.match(groups, /preference\.muted_until/);
+  assert.match(media, /notifications_muted/);
+  assert.match(template, /inbox-views/);
+  assert.match(template, /chat-dialog-controls/);
+  assert.match(inbox, /preferenceControls/);
+  assert.match(inbox, /dataset\.inboxView/);
+  assert.match(routes, /chat-preference\/\{kind\}\/\{target_id\}/);
+});
+
 test("user-facing copy no longer calls listings resources", async () => {
   const visibleFiles = [
     "static/share.js",

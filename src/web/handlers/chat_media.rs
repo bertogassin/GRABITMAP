@@ -400,9 +400,23 @@ pub async fn api_chat_send_image(
         other_user_id,
     );
 
-    let _ = connection
-        .execute(
-            "INSERT INTO user_notifications (
+    let _ = connection.execute(
+        "UPDATE chat_preferences
+         SET archived_at = 0, updated_at = ?3
+         WHERE user_id = ?1 AND chat_kind = 'direct' AND target_id = ?2 AND archived_at > 0",
+        rusqlite::params![other_user_id, user_id, now],
+    );
+
+    if !crate::db::chat_preferences::notifications_muted(
+        &connection,
+        other_user_id,
+        crate::db::chat_preferences::KIND_DIRECT,
+        user_id,
+        now,
+    ) {
+        let _ = connection
+            .execute(
+                "INSERT INTO user_notifications (
                 user_id,
                 resource_id,
                 kind,
@@ -418,11 +432,13 @@ pub async fn api_chat_send_image(
                 FROM user_notifications
                 WHERE user_id = ?1
                   AND kind = 'chat_message'
+                  AND (resource_id = ?2 OR resource_id IS NULL)
                   AND is_read = 0
              )",
-            rusqlite::params![other_user_id, user_id, now],
-        )
-        .unwrap_or(0);
+                rusqlite::params![other_user_id, user_id, now],
+            )
+            .unwrap_or(0);
+    }
 
     (
         StatusCode::OK,
@@ -653,9 +669,23 @@ pub async fn api_chat_send_voice(
         other_user_id,
     );
 
-    let _ = connection
-        .execute(
-            "INSERT INTO user_notifications (
+    let _ = connection.execute(
+        "UPDATE chat_preferences
+         SET archived_at = 0, updated_at = ?3
+         WHERE user_id = ?1 AND chat_kind = 'direct' AND target_id = ?2 AND archived_at > 0",
+        rusqlite::params![other_user_id, user_id, now],
+    );
+
+    if !crate::db::chat_preferences::notifications_muted(
+        &connection,
+        other_user_id,
+        crate::db::chat_preferences::KIND_DIRECT,
+        user_id,
+        now,
+    ) {
+        let _ = connection
+            .execute(
+                "INSERT INTO user_notifications (
                 user_id,
                 resource_id,
                 kind,
@@ -671,11 +701,13 @@ pub async fn api_chat_send_voice(
                 FROM user_notifications
                 WHERE user_id = ?1
                   AND kind = 'chat_message'
+                  AND (resource_id = ?2 OR resource_id IS NULL)
                   AND is_read = 0
              )",
-            rusqlite::params![other_user_id, user_id, now],
-        )
-        .unwrap_or(0);
+                rusqlite::params![other_user_id, user_id, now],
+            )
+            .unwrap_or(0);
+    }
 
     (
         StatusCode::OK,

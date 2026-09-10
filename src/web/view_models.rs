@@ -29,6 +29,9 @@ pub struct ConversationRow {
     pub is_group: bool,
     pub group_id: i64,
     pub has_avatar: bool,
+    pub pinned_at: i64,
+    pub archived_at: i64,
+    pub muted_until: i64,
 }
 
 pub struct UserSessionRow {

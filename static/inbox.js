@@ -63,6 +63,7 @@
         var heartbeatTimer = null;
         var retryAttempt = 0;
         var viewerUserId = String(list.dataset.viewerUserId || "").trim();
+        var inboxView = list.dataset.inboxView === "archived" ? "archived" : "active";
         var cursorKey = "resursmap:inbox-event-cursor:" + viewerUserId;
         var shareListingValue = new URLSearchParams(
             window.location.search
@@ -129,6 +130,9 @@
                 conversation.last_message,
                 conversation.last_time,
                 conversation.has_avatar ? "1" : "0",
+                conversation.pinned_at || 0,
+                conversation.archived_at || 0,
+                conversation.muted_until || 0,
             ].join("|");
         }
 
@@ -138,6 +142,24 @@
             '<svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
         var CHEVRON_ICON =
             '<svg class="icon small-icon" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>';
+
+        function preferenceControls(conversation, isGroup, targetId) {
+            var pinned = Number(conversation.pinned_at || 0) > 0;
+            var muted = Number(conversation.muted_until || 0) > Date.now() / 1000;
+            var kind = isGroup ? "group" : "direct";
+            var action = "/app/chat-preference/" + kind + "/" + encodeURIComponent(targetId);
+            function control(value, label, symbol) {
+                return '<form method="post" action="' + escapeHtml(action) + '">' +
+                    '<input type="hidden" name="action" value="' + value + '">' +
+                    '<input type="hidden" name="return_view" value="' + inboxView + '">' +
+                    '<button type="submit" title="' + label + '" aria-label="' + label + '">' + symbol + '</button></form>';
+            }
+            return '<div class="chat-dialog-controls" aria-label="Действия с чатом">' +
+                control(pinned ? "unpin" : "pin", pinned ? "Открепить" : "Закрепить", pinned ? "★" : "☆") +
+                control(muted ? "unmute" : "mute", muted ? "Включить уведомления" : "Отключить уведомления", muted ? "🔕" : "🔔") +
+                control(inboxView === "archived" ? "unarchive" : "archive", inboxView === "archived" ? "Вернуть из архива" : "В архив", inboxView === "archived" ? "↩" : "▣") +
+                "</div>";
+        }
 
         function formatConversationTime(timestamp) {
             var value = Number(timestamp || 0);
@@ -218,7 +240,7 @@
                 : fallbackAvatar;
 
             return (
-                '<a href="'
+                '<article class="chat-dialog-entry" data-inbox-entry><a href="'
                 + escapeHtml(href)
                 + '#chat-end" class="card chat-dialog-card" data-other-user-id="'
                 + escapeHtml(userId)
@@ -240,6 +262,8 @@
                 + '<div class="card-arrow">'
                 + CHEVRON_ICON
                 + "</div></div></a>"
+                + preferenceControls(conversation, isGroup, isGroup ? groupId : userId)
+                + "</article>"
             );
         }
 
@@ -279,9 +303,9 @@
                 .trim()
                 .toLocaleLowerCase();
 
-            list.querySelectorAll(".chat-dialog-card").forEach(function (card) {
-                var searchable = String(card.textContent || "").toLocaleLowerCase();
-                card.hidden = Boolean(query) && !searchable.includes(query);
+            list.querySelectorAll(".chat-dialog-entry").forEach(function (entry) {
+                var searchable = String(entry.textContent || "").toLocaleLowerCase();
+                entry.hidden = Boolean(query) && !searchable.includes(query);
             });
         }
 
@@ -385,7 +409,8 @@
             fetching = true;
 
             try {
-                var response = await fetch("/api/chat/conversations", {
+                var response = await fetch(
+                    "/api/chat/conversations" + (inboxView === "archived" ? "?view=archived" : ""), {
                     credentials: "same-origin",
                     cache: "no-store",
                     headers: {
