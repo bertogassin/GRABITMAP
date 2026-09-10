@@ -273,6 +273,10 @@ fn fanout_group_message(
     sender_id: i64,
     preview: &str,
 ) {
+    if super::official_groups::is_official_group(db, group_id) {
+        state.publish_membership_scoped_group_chat_event(kind, group_id, message_id);
+        return;
+    }
     let members = group_member_ids(db, group_id);
     if kind == "message.created" {
         notify_group_members(db, group_id, sender_id, "Новое сообщение в группе", preview);
@@ -507,6 +511,11 @@ fn apply_group_delivery_ticks(
     viewer_user_id: i64,
     messages: &mut [crate::web::view_models::ChatMessageRow],
 ) {
+    // Read cursors remain exact for every member, but public groups do not
+    // aggregate millions of cursors merely to paint delivery ticks.
+    if super::official_groups::is_official_group(db, group_id) {
+        return;
+    }
     let (max_other_read, min_other_read, recipient_count) =
         group_peer_read_bounds(db, group_id, viewer_user_id);
     for message in messages.iter_mut() {
@@ -772,8 +781,10 @@ fn mark_group_read(
     mark_group_notifications_read(db, user_id, group_id);
     if changed > 0 && through_id > previous {
         if let Some(state) = state {
-            let members = group_member_ids(db, group_id);
-            state.publish_group_chat_event("message.read", group_id, through_id, &members);
+            if !super::official_groups::is_official_group(db, group_id) {
+                let members = group_member_ids(db, group_id);
+                state.publish_group_chat_event("message.read", group_id, through_id, &members);
+            }
         }
     }
 }
@@ -1004,7 +1015,7 @@ pub async fn group_chat_page(
         .unwrap_or_else(|_| ("Группа".to_string(), String::new()));
     let member_count: i64 = db
         .query_row(
-            "SELECT COUNT(*) FROM chat_group_members WHERE group_id = ?1",
+            "SELECT member_count FROM chat_groups WHERE id = ?1",
             rusqlite::params![group_id],
             |row| row.get(0),
         )
@@ -2835,7 +2846,8 @@ fn load_group_member_names(
          LEFT JOIN profiles AS profile ON profile.user_id = member.user_id
          WHERE member.group_id = ?1
          ORDER BY CASE member.role WHEN 'owner' THEN 0 WHEN 'admin' THEN 1 ELSE 2 END,
-                  member.joined_at ASC, member.user_id ASC",
+                  member.joined_at ASC, member.user_id ASC
+         LIMIT 250",
     )
     .and_then(|mut stmt| {
         stmt.query_map(rusqlite::params![group_id], |row| {
@@ -2913,6 +2925,9 @@ pub fn load_user_groups(
     )
     .and_then(|mut stmt| {
         stmt.query_map(rusqlite::params![user_id], |row| {
+            let updated_at = row.get(3)?;
+            let archived_at = row.get(7)?;
+            let group_scope_type: String = row.get(9)?;
             Ok(crate::web::view_models::ConversationRow {
                 _id: row.get(0)?,
                 other_user_id: 0,
@@ -2921,14 +2936,18 @@ pub fn load_user_groups(
                 last_name: String::new(),
                 last_message: row.get(2)?,
                 unread_count: row.get(4)?,
-                updated_at: row.get(3)?,
+                updated_at,
                 is_group: true,
                 group_id: row.get(0)?,
                 has_avatar: row.get::<_, i64>(5)? != 0,
                 pinned_at: row.get(6)?,
-                archived_at: row.get(7)?,
+                archived_at: if !group_scope_type.is_empty() && updated_at > archived_at {
+                    0
+                } else {
+                    archived_at
+                },
                 muted_until: row.get(8)?,
-                group_scope_type: row.get(9)?,
+                group_scope_type,
                 group_scope_id: row.get(10)?,
             })
         })?

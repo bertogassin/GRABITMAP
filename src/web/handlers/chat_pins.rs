@@ -297,15 +297,19 @@ pub async fn api_group_pin(
     {
         return json_error(StatusCode::INTERNAL_SERVER_ERROR, "pin_update_failed");
     }
-    let members = db
-        .prepare("SELECT user_id FROM chat_group_members WHERE group_id = ?1")
-        .and_then(|mut statement| {
-            statement
-                .query_map(rusqlite::params![group_id], |row| row.get(0))?
-                .collect::<rusqlite::Result<Vec<i64>>>()
-        })
-        .unwrap_or_default();
-    state.publish_group_chat_event("message.updated", group_id, message_id, &members);
+    if super::official_groups::is_official_group(&db, group_id) {
+        state.publish_membership_scoped_group_chat_event("message.updated", group_id, message_id);
+    } else {
+        let members = db
+            .prepare("SELECT user_id FROM chat_group_members WHERE group_id = ?1")
+            .and_then(|mut statement| {
+                statement
+                    .query_map(rusqlite::params![group_id], |row| row.get(0))?
+                    .collect::<rusqlite::Result<Vec<i64>>>()
+            })
+            .unwrap_or_default();
+        state.publish_group_chat_event("message.updated", group_id, message_id, &members);
+    }
     Json(json!({"ok": true, "pinned": group_pin(&db, group_id)})).into_response()
 }
 

@@ -43,11 +43,16 @@ pub struct ChatRealtimeEvent {
     pub group_id: i64,
     #[serde(skip_serializing)]
     pub member_ids: Vec<String>,
+    #[serde(skip_serializing)]
+    pub membership_scoped: bool,
 }
 
 impl ChatRealtimeEvent {
     pub fn includes_user(&self, user_id: i64) -> bool {
         if self.group_id > 0 {
+            if self.membership_scoped {
+                return false;
+            }
             let needle = user_id.to_string();
             return self.member_ids.iter().any(|id| id == &needle);
         }
@@ -70,12 +75,17 @@ pub struct ChatTypingEvent {
     pub group_id: i64,
     #[serde(skip_serializing)]
     pub member_ids: Vec<String>,
+    #[serde(skip_serializing)]
+    pub membership_scoped: bool,
     pub actor_name: String,
 }
 
 impl ChatTypingEvent {
     pub fn includes_user(&self, user_id: i64) -> bool {
         if self.group_id > 0 {
+            if self.membership_scoped {
+                return false;
+            }
             let needle = user_id.to_string();
             return self.member_ids.iter().any(|id| id == &needle);
         }
@@ -193,6 +203,7 @@ impl AppState {
             user2_id,
             group_id: 0,
             member_ids: Vec::new(),
+            membership_scoped: false,
         });
     }
 
@@ -221,6 +232,33 @@ impl AppState {
             user2_id: 0,
             group_id,
             member_ids: member_ids.iter().map(|id| id.to_string()).collect(),
+            membership_scoped: false,
+        });
+    }
+
+    pub fn publish_membership_scoped_group_chat_event(
+        &self,
+        kind: &str,
+        group_id: i64,
+        message_id: i64,
+    ) {
+        if group_id <= 0 || message_id <= 0 {
+            return;
+        }
+        let event_id = self
+            .chat_event_sequence
+            .fetch_add(1, Ordering::Relaxed)
+            .saturating_add(1);
+        let _ = self.chat_events.send(ChatRealtimeEvent {
+            event_id,
+            kind: kind.to_string(),
+            conversation_id: 0,
+            message_id,
+            user1_id: 0,
+            user2_id: 0,
+            group_id,
+            member_ids: Vec::new(),
+            membership_scoped: true,
         });
     }
 
@@ -258,6 +296,7 @@ impl AppState {
             user2_id,
             group_id: 0,
             member_ids: Vec::new(),
+            membership_scoped: false,
             actor_name: String::new(),
         });
 
@@ -297,6 +336,41 @@ impl AppState {
             user2_id: 0,
             group_id,
             member_ids: member_ids.iter().map(|id| id.to_string()).collect(),
+            membership_scoped: false,
+            actor_name,
+        });
+        true
+    }
+
+    pub fn publish_membership_scoped_group_typing_event(
+        &self,
+        kind: &str,
+        actor_user_id: i64,
+        group_id: i64,
+        actor_name: &str,
+    ) -> bool {
+        if actor_user_id <= 0
+            || group_id <= 0
+            || (kind != "typing.start" && kind != "typing.stop")
+            || !self.typing_rate_allows(format!("group-typing:{actor_user_id}:{group_id}"))
+        {
+            return false;
+        }
+        let event_id = self
+            .chat_typing_sequence
+            .fetch_add(1, Ordering::Relaxed)
+            .saturating_add(1);
+        let actor_name: String = actor_name.trim().chars().take(80).collect();
+        let _ = self.chat_typing_events.send(ChatTypingEvent {
+            event_id,
+            kind: kind.to_string(),
+            actor_user_id,
+            other_user_id: 0,
+            user1_id: 0,
+            user2_id: 0,
+            group_id,
+            member_ids: Vec::new(),
+            membership_scoped: true,
             actor_name,
         });
         true
@@ -325,6 +399,7 @@ mod tests {
             user2_id: 9,
             group_id: 0,
             member_ids: Vec::new(),
+            membership_scoped: false,
             actor_name: String::new(),
         };
 
@@ -344,6 +419,7 @@ mod tests {
             user2_id: 4_000_000_000_000_000_009,
             group_id: 0,
             member_ids: Vec::new(),
+            membership_scoped: false,
             actor_name: String::new(),
         };
 
@@ -364,6 +440,7 @@ mod tests {
             user2_id: 0,
             group_id: 44,
             member_ids: vec!["3".into(), "9".into(), "12".into()],
+            membership_scoped: false,
             actor_name: "Амир".to_string(),
         };
 
@@ -388,6 +465,7 @@ mod tests {
             user2_id: 9,
             group_id: 0,
             member_ids: Vec::new(),
+            membership_scoped: false,
         };
 
         assert!(event.includes_user(3));
@@ -403,8 +481,25 @@ mod tests {
             user2_id: 0,
             group_id: 4,
             member_ids: vec!["3".into(), "9".into(), "12".into()],
+            membership_scoped: false,
         };
         assert!(group.includes_user(12));
         assert!(!group.includes_user(8));
+
+        let official_group = ChatRealtimeEvent {
+            event_id: 3,
+            kind: "message.created".to_string(),
+            conversation_id: 0,
+            message_id: 10,
+            user1_id: 0,
+            user2_id: 0,
+            group_id: 5,
+            member_ids: Vec::new(),
+            membership_scoped: true,
+        };
+        assert!(!official_group.includes_user(12));
+        let value = serde_json::to_value(official_group).expect("serialize official event");
+        assert!(value.get("member_ids").is_none());
+        assert!(value.get("membership_scoped").is_none());
     }
 }

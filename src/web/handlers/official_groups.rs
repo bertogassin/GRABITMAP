@@ -14,8 +14,6 @@ use axum::{
 use rusqlite::{Connection, OptionalExtension, Transaction, TransactionBehavior};
 use serde::Deserialize;
 
-const OFFICIAL_GROUP_MAX_MEMBERS: i64 = 250;
-
 #[derive(Debug, Default, Deserialize)]
 pub struct OfficialGroupsQuery {
     scope_type: Option<String>,
@@ -326,12 +324,10 @@ fn ensure_official_group(
 
 fn group_for_scope(db: &Connection, scope_type: &str, scope_id: i64) -> Option<(i64, i64)> {
     db.query_row(
-        "SELECT scope.group_id, COUNT(member.user_id)
+        "SELECT scope.group_id, group_row.member_count
          FROM chat_group_scopes AS scope
          JOIN chat_groups AS group_row ON group_row.id = scope.group_id
-         LEFT JOIN chat_group_members AS member ON member.group_id = scope.group_id
-         WHERE scope.scope_type = ?1 AND scope.scope_id = ?2
-         GROUP BY scope.group_id",
+         WHERE scope.scope_type = ?1 AND scope.scope_id = ?2",
         rusqlite::params![scope_type, scope_id],
         |row| Ok((row.get(0)?, row.get(1)?)),
     )
@@ -349,36 +345,33 @@ fn load_children(
     let sql = match location.scope_type.as_str() {
         "world" => {
             "SELECT 'continent', place.id, place.name_ru,
-                    COALESCE(scope.group_id, 0), COUNT(member.user_id)
+                    COALESCE(scope.group_id, 0), COALESCE(group_row.member_count, 0)
              FROM geo_continents AS place
              LEFT JOIN chat_group_scopes AS scope
                ON scope.scope_type = 'continent' AND scope.scope_id = place.id
-             LEFT JOIN chat_group_members AS member ON member.group_id = scope.group_id
+             LEFT JOIN chat_groups AS group_row ON group_row.id = scope.group_id
              WHERE place.is_active = 1 AND ?1 > 0
-             GROUP BY place.id, place.name_ru, scope.group_id
              ORDER BY place.name_ru COLLATE NOCASE"
         }
         "continent" => {
             "SELECT 'country', place.id, place.name_ru,
-                    COALESCE(scope.group_id, 0), COUNT(member.user_id)
+                    COALESCE(scope.group_id, 0), COALESCE(group_row.member_count, 0)
              FROM geo_countries AS place
              LEFT JOIN chat_group_scopes AS scope
                ON scope.scope_type = 'country' AND scope.scope_id = place.id
-             LEFT JOIN chat_group_members AS member ON member.group_id = scope.group_id
+             LEFT JOIN chat_groups AS group_row ON group_row.id = scope.group_id
              WHERE place.continent_id = ?1 AND place.is_active = 1
-             GROUP BY place.id, place.name_ru, scope.group_id
              ORDER BY place.name_ru COLLATE NOCASE"
         }
         "country" => {
             "SELECT 'city', place.id, place.name_ru,
-                    COALESCE(scope.group_id, 0), COUNT(member.user_id)
+                    COALESCE(scope.group_id, 0), COALESCE(group_row.member_count, 0)
              FROM geo_cities AS place
              LEFT JOIN chat_group_scopes AS scope
                ON scope.scope_type = 'city' AND scope.scope_id = place.id
-             LEFT JOIN chat_group_members AS member ON member.group_id = scope.group_id
+             LEFT JOIN chat_groups AS group_row ON group_row.id = scope.group_id
              WHERE place.country_id = ?1 AND place.is_active = 1
                AND place.place_kind = 'city'
-             GROUP BY place.id, place.name_ru, scope.group_id
              ORDER BY place.population DESC, place.name_ru COLLATE NOCASE"
         }
         _ => return Vec::new(),
@@ -506,23 +499,6 @@ pub async fn join_official_group(
         Ok(group_id) => group_id,
         Err(_) => return StatusCode::CONFLICT.into_response(),
     };
-    let member_count: i64 = transaction
-        .query_row(
-            "SELECT COUNT(*) FROM chat_group_members WHERE group_id = ?1",
-            [group_id],
-            |row| row.get(0),
-        )
-        .unwrap_or(OFFICIAL_GROUP_MAX_MEMBERS);
-    let is_member = transaction
-        .query_row(
-            "SELECT 1 FROM chat_group_members WHERE group_id = ?1 AND user_id = ?2",
-            rusqlite::params![group_id, user_id],
-            |_| Ok(()),
-        )
-        .is_ok();
-    if !is_member && member_count >= OFFICIAL_GROUP_MAX_MEMBERS {
-        return StatusCode::CONFLICT.into_response();
-    }
     if transaction
         .execute(
             "INSERT OR IGNORE INTO chat_group_members (group_id, user_id, joined_at, role)
