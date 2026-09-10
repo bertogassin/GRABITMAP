@@ -717,9 +717,7 @@
                     )
                 )
                     .then(function (data) {
-                        updateReadStatuses(
-                            Number(data.peer_read_through_id || 0)
-                        );
+                        applyReceiptCursors(data);
                         if (typeof window.resursmapRefreshAttentionBadge === "function") {
                             window.resursmapRefreshAttentionBadge();
                         }
@@ -1064,6 +1062,16 @@
             });
         }
 
+        function applyReceiptCursors(data) {
+            data = data || {};
+            updateDeliveryStatuses(
+                Number(data.peer_delivered_through_id || 0)
+            );
+            updateReadStatuses(
+                Number(data.peer_read_through_id || 0)
+            );
+        }
+
         function notifyMessagesRendered(messages) {
             if (!messages || !messages.length) {
                 return;
@@ -1271,9 +1279,7 @@
                 );
 
                 appendMessages(data.messages || []);
-                updateReadStatuses(
-                    Number(data.peer_read_through_id || 0)
-                );
+                applyReceiptCursors(data);
                 setConnection(t("chat_conn_ok", "Связь есть"), "is-online");
             } catch (error) {
                 if (error.status === 401) {
@@ -2574,9 +2580,7 @@
                 var detail = event.detail || {};
 
                 appendMessages(detail.messages || []);
-                updateReadStatuses(
-                    Number(detail.peer_read_through_id || 0)
-                );
+                applyReceiptCursors(detail);
             }
         );
 
@@ -4290,6 +4294,10 @@
                             {
                                 detail: {
                                     messages: data.messages || [],
+                                    peer_delivered_through_id:
+                                        Number(
+                                            data.peer_delivered_through_id || 0
+                                        ),
                                     peer_read_through_id:
                                         Number(
                                             data.peer_read_through_id || 0
@@ -5262,6 +5270,10 @@
                             payload.event &&
                             payload.event.kind === "message.read"
                         ) {
+                            if (Number(payload.event.group_id || 0) > 0) {
+                                requestSync();
+                                return;
+                            }
                             document.dispatchEvent(
                                 new CustomEvent(
                                     "resursmap:chat-read-update",

@@ -390,15 +390,20 @@ fn apply_group_delivery_ticks(
     viewer_user_id: i64,
     messages: &mut [crate::web::view_models::ChatMessageRow],
 ) {
-    let max_other_read = group_peer_read_through(db, group_id, viewer_user_id);
+    let (max_other_read, min_other_read, recipient_count) =
+        group_peer_read_bounds(db, group_id, viewer_user_id);
     for message in messages.iter_mut() {
         if message.sender_user_id != viewer_user_id || message.deleted_at > 0 {
             continue;
         }
-        if max_other_read >= message.id {
+        if recipient_count > 0 && min_other_read >= message.id {
             message.delivered_at = message.created_at.max(1);
             message.read_at = message.created_at.max(1);
             message.is_read = 1;
+        } else if max_other_read >= message.id {
+            message.delivered_at = message.created_at.max(1);
+            message.read_at = 0;
+            message.is_read = 0;
         } else {
             message.delivered_at = 0;
             message.read_at = 0;
@@ -407,16 +412,22 @@ fn apply_group_delivery_ticks(
     }
 }
 
-fn group_peer_read_through(db: &rusqlite::Connection, group_id: i64, viewer_user_id: i64) -> i64 {
+fn group_peer_read_bounds(
+    db: &rusqlite::Connection,
+    group_id: i64,
+    viewer_user_id: i64,
+) -> (i64, i64, i64) {
     db.query_row(
-        "SELECT COALESCE(MAX(last_read_message_id), 0)
+        "SELECT COALESCE(MAX(last_read_message_id), 0),
+                COALESCE(MIN(last_read_message_id), 0),
+                COUNT(*)
          FROM chat_group_members
          WHERE group_id = ?1
            AND user_id <> ?2",
         rusqlite::params![group_id, viewer_user_id],
-        |row| row.get(0),
+        |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
     )
-    .unwrap_or(0)
+    .unwrap_or((0, 0, 0))
 }
 
 fn profile_display_name(db: &rusqlite::Connection, user_id: i64) -> String {
@@ -950,11 +961,13 @@ pub async fn api_group_messages(
         .iter()
         .map(|message| message_json(message, user_id))
         .collect();
-    let peer_read_through_id = group_peer_read_through(&db, group_id, user_id);
+    let (peer_delivered_through_id, peer_read_through_id, _) =
+        group_peer_read_bounds(&db, group_id, user_id);
     Json(json!({
         "ok": true,
         "messages": items,
         "has_more": has_more,
+        "peer_delivered_through_id": peer_delivered_through_id,
         "peer_read_through_id": peer_read_through_id,
     }))
     .into_response()
@@ -2267,7 +2280,8 @@ mod tests {
 
         assert_eq!(messages.len(), 2);
         assert_eq!(messages[0].sender_name, "Амир");
-        assert_eq!(messages[0].read_at, 100);
+        assert_eq!(messages[0].delivered_at, 100);
+        assert_eq!(messages[0].read_at, 0);
         assert_eq!(messages[1].sender_name, "Лейла А");
         assert_eq!(messages[1].reply_sender_user_id, 1);
         assert_eq!(messages[1].reply_sender_name, "Амир");
@@ -2279,6 +2293,33 @@ mod tests {
         let response = message_json(&messages[1], 1);
         assert_eq!(response["reply_sender_name"], "Амир");
         assert_eq!(response["reactions"][0]["count"], 2);
+    }
+
+    #[test]
+    fn group_delivery_ticks_distinguish_one_reader_from_every_reader() {
+        let connection = group_database();
+        connection
+            .execute_batch(
+                "INSERT INTO chat_group_members (group_id, user_id, last_read_message_id)
+                 VALUES (8, 1, 0), (8, 2, 12), (8, 3, 10);
+                 INSERT INTO group_messages (
+                    id, group_id, sender_user_id, message, created_at, reply_to_message_id
+                 ) VALUES
+                    (10, 8, 1, 'Прочитано всеми', 100, 0),
+                    (11, 8, 1, 'Прочитано одним', 101, 0),
+                    (13, 8, 1, 'Не прочитано', 103, 0);",
+            )
+            .expect("receipt fixtures");
+
+        let messages = load_group_messages(&connection, 8, 1, 0, 0, 100);
+
+        assert_eq!(messages.len(), 3);
+        assert_eq!(messages[0].delivered_at, 100);
+        assert_eq!(messages[0].read_at, 100);
+        assert_eq!(messages[1].delivered_at, 101);
+        assert_eq!(messages[1].read_at, 0);
+        assert_eq!(messages[2].delivered_at, 0);
+        assert_eq!(messages[2].read_at, 0);
     }
 
     #[test]

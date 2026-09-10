@@ -503,6 +503,20 @@ test("group typing is membership scoped and names the active participant", async
   assert.match(inbox, /typingPreviewHtml\(actorName\)/);
 });
 
+test("group receipts separate partial delivery from read by everyone", async () => {
+  const [groups, chat] = await Promise.all([
+    readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+  ]);
+
+  assert.match(groups, /MIN\(last_read_message_id\)/);
+  assert.match(groups, /recipient_count > 0/);
+  assert.match(groups, /peer_delivered_through_id/);
+  assert.match(chat, /function applyReceiptCursors/);
+  assert.match(chat, /peer_delivered_through_id/);
+  assert.match(chat, /payload\.event\.group_id/);
+});
+
 test("user-facing copy no longer calls listings resources", async () => {
   const visibleFiles = [
     "static/share.js",
