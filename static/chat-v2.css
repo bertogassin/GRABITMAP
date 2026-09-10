@@ -357,6 +357,54 @@
     gap: 12px;
     margin-bottom: 8px;
 }
+
+.chat-pinned-banner {
+    align-items: center;
+    background: linear-gradient(135deg, rgba(239, 178, 82, 0.13), rgba(67, 196, 154, 0.08));
+    border: 1px solid rgba(239, 194, 116, 0.24);
+    border-radius: 16px;
+    color: inherit;
+    cursor: pointer;
+    display: flex;
+    gap: 11px;
+    margin: 0 10px 8px;
+    min-height: 56px;
+    padding: 9px 12px;
+    text-align: start;
+    width: calc(100% - 20px);
+}
+
+.chat-pinned-banner[hidden] {
+    display: none;
+}
+
+.chat-pinned-icon {
+    font-size: 18px;
+}
+
+.chat-pinned-copy {
+    display: grid;
+    flex: 1;
+    gap: 2px;
+    min-width: 0;
+}
+
+.chat-pinned-copy strong {
+    color: var(--chat-accent, #efc37a);
+    font-size: 12px;
+}
+
+.chat-pinned-copy small {
+    color: inherit;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.chat-pinned-open {
+    font-size: 24px;
+    opacity: 0.55;
+}
 .chat-secondary-button {
     min-height: 34px;
     padding: 0 13px;
