@@ -299,6 +299,7 @@ pub fn render_messages(
         <p class="section-caption" id="inbox-unread-caption">{unread_caption}</p>
     </div>
     <div class="inbox-head-actions">
+        <a href="/app/official-groups" class="ui-button ui-button--secondary inbox-group-btn">Официальные</a>
         <a href="/app/groups/new" class="ui-button inbox-group-btn">{group}</a>
         <span class="inbox-live-badge" id="inbox-live-badge" hidden aria-hidden="true">{live}</span>
     </div>
@@ -1104,6 +1105,214 @@ fn render_chat_thread(
         ),
         &bottom_nav("chats"),
         "",
+    )
+}
+
+#[derive(Debug, Clone)]
+pub struct OfficialGroupPlace {
+    pub scope_type: String,
+    pub scope_id: i64,
+    pub name: String,
+    pub group_id: i64,
+    pub member_count: i64,
+}
+
+pub struct OfficialGroupsPage<'a> {
+    pub authenticated: bool,
+    pub scope_type: &'a str,
+    pub scope_id: i64,
+    pub name: &'a str,
+    pub parent_type: &'a str,
+    pub parent_id: i64,
+    pub parent_name: &'a str,
+    pub group_id: i64,
+    pub member_count: i64,
+    pub is_member: bool,
+    pub can_create: bool,
+    pub query: &'a str,
+    pub children: Vec<OfficialGroupPlace>,
+    pub error: &'a str,
+}
+
+pub fn render_official_groups(params: OfficialGroupsPage<'_>) -> String {
+    let level = match params.scope_type {
+        "world" => "Мир",
+        "continent" => "Континент",
+        "country" => "Страна",
+        "city" => "Город",
+        _ => "Место",
+    };
+    let current_href = format!(
+        "/app/official-groups?scope_type={}&scope_id={}",
+        params.scope_type, params.scope_id
+    );
+    let back = if params.parent_id > 0 {
+        back_link(
+            &format!(
+                "/app/official-groups?scope_type={}&scope_id={}",
+                params.parent_type, params.parent_id
+            ),
+            params.parent_name,
+            "arrow-left",
+        )
+    } else {
+        back_link("/app/messages", "Чаты", "arrow-left")
+    };
+    let error_html = if params.error.is_empty() {
+        String::new()
+    } else {
+        format!(
+            r#"<p class="ui-status is-error">{}</p>"#,
+            escape_html(params.error)
+        )
+    };
+    let group_card = if params.group_id > 0 && params.is_member {
+        format!(
+            r#"<section class="card official-group-current">
+    <span class="chat-official-group">✓ Официальная группа</span>
+    <h2>{name}</h2>
+    <p class="card-meta">{members} участников · история доступна после вступления</p>
+    <a class="ui-button" href="/app/group/{group_id}">Открыть чат</a>
+</section>"#,
+            name = escape_html(params.name),
+            members = params.member_count,
+            group_id = params.group_id,
+        )
+    } else if params.group_id > 0 && params.authenticated {
+        format!(
+            r#"<form method="post" action="/app/official-groups/{scope_type}/{scope_id}/join" class="card official-group-current">
+    <span class="chat-official-group">✓ Официальная группа</span>
+    <h2>{name}</h2>
+    <p class="card-meta">{members} участников · старые сообщения останутся видны после вступления</p>
+    <button class="ui-button" type="submit">Вступить в группу</button>
+</form>"#,
+            scope_type = params.scope_type,
+            scope_id = params.scope_id,
+            name = escape_html(params.name),
+            members = params.member_count,
+        )
+    } else if params.group_id > 0 {
+        let next = urlencoding::encode(&current_href);
+        format!(
+            r#"<section class="card official-group-current">
+    <span class="chat-official-group">✓ Официальная группа</span>
+    <h2>{name}</h2>
+    <p class="card-meta">{members} участников</p>
+    <a class="ui-button" href="/login?next={next}">Войти и вступить</a>
+</section>"#,
+            name = escape_html(params.name),
+            members = params.member_count,
+        )
+    } else if params.can_create {
+        format!(
+            r#"<form method="post" action="/app/official-groups/{scope_type}/{scope_id}/create" class="card official-group-current">
+    <span class="chat-official-group">Управление GRABIT</span>
+    <h2>{name}</h2>
+    <p class="card-meta">Официальная группа здесь ещё не создана. Название и географическая привязка будут установлены автоматически.</p>
+    <button class="ui-button" type="submit">Создать официальную группу</button>
+</form>"#,
+            scope_type = params.scope_type,
+            scope_id = params.scope_id,
+            name = escape_html(params.name),
+        )
+    } else {
+        format!(
+            r#"<section class="card official-group-current official-group-current--empty">
+    <span class="chat-official-group">{level}</span>
+    <h2>{name}</h2>
+    <p class="card-meta">Официальная группа для этого места пока не открыта.</p>
+</section>"#,
+            name = escape_html(params.name),
+        )
+    };
+    let search = if params.scope_type == "city" {
+        String::new()
+    } else {
+        format!(
+            r#"<form method="get" action="/app/official-groups" class="official-group-search">
+    <input type="hidden" name="scope_type" value="{scope_type}">
+    <input type="hidden" name="scope_id" value="{scope_id}">
+    <input class="ui-input" type="search" name="q" maxlength="80" value="{query}" placeholder="Найти место" aria-label="Найти место">
+    <button class="ui-button ui-button--secondary" type="submit">Найти</button>
+</form>"#,
+            scope_type = params.scope_type,
+            scope_id = params.scope_id,
+            query = escape_html(params.query),
+        )
+    };
+    let children = if params.children.is_empty() {
+        if params.scope_type == "city" {
+            String::new()
+        } else {
+            empty_state_card(
+                "Ничего не найдено",
+                "Измените запрос или вернитесь уровнем выше.",
+            )
+        }
+    } else {
+        params
+            .children
+            .iter()
+            .map(|place| {
+                let status = if place.group_id > 0 {
+                    format!("✓ Открыта · {} участников", place.member_count)
+                } else {
+                    "Пока не открыта".to_string()
+                };
+                format!(
+                    r#"<a class="card official-group-place" href="/app/official-groups?scope_type={scope_type}&scope_id={scope_id}">
+    <span class="card-icon">{place_icon}</span>
+    <span class="card-content"><strong>{name}</strong><span class="card-meta">{status}</span></span>
+    <span class="card-arrow">{arrow}</span>
+</a>"#,
+                    scope_type = place.scope_type,
+                    scope_id = place.scope_id,
+                    place_icon = icon(if place.scope_type == "city" { "map-pin" } else { "globe" }),
+                    name = escape_html(&place.name),
+                    status = escape_html(&status),
+                    arrow = icon("chevron"),
+                )
+            })
+            .collect::<Vec<_>>()
+            .join("")
+    };
+    let next_level = match params.scope_type {
+        "world" => "Континенты",
+        "continent" => "Страны",
+        "country" => "Города",
+        _ => "",
+    };
+    let directory = if next_level.is_empty() {
+        String::new()
+    } else {
+        format!(
+            r#"<section class="official-group-directory">
+    <div class="section-head"><div><h2 class="section-title">{next_level}</h2><p class="section-caption">Выберите следующий уровень географии</p></div></div>
+    {search}
+    <div class="official-group-grid">{children}</div>
+</section>"#
+        )
+    };
+    let content = format!(
+        r#"{error_html}{group_card}
+<aside class="card official-group-note">
+    <strong>Официальное пространство GRABIT</strong>
+    <span>Одна группа на одно место. Частные группы остаются отдельными. Вступление добровольное.</span>
+</aside>
+{directory}"#
+    );
+    page_shell(
+        "Официальные группы · GRABIT",
+        &topbar("Группы", "users"),
+        &back_hero(
+            &back,
+            "globe",
+            level,
+            params.name,
+            "Мир → континент → страна → город",
+        ),
+        &content,
+        &bottom_nav("chats"),
     )
 }
 

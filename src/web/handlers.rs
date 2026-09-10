@@ -16,6 +16,7 @@ mod chat_realtime;
 mod chat_search;
 mod direct_chat_start;
 mod groups;
+mod official_groups;
 pub use chat::*;
 pub use chat_api::{
     api_chat_conversations, api_chat_delete, api_chat_edit, api_chat_messages, api_chat_peer,
@@ -34,6 +35,7 @@ pub use groups::{
     rename_group, revoke_group_invite, set_group_avatar, transfer_group_ownership,
     update_group_member_mute, update_group_member_role,
 };
+pub use official_groups::{create_official_group, join_official_group, official_groups_page};
 
 mod profiles;
 pub use profiles::*;

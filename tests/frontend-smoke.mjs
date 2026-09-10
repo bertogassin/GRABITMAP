@@ -622,6 +622,27 @@ test("official groups have one validated geographic scope", async () => {
   assert.match(template, /chat-official-group/);
 });
 
+test("official group directory is hierarchical, authorized, and opt-in", async () => {
+  const [handler, routes, template] = await Promise.all([
+    readFile(new URL("src/web/handlers/official_groups.rs", root), "utf8"),
+    readFile(new URL("src/web/routes/communication.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+  ]);
+
+  assert.match(handler, /AdminPermission::GroupsManage/);
+  assert.match(handler, /scope_is_authorized/);
+  assert.match(handler, /valid_admin_session_public_id/);
+  assert.match(handler, /required_admin_level/);
+  assert.match(handler, /OFFICIAL_GROUP_MAX_MEMBERS/);
+  assert.match(handler, /request_is_cross_site/);
+  assert.match(handler, /INSERT OR IGNORE INTO chat_group_members/);
+  assert.match(routes, /\/app\/official-groups\/\{scope_type\}\/\{scope_id\}\/create/);
+  assert.match(routes, /\/app\/official-groups\/\{scope_type\}\/\{scope_id\}\/join/);
+  assert.match(template, /Мир → континент → страна → город/);
+  assert.match(template, /старые сообщения останутся видны после вступления/);
+  assert.match(template, /Одна группа на одно место/);
+});
+
 test("user-facing copy no longer calls listings resources", async () => {
   const visibleFiles = [
     "static/share.js",
