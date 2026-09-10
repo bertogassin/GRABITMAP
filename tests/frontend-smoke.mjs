@@ -438,6 +438,24 @@ test("official group member directory is bounded and cursor paginated", async ()
   assert.match(template, /member_count_label/);
 });
 
+test("private group member search is isolated from public profile FTS", async () => {
+  const [database, groups, queries, publicFts] = await Promise.all([
+    readFile(new URL("src/db/group_member_search.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
+    readFile(new URL("src/db/queries.rs", root), "utf8"),
+    readFile(new URL("src/db/search_fts.rs", root), "utf8"),
+  ]);
+
+  assert.match(database, /chat_group_member_search_fts USING fts5/);
+  assert.match(database, /tokenize = 'unicode61'/);
+  assert.match(database, /AFTER UPDATE OF username, first_name, last_name, user_id ON profiles/);
+  assert.match(groups, /group_member_fts_query/);
+  assert.match(groups, /directory\.group_id = \?1/);
+  assert.match(queries, /group_member_search::initialize\(&conn\)/);
+  assert.match(publicFts, /never name or username/);
+  assert.doesNotMatch(publicFts, /CREATE VIRTUAL TABLE profiles_fts USING fts5\(\s*username/);
+});
+
 test("inbox organization is account scoped and controls notifications", async () => {
   const [schema, handler, chat, api, groups, media, template, inbox, routes] = await Promise.all([
     readFile(new URL("src/db/chat_preferences.rs", root), "utf8"),
