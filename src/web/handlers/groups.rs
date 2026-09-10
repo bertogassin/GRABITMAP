@@ -1947,13 +1947,6 @@ fn normalized_group_member_query(value: &str) -> String {
     }
 }
 
-fn escape_like_pattern(value: &str) -> String {
-    value
-        .replace('\\', "\\\\")
-        .replace('%', "\\%")
-        .replace('_', "\\_")
-}
-
 pub async fn group_members_page(
     State(state): State<AppState>,
     Path(group_id): Path<i64>,
@@ -2881,6 +2874,16 @@ pub async fn leave_group(
     Redirect::to("/app/messages").into_response()
 }
 
+fn group_member_fts_query(query: &str) -> String {
+    query
+        .split(|character: char| !character.is_alphanumeric())
+        .filter(|token| !token.is_empty())
+        .map(|token| format!("\"{token}\"*"))
+        .take(8)
+        .collect::<Vec<_>>()
+        .join(" AND ")
+}
+
 fn load_group_member_names(
     db: &rusqlite::Connection,
     group_id: i64,
@@ -2890,33 +2893,40 @@ fn load_group_member_names(
     if group_id <= 0 {
         return (vec![], None);
     }
-    let pattern = format!("%{}%", escape_like_pattern(query));
+    let fts_query = group_member_fts_query(query);
+    if !query.is_empty() && fts_query.is_empty() {
+        return (vec![], None);
+    }
+    let sql = if query.is_empty() {
+        "SELECT member.user_id, member.role, COALESCE(member.muted_until, 0),
+                COALESCE(profile.username, ''), COALESCE(profile.first_name, ''),
+                COALESCE(profile.last_name, '')
+         FROM chat_group_members AS member
+         LEFT JOIN profiles AS profile ON profile.user_id = member.user_id
+         WHERE member.group_id = ?1 AND member.user_id > ?2
+         ORDER BY member.user_id ASC LIMIT ?4"
+    } else {
+        "SELECT member.user_id, member.role, COALESCE(member.muted_until, 0),
+                COALESCE(profile.username, ''), COALESCE(profile.first_name, ''),
+                COALESCE(profile.last_name, '')
+         FROM chat_group_member_search_fts AS search
+         JOIN chat_group_member_search AS directory ON directory.id = search.rowid
+         JOIN chat_group_members AS member
+           ON member.group_id = directory.group_id AND member.user_id = directory.user_id
+         LEFT JOIN profiles AS profile ON profile.user_id = member.user_id
+         WHERE search.search_text MATCH ?3
+           AND directory.group_id = ?1 AND directory.user_id > ?2
+         ORDER BY directory.user_id ASC LIMIT ?4"
+    };
     let mut members = db
-        .prepare(
-            "SELECT member.user_id, member.role, COALESCE(member.muted_until, 0),
-                    COALESCE(profile.username, ''), COALESCE(profile.first_name, ''),
-                    COALESCE(profile.last_name, '')
-             FROM chat_group_members AS member
-             LEFT JOIN profiles AS profile ON profile.user_id = member.user_id
-             WHERE member.group_id = ?1 AND member.user_id > ?2
-               AND (?3 = ''
-                    OR CAST(member.user_id AS TEXT) LIKE ?4 ESCAPE '\\'
-                    OR lower(COALESCE(profile.username, '')) LIKE lower(?4) ESCAPE '\\'
-                    OR lower(COALESCE(profile.first_name, '')) LIKE lower(?4) ESCAPE '\\'
-                    OR lower(COALESCE(profile.last_name, '')) LIKE lower(?4) ESCAPE '\\'
-                    OR lower(trim(COALESCE(profile.first_name, '') || ' ' ||
-                                  COALESCE(profile.last_name, ''))) LIKE lower(?4) ESCAPE '\\')
-             ORDER BY member.user_id ASC
-             LIMIT ?5",
-        )
+        .prepare(sql)
         .and_then(|mut statement| {
             statement
                 .query_map(
                     rusqlite::params![
                         group_id,
                         after_user_id,
-                        query,
-                        pattern,
+                        fts_query,
                         GROUP_MEMBER_PAGE_SIZE + 1
                     ],
                     |row| {
@@ -3111,6 +3121,8 @@ mod tests {
                 );",
             )
             .expect("group schema");
+        crate::db::group_member_search::initialize(&connection)
+            .expect("private group member search schema");
         connection
     }
 
