@@ -1,5 +1,6 @@
 use super::auth::verify_user_session;
 use super::common::request_is_cross_site;
+use super::user_blocks::users_are_blocked;
 use crate::state::app_state::AppState;
 use axum::{
     extract::{
@@ -19,6 +20,7 @@ struct ClientFrame {
     #[serde(rename = "type")]
     frame_type: String,
     other_user_id: Option<String>,
+    group_id: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -35,6 +37,33 @@ fn parse_other_user_id(value: Option<&str>) -> Option<i64> {
     raw.parse::<i64>().ok().filter(|id| *id > 0)
 }
 
+fn direct_typing_is_allowed(
+    connection: &rusqlite::Connection,
+    user_id: i64,
+    other_user_id: i64,
+) -> bool {
+    if user_id <= 0
+        || other_user_id <= 0
+        || user_id == other_user_id
+        || users_are_blocked(connection, user_id, other_user_id)
+    {
+        return false;
+    }
+    let (first, second) = if user_id < other_user_id {
+        (user_id, other_user_id)
+    } else {
+        (other_user_id, user_id)
+    };
+    connection
+        .query_row(
+            "SELECT 1 FROM conversations
+             WHERE user1_id = ?1 AND user2_id = ?2 LIMIT 1",
+            rusqlite::params![first, second],
+            |_| Ok(()),
+        )
+        .is_ok()
+}
+
 fn handle_client_frame(state: &AppState, user_id: i64, text: &str) -> bool {
     let frame = match serde_json::from_str::<ClientFrame>(text) {
         Ok(frame) => frame,
@@ -44,15 +73,60 @@ fn handle_client_frame(state: &AppState, user_id: i64, text: &str) -> bool {
     match frame.frame_type.as_str() {
         "ping" => true,
         "typing.start" | "typing.stop" => {
-            let Some(other_user_id) = parse_other_user_id(frame.other_user_id.as_deref()) else {
-                return false;
-            };
-
-            if user_id == other_user_id {
+            if let Some(other_user_id) = parse_other_user_id(frame.other_user_id.as_deref()) {
+                let connection = crate::db::pool::get_connection(&state.db_pool);
+                if connection.as_ref().is_ok_and(|connection| {
+                    direct_typing_is_allowed(connection, user_id, other_user_id)
+                }) {
+                    let _ = state.publish_typing_event(&frame.frame_type, user_id, other_user_id);
+                }
                 return false;
             }
-
-            let _ = state.publish_typing_event(&frame.frame_type, user_id, other_user_id);
+            let Some(group_id) = parse_other_user_id(frame.group_id.as_deref()) else {
+                return false;
+            };
+            let connection = match crate::db::pool::get_connection(&state.db_pool) {
+                Ok(connection) => connection,
+                Err(_) => return false,
+            };
+            let actor_name = connection
+                .query_row(
+                    "SELECT COALESCE(
+                        NULLIF(trim(COALESCE(p.first_name, '') || ' ' || COALESCE(p.last_name, '')), ''),
+                        NULLIF('@' || COALESCE(p.username, ''), '@'),
+                        'Участник'
+                     )
+                     FROM chat_group_members AS member
+                     LEFT JOIN profiles AS p ON p.user_id = member.user_id
+                     WHERE member.group_id = ?1 AND member.user_id = ?2",
+                    rusqlite::params![group_id, user_id],
+                    |row| row.get::<_, String>(0),
+                )
+                .ok();
+            let Some(actor_name) = actor_name else {
+                return false;
+            };
+            let member_ids = connection
+                .prepare(
+                    "SELECT user_id FROM chat_group_members
+                     WHERE group_id = ?1 ORDER BY user_id LIMIT 251",
+                )
+                .and_then(|mut statement| {
+                    statement
+                        .query_map(rusqlite::params![group_id], |row| row.get::<_, i64>(0))?
+                        .collect::<Result<Vec<_>, _>>()
+                })
+                .unwrap_or_default();
+            if member_ids.len() > 250 {
+                return false;
+            }
+            let _ = state.publish_group_typing_event(
+                &frame.frame_type,
+                user_id,
+                group_id,
+                &member_ids,
+                &actor_name,
+            );
             false
         }
         _ => false,
@@ -238,7 +312,7 @@ async fn chat_socket(mut socket: WebSocket, state: AppState, user_id: i64, last_
 
 #[cfg(test)]
 mod tests {
-    use super::{parse_other_user_id, ClientFrame};
+    use super::{direct_typing_is_allowed, parse_other_user_id, ClientFrame};
 
     #[test]
     fn other_user_id_parser_is_strict() {
@@ -257,6 +331,43 @@ mod tests {
 
         assert_eq!(frame.frame_type, "typing.start");
         assert_eq!(frame.other_user_id.as_deref(), Some("18"));
+        assert!(frame.group_id.is_none());
+    }
+
+    #[test]
+    fn client_frame_parses_group_typing() {
+        let frame: ClientFrame = serde_json::from_str(r#"{"type":"typing.start","group_id":"44"}"#)
+            .expect("group typing frame");
+
+        assert_eq!(frame.frame_type, "typing.start");
+        assert_eq!(frame.group_id.as_deref(), Some("44"));
+        assert!(frame.other_user_id.is_none());
+    }
+
+    #[test]
+    fn direct_typing_requires_a_conversation_and_respects_blocks() {
+        let connection = rusqlite::Connection::open_in_memory().expect("typing database");
+        connection
+            .execute_batch(
+                "CREATE TABLE conversations (
+                    id INTEGER PRIMARY KEY, user1_id INTEGER NOT NULL, user2_id INTEGER NOT NULL
+                 );
+                 CREATE TABLE user_blocks (
+                    blocker_user_id INTEGER NOT NULL, blocked_user_id INTEGER NOT NULL
+                 );
+                 INSERT INTO conversations (id, user1_id, user2_id) VALUES (1, 3, 9);",
+            )
+            .expect("typing fixtures");
+
+        assert!(direct_typing_is_allowed(&connection, 3, 9));
+        assert!(!direct_typing_is_allowed(&connection, 3, 12));
+        connection
+            .execute(
+                "INSERT INTO user_blocks (blocker_user_id, blocked_user_id) VALUES (9, 3)",
+                [],
+            )
+            .expect("block fixture");
+        assert!(!direct_typing_is_allowed(&connection, 3, 9));
     }
 
     #[test]

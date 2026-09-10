@@ -455,7 +455,7 @@ dependencies = [
 
 [[package]]
 name = "grabitmap"
-version = "5.9.0"
+version = "6.0.0"
 dependencies = [
  "argon2",
  "axum",

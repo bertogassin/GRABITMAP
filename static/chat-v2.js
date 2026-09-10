@@ -229,7 +229,10 @@
         var peerOnline = false;
         var peerLastSeenAt = 0;
         var peerTyping = false;
+        var peerTypingName = "";
         var peerTypingTimer = null;
+        var groupTypingTimers = Object.create(null);
+        var groupTypingNames = Object.create(null);
         var typingStopTimer = null;
         var presenceTimer = null;
         var lastTypingEmitAt = 0;
@@ -317,10 +320,15 @@
         }
 
         function typingDotsHtml(label) {
+            var safeLabel = String(label || "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
             return (
                 '<span class="chat-typing-dots" aria-hidden="true">' +
                 "<i></i><i></i><i></i></span> " +
-                label
+                safeLabel
             );
         }
 
@@ -343,7 +351,11 @@
             );
 
             if (peerTyping) {
-                headerStatus.innerHTML = typingDotsHtml(t("chat_typing", "печатает…"));
+                var typingLabel = t("chat_typing", "печатает…");
+                if (isGroup && peerTypingName) {
+                    typingLabel = peerTypingName + " · " + typingLabel;
+                }
+                headerStatus.innerHTML = typingDotsHtml(typingLabel);
                 headerStatus.classList.add("is-typing");
                 return;
             }
@@ -378,15 +390,16 @@
             syncHeaderPresence();
         }
 
-        function setPeerTyping(active) {
+        function setPeerTyping(active, actorName) {
             peerTyping = Boolean(active);
+            peerTypingName = peerTyping ? String(actorName || "").trim() : "";
 
             if (peerTypingTimer) {
                 window.clearTimeout(peerTypingTimer);
                 peerTypingTimer = null;
             }
 
-            if (peerTyping) {
+            if (peerTyping && !isGroup) {
                 peerTypingTimer = window.setTimeout(function () {
                     peerTyping = false;
                     updatePeerState();
@@ -394,6 +407,30 @@
             }
 
             updatePeerState();
+        }
+
+        function updateGroupTyping(detail) {
+            var actorId = String(detail.actor_user_id || "").trim();
+            if (!actorId || actorId === viewerUserId) {
+                return;
+            }
+            if (groupTypingTimers[actorId]) {
+                window.clearTimeout(groupTypingTimers[actorId]);
+                delete groupTypingTimers[actorId];
+            }
+            if (detail.kind === "typing.start") {
+                groupTypingNames[actorId] = String(detail.actor_name || "").trim();
+                groupTypingTimers[actorId] = window.setTimeout(function () {
+                    delete groupTypingTimers[actorId];
+                    delete groupTypingNames[actorId];
+                    var remaining = Object.values(groupTypingNames).filter(Boolean);
+                    setPeerTyping(remaining.length > 0, remaining.slice(0, 2).join(", "));
+                }, 5200);
+            } else if (detail.kind === "typing.stop") {
+                delete groupTypingNames[actorId];
+            }
+            var names = Object.values(groupTypingNames).filter(Boolean);
+            setPeerTyping(names.length > 0, names.slice(0, 2).join(", "));
         }
 
         function reconcilePendingForMessage(message) {
@@ -423,6 +460,14 @@
 
         function emitTypingSignal(kind) {
             if (isGroup) {
+                document.dispatchEvent(
+                    new CustomEvent("resursmap:chat-realtime-send", {
+                        detail: {
+                            type: kind,
+                            group_id: groupId
+                        }
+                    })
+                );
                 return;
             }
             document.dispatchEvent(
@@ -2487,6 +2532,14 @@
                 var actorId = String(
                     detail.actor_user_id || ""
                 ).trim();
+
+                if (isGroup) {
+                    if (String(detail.group_id || "") !== groupId) {
+                        return;
+                    }
+                    updateGroupTyping(detail);
+                    return;
+                }
 
                 if (actorId !== otherUserId) {
                     return;
