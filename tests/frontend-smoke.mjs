@@ -145,6 +145,32 @@ test("chat preserves reading position and reveals quoted history", async () => {
   assert.match(template, /id="chat-scroll-unread"/);
 });
 
+test("chat actions preserve media and work consistently in groups", async () => {
+  const [chat, groups, chatApi, template] = await Promise.all([
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/chat_api.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+  ]);
+
+  assert.match(chat, /var currentTarget = isGroup/);
+  assert.match(chat, /candidate !== currentTarget/);
+  assert.match(chat, /attachment_kind:\s*row\.dataset\.attachmentKind/);
+  assert.match(chat, /reactions: Array\.from\(/);
+  assert.doesNotMatch(chat, /messageCache\.set\(id, message\);\s*renderMessage\(message\);/);
+  assert.match(chat, /reply_sender_name/);
+  assert.match(chat, /replyHeading\.textContent = t\("chat_reply_label"/);
+  assert.match(chat, /forwardHeading\.textContent = t\("chat_forward"/);
+  assert.match(chat, /\.catch\(reportActionError\)/);
+  assert.match(chat, /Number\(message\.deleted_at\) > 0\s*\? \[\]/);
+  assert.match(groups, /"message": message_json\(&message, user_id\)/);
+  assert.match(groups, /reply_sender_name = names\.get/);
+  assert.match(chatApi, /message_content_can_be_edited/);
+  assert.match(template, /data-reply-sender-name/);
+  assert.match(template, /data-attachment-kind/);
+  assert.match(template, /if deleted \|\| message\.reactions\.is_empty\(\)/);
+});
+
 test("chat media survives offline sends and retries without duplicates", async () => {
   const [chat, media] = await Promise.all([
     readFile(new URL("static/chat-v2.js", root), "utf8"),
