@@ -622,30 +622,30 @@ test("official groups have one validated geographic scope", async () => {
   assert.match(template, /chat-official-group/);
 });
 
-test("official group directory is hierarchical, authorized, and opt-in", async () => {
+test("official group directory is hierarchical, automatic, and opt-in", async () => {
   const [handler, routes, template] = await Promise.all([
     readFile(new URL("src/web/handlers/official_groups.rs", root), "utf8"),
     readFile(new URL("src/web/routes/communication.rs", root), "utf8"),
     readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
   ]);
 
-  assert.match(handler, /AdminPermission::GroupsManage/);
-  assert.match(handler, /scope_is_authorized/);
-  assert.match(handler, /valid_admin_session_public_id/);
-  assert.match(handler, /required_admin_level/);
   assert.match(handler, /OFFICIAL_GROUP_MAX_MEMBERS/);
   assert.match(handler, /request_is_cross_site/);
+  assert.match(handler, /fn ensure_official_group/);
+  assert.match(handler, /TransactionBehavior::Immediate/);
+  assert.match(handler, /VALUES \(\?1, 0, \?2, 0, \?2, ''\)/);
   assert.match(handler, /INSERT OR IGNORE INTO chat_group_members/);
-  assert.match(routes, /\/app\/official-groups\/\{scope_type\}\/\{scope_id\}\/create/);
   assert.match(routes, /\/app\/official-groups\/\{scope_type\}\/\{scope_id\}\/join/);
+  assert.doesNotMatch(routes, /\/app\/official-groups\/\{scope_type\}\/\{scope_id\}\/create/);
   assert.match(template, /Мир → континент → страна → город/);
-  assert.match(template, /старые сообщения останутся видны после вступления/);
-  assert.match(template, /Одна группа на одно место/);
+  assert.match(template, /Готова к первому участнику/);
+  assert.match(template, /запускается автоматически при первом вступлении/);
 });
 
 test("official group governance follows active geographic administration", async () => {
-  const [database, official, groups, pins, routes, template] = await Promise.all([
+  const [database, groupDatabase, official, groups, pins, routes, template] = await Promise.all([
     readFile(new URL("src/db/group_geography.rs", root), "utf8"),
+    readFile(new URL("src/db/chat_groups.rs", root), "utf8"),
     readFile(new URL("src/web/handlers/official_groups.rs", root), "utf8"),
     readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
     readFile(new URL("src/web/handlers/chat_pins.rs", root), "utf8"),
@@ -654,17 +654,21 @@ test("official group governance follows active geographic administration", async
   ]);
 
   assert.match(database, /chat_official_group_governance_events/);
-  assert.match(database, /control_claimed/);
+  assert.match(database, /SET created_by = 0/);
+  assert.match(database, /owner_user_id = 0/);
+  assert.match(database, /SET role = 'member'/);
+  assert.match(groupDatabase, /official_scope\.group_id = chat_groups\.id/);
   assert.match(official, /fn group_management_role/);
+  assert.match(official, /fn group_member_governance_role/);
   assert.match(official, /valid_admin_session_public_id/);
-  assert.match(official, /previous_owner_user_id/);
-  assert.match(official, /SET owner_user_id = \?1, invite_nonce = ''/);
+  assert.match(official, /AdminPermission::GroupsManage/);
+  assert.match(official, /scope_is_authorized/);
   assert.match(groups, /is_official_group\(&db, group_id\)/);
   assert.match(groups, /SET name = CASE WHEN \?8 = 1 THEN name ELSE \?1 END/);
   assert.match(pins, /official_groups::group_management_role/);
-  assert.match(routes, /\/app\/group\/\{group_id\}\/official-control/);
-  assert.match(template, /Принять управление/);
-  assert.match(template, /Права управления определяются действующим административным назначением/);
+  assert.doesNotMatch(routes, /\/app\/group\/\{group_id\}\/official-control/);
+  assert.match(template, /группа принадлежит платформе GRABIT/);
+  assert.match(template, /У группы нет человеческого владельца/);
 });
 
 test("user-facing copy no longer calls listings resources", async () => {

@@ -138,6 +138,10 @@ pub fn initialize(conn: &Connection) -> Result<()> {
                 WHERE current_owner.group_id = chat_groups.id
                   AND current_owner.user_id = chat_groups.owner_user_id
            ))
+           AND NOT EXISTS (
+                SELECT 1 FROM chat_group_scopes AS official_scope
+                WHERE official_scope.group_id = chat_groups.id
+           )
            AND created_by > 0
            AND EXISTS (
                 SELECT 1 FROM chat_group_members AS member
@@ -153,10 +157,14 @@ pub fn initialize(conn: &Connection) -> Result<()> {
                 ORDER BY member.joined_at ASC, member.user_id ASC
                 LIMIT 1
              ), 0)
-         WHERE owner_user_id <= 0 OR NOT EXISTS (
+         WHERE (owner_user_id <= 0 OR NOT EXISTS (
                 SELECT 1 FROM chat_group_members AS current_owner
                 WHERE current_owner.group_id = chat_groups.id
                   AND current_owner.user_id = chat_groups.owner_user_id
+           ))
+           AND NOT EXISTS (
+                SELECT 1 FROM chat_group_scopes AS official_scope
+                WHERE official_scope.group_id = chat_groups.id
            );
 
          UPDATE chat_group_members

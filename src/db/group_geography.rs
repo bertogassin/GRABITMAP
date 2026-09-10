@@ -98,6 +98,25 @@ pub fn initialize_connection(connection: &Connection) -> Result<()> {
          BEGIN
               DELETE FROM chat_group_scopes WHERE group_id = OLD.id;
          END;",
+    )?;
+
+    connection.execute_batch(
+        "UPDATE chat_group_members
+         SET role = 'member'
+         WHERE role <> 'member'
+           AND EXISTS (
+                SELECT 1 FROM chat_group_scopes AS official_scope
+                WHERE official_scope.group_id = chat_group_members.group_id
+           );
+
+         UPDATE chat_groups
+         SET created_by = 0,
+             owner_user_id = 0,
+             invite_nonce = ''
+         WHERE EXISTS (
+                SELECT 1 FROM chat_group_scopes AS official_scope
+                WHERE official_scope.group_id = chat_groups.id
+         );",
     )
 }
 
@@ -163,7 +182,18 @@ mod tests {
         connection
             .execute_batch(
                 "PRAGMA foreign_keys = ON;
-                 CREATE TABLE chat_groups (id INTEGER PRIMARY KEY);
+                 CREATE TABLE chat_groups (
+                    id INTEGER PRIMARY KEY,
+                    created_by INTEGER NOT NULL DEFAULT 0,
+                    owner_user_id INTEGER NOT NULL DEFAULT 0,
+                    invite_nonce TEXT NOT NULL DEFAULT ''
+                 );
+                 CREATE TABLE chat_group_members (
+                    group_id INTEGER NOT NULL,
+                    user_id INTEGER NOT NULL,
+                    role TEXT NOT NULL DEFAULT 'member',
+                    PRIMARY KEY (group_id, user_id)
+                 );
                  CREATE TABLE geo_continents (
                     id INTEGER PRIMARY KEY, is_active INTEGER NOT NULL
                  );
@@ -173,7 +203,9 @@ mod tests {
                  CREATE TABLE geo_cities (
                     id INTEGER PRIMARY KEY, is_active INTEGER NOT NULL
                  );
-                 INSERT INTO chat_groups VALUES (10), (11), (12), (13), (14);
+                 INSERT INTO chat_groups (id) VALUES (10), (11), (12), (13), (14);
+                 INSERT INTO chat_group_members (group_id, user_id, role)
+                 VALUES (13, 70, 'owner');
                  INSERT INTO geo_continents VALUES (2, 1);
                  INSERT INTO geo_countries VALUES (3, 1);
                  INSERT INTO geo_cities VALUES (4, 1), (5, 0);",
@@ -233,5 +265,42 @@ mod tests {
             )
             .expect("governance audit count");
         assert_eq!(audit_count, 0);
+    }
+
+    #[test]
+    fn official_groups_are_reconciled_to_platform_ownership() {
+        let connection = database();
+        connection
+            .execute(
+                "UPDATE chat_groups
+                 SET created_by = 70, owner_user_id = 70, invite_nonce = 'legacy'
+                 WHERE id = 13",
+                [],
+            )
+            .expect("legacy human owner");
+        bind_group(&connection, 13, SCOPE_CITY, 4, 100).expect("city binding");
+
+        initialize_connection(&connection).expect("platform ownership reconciliation");
+        initialize_connection(&connection).expect("idempotent reconciliation");
+
+        let group: (i64, i64, String) = connection
+            .query_row(
+                "SELECT created_by, owner_user_id, invite_nonce
+                 FROM chat_groups WHERE id = 13",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+            )
+            .expect("official group ownership");
+        let role: String = connection
+            .query_row(
+                "SELECT role FROM chat_group_members
+                 WHERE group_id = 13 AND user_id = 70",
+                [],
+                |row| row.get(0),
+            )
+            .expect("former owner role");
+
+        assert_eq!(group, (0, 0, String::new()));
+        assert_eq!(role, "member");
     }
 }
