@@ -27,8 +27,9 @@ pub use chat_search::{api_chat_search, api_group_search};
 pub use groups::{
     add_group_members, api_group_delete, api_group_edit, api_group_media, api_group_messages,
     api_group_react, api_group_send, api_group_send_image, api_group_send_voice, create_group,
-    group_chat_page, group_members_page, leave_group, new_group_page, remove_group_member,
-    rename_group, transfer_group_ownership, update_group_member_role,
+    create_group_invite, group_chat_page, group_invite_page, group_members_page, join_group_invite,
+    leave_group, new_group_page, remove_group_member, rename_group, revoke_group_invite,
+    transfer_group_ownership, update_group_member_role,
 };
 
 mod profiles;

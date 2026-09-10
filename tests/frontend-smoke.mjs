@@ -517,6 +517,25 @@ test("group receipts separate partial delivery from read by everyone", async () 
   assert.match(chat, /payload\.event\.group_id/);
 });
 
+test("group invites are signed, revocable, expiring, and capacity bounded", async () => {
+  const [database, handlers, routes, template] = await Promise.all([
+    readFile(new URL("src/db/chat_groups.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
+    readFile(new URL("src/web/routes/communication.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+  ]);
+
+  assert.match(database, /invite_nonce TEXT NOT NULL DEFAULT ''/);
+  assert.match(handlers, /HmacSha256/);
+  assert.match(handlers, /GROUP_INVITE_LIFETIME_SECONDS/);
+  assert.match(handlers, /mac\.verify_slice/);
+  assert.match(handlers, /member_count >= MAX_GROUP_MEMBERS/);
+  assert.match(handlers, /SET invite_nonce = ''/);
+  assert.match(routes, /\/app\/group-invite\/\{token\}/);
+  assert.match(template, /data-share-title="GRABIT · группа"/);
+  assert.match(template, /history\.replaceState/);
+});
+
 test("user-facing copy no longer calls listings resources", async () => {
   const visibleFiles = [
     "static/share.js",

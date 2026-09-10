@@ -5,8 +5,9 @@ use super::super::handlers::{
     api_chat_send_voice, api_chat_unblock, api_group_delete, api_group_edit, api_group_media,
     api_group_messages, api_group_react, api_group_search, api_group_send, api_group_send_image,
     api_group_send_voice, api_start_direct_chat, chat_page, contact_requests_page, create_group,
-    group_chat_page, group_members_page, leave_group, messages_page, new_group_page,
-    remove_group_member, rename_group, retired_contact_decision, transfer_group_ownership,
+    create_group_invite, group_chat_page, group_invite_page, group_members_page, join_group_invite,
+    leave_group, messages_page, new_group_page, remove_group_member, rename_group,
+    retired_contact_decision, revoke_group_invite, transfer_group_ownership,
     update_chat_preference, update_group_member_role,
 };
 use crate::state::app_state::AppState;
@@ -39,10 +40,22 @@ pub(super) fn routes() -> Router<AppState> {
         )
         .route("/app/groups/new", get(new_group_page))
         .route("/app/groups", post(create_group))
+        .route(
+            "/app/group-invite/{token}",
+            get(group_invite_page).post(join_group_invite),
+        )
         .route("/app/group/{group_id}", get(group_chat_page))
         .route("/app/group/{group_id}/members", get(group_members_page))
         .route("/app/group/{group_id}/members", post(add_group_members))
         .route("/app/group/{group_id}/settings/name", post(rename_group))
+        .route(
+            "/app/group/{group_id}/invite/create",
+            post(create_group_invite),
+        )
+        .route(
+            "/app/group/{group_id}/invite/revoke",
+            post(revoke_group_invite),
+        )
         .route(
             "/app/group/{group_id}/members/{member_id}/role",
             post(update_group_member_role),

@@ -29,7 +29,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = "6.1.0";
+pub const STATIC_ASSET_VERSION: &str = "6.2.0";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -2262,6 +2262,26 @@ a.feature.rm-feature-add {
     padding: 18px;
     display: grid;
     gap: 14px;
+}
+.rm-group-invite-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.rm-group-invite-actions form {
+    flex: 1 1 190px;
+}
+.rm-group-invite-actions .ui-button {
+    width: 100%;
+}
+.rm-group-invite-ready {
+    display: grid;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+}
+.rm-group-invite-ready[hidden] {
+    display: none;
 }
 .rm-group-members {
     display: grid;

@@ -13,8 +13,11 @@ use axum::{
     response::{Html, IntoResponse, Redirect, Response},
     Form, Json,
 };
+use hmac::{Hmac, Mac};
+use rand_core::{OsRng, RngCore};
 use serde::Deserialize;
 use serde_json::json;
+use sha2::Sha256;
 use std::fs;
 use std::io::Write;
 
@@ -22,6 +25,9 @@ const MAX_GROUP_MEMBERS: i64 = 250;
 const GROUP_ROLE_OWNER: &str = "owner";
 const GROUP_ROLE_ADMIN: &str = "admin";
 const GROUP_ROLE_MEMBER: &str = "member";
+const GROUP_INVITE_LIFETIME_SECONDS: i64 = 7 * 24 * 60 * 60;
+
+type HmacSha256 = Hmac<Sha256>;
 
 #[derive(Debug, Deserialize)]
 pub struct CreateGroupForm {
@@ -59,6 +65,60 @@ fn rate_limited(retry_after: u64) -> Response {
 
 fn positive_message_id(value: &str) -> Option<i64> {
     value.trim().parse::<i64>().ok().filter(|id| *id > 0)
+}
+
+#[derive(Debug, PartialEq)]
+struct GroupInviteToken {
+    group_id: i64,
+    nonce: String,
+}
+
+fn sign_group_invite(admin_key: &str, payload: &str) -> Option<String> {
+    let mut mac = HmacSha256::new_from_slice(admin_key.as_bytes()).ok()?;
+    mac.update(payload.as_bytes());
+    Some(hex::encode(mac.finalize().into_bytes()))
+}
+
+fn create_group_invite_token(admin_key: &str, group_id: i64, now: i64) -> Option<(String, String)> {
+    if group_id <= 0 || admin_key.is_empty() {
+        return None;
+    }
+    let mut bytes = [0_u8; 24];
+    OsRng.fill_bytes(&mut bytes);
+    let nonce = hex::encode(bytes);
+    let payload = format!(
+        "{group_id}.{}.{}",
+        now + GROUP_INVITE_LIFETIME_SECONDS,
+        nonce
+    );
+    let signature = sign_group_invite(admin_key, &payload)?;
+    Some((format!("{payload}.{signature}"), nonce))
+}
+
+fn parse_group_invite_token(admin_key: &str, token: &str, now: i64) -> Option<GroupInviteToken> {
+    let mut parts = token.split('.');
+    let group_id = parts.next()?.parse::<i64>().ok()?;
+    let expires_at = parts.next()?.parse::<i64>().ok()?;
+    let nonce = parts.next()?;
+    let signature = parts.next()?;
+    if parts.next().is_some()
+        || group_id <= 0
+        || expires_at <= now
+        || nonce.len() != 48
+        || !nonce.bytes().all(|byte| byte.is_ascii_hexdigit())
+        || signature.len() != 64
+    {
+        return None;
+    }
+    let payload = format!("{group_id}.{expires_at}.{nonce}");
+    let expected = hex::decode(signature).ok()?;
+    let mut mac = HmacSha256::new_from_slice(admin_key.as_bytes()).ok()?;
+    mac.update(payload.as_bytes());
+    mac.verify_slice(&expected).ok()?;
+    Some(GroupInviteToken {
+        group_id,
+        nonce: nonce.to_ascii_lowercase(),
+    })
 }
 
 fn group_reply_is_valid(db: &rusqlite::Connection, group_id: i64, message_id: i64) -> bool {
@@ -1771,6 +1831,225 @@ pub async fn group_members_page(
     ))
 }
 
+pub async fn create_group_invite(
+    State(state): State<AppState>,
+    Path(group_id): Path<i64>,
+    headers: HeaderMap,
+) -> Response {
+    let target = format!("/app/group/{group_id}/members");
+    if request_is_cross_site(&headers) {
+        return Redirect::to(&target).into_response();
+    }
+    let user_id = match verify_user_session(&state, &headers) {
+        Some(id) => id,
+        None => return Redirect::to("/login?next=/app/messages").into_response(),
+    };
+    if rate_limit_retry_after(&state, user_id, "group_invite_create", 10, 600)
+        .await
+        .is_some()
+    {
+        return Redirect::to(&target).into_response();
+    }
+    let Some((token, nonce)) = create_group_invite_token(&state.admin_key, group_id, unix_now())
+    else {
+        return Redirect::to(&target).into_response();
+    };
+    let db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => return Redirect::to(&target).into_response(),
+    };
+    let changed = db
+        .execute(
+            "UPDATE chat_groups
+             SET invite_nonce = ?1, updated_at = ?2
+             WHERE id = ?3
+               AND EXISTS (
+                    SELECT 1 FROM chat_group_members AS actor
+                    WHERE actor.group_id = chat_groups.id
+                      AND actor.user_id = ?4
+                      AND actor.role IN (?5, ?6)
+               )",
+            rusqlite::params![
+                nonce,
+                unix_now(),
+                group_id,
+                user_id,
+                GROUP_ROLE_OWNER,
+                GROUP_ROLE_ADMIN
+            ],
+        )
+        .unwrap_or(0);
+    if changed != 1 {
+        return Redirect::to("/app/messages").into_response();
+    }
+    Redirect::to(&format!("{target}?invite={}", urlencoding::encode(&token))).into_response()
+}
+
+pub async fn revoke_group_invite(
+    State(state): State<AppState>,
+    Path(group_id): Path<i64>,
+    headers: HeaderMap,
+) -> Response {
+    let target = format!("/app/group/{group_id}/members");
+    if request_is_cross_site(&headers) {
+        return Redirect::to(&target).into_response();
+    }
+    let user_id = match verify_user_session(&state, &headers) {
+        Some(id) => id,
+        None => return Redirect::to("/login?next=/app/messages").into_response(),
+    };
+    if let Ok(db) = crate::db::pool::get_connection(&state.db_pool) {
+        let _ = db.execute(
+            "UPDATE chat_groups
+             SET invite_nonce = '', updated_at = ?1
+             WHERE id = ?2
+               AND EXISTS (
+                    SELECT 1 FROM chat_group_members AS actor
+                    WHERE actor.group_id = chat_groups.id
+                      AND actor.user_id = ?3
+                      AND actor.role IN (?4, ?5)
+               )",
+            rusqlite::params![
+                unix_now(),
+                group_id,
+                user_id,
+                GROUP_ROLE_OWNER,
+                GROUP_ROLE_ADMIN
+            ],
+        );
+    }
+    Redirect::to(&target).into_response()
+}
+
+pub async fn group_invite_page(
+    State(state): State<AppState>,
+    Path(token): Path<String>,
+    headers: HeaderMap,
+) -> Response {
+    let Some(invite) = parse_group_invite_token(&state.admin_key, &token, unix_now()) else {
+        return Html(templates::render_group_invite(false, &token, "", 0, false)).into_response();
+    };
+    let db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => {
+            return (
+                StatusCode::SERVICE_UNAVAILABLE,
+                "Сервис временно недоступен",
+            )
+                .into_response()
+        }
+    };
+    let details = db
+        .query_row(
+            "SELECT chat_groups.name, chat_groups.invite_nonce,
+                    COUNT(chat_group_members.user_id)
+             FROM chat_groups
+             LEFT JOIN chat_group_members ON chat_group_members.group_id = chat_groups.id
+             WHERE chat_groups.id = ?1
+             GROUP BY chat_groups.id",
+            rusqlite::params![invite.group_id],
+            |row| {
+                Ok((
+                    row.get::<_, String>(0)?,
+                    row.get::<_, String>(1)?,
+                    row.get::<_, i64>(2)?,
+                ))
+            },
+        )
+        .ok();
+    let Some((name, current_nonce, member_count)) = details else {
+        return Html(templates::render_group_invite(false, &token, "", 0, false)).into_response();
+    };
+    if current_nonce != invite.nonce
+        || current_nonce.is_empty()
+        || member_count >= MAX_GROUP_MEMBERS
+    {
+        return Html(templates::render_group_invite(false, &token, "", 0, false)).into_response();
+    }
+    let user_id = verify_user_session(&state, &headers).unwrap_or(0);
+    if user_id > 0 && is_member(&db, invite.group_id, user_id) {
+        return Redirect::to(&format!("/app/group/{}", invite.group_id)).into_response();
+    }
+    Html(templates::render_group_invite(
+        user_id > 0,
+        &token,
+        &name,
+        member_count,
+        true,
+    ))
+    .into_response()
+}
+
+pub async fn join_group_invite(
+    State(state): State<AppState>,
+    Path(token): Path<String>,
+    headers: HeaderMap,
+) -> Response {
+    let invite_path = format!("/app/group-invite/{}", urlencoding::encode(&token));
+    if request_is_cross_site(&headers) {
+        return Redirect::to(&invite_path).into_response();
+    }
+    let user_id = match verify_user_session(&state, &headers) {
+        Some(id) => id,
+        None => {
+            return Redirect::to(&format!(
+                "/login?next={}",
+                urlencoding::encode(&invite_path)
+            ))
+            .into_response()
+        }
+    };
+    if rate_limit_retry_after(&state, user_id, "group_invite_join", 12, 600)
+        .await
+        .is_some()
+    {
+        return Redirect::to(&invite_path).into_response();
+    }
+    let Some(invite) = parse_group_invite_token(&state.admin_key, &token, unix_now()) else {
+        return Redirect::to(&invite_path).into_response();
+    };
+    let mut db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => return Redirect::to(&invite_path).into_response(),
+    };
+    let tx = match db.transaction() {
+        Ok(tx) => tx,
+        Err(_) => return Redirect::to(&invite_path).into_response(),
+    };
+    let current_nonce = tx
+        .query_row(
+            "SELECT invite_nonce FROM chat_groups WHERE id = ?1",
+            rusqlite::params![invite.group_id],
+            |row| row.get::<_, String>(0),
+        )
+        .unwrap_or_default();
+    let member_count = tx
+        .query_row(
+            "SELECT COUNT(*) FROM chat_group_members WHERE group_id = ?1",
+            rusqlite::params![invite.group_id],
+            |row| row.get::<_, i64>(0),
+        )
+        .unwrap_or(MAX_GROUP_MEMBERS);
+    if current_nonce.is_empty()
+        || current_nonce != invite.nonce
+        || member_count >= MAX_GROUP_MEMBERS
+    {
+        return Redirect::to(&invite_path).into_response();
+    }
+    if tx
+        .execute(
+            "INSERT OR IGNORE INTO chat_group_members (group_id, user_id, joined_at, role)
+             VALUES (?1, ?2, ?3, ?4)",
+            rusqlite::params![invite.group_id, user_id, unix_now(), GROUP_ROLE_MEMBER],
+        )
+        .is_err()
+        || tx.commit().is_err()
+    {
+        return Redirect::to(&invite_path).into_response();
+    }
+    Redirect::to(&format!("/app/group/{}", invite.group_id)).into_response()
+}
+
 pub async fn add_group_members(
     State(state): State<AppState>,
     Path(group_id): Path<i64>,
@@ -2320,6 +2599,26 @@ mod tests {
         assert_eq!(messages[1].read_at, 0);
         assert_eq!(messages[2].delivered_at, 0);
         assert_eq!(messages[2].read_at, 0);
+    }
+
+    #[test]
+    fn group_invite_tokens_are_signed_expiring_and_tamper_evident() {
+        let (token, nonce) =
+            create_group_invite_token("test-secret", 77, 1_000).expect("invite token");
+        let parsed = parse_group_invite_token("test-secret", &token, 1_001).expect("valid token");
+
+        assert_eq!(parsed.group_id, 77);
+        assert_eq!(parsed.nonce, nonce);
+        assert!(parse_group_invite_token("wrong-secret", &token, 1_001).is_none());
+        assert!(parse_group_invite_token(
+            "test-secret",
+            &token,
+            1_000 + GROUP_INVITE_LIFETIME_SECONDS
+        )
+        .is_none());
+
+        let tampered = token.replacen("77.", "78.", 1);
+        assert!(parse_group_invite_token("test-secret", &tampered, 1_001).is_none());
     }
 
     #[test]
