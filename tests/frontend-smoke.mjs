@@ -454,6 +454,32 @@ test("inbox organization is account scoped and controls notifications", async ()
   assert.match(routes, /chat-preference\/\{kind\}\/\{target_id\}/);
 });
 
+test("chat search is authorized, bounded, and navigates to results", async () => {
+  const [handler, routes, template, search, chat] = await Promise.all([
+    readFile(new URL("src/web/handlers/chat_search.rs", root), "utf8"),
+    readFile(new URL("src/web/routes/communication.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+    readFile(new URL("static/chat-search.js", root), "utf8"),
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+  ]);
+
+  assert.match(handler, /verify_user_session/);
+  assert.match(handler, /SEARCH_SCAN_LIMIT: i64 = 2_000/);
+  assert.match(handler, /SEARCH_RESULT_LIMIT: usize = 50/);
+  assert.match(handler, /chat_group_members/);
+  assert.match(handler, /deleted_at = 0/);
+  assert.match(handler, /to_lowercase\(\)\.contains/);
+  assert.match(routes, /api\/chat\/\{other_user_id\}\/search/);
+  assert.match(routes, /api\/group\/\{group_id\}\/search/);
+  assert.match(template, /chat-search-panel/);
+  assert.match(template, /chat-search\.js/);
+  assert.match(search, /AbortController/);
+  assert.match(search, /textContent = String\(item\.message/);
+  assert.match(search, /resursmapRevealChatMessage/);
+  assert.match(chat, /window\.resursmapRevealChatMessage/);
+  assert.doesNotMatch(search, /innerHTML\s*=\s*item\./);
+});
+
 test("user-facing copy no longer calls listings resources", async () => {
   const visibleFiles = [
     "static/share.js",

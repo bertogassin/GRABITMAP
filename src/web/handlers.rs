@@ -12,6 +12,7 @@ mod chat_api;
 mod chat_media;
 mod chat_preferences;
 mod chat_realtime;
+mod chat_search;
 mod direct_chat_start;
 mod groups;
 pub use chat::*;
@@ -22,6 +23,7 @@ pub use chat_api::{
 pub use chat_media::{api_chat_media, api_chat_send_image, api_chat_send_voice};
 pub use chat_preferences::update_chat_preference;
 pub use chat_realtime::api_chat_realtime;
+pub use chat_search::{api_chat_search, api_group_search};
 pub use groups::{
     add_group_members, api_group_delete, api_group_edit, api_group_media, api_group_messages,
     api_group_react, api_group_send, api_group_send_image, api_group_send_voice, create_group,

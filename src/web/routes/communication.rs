@@ -1,13 +1,13 @@
 use super::super::handlers::{
     add_group_members, api_chat_block, api_chat_block_status, api_chat_conversations,
     api_chat_delete, api_chat_edit, api_chat_media, api_chat_messages, api_chat_peer,
-    api_chat_react, api_chat_realtime, api_chat_send, api_chat_send_image, api_chat_send_voice,
-    api_chat_unblock, api_group_delete, api_group_edit, api_group_media, api_group_messages,
-    api_group_react, api_group_send, api_group_send_image, api_group_send_voice,
-    api_start_direct_chat, chat_page, contact_requests_page, create_group, group_chat_page,
-    group_members_page, leave_group, messages_page, new_group_page, remove_group_member,
-    rename_group, retired_contact_decision, transfer_group_ownership, update_chat_preference,
-    update_group_member_role,
+    api_chat_react, api_chat_realtime, api_chat_search, api_chat_send, api_chat_send_image,
+    api_chat_send_voice, api_chat_unblock, api_group_delete, api_group_edit, api_group_media,
+    api_group_messages, api_group_react, api_group_search, api_group_send, api_group_send_image,
+    api_group_send_voice, api_start_direct_chat, chat_page, contact_requests_page, create_group,
+    group_chat_page, group_members_page, leave_group, messages_page, new_group_page,
+    remove_group_member, rename_group, retired_contact_decision, transfer_group_ownership,
+    update_chat_preference, update_group_member_role,
 };
 use crate::state::app_state::AppState;
 use axum::{
@@ -57,6 +57,7 @@ pub(super) fn routes() -> Router<AppState> {
         )
         .route("/app/group/{group_id}/leave", post(leave_group))
         .route("/api/group/{group_id}/messages", get(api_group_messages))
+        .route("/api/group/{group_id}/search", get(api_group_search))
         .route("/api/group/{group_id}/send", post(api_group_send))
         .route(
             "/api/group/{group_id}/send-image",
@@ -81,6 +82,7 @@ pub(super) fn routes() -> Router<AppState> {
         )
         .route("/api/chat/conversations", get(api_chat_conversations))
         .route("/api/chat/{other_user_id}/messages", get(api_chat_messages))
+        .route("/api/chat/{other_user_id}/search", get(api_chat_search))
         .route("/api/chat/{other_user_id}/peer", get(api_chat_peer))
         .route("/api/chat/realtime", get(api_chat_realtime))
         .route("/api/chat/{other_user_id}/send", post(api_chat_send))

@@ -858,6 +858,31 @@ fn render_chat_thread(
 
 <section class="card chat-shell">
 
+    <section id="chat-search-panel"
+             class="chat-search-panel"
+             aria-label="{search_label}"
+             hidden>
+        <form id="chat-search-form" class="chat-search-form" role="search">
+            <span class="chat-search-icon" aria-hidden="true">⌕</span>
+            <input id="chat-search-input"
+                   type="search"
+                   minlength="2"
+                   maxlength="100"
+                   autocomplete="off"
+                   enterkeyhint="search"
+                   placeholder="{search_placeholder}"
+                   aria-label="{search_label}">
+            <button id="chat-search-close"
+                    type="button"
+                    aria-label="{close_label}">×</button>
+        </form>
+        <div id="chat-search-status"
+             class="chat-search-status"
+             aria-live="polite"></div>
+        <div id="chat-search-results"
+             class="chat-search-results"></div>
+    </section>
+
     <div class="chat-history-toolbar">
         <button id="chat-load-older"
                 type="button"
@@ -910,13 +935,18 @@ fn render_chat_thread(
 
 <script src="{chat_voice_js}" defer></script>
 <script src="{chat_js}" defer></script>
+<script src="{chat_search_js}" defer></script>
 <script src="{chat_blocks_js}" defer></script>
 
 "#,
             chat_css = static_asset("chat-v2.css"),
             chat_voice_js = static_asset("chat-voice-player.js"),
             chat_js = static_asset("chat-v2.js"),
+            chat_search_js = static_asset("chat-search.js"),
             chat_blocks_js = static_asset("chat-blocks.js"),
+            search_label = escape_html(&crate::i18n::t("nav_search")),
+            search_placeholder = escape_html(&crate::i18n::t("search_what")),
+            close_label = escape_html(&crate::i18n::t("chat_close")),
             other_user_id = other_user_id,
             group_id_attr = if group_id > 0 {
                 group_id.to_string()
@@ -972,6 +1002,11 @@ fn render_chat_thread(
                 ⋮
             </button>
             <div id="chat-header-menu" class="chat-header-menu" hidden>
+                <button id="chat-search-toggle"
+                        type="button"
+                        class="chat-sound-toggle">
+                    {search_label}
+                </button>
                 <button id="chat-sound-toggle"
                         type="button"
                         class="chat-sound-toggle"
@@ -1019,6 +1054,7 @@ fn render_chat_thread(
         } else {
             String::new()
         },
+        search_label = escape_html(&crate::i18n::t("nav_search")),
         display_name = display_name,
         subtitle = subtitle,
         content = content,
