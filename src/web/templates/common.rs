@@ -29,7 +29,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = "5.6.0";
+pub const STATIC_ASSET_VERSION: &str = "5.7.0";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -2272,6 +2272,82 @@ a.feature.rm-feature-add {
     align-items: center;
     gap: 10px;
     min-height: 40px;
+}
+.rm-group-member--managed {
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--panel) 86%, transparent);
+}
+.rm-group-member-copy {
+    display: grid;
+    gap: 7px;
+    min-width: 0;
+}
+.rm-group-member-copy strong {
+    overflow-wrap: anywhere;
+}
+.rm-group-member-meta,
+.rm-group-section-head,
+.rm-group-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.rm-group-section-head {
+    justify-content: space-between;
+}
+.rm-group-role,
+.rm-group-you,
+.rm-group-count {
+    padding: 4px 8px;
+    border-radius: 999px;
+    color: var(--muted);
+    background: var(--surface);
+    font-size: 12px;
+    font-weight: 750;
+}
+.rm-group-role--owner {
+    color: var(--accent);
+}
+.rm-group-role--admin {
+    color: var(--success);
+}
+.rm-group-actions {
+    justify-content: flex-end;
+    max-width: 52%;
+}
+.rm-group-action {
+    min-height: 34px;
+    padding: 6px 9px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: var(--text);
+    background: var(--surface);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 750;
+    cursor: pointer;
+}
+.rm-group-action--danger,
+.ui-button--danger {
+    color: var(--danger);
+}
+.ui-button--secondary {
+    background: var(--surface);
+    color: var(--text);
+}
+@media (max-width: 560px) {
+    .rm-group-member--managed {
+        display: grid;
+    }
+    .rm-group-actions {
+        justify-content: flex-start;
+        max-width: none;
+    }
 }
 
 .rm-me-name-wrap {

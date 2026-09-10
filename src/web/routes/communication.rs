@@ -5,7 +5,8 @@ use super::super::handlers::{
     api_chat_unblock, api_group_delete, api_group_edit, api_group_media, api_group_messages,
     api_group_react, api_group_send, api_group_send_image, api_group_send_voice,
     api_start_direct_chat, chat_page, contact_requests_page, create_group, group_chat_page,
-    group_members_page, leave_group, messages_page, new_group_page, retired_contact_decision,
+    group_members_page, leave_group, messages_page, new_group_page, remove_group_member,
+    rename_group, retired_contact_decision, transfer_group_ownership, update_group_member_role,
 };
 use crate::state::app_state::AppState;
 use axum::{
@@ -36,6 +37,19 @@ pub(super) fn routes() -> Router<AppState> {
         .route("/app/group/{group_id}", get(group_chat_page))
         .route("/app/group/{group_id}/members", get(group_members_page))
         .route("/app/group/{group_id}/members", post(add_group_members))
+        .route("/app/group/{group_id}/settings/name", post(rename_group))
+        .route(
+            "/app/group/{group_id}/members/{member_id}/role",
+            post(update_group_member_role),
+        )
+        .route(
+            "/app/group/{group_id}/members/{member_id}/owner",
+            post(transfer_group_ownership),
+        )
+        .route(
+            "/app/group/{group_id}/members/{member_id}/remove",
+            post(remove_group_member),
+        )
         .route("/app/group/{group_id}/leave", post(leave_group))
         .route("/api/group/{group_id}/messages", get(api_group_messages))
         .route("/api/group/{group_id}/send", post(api_group_send))
