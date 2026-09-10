@@ -1172,7 +1172,7 @@ pub struct GroupMembersPage<'a> {
     pub name: &'a str,
     pub description: &'a str,
     pub viewer_role: &'a str,
-    pub members: Vec<(i64, String, String)>,
+    pub members: Vec<(i64, String, String, i64)>,
     pub candidates: Vec<(i64, String)>,
     pub error: &'a str,
 }
@@ -1196,9 +1196,10 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
     } else {
         let is_owner = viewer_role == "owner";
         let can_manage = is_owner || viewer_role == "admin";
+        let now = chrono::Utc::now().timestamp();
         let list = members
             .iter()
-            .map(|(id, member, role)| {
+            .map(|(id, member, role, muted_until)| {
                 let role_label = match role.as_str() {
                     "owner" => "Владелец",
                     "admin" => "Администратор",
@@ -1245,13 +1246,45 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
                 } else {
                     String::new()
                 };
+                let can_moderate = *id != viewer_user_id
+                    && ((viewer_role == "owner" && role != "owner")
+                        || (viewer_role == "admin" && role == "member"));
+                let is_muted = *muted_until > now;
+                let mute_action = if !can_moderate {
+                    String::new()
+                } else if is_muted {
+                    format!(
+                        r#"<form method="post" action="/app/group/{group_id}/members/{id}/mute">
+    <input type="hidden" name="seconds" value="0">
+    <button type="submit" class="rm-group-action">Разрешить писать</button>
+</form>"#
+                    )
+                } else {
+                    format!(
+                        r#"<form method="post" action="/app/group/{group_id}/members/{id}/mute" class="rm-group-mute-form">
+    <select name="seconds" class="ui-input" aria-label="Срок ограничения">
+        <option value="600">10 минут</option>
+        <option value="3600">1 час</option>
+        <option value="86400">24 часа</option>
+        <option value="604800">7 дней</option>
+        <option value="2592000">30 дней</option>
+    </select>
+    <button type="submit" class="rm-group-action">Ограничить</button>
+</form>"#
+                    )
+                };
+                let mute_status = if is_muted {
+                    r#"<span class="rm-group-you">Не может писать</span>"#
+                } else {
+                    ""
+                };
                 format!(
                     r#"<article class="rm-group-member rm-group-member--managed">
     <div class="rm-group-member-copy">
         <strong>{member}</strong>
-        <div class="rm-group-member-meta"><span class="rm-group-role rm-group-role--{role}">{role_label}</span>{you}</div>
+        <div class="rm-group-member-meta"><span class="rm-group-role rm-group-role--{role}">{role_label}</span>{you}{mute_status}</div>
     </div>
-    <div class="rm-group-actions">{role_action}{transfer_action}{remove_action}</div>
+    <div class="rm-group-actions">{role_action}{transfer_action}{mute_action}{remove_action}</div>
 </article>"#,
                     member = escape_html(member),
                 )

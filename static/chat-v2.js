@@ -1440,6 +1440,12 @@
             if (code === "rate_limited") {
                 return t("chat_rate_limited", "Слишком часто · подождите");
             }
+            if (code === "member_muted") {
+                return t(
+                    "chat_member_muted",
+                    "Отправка временно ограничена администратором"
+                );
+            }
             if (error && error.status === 403) {
                 return t("chat_send_unavailable", "Отправка недоступна");
             }
@@ -2072,6 +2078,12 @@
             }
             if (code === "invalid_reply") {
                 return t("chat_reply_unavailable", "Сообщение для ответа уже недоступно");
+            }
+            if (code === "member_muted") {
+                return t(
+                    "chat_member_muted",
+                    "Отправка временно ограничена администратором"
+                );
             }
             if (code === "image_too_large") {
                 return t("chat_photo_over_8mb", "Фото больше 8 МБ");
@@ -4433,7 +4445,8 @@
                 Number(message.deleted_at) > 0;
 
             editButton.hidden = !messageCanBeEdited(message);
-            deleteButton.hidden = !mine || deleted;
+            deleteButton.hidden =
+                deleted || (!mine && !(isGroup && canManagePins));
 
             if (forwardButton) {
                 forwardButton.hidden = deleted;

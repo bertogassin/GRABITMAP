@@ -405,6 +405,20 @@
     font-size: 24px;
     opacity: 0.55;
 }
+
+.rm-group-mute-form {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.rm-group-mute-form .ui-input {
+    font-size: 13px;
+    min-height: 36px;
+    padding: 6px 9px;
+    width: auto;
+}
 .chat-secondary-button {
     min-height: 34px;
     padding: 0 13px;

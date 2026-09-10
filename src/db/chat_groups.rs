@@ -50,6 +50,7 @@ pub fn initialize(conn: &Connection) -> Result<()> {
             joined_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
             role TEXT NOT NULL DEFAULT 'member'
                 CHECK (role IN ('owner', 'admin', 'member')),
+            muted_until INTEGER NOT NULL DEFAULT 0,
             PRIMARY KEY (group_id, user_id)
         )",
         [],
@@ -103,6 +104,17 @@ pub fn initialize(conn: &Connection) -> Result<()> {
          ADD COLUMN role TEXT NOT NULL DEFAULT 'member'",
         [],
     );
+    let _ = tx.execute(
+        "ALTER TABLE chat_group_members
+         ADD COLUMN muted_until INTEGER NOT NULL DEFAULT 0",
+        [],
+    );
+
+    tx.execute(
+        "CREATE INDEX IF NOT EXISTS idx_chat_group_members_mute
+         ON chat_group_members(group_id, muted_until)",
+        [],
+    )?;
 
     tx.execute_batch(
         "UPDATE chat_groups
@@ -258,6 +270,16 @@ mod tests {
             )
             .expect("fallback owner");
         assert_eq!(fallback_owner, 20);
+
+        let muted_until: i64 = connection
+            .query_row(
+                "SELECT muted_until FROM chat_group_members
+                 WHERE group_id = 7 AND user_id = 12",
+                [],
+                |row| row.get(0),
+            )
+            .expect("migrated mute state");
+        assert_eq!(muted_until, 0);
         let invite_nonce: String = connection
             .query_row(
                 "SELECT invite_nonce FROM chat_groups WHERE id = 7",

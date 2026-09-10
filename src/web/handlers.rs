@@ -32,7 +32,7 @@ pub use groups::{
     create_group_invite, delete_group_avatar, get_group_avatar, group_chat_page, group_invite_page,
     group_members_page, join_group_invite, leave_group, new_group_page, remove_group_member,
     rename_group, revoke_group_invite, set_group_avatar, transfer_group_ownership,
-    update_group_member_role,
+    update_group_member_mute, update_group_member_role,
 };
 
 mod profiles;
