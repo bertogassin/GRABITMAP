@@ -12,7 +12,8 @@ pub fn initialize(conn: &Connection) -> Result<()> {
             updated_at INTEGER NOT NULL DEFAULT 0,
             invite_nonce TEXT NOT NULL DEFAULT '',
             description TEXT NOT NULL DEFAULT '',
-            avatar_path TEXT NOT NULL DEFAULT ''
+            avatar_path TEXT NOT NULL DEFAULT '',
+            member_count INTEGER NOT NULL DEFAULT 0
         )",
         [],
     )?;
@@ -42,6 +43,13 @@ pub fn initialize(conn: &Connection) -> Result<()> {
          ADD COLUMN avatar_path TEXT NOT NULL DEFAULT ''",
         [],
     );
+    let member_count_added = tx
+        .execute(
+            "ALTER TABLE chat_groups
+             ADD COLUMN member_count INTEGER NOT NULL DEFAULT 0",
+            [],
+        )
+        .is_ok();
 
     tx.execute_batch(
         "CREATE TABLE IF NOT EXISTS chat_group_scopes (
@@ -74,6 +82,34 @@ pub fn initialize(conn: &Connection) -> Result<()> {
         "CREATE INDEX IF NOT EXISTS idx_chat_group_members_user
          ON chat_group_members(user_id, joined_at)",
         [],
+    )?;
+
+    if member_count_added {
+        tx.execute(
+            "UPDATE chat_groups
+             SET member_count = (
+                SELECT COUNT(*) FROM chat_group_members AS member
+                WHERE member.group_id = chat_groups.id
+             )",
+            [],
+        )?;
+    }
+    tx.execute_batch(
+        "CREATE TRIGGER IF NOT EXISTS chat_group_member_count_insert
+         AFTER INSERT ON chat_group_members
+         BEGIN
+             UPDATE chat_groups
+             SET member_count = member_count + 1
+             WHERE id = NEW.group_id;
+         END;
+
+         CREATE TRIGGER IF NOT EXISTS chat_group_member_count_delete
+         AFTER DELETE ON chat_group_members
+         BEGIN
+             UPDATE chat_groups
+             SET member_count = MAX(member_count - 1, 0)
+             WHERE id = OLD.group_id;
+         END;",
     )?;
 
     tx.execute(
@@ -318,6 +354,35 @@ mod tests {
             )
             .expect("group identity columns");
         assert_eq!(identity, (String::new(), String::new()));
+        let member_count: i64 = connection
+            .query_row(
+                "SELECT member_count FROM chat_groups WHERE id = 7",
+                [],
+                |row| row.get(0),
+            )
+            .expect("backfilled member count");
+        assert_eq!(member_count, 2);
+        connection
+            .execute(
+                "INSERT INTO chat_group_members (group_id, user_id, joined_at)
+                 VALUES (7, 13, 102)",
+                [],
+            )
+            .expect("member count insert trigger");
+        connection
+            .execute(
+                "DELETE FROM chat_group_members WHERE group_id = 7 AND user_id = 13",
+                [],
+            )
+            .expect("member count delete trigger");
+        let member_count: i64 = connection
+            .query_row(
+                "SELECT member_count FROM chat_groups WHERE id = 7",
+                [],
+                |row| row.get(0),
+            )
+            .expect("maintained member count");
+        assert_eq!(member_count, 2);
         assert!(connection
             .execute(
                 "UPDATE chat_group_members SET role = 'invalid' WHERE group_id = 7 AND user_id = 12",

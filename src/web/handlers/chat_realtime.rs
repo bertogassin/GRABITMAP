@@ -64,6 +64,24 @@ fn direct_typing_is_allowed(
         .is_ok()
 }
 
+fn user_is_group_member(state: &AppState, user_id: i64, group_id: i64) -> bool {
+    if user_id <= 0 || group_id <= 0 {
+        return false;
+    }
+    crate::db::pool::get_connection(&state.db_pool)
+        .ok()
+        .is_some_and(|connection| {
+            connection
+                .query_row(
+                    "SELECT 1 FROM chat_group_members
+                     WHERE group_id = ?1 AND user_id = ?2",
+                    rusqlite::params![group_id, user_id],
+                    |_| Ok(()),
+                )
+                .is_ok()
+        })
+}
+
 fn handle_client_frame(state: &AppState, user_id: i64, text: &str) -> bool {
     let frame = match serde_json::from_str::<ClientFrame>(text) {
         Ok(frame) => frame,
@@ -106,27 +124,30 @@ fn handle_client_frame(state: &AppState, user_id: i64, text: &str) -> bool {
             let Some(actor_name) = actor_name else {
                 return false;
             };
-            let member_ids = connection
-                .prepare(
-                    "SELECT user_id FROM chat_group_members
-                     WHERE group_id = ?1 ORDER BY user_id LIMIT 251",
-                )
-                .and_then(|mut statement| {
-                    statement
-                        .query_map(rusqlite::params![group_id], |row| row.get::<_, i64>(0))?
-                        .collect::<Result<Vec<_>, _>>()
-                })
-                .unwrap_or_default();
-            if member_ids.len() > 250 {
-                return false;
+            if super::official_groups::is_official_group(&connection, group_id) {
+                let _ = state.publish_membership_scoped_group_typing_event(
+                    &frame.frame_type,
+                    user_id,
+                    group_id,
+                    &actor_name,
+                );
+            } else {
+                let member_ids = connection
+                    .prepare("SELECT user_id FROM chat_group_members WHERE group_id = ?1")
+                    .and_then(|mut statement| {
+                        statement
+                            .query_map(rusqlite::params![group_id], |row| row.get::<_, i64>(0))?
+                            .collect::<Result<Vec<_>, _>>()
+                    })
+                    .unwrap_or_default();
+                let _ = state.publish_group_typing_event(
+                    &frame.frame_type,
+                    user_id,
+                    group_id,
+                    &member_ids,
+                    &actor_name,
+                );
             }
-            let _ = state.publish_group_typing_event(
-                &frame.frame_type,
-                user_id,
-                group_id,
-                &member_ids,
-                &actor_name,
-            );
             false
         }
         _ => false,
@@ -245,7 +266,10 @@ async fn chat_socket(mut socket: WebSocket, state: AppState, user_id: i64, last_
             event = events.recv() => {
                 match event {
                     Ok(event) => {
-                        if !event.includes_user(user_id) {
+                        if !(event.includes_user(user_id)
+                            || event.membership_scoped
+                                && user_is_group_member(&state, user_id, event.group_id))
+                        {
                             continue;
                         }
 
@@ -282,7 +306,11 @@ async fn chat_socket(mut socket: WebSocket, state: AppState, user_id: i64, last_
             typing = typing_events.recv() => {
                 match typing {
                     Ok(event) => {
-                        if !event.is_visible_to(user_id) {
+                        if event.actor_user_id == user_id
+                            || !(event.is_visible_to(user_id)
+                                || event.membership_scoped
+                                    && user_is_group_member(&state, user_id, event.group_id))
+                        {
                             continue;
                         }
 

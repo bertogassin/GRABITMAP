@@ -495,7 +495,8 @@ test("group typing is membership scoped and names the active participant", async
   assert.match(realtime, /chat_group_members AS member/);
   assert.match(realtime, /direct_typing_is_allowed/);
   assert.match(realtime, /users_are_blocked/);
-  assert.match(realtime, /LIMIT 251/);
+  assert.match(realtime, /publish_membership_scoped_group_typing_event/);
+  assert.match(realtime, /user_is_group_member/);
   assert.match(chat, /group_id: groupId/);
   assert.match(chat, /updateGroupTyping/);
   assert.match(chat, /peerTypingName/);
@@ -629,7 +630,7 @@ test("official group directory is hierarchical, automatic, and opt-in", async ()
     readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
   ]);
 
-  assert.match(handler, /OFFICIAL_GROUP_MAX_MEMBERS/);
+  assert.doesNotMatch(handler, /OFFICIAL_GROUP_MAX_MEMBERS/);
   assert.match(handler, /request_is_cross_site/);
   assert.match(handler, /fn ensure_official_group/);
   assert.match(handler, /TransactionBehavior::Immediate/);
@@ -640,6 +641,30 @@ test("official group directory is hierarchical, automatic, and opt-in", async ()
   assert.match(template, /Мир → континент → страна → город/);
   assert.match(template, /Готова к первому участнику/);
   assert.match(template, /запускается автоматически при первом вступлении/);
+});
+
+test("official group delivery avoids per-member sender fanout", async () => {
+  const [state, groups, realtime, pins, database, directory] = await Promise.all([
+    readFile(new URL("src/state/app_state.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/chat_realtime.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/chat_pins.rs", root), "utf8"),
+    readFile(new URL("src/db/chat_groups.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/official_groups.rs", root), "utf8"),
+  ]);
+
+  assert.match(state, /publish_membership_scoped_group_chat_event/);
+  assert.match(state, /publish_membership_scoped_group_typing_event/);
+  assert.match(groups, /is_official_group\(db, group_id\)/);
+  assert.match(groups, /public groups do not[\s\S]*aggregate millions of cursors/);
+  assert.match(groups, /SELECT member_count FROM chat_groups/);
+  assert.match(realtime, /user_is_group_member/);
+  assert.match(pins, /publish_membership_scoped_group_chat_event/);
+  assert.match(database, /member_count INTEGER NOT NULL DEFAULT 0/);
+  assert.match(database, /chat_group_member_count_insert/);
+  assert.match(database, /chat_group_member_count_delete/);
+  assert.match(directory, /group_row\.member_count/);
+  assert.doesNotMatch(directory, /COUNT\(member\.user_id\)/);
 });
 
 test("official group governance follows active geographic administration", async () => {
