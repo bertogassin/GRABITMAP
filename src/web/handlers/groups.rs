@@ -3019,6 +3019,26 @@ mod tests {
     }
 
     #[test]
+    fn member_can_read_group_history_from_before_joining() {
+        let connection = group_database();
+        connection
+            .execute_batch(
+                "INSERT INTO chat_group_members (group_id, user_id, joined_at)
+                 VALUES (7, 2, 200);
+                 INSERT INTO group_messages (
+                    id, group_id, sender_user_id, message, created_at
+                 ) VALUES (10, 7, 1, 'История группы', 100);",
+            )
+            .expect("history visibility fixtures");
+
+        let messages = load_group_messages(&connection, 7, 2, 0, 0, 100);
+
+        assert_eq!(messages.len(), 1);
+        assert_eq!(messages[0].message, "История группы");
+        assert!(messages[0].created_at < 200);
+    }
+
+    #[test]
     fn group_delivery_ticks_distinguish_one_reader_from_every_reader() {
         let connection = group_database();
         connection

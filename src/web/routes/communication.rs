@@ -6,11 +6,11 @@ use super::super::handlers::{
     api_group_media, api_group_messages, api_group_pin, api_group_pinned, api_group_react,
     api_group_search, api_group_send, api_group_send_image, api_group_send_voice,
     api_start_direct_chat, chat_page, contact_requests_page, create_group, create_group_invite,
-    delete_group_avatar, get_group_avatar, group_chat_page, group_invite_page, group_members_page,
-    join_group_invite, leave_group, messages_page, new_group_page, remove_group_member,
-    rename_group, retired_contact_decision, revoke_group_invite, set_group_avatar,
-    transfer_group_ownership, update_chat_preference, update_group_member_mute,
-    update_group_member_role,
+    create_official_group, delete_group_avatar, get_group_avatar, group_chat_page,
+    group_invite_page, group_members_page, join_group_invite, join_official_group, leave_group,
+    messages_page, new_group_page, official_groups_page, remove_group_member, rename_group,
+    retired_contact_decision, revoke_group_invite, set_group_avatar, transfer_group_ownership,
+    update_chat_preference, update_group_member_mute, update_group_member_role,
 };
 use crate::state::app_state::AppState;
 use axum::{
@@ -42,6 +42,15 @@ pub(super) fn routes() -> Router<AppState> {
         )
         .route("/app/groups/new", get(new_group_page))
         .route("/app/groups", post(create_group))
+        .route("/app/official-groups", get(official_groups_page))
+        .route(
+            "/app/official-groups/{scope_type}/{scope_id}/create",
+            post(create_official_group),
+        )
+        .route(
+            "/app/official-groups/{scope_type}/{scope_id}/join",
+            post(join_official_group),
+        )
         .route(
             "/app/group-invite/{token}",
             get(group_invite_page).post(join_group_invite),

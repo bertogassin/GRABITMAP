@@ -3258,3 +3258,63 @@ html[dir="rtl"] .chat-message-more {
         min-width: min(76vw, 290px);
     }
 }
+
+.official-group-current,
+.official-group-note {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.official-group-current h2 {
+    margin: 0;
+}
+
+.official-group-current--empty {
+    border-style: dashed;
+}
+
+.official-group-note span {
+    color: var(--muted);
+    line-height: 1.45;
+}
+
+.official-group-directory {
+    display: grid;
+    gap: 12px;
+}
+
+.official-group-search {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+}
+
+.official-group-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.official-group-place {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+.official-group-place .card-content {
+    display: grid;
+    gap: 4px;
+}
+
+@media (max-width: 420px) {
+    .inbox-head-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .official-group-search {
+        grid-template-columns: 1fr;
+    }
+}
