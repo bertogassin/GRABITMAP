@@ -557,6 +557,29 @@ test("group identity supports private avatars and bounded descriptions", async (
   assert.match(inbox, /conversation\.has_avatar && groupId/);
 });
 
+test("pinned messages are scoped, authorized, and reveal their source", async () => {
+  const [database, handlers, routes, chat, css] = await Promise.all([
+    readFile(new URL("src/db/chat_pins.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/chat_pins.rs", root), "utf8"),
+    readFile(new URL("src/web/routes/communication.rs", root), "utf8"),
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("static/chat-v2.css", root), "utf8"),
+  ]);
+
+  assert.match(database, /PRIMARY KEY \(chat_kind, target_id\)/);
+  assert.match(database, /CHECK \(chat_kind IN \('direct', 'group'\)\)/);
+  assert.match(handlers, /request_is_cross_site/);
+  assert.match(handlers, /can_manage_group_pins/);
+  assert.match(handlers, /message\.conversation_id = \?2/);
+  assert.match(handlers, /message\.group_id = \?2/);
+  assert.match(routes, /\/api\/chat\/\{other_user_id\}\/pinned/);
+  assert.match(routes, /\/api\/group\/\{group_id\}\/pinned/);
+  assert.match(chat, /function loadPinned/);
+  assert.match(chat, /resursmapRevealChatMessage\(pinnedMessageId\)/);
+  assert.match(chat, /data-chat-action="pin"/);
+  assert.match(css, /\.chat-pinned-banner\[hidden\]/);
+});
+
 test("user-facing copy no longer calls listings resources", async () => {
   const visibleFiles = [
     "static/share.js",

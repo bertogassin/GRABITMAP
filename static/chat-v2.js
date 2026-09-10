@@ -2846,6 +2846,22 @@
         var refreshFallbackTimer = null;
         var lastTapAt = 0;
         var lastTapMessageId = 0;
+        var pinnedMessageId = 0;
+        var canManagePins = !isGroup;
+
+        var pinnedBanner = document.createElement("button");
+        pinnedBanner.id = "chat-pinned-banner";
+        pinnedBanner.className = "chat-pinned-banner";
+        pinnedBanner.type = "button";
+        pinnedBanner.hidden = true;
+        pinnedBanner.innerHTML =
+            '<span class="chat-pinned-icon" aria-hidden="true">📌</span>' +
+            '<span class="chat-pinned-copy">' +
+                '<strong>' + t("chat_pinned_message", "Закреплённое сообщение") + '</strong>' +
+                '<small id="chat-pinned-preview"></small>' +
+            '</span>' +
+            '<span class="chat-pinned-open" aria-hidden="true">›</span>';
+        history.parentNode.insertBefore(pinnedBanner, history);
 
         var replyBar = document.getElementById("chat-reply-bar");
         var replyText =
@@ -2904,6 +2920,12 @@
                     '<button type="button" ' +
                         'data-chat-action="forward">' +
                         '<span>↪</span>' + t("chat_forward", "Переслать") +
+                    '</button>' +
+                    '<button type="button" ' +
+                        'data-chat-action="pin">' +
+                        '<span>📌</span><span data-chat-pin-label>' +
+                            t("chat_pin", "Закрепить") +
+                        '</span>' +
                     '</button>' +
                     '<button type="button" ' +
                         'data-chat-action="edit">' +
@@ -3626,6 +3648,66 @@
             });
         }
 
+        function pinnedPreview(message) {
+            var text = String(message.message || "").trim();
+            if (text) {
+                return shortText(text, 100);
+            }
+            if (message.attachment_kind === "image") {
+                return t("chat_photo", "Фото");
+            }
+            if (message.attachment_kind === "voice") {
+                return t("chat_voice", "Голосовое сообщение");
+            }
+            return t("chat_message", "Сообщение");
+        }
+
+        function applyPinned(data) {
+            canManagePins = Boolean(data.can_manage_pins);
+            var message = data.pinned || null;
+            pinnedMessageId = message ? Number(message.id || 0) : 0;
+            if (!message || pinnedMessageId <= 0) {
+                pinnedBanner.hidden = true;
+                return;
+            }
+            var preview = document.getElementById("chat-pinned-preview");
+            if (preview) {
+                var sender = String(message.sender_name || "").trim();
+                preview.textContent = sender
+                    ? sender + ": " + pinnedPreview(message)
+                    : pinnedPreview(message);
+            }
+            pinnedBanner.hidden = false;
+        }
+
+        function loadPinned() {
+            return requestJson(chatApi("/pinned"))
+                .then(applyPinned)
+                .catch(function () {
+                    // The conversation remains usable if the banner cannot refresh.
+                });
+        }
+
+        function togglePin(message) {
+            var id = Number(message && message.id || 0);
+            if (id <= 0 || !canManagePins) {
+                return Promise.reject(new Error("pin_not_allowed"));
+            }
+            return requestJson(
+                chatApi("/messages/" + id + "/pin"),
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ pinned: pinnedMessageId !== id })
+                }
+            ).then(function (data) {
+                applyPinned({
+                    pinned: data.pinned || null,
+                    can_manage_pins: canManagePins
+                });
+            });
+        }
+
         function messageText(message) {
             if (Number(message.deleted_at) > 0) {
                 return t("chat_deleted", "Сообщение удалено");
@@ -4342,6 +4424,9 @@
             var forwardButton = sheet.querySelector(
                 '[data-chat-action="forward"]'
             );
+            var pinButton = sheet.querySelector(
+                '[data-chat-action="pin"]'
+            );
 
             var mine = Boolean(message.is_mine);
             var deleted =
@@ -4352,6 +4437,16 @@
 
             if (forwardButton) {
                 forwardButton.hidden = deleted;
+            }
+
+            if (pinButton) {
+                pinButton.hidden = deleted || !canManagePins;
+                var pinLabel = pinButton.querySelector("[data-chat-pin-label]");
+                if (pinLabel) {
+                    pinLabel.textContent = Number(message.id) === pinnedMessageId
+                        ? t("chat_unpin", "Открепить")
+                        : t("chat_pin", "Закрепить");
+                }
             }
 
             var reactionsRow =
@@ -4625,6 +4720,13 @@
                         });
                 } else if (action.dataset.chatAction === "forward") {
                     openForwardPicker(selectedMessage);
+                } else if (action.dataset.chatAction === "pin") {
+                    togglePin(selectedMessage)
+                        .then(closeSheet)
+                        .catch(function () {
+                            reportActionError();
+                            closeSheet();
+                        });
                 } else if (action.dataset.chatAction === "react") {
                     reactToMessage(
                         selectedMessage,
@@ -4770,6 +4872,9 @@
                             data.deleted_at;
                         selectedMessage.edited_at = 0;
                         renderMessage(selectedMessage);
+                        if (Number(selectedMessage.id) === pinnedMessageId) {
+                            loadPinned();
+                        }
                         closeDelete();
                     })
                     .catch(function () {
@@ -4808,6 +4913,7 @@
             "resursmap:chat-realtime-sync",
             function () {
                 refreshRecentDebounced();
+                loadPinned();
             }
         );
 
@@ -4818,12 +4924,23 @@
                     document.visibilityState === "visible"
                 ) {
                     refreshRecentDebounced();
+                    loadPinned();
                 }
             }
         );
 
+        pinnedBanner.addEventListener("click", function () {
+            if (
+                pinnedMessageId > 0 &&
+                typeof window.resursmapRevealChatMessage === "function"
+            ) {
+                window.resursmapRevealChatMessage(pinnedMessageId);
+            }
+        });
+
         prepareSharedListingDraft();
         hydrateSsrMessages();
+        loadPinned();
 
         refreshFallbackTimer = window.setInterval(
             refreshRecent,

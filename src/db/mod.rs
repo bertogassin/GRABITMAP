@@ -1,6 +1,7 @@
 pub mod admin_geography;
 pub mod admin_v2;
 pub mod chat_groups;
+pub mod chat_pins;
 pub mod chat_preferences;
 pub mod geography_countries;
 pub mod geography_v2;
