@@ -126,6 +126,26 @@ test("chat photo viewer is isolated, keyboard accessible, and downloadable", asy
   assert.match(css, /\.chat-lightbox-actions/);
 });
 
+test("chat media survives offline sends and retries without duplicates", async () => {
+  const [chat, media] = await Promise.all([
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("src/web/handlers/chat_media.rs", root), "utf8"),
+  ]);
+
+  assert.match(chat, /MEDIA_DB_NAME = "grabit-chat-media-outbox"/);
+  assert.match(chat, /window\.indexedDB\.open/);
+  assert.match(chat, /mediaOutboxWrite\(item\)/);
+  assert.match(chat, /mediaOutboxLoad\(\)/);
+  assert.match(chat, /mediaOutboxDelete\(item\.clientMessageId\)/);
+  assert.match(chat, /formData\.append\("client_message_id", item\.clientMessageId\)/);
+  assert.match(chat, /item\.state = "failed"/);
+  assert.match(chat, /flushMediaQueue\(\)/);
+  assert.doesNotMatch(chat, /фото нельзя отправить офлайн/iu);
+  assert.doesNotMatch(chat, /голосовое нельзя отправить офлайн/iu);
+  assert.match(media, /INSERT OR IGNORE INTO messages/);
+  assert.match(media, /media_retries_keep_one_message_per_client_id/);
+});
+
 test("production compose keeps Caddy in front of the private app", async () => {
   const [compose, caddy] = await Promise.all([
     readFile(new URL("docker-compose.prod.yml", root), "utf8"),
@@ -178,7 +198,7 @@ test("chat has one active submit owner and accepts practical voice sizes", async
     readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
   ]);
   assert.match(chat, /if \(form\.dataset\.chatCoreReady === "1"\) \{\s*return;/);
-  assert.match(chat, /voice\." \+ extension/);
+  assert.match(chat, /field \+ "\." \+ extension/);
   assert.match(chat, /voice_too_large/);
   assert.match(media, /MAX_VOICE_BYTES: usize = 8 \* 1024 \* 1024/);
   assert.match(groups, /bytes\.len\(\) > MAX_VOICE_BYTES/);
