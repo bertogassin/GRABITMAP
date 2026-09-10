@@ -140,6 +140,32 @@
             return t(key, fallback, params);
         }
 
+        function labelAction(button, key, fallback) {
+            if (!button) {
+                return;
+            }
+            var label = t(key, fallback);
+            var text = button.querySelector(".chat-action-label");
+            if (text) {
+                text.textContent = label;
+            }
+            button.setAttribute("aria-label", label);
+            button.title = label;
+        }
+
+        var messageLabel = t("chat_message", "Сообщение");
+        input.placeholder = messageLabel + "…";
+        input.setAttribute("aria-label", messageLabel);
+        labelAction(send, "chat_send_action", "Отправить");
+        loadOlder.textContent = t(
+            "chat_load_older",
+            "Загрузить предыдущие сообщения"
+        );
+        connectionState.textContent = t(
+            "chat_connecting",
+            "Связь восстанавливается…"
+        );
+
         function localizeDeletedText(value) {
             var text = String(value || "");
             if (
@@ -336,24 +362,10 @@
 
         function updatePeerState() {
             if (peerState) {
-                peerState.hidden = false;
-                peerState.classList.remove(
-                    "is-online",
-                    "is-typing"
-                );
-
-                if (peerTyping) {
-                    peerState.innerHTML = typingDotsHtml(t("chat_typing", "печатает…"));
-                    peerState.classList.add("is-typing");
-                } else if (peerOnline) {
-                    peerState.textContent = t("chat_online", "онлайн");
-                    peerState.classList.add("is-online");
-                } else {
-                    peerState.textContent =
-                        peerLastSeenAt > 0
-                            ? tf("chat_last_seen", "был(а) {when}", { when: formatLastSeen(peerLastSeenAt) })
-                            : t("chat_offline", "не в сети");
-                }
+                // Presence already lives in the chat header. Keeping a second
+                // copy beside transport state produced contradictory labels
+                // such as “Reconnecting… · online” on mobile.
+                peerState.hidden = true;
             }
 
             syncHeaderPresence();
@@ -1502,6 +1514,37 @@
 
         var imageInput = document.getElementById("chat-image-input");
         var imageBtn = document.getElementById("chat-image-btn");
+        var mediaSending = false;
+
+        function setMediaSending(active) {
+            mediaSending = Boolean(active);
+            if (imageBtn) {
+                imageBtn.disabled = mediaSending;
+                imageBtn.setAttribute("aria-busy", mediaSending ? "true" : "false");
+            }
+            if (voiceBtn) {
+                voiceBtn.disabled = mediaSending;
+                voiceBtn.setAttribute("aria-busy", mediaSending ? "true" : "false");
+            }
+        }
+
+        function mediaErrorCopy(kind, code) {
+            if (code === "rate_limited") {
+                return t("chat_rate_limited", "Слишком часто · подождите");
+            }
+            if (code === "invalid_reply") {
+                return t("chat_reply_unavailable", "Сообщение для ответа уже недоступно");
+            }
+            if (code === "image_too_large") {
+                return t("chat_photo_over_8mb", "Фото больше 8 МБ");
+            }
+            if (code === "voice_too_large") {
+                return t("chat_voice_too_large", "Запись слишком длинная — максимум 2 минуты");
+            }
+            return kind === "image"
+                ? t("chat_photo_failed", "Фото не отправлено")
+                : t("chat_voice_failed", "Голосовое не отправлено");
+        }
 
         if (!imageInput) {
             imageInput = document.createElement("input");
@@ -1523,7 +1566,12 @@
             }
         }
 
+        labelAction(imageBtn, "chat_photo", "Фото");
+
         imageBtn.addEventListener("click", function () {
+            if (mediaSending) {
+                return;
+            }
             imageInput.click();
         });
 
@@ -1541,6 +1589,7 @@
                 return;
             }
             sendState.textContent = t("chat_compressing_photo", "Сжимаем фото…");
+            setMediaSending(true);
             compressImageFile(file, 1600, 0.82).then(function (readyFile) {
                 if (readyFile.size > 8 * 1024 * 1024) {
                     setConnection(t("chat_photo_over_8mb", "Фото больше 8 МБ"), "is-error");
@@ -1584,13 +1633,17 @@
                         window.resursmapRefreshAttentionBadge();
                     }
                   });
-            }).catch(function () {
+            }).catch(function (error) {
                 setConnection(t("chat_photo_error", "Ошибка фото"), "is-error");
-                sendState.textContent = t("chat_photo_failed", "Фото не отправлено");
+                var code = error && error.message ? error.message : "send_failed";
+                sendState.textContent = mediaErrorCopy("image", code);
+            }).finally(function () {
+                setMediaSending(false);
             });
         });
 
         var voiceBtn = document.getElementById("chat-voice-btn");
+        labelAction(voiceBtn, "chat_voice", "Голосовое");
         var voiceRecording = false;
         var voiceStarting = false;
         var voiceRecorder = null;
@@ -1636,7 +1689,7 @@
             voiceOverlay.hidden = true;
             if (voiceBtn) {
                 voiceBtn.classList.remove("is-recording");
-                voiceBtn.textContent = t("chat_voice", "Голос");
+                labelAction(voiceBtn, "chat_voice", "Голосовое");
                 voiceBtn.disabled = false;
             }
             if (voiceTimerId) {
@@ -1650,7 +1703,7 @@
         }
 
         function sendVoiceBlob(blob, mimeType) {
-            if (!blob || !blob.size) {
+            if (!blob || !blob.size || mediaSending) {
                 return;
             }
             if (navigator.onLine === false) {
@@ -1658,6 +1711,7 @@
                 sendState.textContent = t("chat_no_network", "Нет сети");
                 return;
             }
+            setMediaSending(true);
             var clientMessageId = createClientMessageId();
             var formData = new FormData();
             var extension = mimeType.indexOf("ogg") !== -1
@@ -1705,12 +1759,12 @@
             }).catch(function (error) {
                 setConnection(t("chat_voice_error", "Ошибка голосового"), "is-error");
                 var code = error && error.message ? error.message : "send_failed";
-                sendState.textContent = code === "voice_too_large"
-                    ? t("chat_voice_too_large", "Запись слишком длинная — максимум 2 минуты")
-                    : t("chat_voice_failed", "Голосовое не отправлено") + " (" + code + ")";
+                sendState.textContent = mediaErrorCopy("voice", code);
                 if (typeof window.playChatError === "function") {
                     window.playChatError();
                 }
+            }).finally(function () {
+                setMediaSending(false);
             });
         }
 
@@ -1807,7 +1861,17 @@
                     voiceRecording = true;
                     voiceStartedAt = Date.now();
                     voiceBtn.classList.add("is-recording");
-                    voiceBtn.textContent = t("chat_voice_send", "Отправить");
+                    var voiceLabel = voiceBtn.querySelector(".chat-action-label");
+                    if (voiceLabel) {
+                        voiceLabel.textContent = t("chat_voice_send", "Отправить");
+                    } else {
+                        voiceBtn.textContent = t("chat_voice_send", "Отправить");
+                    }
+                    voiceBtn.setAttribute(
+                        "aria-label",
+                        t("chat_voice_send", "Отправить")
+                    );
+                    voiceBtn.title = t("chat_voice_send", "Отправить");
                     voiceOverlay.hidden = false;
                     updateVoiceTimer();
                     voiceTimerId = window.setInterval(
@@ -3110,6 +3174,32 @@
             var card = document.createElement("a");
             card.className = "chat-listing-card";
             card.href = internalHref(listing.url, "/app");
+
+            var imageUrl = "";
+            try {
+                var candidateImage = new URL(
+                    String(listing.image_url || ""),
+                    window.location.origin
+                );
+                if (
+                    candidateImage.origin === window.location.origin &&
+                    candidateImage.pathname.startsWith("/static/")
+                ) {
+                    imageUrl = candidateImage.pathname + candidateImage.search;
+                }
+            } catch (_) {
+                imageUrl = "";
+            }
+
+            if (imageUrl) {
+                var cover = document.createElement("img");
+                cover.className = "chat-listing-cover";
+                cover.src = imageUrl;
+                cover.alt = "";
+                cover.loading = "lazy";
+                cover.decoding = "async";
+                card.appendChild(cover);
+            }
 
             var brand = document.createElement("div");
             brand.className = "chat-listing-brand";

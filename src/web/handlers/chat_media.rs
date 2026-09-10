@@ -73,6 +73,10 @@ pub(crate) fn media_root() -> PathBuf {
         .unwrap_or_else(|| PathBuf::from("data/chat-media"))
 }
 
+pub(crate) fn media_path_is_safe(relative: &str) -> bool {
+    !relative.trim().is_empty() && !relative.contains("..") && !FsPath::new(relative).is_absolute()
+}
+
 pub(crate) fn detect_image(bytes: &[u8]) -> Option<(&'static str, &'static str)> {
     if bytes.len() >= 3 && bytes[0] == 0xff && bytes[1] == 0xd8 && bytes[2] == 0xff {
         return Some(("image", "image/jpeg"));
@@ -242,7 +246,7 @@ pub async fn api_chat_send_image(
         _ => return json_error(StatusCode::BAD_REQUEST, "image_required"),
     };
     if file_bytes.len() > MAX_IMAGE_BYTES {
-        return json_error(StatusCode::BAD_REQUEST, "image_too_large");
+        return json_error(StatusCode::PAYLOAD_TOO_LARGE, "image_too_large");
     }
     let (kind, mime) = match detect_image(&file_bytes) {
         Some(p) => p,
@@ -489,7 +493,7 @@ pub async fn api_chat_send_voice(
         _ => return json_error(StatusCode::BAD_REQUEST, "voice_required"),
     };
     if file_bytes.len() > MAX_VOICE_BYTES {
-        return json_error(StatusCode::BAD_REQUEST, "voice_too_large");
+        return json_error(StatusCode::PAYLOAD_TOO_LARGE, "voice_too_large");
     }
     let (kind, mime) = match detect_audio(&file_bytes) {
         Some(p) => p,
@@ -667,11 +671,7 @@ pub async fn api_chat_media(
         Ok(r) => r,
         Err(_) => return json_error(StatusCode::NOT_FOUND, "media_not_found"),
     };
-    if deleted_at > 0
-        || relative.trim().is_empty()
-        || relative.contains("..")
-        || FsPath::new(&relative).is_absolute()
-    {
+    if deleted_at > 0 || !media_path_is_safe(&relative) {
         return json_error(StatusCode::NOT_FOUND, "media_not_found");
     }
     let bytes = match fs::read(media_root().join(&relative)) {
@@ -699,4 +699,19 @@ pub async fn api_chat_media(
         HeaderValue::from_static("nosniff"),
     );
     response
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn media_paths_stay_inside_the_private_media_root() {
+        assert!(media_path_is_safe("42/photo.webp"));
+        assert!(media_path_is_safe("groups/7/voice.ogg"));
+        assert!(!media_path_is_safe(""));
+        assert!(!media_path_is_safe("../votes.db"));
+        assert!(!media_path_is_safe("groups/../../votes.db"));
+        assert!(!media_path_is_safe("/etc/passwd"));
+    }
 }

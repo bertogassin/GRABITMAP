@@ -69,6 +69,32 @@ test("background chat polling pauses without overlapping requests", async () => 
   assert.match(chat, /socket !== currentSocket/);
 });
 
+test("chat separates transport health from peer presence", async () => {
+  const chat = await readFile(new URL("static/chat-v2.js", root), "utf8");
+  assert.match(chat, /peerState\.hidden = true/);
+  assert.match(chat, /syncHeaderPresence\(\)/);
+  assert.doesNotMatch(chat, /peerState\.hidden = false/);
+});
+
+test("mobile chat composer keeps media, text, and send in one action row", async () => {
+  const [template, css, chat] = await Promise.all([
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+    readFile(new URL("static/chat-v2.css", root), "utf8"),
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+  ]);
+
+  assert.match(template, /class="chat-action-label">Голос<\/span>/);
+  assert.match(template, /class="chat-action-label">Фото<\/span>/);
+  assert.match(template, /class="chat-action-label">Отправить<\/span>/);
+  assert.match(css, /grid-template-columns:\s*44px 44px minmax\(0, 1fr\) 48px/);
+  assert.match(chat, /labelAction\(send, "chat_send_action", "Отправить"\)/);
+  assert.match(chat, /labelAction\(imageBtn, "chat_photo", "Фото"\)/);
+  assert.match(chat, /labelAction\(voiceBtn, "chat_voice", "Голосовое"\)/);
+  assert.match(chat, /setMediaSending\(true\)/);
+  assert.match(chat, /mediaErrorCopy\("image", code\)/);
+  assert.match(chat, /mediaErrorCopy\("voice", code\)/);
+});
+
 test("production compose keeps Caddy in front of the private app", async () => {
   const [compose, caddy] = await Promise.all([
     readFile(new URL("docker-compose.prod.yml", root), "utf8"),
@@ -264,7 +290,9 @@ test("listing links become safe cards in direct and group chats", async () => {
   assert.match(routes, /\/app\/listing\/\{id\}/);
   assert.match(preview, /moderation_status = 'approved'/);
   assert.match(preview, /is_active = 1/);
+  assert.match(preview, /grabit-share-cover\.png/);
   assert.match(chat, /chat-listing-card/);
+  assert.match(chat, /chat-listing-cover/);
   assert.match(chat, /\/api\/listing\//);
   assert.match(chat, /URLSearchParams\(window\.location\.search\)\.get\("share"\)/);
   assert.match(inbox, /shareUrl\.searchParams\.set\("share", shareListingId\)/);

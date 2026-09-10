@@ -2,9 +2,9 @@ use super::auth::verify_user_session;
 use super::chat::load_user_conversations;
 use super::chat_api::{message_can_be_edited, message_is_valid, reaction_emoji_is_allowed};
 use super::chat_media::{
-    detect_audio, detect_image, extension_for_mime, media_root, MAX_VOICE_BYTES,
+    detect_audio, detect_image, extension_for_mime, media_path_is_safe, media_root, MAX_VOICE_BYTES,
 };
-use super::common::{input_text_is_valid, request_is_cross_site, unix_now};
+use super::common::{input_text_is_valid, rate_limit_retry_after, request_is_cross_site, unix_now};
 use crate::state::app_state::AppState;
 use crate::web::templates;
 use axum::{
@@ -27,6 +27,35 @@ pub struct CreateGroupForm {
 
 fn json_error(status: StatusCode, error: &str) -> Response {
     (status, Json(json!({"ok": false, "error": error}))).into_response()
+}
+
+fn rate_limited(retry_after: u64) -> Response {
+    (
+        StatusCode::TOO_MANY_REQUESTS,
+        [(header::RETRY_AFTER, retry_after.to_string())],
+        Json(json!({
+            "ok": false,
+            "error": "rate_limited",
+            "retry_after": retry_after
+        })),
+    )
+        .into_response()
+}
+
+fn positive_message_id(value: &str) -> Option<i64> {
+    value.trim().parse::<i64>().ok().filter(|id| *id > 0)
+}
+
+fn group_reply_is_valid(db: &rusqlite::Connection, group_id: i64, message_id: i64) -> bool {
+    message_id <= 0
+        || db
+            .query_row(
+                "SELECT 1 FROM group_messages
+                 WHERE id = ?1 AND group_id = ?2 AND deleted_at = 0",
+                rusqlite::params![message_id, group_id],
+                |_| Ok(()),
+            )
+            .is_ok()
 }
 
 fn client_message_id_ok(value: &str) -> bool {
@@ -807,6 +836,11 @@ pub async fn api_group_send(
         Some(id) => id,
         None => return json_error(StatusCode::UNAUTHORIZED, "login_required"),
     };
+    if let Some(retry_after) =
+        rate_limit_retry_after(&state, user_id, "group_api_send", 30, 60).await
+    {
+        return rate_limited(retry_after);
+    }
     let message = payload.message.trim();
     if !input_text_is_valid(message, 1, 2000) {
         return json_error(StatusCode::BAD_REQUEST, "invalid_message");
@@ -819,16 +853,7 @@ pub async fn api_group_send(
         return json_error(StatusCode::FORBIDDEN, "not_a_member");
     }
     let reply_to_message_id = payload.reply_to_message_id.unwrap_or(0).max(0);
-    if reply_to_message_id > 0
-        && db
-            .query_row(
-                "SELECT 1 FROM group_messages
-                 WHERE id = ?1 AND group_id = ?2 AND deleted_at = 0",
-                rusqlite::params![reply_to_message_id, group_id],
-                |_| Ok(()),
-            )
-            .is_err()
-    {
+    if !group_reply_is_valid(&db, group_id, reply_to_message_id) {
         return json_error(StatusCode::BAD_REQUEST, "invalid_reply");
     }
     let client_message_id = payload.client_message_id.trim().to_string();
@@ -918,15 +943,23 @@ pub async fn api_group_send_image(
         Some(id) => id,
         None => return json_error(StatusCode::UNAUTHORIZED, "login_required"),
     };
-    let db = match crate::db::pool::get_connection(&state.db_pool) {
-        Ok(db) => db,
-        Err(_) => return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable"),
-    };
-    if group_id <= 0 || !is_member(&db, group_id, user_id) {
-        return json_error(StatusCode::FORBIDDEN, "not_a_member");
+    if let Some(retry_after) =
+        rate_limit_retry_after(&state, user_id, "group_api_send_image", 20, 60).await
+    {
+        return rate_limited(retry_after);
+    }
+    {
+        let db = match crate::db::pool::get_connection(&state.db_pool) {
+            Ok(db) => db,
+            Err(_) => return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable"),
+        };
+        if group_id <= 0 || !is_member(&db, group_id, user_id) {
+            return json_error(StatusCode::FORBIDDEN, "not_a_member");
+        }
     }
     let mut caption = String::new();
     let mut client_message_id = String::new();
+    let mut reply_to_message_id = 0;
     let mut file_bytes: Option<Vec<u8>> = None;
     while let Ok(Some(field)) = multipart.next_field().await {
         let name = field.name().unwrap_or("").to_string();
@@ -939,6 +972,11 @@ pub async fn api_group_send_image(
             "client_message_id" => {
                 if let Ok(text) = field.text().await {
                     client_message_id = text.trim().to_string();
+                }
+            }
+            "reply_to_message_id" => {
+                if let Ok(text) = field.text().await {
+                    reply_to_message_id = positive_message_id(&text).unwrap_or(0);
                 }
             }
             "image" | "file" => {
@@ -954,6 +992,19 @@ pub async fn api_group_send_image(
     };
     if !client_message_id.is_empty() && !client_message_id_ok(&client_message_id) {
         return json_error(StatusCode::BAD_REQUEST, "invalid_client_message_id");
+    }
+    if !caption.is_empty() && !input_text_is_valid(&caption, 1, 2000) {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_message");
+    }
+    let db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable"),
+    };
+    if !is_member(&db, group_id, user_id) {
+        return json_error(StatusCode::FORBIDDEN, "not_a_member");
+    }
+    if !group_reply_is_valid(&db, group_id, reply_to_message_id) {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_reply");
     }
     if !client_message_id.is_empty() {
         if let Some(existing) =
@@ -1001,14 +1052,16 @@ pub async fn api_group_send_image(
         .execute(
             "INSERT OR IGNORE INTO group_messages (
                 group_id, sender_user_id, message, created_at, client_message_id,
-                attachment_kind, attachment_path, attachment_mime, attachment_size
-             ) VALUES (?1, ?2, ?3, ?4, ?5, 'image', ?6, ?7, ?8)",
+                reply_to_message_id, attachment_kind, attachment_path, attachment_mime,
+                attachment_size
+             ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, 'image', ?7, ?8, ?9)",
             rusqlite::params![
                 group_id,
                 user_id,
                 caption,
                 now,
                 client_message_id,
+                reply_to_message_id,
                 relative,
                 mime,
                 bytes.len() as i64
@@ -1046,20 +1099,24 @@ pub async fn api_group_send_image(
             caption.as_str()
         },
     );
-    Json(json!({
-        "ok": true,
-        "message": {
-            "id": message_id,
-            "sender_user_id": user_id.to_string(),
-            "message": caption,
-            "is_mine": true,
-            "created_at": now,
-            "sender_name": profile_display_name(&db, user_id),
-            "attachment_kind": "image",
-            "attachment_url": format!("/api/group/media/{message_id}"),
-        }
-    }))
-    .into_response()
+    let item = load_group_messages(&db, group_id, user_id, message_id - 1, 0, 1)
+        .into_iter()
+        .find(|message| message.id == message_id)
+        .map(|message| message_json(&message, user_id))
+        .unwrap_or_else(|| {
+            json!({
+                "id": message_id,
+                "sender_user_id": user_id.to_string(),
+                "message": caption,
+                "is_mine": true,
+                "created_at": now,
+                "sender_name": profile_display_name(&db, user_id),
+                "reply_to_message_id": if reply_to_message_id > 0 { Some(reply_to_message_id) } else { None },
+                "attachment_kind": "image",
+                "attachment_url": format!("/api/group/media/{message_id}"),
+            })
+        });
+    Json(json!({"ok": true, "message": item})).into_response()
 }
 
 pub async fn api_group_media(
@@ -1075,21 +1132,29 @@ pub async fn api_group_media(
         Ok(db) => db,
         Err(_) => return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable"),
     };
-    let row: Option<(i64, String, String, i64)> = db
+    let row: Option<(i64, String, String, String, i64)> = db
         .query_row(
-            "SELECT group_id, attachment_path, attachment_mime, deleted_at
+            "SELECT group_id, attachment_path, attachment_mime, attachment_kind, deleted_at
              FROM group_messages WHERE id = ?1",
             rusqlite::params![message_id],
-            |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
+            |row| {
+                Ok((
+                    row.get(0)?,
+                    row.get(1)?,
+                    row.get(2)?,
+                    row.get(3)?,
+                    row.get(4)?,
+                ))
+            },
         )
         .ok();
-    let Some((group_id, path, mime, deleted_at)) = row else {
+    let Some((group_id, path, mime, kind, deleted_at)) = row else {
         return json_error(StatusCode::NOT_FOUND, "not_found");
     };
     if deleted_at > 0 || !is_member(&db, group_id, user_id) {
         return json_error(StatusCode::FORBIDDEN, "not_a_member");
     }
-    if path.is_empty() || path.contains("..") {
+    if !media_path_is_safe(&path) || (kind != "image" && kind != "voice") {
         return json_error(StatusCode::NOT_FOUND, "not_found");
     }
     let absolute = media_root().join(&path);
@@ -1113,6 +1178,10 @@ pub async fn api_group_media(
                 header::CACHE_CONTROL,
                 HeaderValue::from_static("private, max-age=3600"),
             ),
+            (
+                header::X_CONTENT_TYPE_OPTIONS,
+                HeaderValue::from_static("nosniff"),
+            ),
         ],
         bytes,
     )
@@ -1132,14 +1201,22 @@ pub async fn api_group_send_voice(
         Some(id) => id,
         None => return json_error(StatusCode::UNAUTHORIZED, "login_required"),
     };
-    let db = match crate::db::pool::get_connection(&state.db_pool) {
-        Ok(db) => db,
-        Err(_) => return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable"),
-    };
-    if group_id <= 0 || !is_member(&db, group_id, user_id) {
-        return json_error(StatusCode::FORBIDDEN, "not_a_member");
+    if let Some(retry_after) =
+        rate_limit_retry_after(&state, user_id, "group_api_send_voice", 12, 60).await
+    {
+        return rate_limited(retry_after);
+    }
+    {
+        let db = match crate::db::pool::get_connection(&state.db_pool) {
+            Ok(db) => db,
+            Err(_) => return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable"),
+        };
+        if group_id <= 0 || !is_member(&db, group_id, user_id) {
+            return json_error(StatusCode::FORBIDDEN, "not_a_member");
+        }
     }
     let mut client_message_id = String::new();
+    let mut reply_to_message_id = 0;
     let mut file_bytes: Option<Vec<u8>> = None;
     while let Ok(Some(field)) = multipart.next_field().await {
         let name = field.name().unwrap_or("").to_string();
@@ -1147,6 +1224,11 @@ pub async fn api_group_send_voice(
             "client_message_id" => {
                 if let Ok(text) = field.text().await {
                     client_message_id = text.trim().to_string();
+                }
+            }
+            "reply_to_message_id" => {
+                if let Ok(text) = field.text().await {
+                    reply_to_message_id = positive_message_id(&text).unwrap_or(0);
                 }
             }
             "voice" | "audio" | "file" => {
@@ -1163,6 +1245,16 @@ pub async fn api_group_send_voice(
     if !client_message_id.is_empty() && !client_message_id_ok(&client_message_id) {
         return json_error(StatusCode::BAD_REQUEST, "invalid_client_message_id");
     }
+    let db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable"),
+    };
+    if !is_member(&db, group_id, user_id) {
+        return json_error(StatusCode::FORBIDDEN, "not_a_member");
+    }
+    if !group_reply_is_valid(&db, group_id, reply_to_message_id) {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_reply");
+    }
     if !client_message_id.is_empty() {
         if let Some(existing) =
             find_group_message_by_client_id(&db, group_id, user_id, &client_message_id)
@@ -1176,7 +1268,7 @@ pub async fn api_group_send_voice(
         }
     }
     if bytes.len() > MAX_VOICE_BYTES {
-        return json_error(StatusCode::BAD_REQUEST, "voice_too_large");
+        return json_error(StatusCode::PAYLOAD_TOO_LARGE, "voice_too_large");
     }
     let Some((_, mime)) = detect_audio(&bytes) else {
         return json_error(StatusCode::BAD_REQUEST, "unsupported_voice");
@@ -1203,13 +1295,15 @@ pub async fn api_group_send_voice(
         .execute(
             "INSERT OR IGNORE INTO group_messages (
                 group_id, sender_user_id, message, created_at, client_message_id,
-                attachment_kind, attachment_path, attachment_mime, attachment_size
-             ) VALUES (?1, ?2, '', ?3, ?4, 'voice', ?5, ?6, ?7)",
+                reply_to_message_id, attachment_kind, attachment_path, attachment_mime,
+                attachment_size
+             ) VALUES (?1, ?2, '', ?3, ?4, ?5, 'voice', ?6, ?7, ?8)",
             rusqlite::params![
                 group_id,
                 user_id,
                 now,
                 client_message_id,
+                reply_to_message_id,
                 relative,
                 mime,
                 bytes.len() as i64
@@ -1243,20 +1337,24 @@ pub async fn api_group_send_voice(
         user_id,
         "Голосовое",
     );
-    Json(json!({
-        "ok": true,
-        "message": {
-            "id": message_id,
-            "sender_user_id": user_id.to_string(),
-            "message": "",
-            "is_mine": true,
-            "created_at": now,
-            "sender_name": profile_display_name(&db, user_id),
-            "attachment_kind": "voice",
-            "attachment_url": format!("/api/group/media/{message_id}"),
-        }
-    }))
-    .into_response()
+    let item = load_group_messages(&db, group_id, user_id, message_id - 1, 0, 1)
+        .into_iter()
+        .find(|message| message.id == message_id)
+        .map(|message| message_json(&message, user_id))
+        .unwrap_or_else(|| {
+            json!({
+                "id": message_id,
+                "sender_user_id": user_id.to_string(),
+                "message": "",
+                "is_mine": true,
+                "created_at": now,
+                "sender_name": profile_display_name(&db, user_id),
+                "reply_to_message_id": if reply_to_message_id > 0 { Some(reply_to_message_id) } else { None },
+                "attachment_kind": "voice",
+                "attachment_url": format!("/api/group/media/{message_id}"),
+            })
+        });
+    Json(json!({"ok": true, "message": item})).into_response()
 }
 
 pub async fn api_group_edit(
@@ -1756,5 +1854,28 @@ mod tests {
         .expect("group send payload with no reply");
 
         assert_eq!(payload.reply_to_message_id, None);
+    }
+
+    #[test]
+    fn group_media_replies_require_an_active_message_in_the_same_group() {
+        let connection = group_database();
+        connection
+            .execute_batch(
+                "INSERT INTO group_messages (
+                    id, group_id, sender_user_id, message, created_at, deleted_at
+                 ) VALUES
+                    (10, 7, 1, 'Доступно', 100, 0),
+                    (11, 7, 1, 'Удалено', 101, 1),
+                    (12, 8, 1, 'Другая группа', 102, 0);",
+            )
+            .expect("reply fixtures");
+
+        assert_eq!(positive_message_id("10"), Some(10));
+        assert_eq!(positive_message_id("0"), None);
+        assert_eq!(positive_message_id("не число"), None);
+        assert!(group_reply_is_valid(&connection, 7, 0));
+        assert!(group_reply_is_valid(&connection, 7, 10));
+        assert!(!group_reply_is_valid(&connection, 7, 11));
+        assert!(!group_reply_is_valid(&connection, 7, 12));
     }
 }

@@ -107,6 +107,7 @@
   "chat_saving": "保存中…",
   "chat_deleting": "削除中…",
   "chat_message": "メッセージ",
+  "chat_send_action": "送信",
   "chat_peer": "相手",
   "chat_original": "元のメッセージ",
   "chat_actions_aria": "メッセージ操作",

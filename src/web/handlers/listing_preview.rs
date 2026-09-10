@@ -19,6 +19,7 @@ struct ListingPreview {
     listing_type: String,
     verified: bool,
     premium: bool,
+    image_url: String,
     url: String,
 }
 
@@ -60,6 +61,10 @@ fn load_public_listing_preview(
                     listing_type: row.get(5)?,
                     verified: row.get::<_, i64>(6)? != 0,
                     premium: row.get::<_, i64>(7)? != 0,
+                    image_url: format!(
+                        "/static/grabit-share-cover.png?v={}",
+                        crate::web::templates::STATIC_ASSET_VERSION
+                    ),
                     url: format!("/app/listing/{id}"),
                 })
             },
@@ -152,6 +157,7 @@ mod tests {
         assert_eq!(preview.title, "Охрана");
         assert_eq!(preview.rubric, "Охрана");
         assert_eq!(preview.url, "/app/listing/1");
+        assert_eq!(preview.image_url, "/static/grabit-share-cover.png?v=5.2.0");
         assert!(preview.verified);
         assert!(load_public_listing_preview(&connection, 2)
             .expect("pending query")

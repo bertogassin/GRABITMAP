@@ -107,6 +107,7 @@
   "chat_saving": "儲存中…",
   "chat_deleting": "刪除中…",
   "chat_message": "訊息",
+  "chat_send_action": "傳送",
   "chat_peer": "對方",
   "chat_original": "原始訊息",
   "chat_actions_aria": "訊息操作",
