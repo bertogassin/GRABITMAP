@@ -766,9 +766,18 @@ fn render_chat_thread(
         <textarea id="chat-input" name="message" rows="1" maxlength="2000" required autocomplete="off" enterkeyhint="send" aria-label="Текст сообщения" placeholder="Сообщение…" class="ui-textarea chat-input"></textarea>
     </div>
     <input type="file" id="chat-image-input" accept="image/jpeg,image/png,image/webp" class="chat-file-input">
-    <button id="chat-voice-btn" type="button" class="chat-voice-btn">Голос</button>
-    <button id="chat-image-btn" type="button" class="chat-image-btn">Фото</button>
-    <button id="chat-send" type="submit" class="ui-button chat-send-button">Отправить</button>
+    <button id="chat-voice-btn" type="button" class="chat-voice-btn">
+        <span class="chat-action-icon" aria-hidden="true">●</span>
+        <span class="chat-action-label">Голос</span>
+    </button>
+    <button id="chat-image-btn" type="button" class="chat-image-btn">
+        <span class="chat-action-icon" aria-hidden="true">▣</span>
+        <span class="chat-action-label">Фото</span>
+    </button>
+    <button id="chat-send" type="submit" class="ui-button chat-send-button">
+        <span class="chat-action-icon" aria-hidden="true">➤</span>
+        <span class="chat-action-label">Отправить</span>
+    </button>
     <div class="chat-composer-footer"><span id="chat-send-state">Enter — отправить · Shift+Enter — новая строка</span><span id="chat-counter">0 / 2000</span></div>
 </form>
 "#;

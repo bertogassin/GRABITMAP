@@ -107,6 +107,7 @@
   "chat_saving": "저장 중…",
   "chat_deleting": "삭제 중…",
   "chat_message": "메시지",
+  "chat_send_action": "보내기",
   "chat_peer": "상대",
   "chat_original": "원본 메시지",
   "chat_actions_aria": "메시지 작업",

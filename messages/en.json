@@ -107,6 +107,7 @@
   "chat_saving": "Saving…",
   "chat_deleting": "Deleting…",
   "chat_message": "Message",
+  "chat_send_action": "Send",
   "chat_peer": "Contact",
   "chat_original": "Original message",
   "chat_actions_aria": "Message actions",

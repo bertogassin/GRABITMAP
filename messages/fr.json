@@ -107,6 +107,7 @@
   "chat_saving": "Enregistrement…",
   "chat_deleting": "Suppression…",
   "chat_message": "Message",
+  "chat_send_action": "Envoyer",
   "chat_peer": "Contact",
   "chat_original": "Message d’origine",
   "chat_actions_aria": "Actions sur le message",
