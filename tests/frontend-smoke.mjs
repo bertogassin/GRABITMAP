@@ -422,6 +422,22 @@ test("group management preserves ownership and limits privileged actions", async
   assert.match(common, /rm-group-member--managed/);
 });
 
+test("official group member directory is bounded and cursor paginated", async () => {
+  const [handler, template] = await Promise.all([
+    readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+  ]);
+
+  assert.match(handler, /const GROUP_MEMBER_PAGE_SIZE: i64 = 50/);
+  assert.match(handler, /Query\(query\): Query<GroupMembersQuery>/);
+  assert.match(handler, /member\.user_id > \?2/);
+  assert.match(handler, /GROUP_MEMBER_PAGE_SIZE \+ 1/);
+  assert.match(handler, /SELECT member_count FROM chat_groups/);
+  assert.match(template, /name="q" maxlength="80"/);
+  assert.match(template, /Показать следующих/);
+  assert.match(template, /member_count_label/);
+});
+
 test("inbox organization is account scoped and controls notifications", async () => {
   const [schema, handler, chat, api, groups, media, template, inbox, routes] = await Promise.all([
     readFile(new URL("src/db/chat_preferences.rs", root), "utf8"),
