@@ -92,6 +92,9 @@
         var scrollBottomButton = document.getElementById(
             "chat-scroll-bottom"
         );
+        var scrollUnreadBadge = document.getElementById(
+            "chat-scroll-unread"
+        );
         var loadOlder = document.getElementById(
             "chat-load-older"
         );
@@ -230,6 +233,8 @@
         var typingStopTimer = null;
         var presenceTimer = null;
         var lastTypingEmitAt = 0;
+        var unreadBelowCount = 0;
+        var unreadDivider = null;
 
         function createClientMessageId() {
             if (
@@ -596,8 +601,56 @@
             if (!scrollBottomButton) {
                 return;
             }
+            var atBottom = nearBottom();
+            scrollBottomButton.hidden = atBottom;
 
-            scrollBottomButton.hidden = nearBottom();
+            if (atBottom) {
+                clearUnreadBelow();
+            }
+
+            if (scrollUnreadBadge) {
+                scrollUnreadBadge.hidden = unreadBelowCount <= 0;
+                scrollUnreadBadge.textContent = unreadBelowCount > 99
+                    ? "99+"
+                    : String(unreadBelowCount);
+            }
+
+            var label = unreadBelowCount > 0
+                ? tf("inbox_unread_many", "{n} непрочитанных", {
+                    n: unreadBelowCount
+                })
+                : t("chat_message", "Сообщение");
+            scrollBottomButton.setAttribute("aria-label", label);
+        }
+
+        function clearUnreadBelow() {
+            unreadBelowCount = 0;
+            if (unreadDivider) {
+                unreadDivider.remove();
+                unreadDivider = null;
+            }
+        }
+
+        function markUnreadBelow(firstIncomingRow, count) {
+            unreadBelowCount += count;
+
+            if (!unreadDivider && firstIncomingRow) {
+                unreadDivider = document.createElement("div");
+                unreadDivider.className = "chat-unread-divider";
+                unreadDivider.setAttribute("role", "status");
+                firstIncomingRow.parentNode.insertBefore(
+                    unreadDivider,
+                    firstIncomingRow
+                );
+            }
+
+            if (unreadDivider) {
+                unreadDivider.textContent = tf(
+                    "inbox_unread_many",
+                    "{n} непрочитанных",
+                    { n: unreadBelowCount }
+                );
+            }
         }
 
         var markReadTimer = null;
@@ -633,6 +686,7 @@
         }
 
         function scrollToBottom(behavior) {
+            clearUnreadBelow();
             history.scrollTo({
                 top: history.scrollHeight,
                 behavior: behavior || "auto"
@@ -984,6 +1038,7 @@
             var shouldStick = nearBottom();
             var incomingCount = 0;
             var insertedCount = 0;
+            var firstIncomingRow = null;
 
             messages.forEach(function (message) {
                 var id = Number(message.id);
@@ -996,10 +1051,8 @@
 
                 reconcilePendingForMessage(message);
 
-                history.insertBefore(
-                    createMessageRow(message, true),
-                    historyEnd
-                );
+                var row = createMessageRow(message, true);
+                history.insertBefore(row, historyEnd);
 
                 firstMessageId =
                     firstMessageId > 0
@@ -1011,6 +1064,9 @@
 
                 if (!message.is_mine) {
                     incomingCount += 1;
+                    if (!firstIncomingRow) {
+                        firstIncomingRow = row;
+                    }
                 }
             });
 
@@ -1027,10 +1083,12 @@
                 });
             }
 
-            if (shouldStick || incomingCount > 0) {
+            if (shouldStick) {
                 scrollToBottom(
                     incomingCount > 0 ? "smooth" : "auto"
                 );
+            } else if (incomingCount > 0) {
+                markUnreadBelow(firstIncomingRow, incomingCount);
             }
 
             if (
@@ -1232,6 +1290,59 @@
                 loadOlder.disabled = false;
             }
         }
+
+        function highlightMessage(row) {
+            if (!row) {
+                return false;
+            }
+            row.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+            row.classList.add("is-highlighted");
+            window.setTimeout(function () {
+                row.classList.remove("is-highlighted");
+            }, 1400);
+            return true;
+        }
+
+        window.resursmapRevealChatMessage = async function (messageId) {
+            var targetId = Number(messageId);
+            if (!Number.isSafeInteger(targetId) || targetId <= 0) {
+                return false;
+            }
+
+            var selector =
+                '.chat-message-row[data-message-id="' + targetId + '"]';
+            var target = history.querySelector(selector);
+            var pagesLoaded = 0;
+
+            while (
+                !target &&
+                mayHaveOlder &&
+                firstMessageId > targetId &&
+                pagesLoaded < 20
+            ) {
+                var previousFirstId = firstMessageId;
+                await loadOlderMessages();
+                pagesLoaded += 1;
+                target = history.querySelector(selector);
+
+                if (firstMessageId >= previousFirstId) {
+                    break;
+                }
+            }
+
+            if (highlightMessage(target)) {
+                return true;
+            }
+
+            sendState.textContent = t(
+                "chat_reply_unavailable",
+                "Сообщение для ответа уже недоступно"
+            );
+            return false;
+        };
 
         var MAX_AUTO_RETRIES = 5;
         var RETRY_BASE_DELAY_MS = 1000;
@@ -4209,25 +4320,16 @@
                 );
 
                 if (quote) {
-                    var target = history.querySelector(
-                        '.chat-message-row[data-message-id="' +
-                        quote.dataset.targetMessageId +
-                        '"]'
+                    var targetMessageId = Number(
+                        quote.dataset.targetMessageId || 0
                     );
-
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: "smooth",
-                            block: "center"
-                        });
-                        target.classList.add(
-                            "is-highlighted"
+                    if (
+                        typeof window.resursmapRevealChatMessage ===
+                        "function"
+                    ) {
+                        window.resursmapRevealChatMessage(
+                            targetMessageId
                         );
-                        window.setTimeout(function () {
-                            target.classList.remove(
-                                "is-highlighted"
-                            );
-                        }, 1400);
                     }
 
                     return;
