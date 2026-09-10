@@ -9,7 +9,8 @@ pub fn initialize(conn: &Connection) -> Result<()> {
             created_by INTEGER NOT NULL,
             created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
             owner_user_id INTEGER NOT NULL DEFAULT 0,
-            updated_at INTEGER NOT NULL DEFAULT 0
+            updated_at INTEGER NOT NULL DEFAULT 0,
+            invite_nonce TEXT NOT NULL DEFAULT ''
         )",
         [],
     )?;
@@ -22,6 +23,11 @@ pub fn initialize(conn: &Connection) -> Result<()> {
     let _ = tx.execute(
         "ALTER TABLE chat_groups
          ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0",
+        [],
+    );
+    let _ = tx.execute(
+        "ALTER TABLE chat_groups
+         ADD COLUMN invite_nonce TEXT NOT NULL DEFAULT ''",
         [],
     );
 
@@ -240,6 +246,14 @@ mod tests {
             )
             .expect("fallback owner");
         assert_eq!(fallback_owner, 20);
+        let invite_nonce: String = connection
+            .query_row(
+                "SELECT invite_nonce FROM chat_groups WHERE id = 7",
+                [],
+                |row| row.get(0),
+            )
+            .expect("invite nonce column");
+        assert!(invite_nonce.is_empty());
         assert!(connection
             .execute(
                 "UPDATE chat_group_members SET role = 'invalid' WHERE group_id = 7 AND user_id = 12",

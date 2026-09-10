@@ -1271,6 +1271,35 @@ pub fn render_group_members(
         } else {
             String::new()
         };
+        let invite = if can_manage {
+            format!(
+                r#"<section class="card rm-group-create">
+    <div class="rm-profile-field-label">Приглашение в группу</div>
+    <p class="card-meta">Ссылка действует 7 дней. Новая ссылка автоматически отключает предыдущую.</p>
+    <div class="rm-group-invite-actions">
+        <form method="post" action="/app/group/{group_id}/invite/create">
+            <button type="submit" class="ui-button">Создать новую ссылку</button>
+        </form>
+        <form method="post" action="/app/group/{group_id}/invite/revoke" data-confirm="Отключить действующую ссылку-приглашение?">
+            <button type="submit" class="ui-button ui-button--secondary">Отключить ссылку</button>
+        </form>
+    </div>
+    <div id="rm-group-invite-ready" class="rm-group-invite-ready" hidden>
+        <label class="rm-profile-field">
+            <div class="rm-profile-field-label">Готовая ссылка</div>
+            <input id="rm-group-invite-url" class="ui-input" readonly>
+        </label>
+        <button id="rm-group-invite-share" type="button" class="ui-button" data-share
+                data-share-title="GRABIT · группа"
+                data-share-text="Присоединяйтесь к нашей группе в GRABIT.">
+            Отправить приглашение
+        </button>
+    </div>
+</section>"#
+            )
+        } else {
+            String::new()
+        };
         let leave = if is_owner {
             r#"<section class="card rm-group-create"><div class="rm-profile-field-label">Вы владелец группы</div><p class="card-meta">Перед выходом передайте владение другому участнику. Так группа не останется без управления.</p></section>"#.to_string()
         } else {
@@ -1282,6 +1311,7 @@ pub fn render_group_members(
         };
         format!(
             r#"{rename}
+{invite}
 <section class="card rm-group-create">
     <div class="rm-group-section-head"><div class="rm-profile-field-label">Участники</div><span class="rm-group-count">{member_count} / 250</span></div>
     <div class="rm-group-members">{list}</div>
@@ -1290,6 +1320,20 @@ pub fn render_group_members(
 {leave}
 <script>
 (function () {{
+    var query = new URLSearchParams(window.location.search);
+    var inviteToken = query.get("invite") || "";
+    if (/^[A-Za-z0-9.]+$/.test(inviteToken)) {{
+        var inviteUrl = new URL("/app/group-invite/" + encodeURIComponent(inviteToken), window.location.origin).href;
+        var ready = document.getElementById("rm-group-invite-ready");
+        var input = document.getElementById("rm-group-invite-url");
+        var share = document.getElementById("rm-group-invite-share");
+        if (ready && input && share) {{
+            input.value = inviteUrl;
+            share.setAttribute("data-share-url", inviteUrl);
+            ready.hidden = false;
+        }}
+        window.history.replaceState(null, "", window.location.pathname);
+    }}
     var addForm = document.getElementById("rm-group-add");
     if (addForm) {{
         addForm.addEventListener("submit", function () {{
@@ -1313,6 +1357,7 @@ pub fn render_group_members(
 }})();
 </script>"#,
             rename = rename,
+            invite = invite,
             member_count = members.len(),
             list = list,
             add = add,
@@ -1329,6 +1374,56 @@ pub fn render_group_members(
             "Группа",
             name,
             "Роли, участники и настройки группы.",
+        ),
+        &content,
+        &bottom_nav("chats"),
+    )
+}
+
+pub fn render_group_invite(
+    authenticated: bool,
+    token: &str,
+    name: &str,
+    member_count: i64,
+    valid: bool,
+) -> String {
+    let content = if !valid {
+        empty_state_card(
+            "Ссылка недействительна",
+            "Приглашение истекло, было отключено или группа уже заполнена.",
+        )
+    } else if !authenticated {
+        let next = format!("/app/group-invite/{}", urlencoding::encode(token));
+        format!(
+            r#"<section class="card rm-group-create">
+    <div class="rm-profile-field-label">{name}</div>
+    <p class="card-meta">{member_count} участников · приглашение действует 7 дней</p>
+    <a class="ui-button" href="/login?next={next}">Войти и присоединиться</a>
+</section>"#,
+            name = escape_html(name),
+            next = urlencoding::encode(&next),
+        )
+    } else {
+        format!(
+            r#"<form method="post" action="/app/group-invite/{token}" class="card rm-group-create">
+    <div class="rm-profile-field-label">{name}</div>
+    <p class="card-meta">{member_count} участников</p>
+    <button type="submit" class="ui-button">Присоединиться к группе</button>
+</form>"#,
+            token = escape_html(token),
+            name = escape_html(name),
+        )
+    };
+
+    page_shell(
+        "Приглашение в группу · GRABIT",
+        &topbar("Группа", "users"),
+        &back_hero(
+            &back_link("/app/messages", "Чаты", "arrow-left"),
+            "users",
+            "GRABIT",
+            "Приглашение в группу",
+            "Проверьте название и присоединитесь после входа.",
         ),
         &content,
         &bottom_nav("chats"),
