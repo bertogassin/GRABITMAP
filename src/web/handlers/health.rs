@@ -66,17 +66,42 @@ pub async fn metrics(State(state): State<AppState>, headers: HeaderMap) -> Respo
     }
 
     let pool = &state.db_pool;
+    let pool_state = pool.state();
+    let backfill = crate::db::pool::get_connection(pool)
+        .ok()
+        .and_then(|connection| crate::db::group_member_search::backfill_status(&connection).ok());
+    let backfill_processed = backfill.map_or(0, |status| status.processed_count);
+    let backfill_completed = backfill.map_or(0, |status| i64::from(status.completed));
     let body = format!(
-        "# HELP grabitmap_db_connections SQLite connections in the pool\n\
-         # TYPE grabitmap_db_connections gauge\n\
-         grabitmap_db_connections {}\n\
-         # HELP grabitmap_db_idle_connections Idle SQLite connections in the pool\n\
-         # TYPE grabitmap_db_idle_connections gauge\n\
-         grabitmap_db_idle_connections {}\n",
-        pool.state().connections,
-        pool.state().idle_connections
+        "# HELP grabitmap_db_connections Open database connections.
+\
+# TYPE grabitmap_db_connections gauge
+\
+grabitmap_db_connections {}
+\
+# HELP grabitmap_db_idle_connections Idle database connections.
+\
+# TYPE grabitmap_db_idle_connections gauge
+\
+grabitmap_db_idle_connections {}
+\
+# HELP grabitmap_group_member_index_processed Membership rows processed by the private search backfill.
+\
+# TYPE grabitmap_group_member_index_processed gauge
+\
+grabitmap_group_member_index_processed {}
+\
+# HELP grabitmap_group_member_index_completed Whether the private member index backfill is complete.
+\
+# TYPE grabitmap_group_member_index_completed gauge
+\
+grabitmap_group_member_index_completed {}
+",
+        pool_state.connections,
+        pool_state.idle_connections,
+        backfill_processed,
+        backfill_completed,
     );
-
     let mut response = body.into_response();
     let response_headers = response.headers_mut();
 

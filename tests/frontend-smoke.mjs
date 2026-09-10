@@ -779,3 +779,20 @@ test("owner center uses the modern shell and install help is non-blocking", asyn
   assert.doesNotMatch(install, /window\.alert/);
   assert.match(install, /showManualInstallHint/);
 });
+
+test("member index backfill is bounded resumable and observable", async () => {
+  const [search, main, health] = await Promise.all([
+    readFile(new URL("src/db/group_member_search.rs", root), "utf8"),
+    readFile(new URL("src/main.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/health.rs", root), "utf8"),
+  ]);
+
+  assert.match(search, /BACKFILL_BATCH_SIZE:\s*i64\s*=\s*500/);
+  assert.match(search, /chat_group_member_search_backfill/);
+  assert.match(search, /last_group_id/);
+  assert.match(search, /last_user_id/);
+  assert.match(search, /pub fn backfill_status/);
+  assert.match(main, /group_member_search::spawn_backfill_worker/);
+  assert.match(health, /grabitmap_group_member_index_processed/);
+  assert.match(health, /grabitmap_group_member_index_completed/);
+});
