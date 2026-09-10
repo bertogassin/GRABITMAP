@@ -836,7 +836,10 @@ fn render_chat_thread(
             class="chat-scroll-bottom"
             hidden
             aria-label="К новым сообщениям">
-        ↓
+        <span aria-hidden="true">↓</span>
+        <span id="chat-scroll-unread"
+              class="chat-scroll-unread"
+              hidden></span>
     </button>
 
     {composer}

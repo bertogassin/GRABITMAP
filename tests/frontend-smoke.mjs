@@ -126,6 +126,25 @@ test("chat photo viewer is isolated, keyboard accessible, and downloadable", asy
   assert.match(css, /\.chat-lightbox-actions/);
 });
 
+test("chat preserves reading position and reveals quoted history", async () => {
+  const [chat, styles, template] = await Promise.all([
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("static/chat-v2.css", root), "utf8"),
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+  ]);
+
+  assert.match(chat, /else if \(incomingCount > 0\)/);
+  assert.match(chat, /markUnreadBelow\(firstIncomingRow, incomingCount\)/);
+  assert.doesNotMatch(chat, /shouldStick \|\| incomingCount > 0/);
+  assert.match(chat, /window\.resursmapRevealChatMessage = async function/);
+  assert.match(chat, /await loadOlderMessages\(\)/);
+  assert.match(chat, /firstMessageId >= previousFirstId/);
+  assert.match(chat, /chat_reply_unavailable/);
+  assert.match(styles, /\.chat-scroll-unread/);
+  assert.match(styles, /\.chat-unread-divider/);
+  assert.match(template, /id="chat-scroll-unread"/);
+});
+
 test("chat media survives offline sends and retries without duplicates", async () => {
   const [chat, media] = await Promise.all([
     readFile(new URL("static/chat-v2.js", root), "utf8"),
