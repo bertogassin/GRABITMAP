@@ -1442,12 +1442,12 @@ pub async fn api_chat_conversations(State(state): State<AppState>, headers: Head
             };
             let last_message = if conversation.last_message.is_empty() {
                 if conversation.is_group {
-                    "Новая группа".to_string()
+                    crate::i18n::t("chat_new_group_preview")
                 } else {
-                    "Новый диалог".to_string()
+                    crate::i18n::t("chat_new_dialog")
                 }
             } else {
-                conversation.last_message.clone()
+                crate::web::templates::conversation_preview_text(&conversation.last_message)
             };
             let last_time = if conversation.last_message.is_empty() {
                 String::new()

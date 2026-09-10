@@ -157,7 +157,13 @@ mod tests {
         assert_eq!(preview.title, "Охрана");
         assert_eq!(preview.rubric, "Охрана");
         assert_eq!(preview.url, "/app/listing/1");
-        assert_eq!(preview.image_url, "/static/grabit-share-cover.png?v=5.2.0");
+        assert_eq!(
+            preview.image_url,
+            format!(
+                "/static/grabit-share-cover.png?v={}",
+                crate::web::templates::STATIC_ASSET_VERSION
+            )
+        );
         assert!(preview.verified);
         assert!(load_public_listing_preview(&connection, 2)
             .expect("pending query")

@@ -54,6 +54,7 @@
 
         var caption = document.getElementById("inbox-unread-caption");
         var liveBadge = document.getElementById("inbox-live-badge");
+        var searchInput = document.getElementById("inbox-search-input");
         var fetching = false;
         var pollTimer = null;
         var syncTimer = null;
@@ -61,7 +62,8 @@
         var retryTimer = null;
         var heartbeatTimer = null;
         var retryAttempt = 0;
-        var cursorKey = "resursmap:inbox-event-cursor";
+        var viewerUserId = String(list.dataset.viewerUserId || "").trim();
+        var cursorKey = "resursmap:inbox-event-cursor:" + viewerUserId;
         var shareListingValue = new URLSearchParams(
             window.location.search
         ).get("share");
@@ -137,6 +139,36 @@
         var CHEVRON_ICON =
             '<svg class="icon small-icon" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>';
 
+        function formatConversationTime(timestamp) {
+            var value = Number(timestamp || 0);
+            var date = new Date(value * 1000);
+            if (!Number.isFinite(value) || value <= 0 || Number.isNaN(date.getTime())) {
+                return "";
+            }
+
+            var now = new Date();
+            var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            var target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            var days = Math.round((today.getTime() - target.getTime()) / 86400000);
+            var locale = document.documentElement.lang || navigator.language || "en";
+
+            if (days === 0) {
+                return new Intl.DateTimeFormat(locale, {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                }).format(date);
+            }
+            if (days > 0 && days < 7) {
+                return new Intl.DateTimeFormat(locale, {
+                    weekday: "short",
+                }).format(date);
+            }
+            return new Intl.DateTimeFormat(locale, {
+                day: "2-digit",
+                month: "2-digit",
+            }).format(date);
+        }
+
         function renderConversation(conversation) {
             var userId = String(conversation.other_user_id || "").trim();
             var groupId = String(conversation.group_id || "").trim();
@@ -156,15 +188,19 @@
                   + escapeHtml(username)
                   + "</div>"
                 : "";
+            var unreadCount = Math.max(0, Number(conversation.unread_count) || 0);
             var unreadHtml =
-                Number(conversation.unread_count) > 0
-                    ? '<span class="chat-dialog-unread">'
-                      + escapeHtml(conversation.unread_count)
+                unreadCount > 0
+                    ? '<span class="chat-dialog-unread" aria-label="'
+                      + escapeHtml(unreadCaption(unreadCount))
+                      + '">'
+                      + escapeHtml(unreadCount > 99 ? "99+" : unreadCount)
                       + "</span>"
                     : "";
-            var lastTime = conversation.last_time
+            var formattedTime = formatConversationTime(conversation.updated_at);
+            var lastTime = formattedTime
                 ? '<div class="chat-dialog-time">'
-                  + escapeHtml(conversation.last_time)
+                  + escapeHtml(formattedTime)
                   + "</div>"
                 : '<div class="chat-dialog-time"></div>';
             var previewText = !isGroup && activeTyping[userId]
@@ -233,6 +269,20 @@
                 t("chat_new_group", "Создать группу") +
                 "</a></div></div></div>"
             );
+        }
+
+        function applyInboxFilter() {
+            if (!searchInput) {
+                return;
+            }
+            var query = String(searchInput.value || "")
+                .trim()
+                .toLocaleLowerCase();
+
+            list.querySelectorAll(".chat-dialog-card").forEach(function (card) {
+                var searchable = String(card.textContent || "").toLocaleLowerCase();
+                card.hidden = Boolean(query) && !searchable.includes(query);
+            });
         }
 
         function updateDialogTyping(userId, active) {
@@ -324,6 +374,7 @@
             }
 
             list.innerHTML = conversations.map(renderConversation).join("");
+            applyInboxFilter();
         }
 
         async function refreshInbox() {
@@ -572,6 +623,9 @@
         });
 
         refreshInbox();
+        if (searchInput) {
+            searchInput.addEventListener("input", applyInboxFilter);
+        }
         connectRealtime();
         startPollingFallback();
     });

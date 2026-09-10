@@ -69,6 +69,23 @@ test("background chat polling pauses without overlapping requests", async () => 
   assert.match(chat, /socket !== currentSocket/);
 });
 
+test("inbox state is account scoped and dates follow the browser locale", async () => {
+  const [inbox, template] = await Promise.all([
+    readFile(new URL("static/inbox.js", root), "utf8"),
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+  ]);
+
+  assert.match(template, /data-viewer-user-id="\{viewer_user_id\}"/);
+  assert.match(inbox, /inbox-event-cursor:" \+ viewerUserId/);
+  assert.match(inbox, /new Intl\.DateTimeFormat\(locale/);
+  assert.match(inbox, /unreadCount > 99 \? "99\+" : unreadCount/);
+  assert.match(template, /id="inbox-search-input"/);
+  assert.match(inbox, /function applyInboxFilter\(\)/);
+  assert.doesNotMatch(template, /fn ru_weekday_short/);
+  assert.match(template, /"__image__" => crate::i18n::t\("chat_photo"\)/);
+  assert.match(template, /"__voice__" => crate::i18n::t\("chat_voice"\)/);
+});
+
 test("chat separates transport health from peer presence", async () => {
   const chat = await readFile(new URL("static/chat-v2.js", root), "utf8");
   assert.match(chat, /peerState\.hidden = true/);
@@ -93,6 +110,20 @@ test("mobile chat composer keeps media, text, and send in one action row", async
   assert.match(chat, /setMediaSending\(true\)/);
   assert.match(chat, /mediaErrorCopy\("image", code\)/);
   assert.match(chat, /mediaErrorCopy\("voice", code\)/);
+});
+
+test("chat photo viewer is isolated, keyboard accessible, and downloadable", async () => {
+  const [chat, css] = await Promise.all([
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("static/chat-v2.css", root), "utf8"),
+  ]);
+
+  assert.match(chat, /function lightboxText\(key, fallback\)/);
+  assert.match(chat, /function safeMediaUrl\(value\)/);
+  assert.match(chat, /chat-lightbox-download/);
+  assert.match(chat, /event\.key === "Enter" \|\| event\.key === " "/);
+  assert.doesNotMatch(chat, /classList\.contains\("chat-lightbox-image"\)/);
+  assert.match(css, /\.chat-lightbox-actions/);
 });
 
 test("production compose keeps Caddy in front of the private app", async () => {
