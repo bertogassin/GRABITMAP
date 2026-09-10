@@ -480,6 +480,29 @@ test("chat search is authorized, bounded, and navigates to results", async () =>
   assert.doesNotMatch(search, /innerHTML\s*=\s*item\./);
 });
 
+test("group typing is membership scoped and names the active participant", async () => {
+  const [state, realtime, chat, inbox] = await Promise.all([
+    readFile(new URL("src/state/app_state.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/chat_realtime.rs", root), "utf8"),
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("static/inbox.js", root), "utf8"),
+  ]);
+
+  assert.match(state, /pub fn publish_group_typing_event/);
+  assert.match(state, /member_ids\.contains\(&actor_user_id\)/);
+  assert.match(state, /group-typing:\{actor_user_id\}:\{group_id\}/);
+  assert.match(state, /actor_name: String/);
+  assert.match(realtime, /chat_group_members AS member/);
+  assert.match(realtime, /direct_typing_is_allowed/);
+  assert.match(realtime, /users_are_blocked/);
+  assert.match(realtime, /LIMIT 251/);
+  assert.match(chat, /group_id: groupId/);
+  assert.match(chat, /updateGroupTyping/);
+  assert.match(chat, /peerTypingName/);
+  assert.match(inbox, /event\.group_id/);
+  assert.match(inbox, /typingPreviewHtml\(actorName\)/);
+});
+
 test("user-facing copy no longer calls listings resources", async () => {
   const visibleFiles = [
     "static/share.js",

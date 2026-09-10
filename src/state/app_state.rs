@@ -41,6 +41,7 @@ pub struct ChatRealtimeEvent {
     #[serde(serialize_with = "serialize_realtime_user_id")]
     pub user2_id: i64,
     pub group_id: i64,
+    #[serde(skip_serializing)]
     pub member_ids: Vec<String>,
 }
 
@@ -66,10 +67,18 @@ pub struct ChatTypingEvent {
     pub user1_id: i64,
     #[serde(serialize_with = "serialize_realtime_user_id")]
     pub user2_id: i64,
+    pub group_id: i64,
+    #[serde(skip_serializing)]
+    pub member_ids: Vec<String>,
+    pub actor_name: String,
 }
 
 impl ChatTypingEvent {
     pub fn includes_user(&self, user_id: i64) -> bool {
+        if self.group_id > 0 {
+            let needle = user_id.to_string();
+            return self.member_ids.iter().any(|id| id == &needle);
+        }
         self.user1_id == user_id || self.user2_id == user_id
     }
 
@@ -112,6 +121,23 @@ pub struct AppState {
 }
 
 impl AppState {
+    fn typing_rate_allows(&self, rate_key: String) -> bool {
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|duration| duration.as_secs() as i64)
+            .unwrap_or(0);
+        let mut rate_limits = match self.chat_typing_rate.lock() {
+            Ok(rate_limits) => rate_limits,
+            Err(_) => return false,
+        };
+        let last_sent = rate_limits.get(&rate_key).copied().unwrap_or(0);
+        if now.saturating_sub(last_sent) < 2 {
+            return false;
+        }
+        rate_limits.insert(rate_key, now);
+        true
+    }
+
     pub fn new(db_pool: DbPool, bot_token: Option<String>, admin_key: String) -> Self {
         let (chat_events, _) = broadcast::channel(2_048);
         let (chat_typing_events, _) = broadcast::channel(1_024);
@@ -207,24 +233,9 @@ impl AppState {
             return false;
         }
 
-        let now = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .map(|duration| duration.as_secs() as i64)
-            .unwrap_or(0);
         let rate_key = format!("typing:{actor_user_id}:{other_user_id}");
-
-        {
-            let mut rate_limits = match self.chat_typing_rate.lock() {
-                Ok(rate_limits) => rate_limits,
-                Err(_) => return false,
-            };
-
-            let last_sent = rate_limits.get(&rate_key).copied().unwrap_or(0);
-            if now.saturating_sub(last_sent) < 2 {
-                return false;
-            }
-
-            rate_limits.insert(rate_key, now);
+        if !self.typing_rate_allows(rate_key) {
+            return false;
         }
 
         let (user1_id, user2_id) = if actor_user_id < other_user_id {
@@ -245,8 +256,49 @@ impl AppState {
             other_user_id,
             user1_id,
             user2_id,
+            group_id: 0,
+            member_ids: Vec::new(),
+            actor_name: String::new(),
         });
 
+        true
+    }
+
+    pub fn publish_group_typing_event(
+        &self,
+        kind: &str,
+        actor_user_id: i64,
+        group_id: i64,
+        member_ids: &[i64],
+        actor_name: &str,
+    ) -> bool {
+        if actor_user_id <= 0
+            || group_id <= 0
+            || member_ids.is_empty()
+            || !member_ids.contains(&actor_user_id)
+            || (kind != "typing.start" && kind != "typing.stop")
+        {
+            return false;
+        }
+        if !self.typing_rate_allows(format!("group-typing:{actor_user_id}:{group_id}")) {
+            return false;
+        }
+        let event_id = self
+            .chat_typing_sequence
+            .fetch_add(1, Ordering::Relaxed)
+            .saturating_add(1);
+        let actor_name: String = actor_name.trim().chars().take(80).collect();
+        let _ = self.chat_typing_events.send(ChatTypingEvent {
+            event_id,
+            kind: kind.to_string(),
+            actor_user_id,
+            other_user_id: 0,
+            user1_id: 0,
+            user2_id: 0,
+            group_id,
+            member_ids: member_ids.iter().map(|id| id.to_string()).collect(),
+            actor_name,
+        });
         true
     }
 }
@@ -271,6 +323,9 @@ mod tests {
             other_user_id: 9,
             user1_id: 3,
             user2_id: 9,
+            group_id: 0,
+            member_ids: Vec::new(),
+            actor_name: String::new(),
         };
 
         assert!(event.is_visible_to(9));
@@ -287,12 +342,39 @@ mod tests {
             other_user_id: 4_000_000_000_000_000_009,
             user1_id: 4_000_000_000_000_000_007,
             user2_id: 4_000_000_000_000_000_009,
+            group_id: 0,
+            member_ids: Vec::new(),
+            actor_name: String::new(),
         };
 
         let value = serde_json::to_value(event).expect("serialize typing event");
 
         assert_eq!(value["actor_user_id"], "4000000000000000007");
         assert_eq!(value["other_user_id"], "4000000000000000009");
+    }
+
+    #[test]
+    fn group_typing_event_is_visible_only_to_other_members() {
+        let event = ChatTypingEvent {
+            event_id: 2,
+            kind: "typing.start".to_string(),
+            actor_user_id: 3,
+            other_user_id: 0,
+            user1_id: 0,
+            user2_id: 0,
+            group_id: 44,
+            member_ids: vec!["3".into(), "9".into(), "12".into()],
+            actor_name: "Амир".to_string(),
+        };
+
+        assert!(!event.is_visible_to(3));
+        assert!(event.is_visible_to(9));
+        assert!(event.is_visible_to(12));
+        assert!(!event.is_visible_to(18));
+
+        let value = serde_json::to_value(event).expect("serialize group typing event");
+        assert!(value.get("member_ids").is_none());
+        assert_eq!(value["actor_name"], "Амир");
     }
 
     #[test]

@@ -100,14 +100,21 @@
                 .replace(/"/g, "&quot;");
         }
 
-        function typingPreviewHtml() {
+        function typingPreviewHtml(actorName) {
+            var name = String(actorName || "").trim();
             return (
                 '<span class="chat-dialog-typing">' +
                 '<span class="chat-typing-dots" aria-hidden="true">' +
                 "<i></i><i></i><i></i></span>" +
+                (name ? escapeHtml(name) + " · " : "") +
                 t("chat_typing", "печатает…") +
                 "</span>"
             );
+        }
+
+        function typingNames(typingKey) {
+            var actors = activeTyping[typingKey] || {};
+            return Object.values(actors).filter(Boolean).slice(0, 2).join(", ");
         }
 
         function setLiveState(online) {
@@ -225,8 +232,9 @@
                   + escapeHtml(formattedTime)
                   + "</div>"
                 : '<div class="chat-dialog-time"></div>';
-            var previewText = !isGroup && activeTyping[userId]
-                ? typingPreviewHtml()
+            var typingKey = (isGroup ? "g:" : "d:") + (isGroup ? groupId : userId);
+            var previewText = activeTyping[typingKey]
+                ? typingPreviewHtml(isGroup ? typingNames(typingKey) : "")
                 : escapeHtml(
                     conversation.last_message || (isGroup ? t("chat_new_group_preview", "Новая группа") : t("chat_new_dialog", "Новый диалог"))
                 );
@@ -309,16 +317,22 @@
             });
         }
 
-        function updateDialogTyping(userId, active) {
+        function updateDialogTyping(kind, targetId, actorId, active, actorName) {
+            var typingKey = kind + ":" + targetId;
             if (active) {
-                activeTyping[userId] = true;
-            } else {
-                delete activeTyping[userId];
+                activeTyping[typingKey] = activeTyping[typingKey] || Object.create(null);
+                activeTyping[typingKey][actorId] = String(actorName || "");
+            } else if (activeTyping[typingKey]) {
+                delete activeTyping[typingKey][actorId];
+            }
+            if (activeTyping[typingKey] && Object.keys(activeTyping[typingKey]).length === 0) {
+                delete activeTyping[typingKey];
             }
 
-            var card = list.querySelector(
-                '.chat-dialog-card[data-other-user-id="' + userId + '"]'
-            );
+            var selector = kind === "g"
+                ? '.chat-dialog-card[data-group-id="' + targetId + '"]'
+                : '.chat-dialog-card[data-other-user-id="' + targetId + '"]';
+            var card = list.querySelector(selector);
 
             if (!card) {
                 return;
@@ -330,12 +344,12 @@
                 return;
             }
 
-            if (active) {
+            if (activeTyping[typingKey]) {
                 if (!preview.dataset.savedPreview) {
                     preview.dataset.savedPreview = preview.innerHTML;
                 }
 
-                preview.innerHTML = typingPreviewHtml();
+                preview.innerHTML = typingPreviewHtml(kind === "g" ? typingNames(typingKey) : "");
                 preview.classList.add("is-typing");
                 card.classList.add("is-peer-typing");
                 return;
@@ -350,26 +364,30 @@
             }
         }
 
-        function markTyping(userId) {
-            updateDialogTyping(userId, true);
+        function markTyping(kind, targetId, actorId, actorName) {
+            var typingKey = kind + ":" + targetId;
+            var timerKey = typingKey + ":" + actorId;
+            updateDialogTyping(kind, targetId, actorId, true, actorName);
 
-            if (typingTimers[userId]) {
-                window.clearTimeout(typingTimers[userId]);
+            if (typingTimers[timerKey]) {
+                window.clearTimeout(typingTimers[timerKey]);
             }
 
-            typingTimers[userId] = window.setTimeout(function () {
-                typingTimers[userId] = null;
-                updateDialogTyping(userId, false);
+            typingTimers[timerKey] = window.setTimeout(function () {
+                typingTimers[timerKey] = null;
+                updateDialogTyping(kind, targetId, actorId, false, "");
             }, 5200);
         }
 
-        function stopTyping(userId) {
-            if (typingTimers[userId]) {
-                window.clearTimeout(typingTimers[userId]);
-                typingTimers[userId] = null;
+        function stopTyping(kind, targetId, actorId) {
+            var typingKey = kind + ":" + targetId;
+            var timerKey = typingKey + ":" + actorId;
+            if (typingTimers[timerKey]) {
+                window.clearTimeout(typingTimers[timerKey]);
+                typingTimers[timerKey] = null;
             }
 
-            updateDialogTyping(userId, false);
+            updateDialogTyping(kind, targetId, actorId, false, "");
         }
 
         function applySnapshot(data) {
@@ -490,15 +508,19 @@
 
             var event = payload.event;
             var actorId = String(event.actor_user_id || "").trim();
+            var groupId = String(event.group_id || "").trim();
 
             if (!actorId) {
                 return;
             }
+            var kind = groupId ? "g" : "d";
+            var targetId = groupId || actorId;
+            var actorName = groupId ? String(event.actor_name || "").trim() : "";
 
             if (event.kind === "typing.start") {
-                markTyping(actorId);
+                markTyping(kind, targetId, actorId, actorName);
             } else if (event.kind === "typing.stop") {
-                stopTyping(actorId);
+                stopTyping(kind, targetId, actorId);
             }
         }
 
