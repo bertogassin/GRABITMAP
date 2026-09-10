@@ -5,6 +5,7 @@ pub mod chat_pins;
 pub mod chat_preferences;
 pub mod geography_countries;
 pub mod geography_v2;
+pub mod group_geography;
 pub mod moderation_legacy;
 pub mod owner_bootstrap;
 pub mod path;

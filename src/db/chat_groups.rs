@@ -43,6 +43,20 @@ pub fn initialize(conn: &Connection) -> Result<()> {
         [],
     );
 
+    tx.execute_batch(
+        "CREATE TABLE IF NOT EXISTS chat_group_scopes (
+            group_id INTEGER PRIMARY KEY,
+            scope_type TEXT NOT NULL
+                CHECK (scope_type IN ('world', 'continent', 'country', 'city')),
+            scope_id INTEGER NOT NULL CHECK (scope_id > 0),
+            created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+            FOREIGN KEY(group_id) REFERENCES chat_groups(id) ON DELETE CASCADE,
+            UNIQUE(scope_type, scope_id)
+         );
+         CREATE INDEX IF NOT EXISTS idx_chat_group_scopes_lookup
+         ON chat_group_scopes(scope_type, scope_id, group_id);",
+    )?;
+
     tx.execute(
         "CREATE TABLE IF NOT EXISTS chat_group_members (
             group_id INTEGER NOT NULL,

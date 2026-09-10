@@ -2833,7 +2833,9 @@ pub fn load_user_groups(
             CASE WHEN trim(COALESCE(g.avatar_path, '')) <> '' THEN 1 ELSE 0 END,
             COALESCE(pref.pinned_at, 0),
             COALESCE(pref.archived_at, 0),
-            COALESCE(pref.muted_until, 0)
+            COALESCE(pref.muted_until, 0),
+            COALESCE(scope.scope_type, ''),
+            COALESCE(scope.scope_id, 0)
          FROM chat_groups g
          JOIN chat_group_members mem
            ON mem.group_id = g.id
@@ -2842,6 +2844,8 @@ pub fn load_user_groups(
            ON pref.user_id = ?1
           AND pref.chat_kind = 'group'
           AND pref.target_id = g.id
+         LEFT JOIN chat_group_scopes AS scope
+           ON scope.group_id = g.id
          ORDER BY 4 DESC
          LIMIT 100",
     )
@@ -2862,6 +2866,8 @@ pub fn load_user_groups(
                 pinned_at: row.get(6)?,
                 archived_at: row.get(7)?,
                 muted_until: row.get(8)?,
+                group_scope_type: row.get(9)?,
+                group_scope_id: row.get(10)?,
             })
         })?
         .collect::<Result<Vec<_>, _>>()
@@ -2905,6 +2911,12 @@ mod tests {
                     muted_until INTEGER NOT NULL DEFAULT 0,
                     updated_at INTEGER NOT NULL DEFAULT 0,
                     PRIMARY KEY (user_id, chat_kind, target_id)
+                );
+                CREATE TABLE chat_group_scopes (
+                    group_id INTEGER PRIMARY KEY,
+                    scope_type TEXT NOT NULL,
+                    scope_id INTEGER NOT NULL,
+                    UNIQUE(scope_type, scope_id)
                 );
                 CREATE TABLE profiles (
                     user_id INTEGER PRIMARY KEY,
