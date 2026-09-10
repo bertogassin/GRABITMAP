@@ -391,6 +391,7 @@ fn chat_message_body_html(message: &crate::web::view_models::ChatMessageRow) -> 
 
 fn chat_reply_author_label(
     reply_sender_user_id: i64,
+    reply_sender_name: &str,
     viewer_user_id: i64,
     other_user_id: i64,
 ) -> String {
@@ -400,6 +401,8 @@ fn chat_reply_author_label(
 
     if reply_sender_user_id == viewer_user_id {
         crate::i18n::t("chat_you")
+    } else if other_user_id <= 0 && !reply_sender_name.trim().is_empty() {
+        reply_sender_name.trim().to_string()
     } else if reply_sender_user_id == other_user_id {
         crate::i18n::t("chat_peer")
     } else {
@@ -488,8 +491,12 @@ fn render_chat_message_row(
 
     let reply_html = if message.reply_to_message_id > 0 {
         let reply_preview = escape_html(&message.reply_message);
-        let reply_author =
-            chat_reply_author_label(message.reply_sender_user_id, viewer_user_id, other_user_id);
+        let reply_author = escape_html(&chat_reply_author_label(
+            message.reply_sender_user_id,
+            &message.reply_sender_name,
+            viewer_user_id,
+            other_user_id,
+        ));
 
         format!(
             r#"
@@ -521,7 +528,7 @@ fn render_chat_message_row(
     let attachment_kind = escape_html(&message.attachment_kind);
     let attachment_url = escape_html(&message.attachment_url);
 
-    let reactions_html = if message.reactions.is_empty() {
+    let reactions_html = if deleted || message.reactions.is_empty() {
         String::new()
     } else {
         let pills = message
@@ -559,6 +566,8 @@ fn render_chat_message_row(
      data-reply-to="{reply_to}"
      data-reply-message="{reply_message}"
      data-reply-sender="{reply_sender}"
+     data-reply-sender-name="{reply_sender_name}"
+     data-sender-name="{sender_name}"
      data-read-at="{read_at}"
      data-delivered-at="{delivered_at}"
      data-created-at="{created_at}"
@@ -590,6 +599,8 @@ fn render_chat_message_row(
         reply_to = message.reply_to_message_id,
         reply_message = escape_html(&message.reply_message),
         reply_sender = message.reply_sender_user_id,
+        reply_sender_name = escape_html(&message.reply_sender_name),
+        sender_name = escape_html(&message.sender_name),
         read_at = message.read_at,
         delivered_at = message.delivered_at,
         created_at = message.created_at,

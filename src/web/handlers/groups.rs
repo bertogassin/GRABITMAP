@@ -1,6 +1,6 @@
 use super::auth::verify_user_session;
 use super::chat::load_user_conversations;
-use super::chat_api::{message_can_be_edited, message_is_valid, reaction_emoji_is_allowed};
+use super::chat_api::{message_content_can_be_edited, message_is_valid, reaction_emoji_is_allowed};
 use super::chat_media::{
     detect_audio, detect_image, extension_for_mime, media_path_is_safe, media_root, MAX_VOICE_BYTES,
 };
@@ -420,6 +420,7 @@ fn decorate_group_messages(
         }
         if let Some((sender_id, text)) = replies.get(&message.reply_to_message_id) {
             message.reply_sender_user_id = *sender_id;
+            message.reply_sender_name = names.get(sender_id).cloned().unwrap_or_default();
             message.reply_message = text.clone();
         }
     }
@@ -540,6 +541,7 @@ fn map_group_message_row(
         read_at: 0,
         reply_to_message_id: row.get(9)?,
         reply_sender_user_id: 0,
+        reply_sender_name: String::new(),
         reply_message: String::new(),
         edited_at: row.get(4)?,
         deleted_at,
@@ -572,6 +574,7 @@ fn message_json(
         "created_at": message.created_at,
         "reply_to_message_id": if message.reply_to_message_id > 0 { Some(message.reply_to_message_id) } else { None::<i64> },
         "reply_sender_user_id": if message.reply_sender_user_id > 0 { Some(message.reply_sender_user_id) } else { None::<i64> },
+        "reply_sender_name": message.reply_sender_name,
         "reply_message": message.reply_message,
         "edited_at": message.edited_at,
         "deleted_at": message.deleted_at,
@@ -1381,19 +1384,19 @@ pub async fn api_group_edit(
     if group_id <= 0 || !is_member(&db, group_id, user_id) {
         return json_error(StatusCode::FORBIDDEN, "not_a_member");
     }
-    let row: Option<(i64, i64)> = db
+    let row: Option<(i64, i64, String)> = db
         .query_row(
-            "SELECT created_at, deleted_at FROM group_messages
+            "SELECT created_at, deleted_at, COALESCE(attachment_kind, '') FROM group_messages
              WHERE id = ?1 AND group_id = ?2 AND sender_user_id = ?3",
             rusqlite::params![message_id, group_id, user_id],
-            |row| Ok((row.get(0)?, row.get(1)?)),
+            |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
         )
         .ok();
-    let Some((created_at, deleted_at)) = row else {
+    let Some((created_at, deleted_at, attachment_kind)) = row else {
         return json_error(StatusCode::NOT_FOUND, "message_not_found");
     };
     let now = unix_now();
-    if !message_can_be_edited(created_at, deleted_at, now) {
+    if !message_content_can_be_edited(created_at, deleted_at, &attachment_kind, now) {
         return json_error(StatusCode::CONFLICT, "message_not_editable");
     }
     if db
@@ -1504,21 +1507,27 @@ pub async fn api_group_react(
             |row| row.get(0),
         )
         .ok();
-    if existing.as_deref() == Some(emoji) {
-        let _ = db.execute(
+    let changed = if existing.as_deref() == Some(emoji) {
+        db.execute(
             "DELETE FROM group_message_reactions WHERE message_id = ?1 AND user_id = ?2",
             rusqlite::params![message_id, user_id],
-        );
+        )
     } else {
-        let _ = db.execute(
+        db.execute(
             "INSERT INTO group_message_reactions (message_id, user_id, emoji, created_at)
              VALUES (?1, ?2, ?3, ?4)
              ON CONFLICT(message_id, user_id) DO UPDATE SET emoji = excluded.emoji, created_at = excluded.created_at",
             rusqlite::params![message_id, user_id, emoji, unix_now()],
-        );
+        )
+    }
+    .unwrap_or(0);
+    if changed != 1 {
+        return json_error(StatusCode::INTERNAL_SERVER_ERROR, "reaction_save_failed");
     }
     let mut loaded = load_group_messages(&db, group_id, user_id, message_id - 1, 0, 1);
-    let reactions = loaded.pop().map(|m| m.reactions).unwrap_or_default();
+    let Some(message) = loaded.pop() else {
+        return json_error(StatusCode::INTERNAL_SERVER_ERROR, "message_reload_failed");
+    };
     fanout_group_message(
         &state,
         &db,
@@ -1530,7 +1539,9 @@ pub async fn api_group_react(
     );
     Json(json!({
         "ok": true,
-        "reactions": reactions.iter().map(|r| json!({"emoji": r.emoji, "count": r.count, "mine": r.mine})).collect::<Vec<_>>()
+        "message_id": message_id,
+        "reactions": message.reactions.iter().map(|r| json!({"emoji": r.emoji, "count": r.count, "mine": r.mine})).collect::<Vec<_>>(),
+        "message": message_json(&message, user_id),
     }))
     .into_response()
 }
@@ -1841,10 +1852,15 @@ mod tests {
         assert_eq!(messages[0].read_at, 100);
         assert_eq!(messages[1].sender_name, "Лейла А");
         assert_eq!(messages[1].reply_sender_user_id, 1);
+        assert_eq!(messages[1].reply_sender_name, "Амир");
         assert_eq!(messages[1].reply_message, "Первое");
         assert_eq!(messages[1].reactions.len(), 1);
         assert_eq!(messages[1].reactions[0].count, 2);
         assert!(messages[1].reactions[0].mine);
+
+        let response = message_json(&messages[1], 1);
+        assert_eq!(response["reply_sender_name"], "Амир");
+        assert_eq!(response["reactions"][0]["count"], 2);
     }
 
     #[test]

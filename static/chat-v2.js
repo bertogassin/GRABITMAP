@@ -2970,6 +2970,34 @@
         var forwardDraftKey =
             "resursmap-chat-forward:" + (isGroup ? ("g:" + groupId) : ("d:" + otherUserId));
 
+        if (replyBar) {
+            var replyHeading = replyBar.querySelector("strong");
+            var replyClose = replyBar.querySelector("#chat-reply-close");
+            if (replyHeading) {
+                replyHeading.textContent = t("chat_reply_label", "Ответ");
+            }
+            if (replyClose) {
+                replyClose.setAttribute(
+                    "aria-label",
+                    t("chat_cancel_reply", "Отменить ответ")
+                );
+            }
+        }
+
+        if (forwardBar) {
+            var forwardHeading = forwardBar.querySelector("strong");
+            var forwardClose = forwardBar.querySelector("#chat-forward-close");
+            if (forwardHeading) {
+                forwardHeading.textContent = t("chat_forward", "Переслать");
+            }
+            if (forwardClose) {
+                forwardClose.setAttribute(
+                    "aria-label",
+                    t("chat_cancel", "Отмена")
+                );
+            }
+        }
+
         function escapeHtml(value) {
             return String(value || "")
                 .replace(/&/g, "&amp;")
@@ -3090,11 +3118,15 @@
                             ? data.conversations
                             : [];
 
+                    var currentTarget = isGroup
+                        ? ("g:" + groupId)
+                        : ("d:" + otherUserId);
                     conversations = conversations.filter(
                         function (conversation) {
-                            return String(
-                                conversation.other_user_id
-                            ) !== otherUserId;
+                            var candidate = conversation.is_group
+                                ? ("g:" + String(conversation.group_id || ""))
+                                : ("d:" + String(conversation.other_user_id || ""));
+                            return candidate !== currentTarget;
                         }
                     );
 
@@ -3218,6 +3250,10 @@
             if (node) {
                 node.textContent = text;
             }
+        }
+
+        function reportActionError() {
+            setSendState(t("chat_send_error", "Ошибка отправки"));
         }
 
         window.resursmapSendChatForward = function () {
@@ -3894,6 +3930,7 @@
                 String(message.message || ""),
                 Number(message.reply_to_message_id || 0),
                 String(message.reply_message || ""),
+                String(message.reply_sender_name || ""),
                 Number(message.edited_at || 0),
                 Number(message.deleted_at || 0),
                 Number(message.read_at || 0),
@@ -3920,6 +3957,15 @@
                 message.is_mine ? "1" : "0";
             row.dataset.messageText =
                 String(message.message || "");
+            row.dataset.editedAt = String(Number(message.edited_at) || 0);
+            row.dataset.replyTo = String(Number(message.reply_to_message_id) || 0);
+            row.dataset.replyMessage = String(message.reply_message || "");
+            row.dataset.replySender = String(message.reply_sender_user_id || "");
+            row.dataset.replySenderName = String(message.reply_sender_name || "");
+            row.dataset.createdAt = String(Number(message.created_at) || 0);
+            row.dataset.attachmentKind = String(message.attachment_kind || "");
+            row.dataset.attachmentUrl = String(message.attachment_url || "");
+            row.dataset.senderName = String(message.sender_name || "");
             row.dataset.deleted =
                 Number(message.deleted_at) > 0
                     ? "1"
@@ -3997,7 +4043,9 @@
                 ).trim();
                 var author = t("chat_message", "Сообщение");
 
-                if (replySender) {
+                if (isGroup && message.reply_sender_name) {
+                    author = String(message.reply_sender_name);
+                } else if (replySender) {
                     author =
                         replySender === otherUserId
                             ? t("chat_peer", "Собеседник")
@@ -4034,7 +4082,12 @@
                 bubble.appendChild(edited);
             }
 
-            renderReactions(row, message.reactions || []);
+            renderReactions(
+                row,
+                Number(message.deleted_at) > 0
+                    ? []
+                    : (message.reactions || [])
+            );
         }
 
         function messageFromRow(row) {
@@ -4073,6 +4126,8 @@
                 reply_sender_user_id:
                     String(row.dataset.replySender || "").trim() ||
                     null,
+                reply_sender_name:
+                    String(row.dataset.replySenderName || "").trim(),
                 read_at:
                     Number(row.dataset.readAt || 0),
                 delivered_at:
@@ -4082,7 +4137,19 @@
                 attachment_kind:
                     row.dataset.attachmentKind || "",
                 attachment_url:
-                    row.dataset.attachmentUrl || ""
+                    row.dataset.attachmentUrl || "",
+                sender_name:
+                    String(row.dataset.senderName || "").trim(),
+                reactions: Array.from(
+                    row.querySelectorAll(".chat-reaction-pill")
+                ).map(function (pill) {
+                    var count = pill.querySelector("span");
+                    return {
+                        emoji: pill.dataset.emoji || "",
+                        count: Number(count ? count.textContent : 0) || 0,
+                        mine: pill.classList.contains("is-mine")
+                    };
+                })
             };
         }
 
@@ -4129,16 +4196,33 @@
                     reply_sender_user_id:
                         String(row.dataset.replySender || "").trim() ||
                         null,
+                    reply_sender_name:
+                        String(row.dataset.replySenderName || "").trim(),
                     read_at:
                         Number(row.dataset.readAt || 0),
                     delivered_at:
                         Number(row.dataset.deliveredAt || 0),
                     created_at:
-                        Number(row.dataset.createdAt || 0)
+                        Number(row.dataset.createdAt || 0),
+                    attachment_kind:
+                        row.dataset.attachmentKind || "",
+                    attachment_url:
+                        row.dataset.attachmentUrl || "",
+                    sender_name:
+                        String(row.dataset.senderName || "").trim(),
+                    reactions: Array.from(
+                        row.querySelectorAll(".chat-reaction-pill")
+                    ).map(function (pill) {
+                        var count = pill.querySelector("span");
+                        return {
+                            emoji: pill.dataset.emoji || "",
+                            count: Number(count ? count.textContent : 0) || 0,
+                            mine: pill.classList.contains("is-mine")
+                        };
+                    })
                 };
 
                 messageCache.set(id, message);
-                renderMessage(message);
             });
         }
 
@@ -4309,7 +4393,7 @@
                         reactToMessage(
                             reactionMessage,
                             reaction.dataset.emoji || "❤️"
-                        );
+                        ).catch(reportActionError);
                     }
 
                     return;
@@ -4475,6 +4559,7 @@
                             closeSheet();
                         })
                         .catch(function () {
+                            reportActionError();
                             closeSheet();
                         });
                 } else if (action.dataset.chatAction === "forward") {
@@ -4483,9 +4568,11 @@
                     reactToMessage(
                         selectedMessage,
                         action.dataset.emoji || "❤️"
-                    ).finally(function () {
-                        closeSheet();
-                    });
+                    )
+                        .catch(reportActionError)
+                        .finally(function () {
+                            closeSheet();
+                        });
                 } else if (
                     action.dataset.chatAction === "edit"
                 ) {
@@ -4592,6 +4679,7 @@
                         editorInput.classList.add(
                             "is-error"
                         );
+                        reportActionError();
                     })
                     .finally(function () {
                         editorSave.disabled = false;
@@ -4625,6 +4713,7 @@
                     })
                     .catch(function () {
                         deleteApply.classList.add("is-error");
+                        reportActionError();
                     })
                     .finally(function () {
                         deleteApply.disabled = false;

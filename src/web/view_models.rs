@@ -57,6 +57,7 @@ pub struct ChatMessageRow {
     pub read_at: i64,
     pub reply_to_message_id: i64,
     pub reply_sender_user_id: i64,
+    pub reply_sender_name: String,
     pub reply_message: String,
     pub edited_at: i64,
     pub deleted_at: i64,

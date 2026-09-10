@@ -83,6 +83,7 @@ fn load_recent_chat_messages(
                     read_at: optional_i64(row, 6)?,
                     reply_to_message_id: optional_i64(row, 7)?,
                     reply_sender_user_id: optional_i64(row, 8)?,
+                    reply_sender_name: String::new(),
                     reply_message: row.get(9)?,
                     edited_at: optional_i64(row, 10)?,
                     deleted_at,

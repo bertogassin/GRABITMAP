@@ -43,6 +43,16 @@ pub(crate) fn message_can_be_edited(created_at: i64, deleted_at: i64, now: i64) 
         && now.saturating_sub(created_at) <= 86_400
 }
 
+pub(crate) fn message_content_can_be_edited(
+    created_at: i64,
+    deleted_at: i64,
+    attachment_kind: &str,
+    now: i64,
+) -> bool {
+    (attachment_kind.is_empty() || attachment_kind == "text")
+        && message_can_be_edited(created_at, deleted_at, now)
+}
+
 pub(crate) fn chat_media_attachment_url(
     id: i64,
     deleted_at: i64,
@@ -1188,25 +1198,25 @@ pub async fn api_chat_edit(
         }
     };
 
-    let row: Option<(i64, i64)> = connection
+    let row: Option<(i64, i64, String)> = connection
         .query_row(
-            "SELECT created_at, deleted_at
+            "SELECT created_at, deleted_at, COALESCE(attachment_kind, '')
              FROM messages
              WHERE id = ?1
                AND conversation_id = ?2
                AND sender_user_id = ?3",
             rusqlite::params![message_id, conversation_id, user_id],
-            |row| Ok((row.get(0)?, row.get(1)?)),
+            |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
         )
         .ok();
 
-    let Some((created_at, deleted_at)) = row else {
+    let Some((created_at, deleted_at, attachment_kind)) = row else {
         return json_error(StatusCode::NOT_FOUND, "message_not_found");
     };
 
     let now = crate::web::handlers::common::unix_now();
 
-    if !message_can_be_edited(created_at, deleted_at, now) {
+    if !message_content_can_be_edited(created_at, deleted_at, &attachment_kind, now) {
         return json_error(StatusCode::CONFLICT, "message_not_editable");
     }
 
@@ -1686,6 +1696,14 @@ mod tests {
         assert!(message_can_be_edited(1_000, 0, 1_000 + 86_400));
         assert!(!message_can_be_edited(1_000, 0, 1_000 + 86_401));
         assert!(!message_can_be_edited(1_000, 2_000, 1_001));
+    }
+
+    #[test]
+    fn chat_edit_policy_rejects_media_messages() {
+        assert!(message_content_can_be_edited(1_000, 0, "", 1_001));
+        assert!(message_content_can_be_edited(1_000, 0, "text", 1_001));
+        assert!(!message_content_can_be_edited(1_000, 0, "image", 1_001));
+        assert!(!message_content_can_be_edited(1_000, 0, "voice", 1_001));
     }
 
     #[test]
