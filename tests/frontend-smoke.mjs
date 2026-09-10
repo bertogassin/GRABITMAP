@@ -643,6 +643,30 @@ test("official group directory is hierarchical, authorized, and opt-in", async (
   assert.match(template, /Одна группа на одно место/);
 });
 
+test("official group governance follows active geographic administration", async () => {
+  const [database, official, groups, pins, routes, template] = await Promise.all([
+    readFile(new URL("src/db/group_geography.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/official_groups.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/chat_pins.rs", root), "utf8"),
+    readFile(new URL("src/web/routes/communication.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+  ]);
+
+  assert.match(database, /chat_official_group_governance_events/);
+  assert.match(database, /control_claimed/);
+  assert.match(official, /fn group_management_role/);
+  assert.match(official, /valid_admin_session_public_id/);
+  assert.match(official, /previous_owner_user_id/);
+  assert.match(official, /SET owner_user_id = \?1, invite_nonce = ''/);
+  assert.match(groups, /is_official_group\(&db, group_id\)/);
+  assert.match(groups, /SET name = CASE WHEN \?8 = 1 THEN name ELSE \?1 END/);
+  assert.match(pins, /official_groups::group_management_role/);
+  assert.match(routes, /\/app\/group\/\{group_id\}\/official-control/);
+  assert.match(template, /Принять управление/);
+  assert.match(template, /Права управления определяются действующим административным назначением/);
+});
+
 test("user-facing copy no longer calls listings resources", async () => {
   const visibleFiles = [
     "static/share.js",

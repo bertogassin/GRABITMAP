@@ -49,15 +49,6 @@ fn direct_conversation_id(
     .ok()
 }
 
-fn group_role(db: &rusqlite::Connection, group_id: i64, user_id: i64) -> Option<String> {
-    db.query_row(
-        "SELECT role FROM chat_group_members WHERE group_id = ?1 AND user_id = ?2",
-        rusqlite::params![group_id, user_id],
-        |row| row.get(0),
-    )
-    .ok()
-}
-
 fn can_manage_group_pins(role: &str) -> bool {
     role == "owner" || role == "admin"
 }
@@ -172,7 +163,9 @@ pub async fn api_group_pinned(
         Ok(value) => value,
         Err(_) => return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable"),
     };
-    let Some(role) = group_role(&db, group_id, user_id) else {
+    let Some(role) =
+        super::official_groups::group_management_role(&state, &headers, &db, group_id, user_id)
+    else {
         return json_error(StatusCode::FORBIDDEN, "not_a_member");
     };
     Json(json!({
@@ -275,7 +268,9 @@ pub async fn api_group_pin(
         Ok(value) => value,
         Err(_) => return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable"),
     };
-    let role = group_role(&db, group_id, user_id).unwrap_or_default();
+    let role =
+        super::official_groups::group_management_role(&state, &headers, &db, group_id, user_id)
+            .unwrap_or_default();
     if !can_manage_group_pins(&role) {
         return json_error(StatusCode::FORBIDDEN, "group_admin_required");
     }

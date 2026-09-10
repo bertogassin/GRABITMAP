@@ -188,6 +188,67 @@ fn can_create_official_group(
         && scope_is_authorized(state, &context, target_scope_id)
 }
 
+pub(super) fn is_official_group(db: &Connection, group_id: i64) -> bool {
+    group_id > 0
+        && db
+            .query_row(
+                "SELECT 1 FROM chat_group_scopes WHERE group_id = ?1",
+                [group_id],
+                |_| Ok(()),
+            )
+            .is_ok()
+}
+
+fn official_group_location(db: &Connection, group_id: i64) -> Option<ScopeLocation> {
+    let (scope_type, scope_id): (String, i64) = db
+        .query_row(
+            "SELECT scope_type, scope_id FROM chat_group_scopes WHERE group_id = ?1",
+            [group_id],
+            |row| Ok((row.get(0)?, row.get(1)?)),
+        )
+        .ok()?;
+    load_scope(db, &scope_type, scope_id)
+}
+
+pub(super) fn can_administer_official_group(
+    state: &AppState,
+    headers: &HeaderMap,
+    db: &Connection,
+    group_id: i64,
+    user_id: i64,
+) -> bool {
+    let Some(location) = official_group_location(db, group_id) else {
+        return false;
+    };
+    can_create_official_group(state, headers, db, user_id, &location)
+}
+
+pub(super) fn group_management_role(
+    state: &AppState,
+    headers: &HeaderMap,
+    db: &Connection,
+    group_id: i64,
+    user_id: i64,
+) -> Option<String> {
+    let stored_role: Option<String> = db
+        .query_row(
+            "SELECT role FROM chat_group_members WHERE group_id = ?1 AND user_id = ?2",
+            rusqlite::params![group_id, user_id],
+            |row| row.get(0),
+        )
+        .ok();
+    if !is_official_group(db, group_id) {
+        return stored_role;
+    }
+    match stored_role.as_deref() {
+        Some("owner") if can_administer_official_group(state, headers, db, group_id, user_id) => {
+            Some("owner".to_string())
+        }
+        Some(_) => Some("member".to_string()),
+        None => None,
+    }
+}
+
 fn group_for_scope(db: &Connection, scope_type: &str, scope_id: i64) -> Option<(i64, i64)> {
     db.query_row(
         "SELECT scope.group_id, COUNT(member.user_id)
@@ -369,6 +430,9 @@ pub async fn create_official_group(
     if !can_create_official_group(&state, &headers, &db, user_id, &location) {
         return StatusCode::FORBIDDEN.into_response();
     }
+    let Some(admin_context) = load_admin_context(&state, user_id) else {
+        return StatusCode::FORBIDDEN.into_response();
+    };
     let now = unix_now();
     let transaction = match db.transaction() {
         Ok(transaction) => transaction,
@@ -403,10 +467,112 @@ pub async fn create_official_group(
          VALUES (?1, ?2, ?3, ?4)",
         rusqlite::params![group_id, safe_type, safe_id, now],
     );
-    if saved.is_err() || bound.is_err() || transaction.commit().is_err() {
+    let audited = transaction.execute(
+        "INSERT INTO chat_official_group_governance_events (
+            group_id, action, actor_user_id, admin_assignment_id,
+            previous_owner_user_id, new_owner_user_id, created_at
+         ) VALUES (?1, 'created', ?2, ?3, 0, ?2, ?4)",
+        rusqlite::params![group_id, user_id, admin_context.assignment_id, now],
+    );
+    if saved.is_err() || bound.is_err() || audited.is_err() || transaction.commit().is_err() {
         return StatusCode::CONFLICT.into_response();
     }
     Redirect::to(&format!("/app/group/{group_id}")).into_response()
+}
+
+pub async fn claim_official_group_control(
+    State(state): State<AppState>,
+    Path(group_id): Path<i64>,
+    headers: HeaderMap,
+) -> Response {
+    let target = format!("/app/group/{group_id}/members");
+    if request_is_cross_site(&headers) {
+        return StatusCode::FORBIDDEN.into_response();
+    }
+    let Some(user_id) = verify_user_session(&state, &headers) else {
+        return Redirect::to("/login?next=/app/messages").into_response();
+    };
+    if rate_limit_retry_after(&state, user_id, "official_group_control", 6, 600)
+        .await
+        .is_some()
+    {
+        return StatusCode::TOO_MANY_REQUESTS.into_response();
+    }
+    let mut db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => return StatusCode::SERVICE_UNAVAILABLE.into_response(),
+    };
+    if !is_official_group(&db, group_id)
+        || !can_administer_official_group(&state, &headers, &db, group_id, user_id)
+    {
+        return StatusCode::FORBIDDEN.into_response();
+    }
+    let Some(admin_context) = load_admin_context(&state, user_id) else {
+        return StatusCode::FORBIDDEN.into_response();
+    };
+    let transaction = match db.transaction() {
+        Ok(transaction) => transaction,
+        Err(_) => return StatusCode::SERVICE_UNAVAILABLE.into_response(),
+    };
+    let is_member = transaction
+        .query_row(
+            "SELECT 1 FROM chat_group_members WHERE group_id = ?1 AND user_id = ?2",
+            rusqlite::params![group_id, user_id],
+            |_| Ok(()),
+        )
+        .is_ok();
+    if !is_member {
+        return StatusCode::FORBIDDEN.into_response();
+    }
+    let previous_owner: i64 = transaction
+        .query_row(
+            "SELECT owner_user_id FROM chat_groups WHERE id = ?1",
+            [group_id],
+            |row| row.get(0),
+        )
+        .unwrap_or(0);
+    if previous_owner == user_id {
+        return Redirect::to(&target).into_response();
+    }
+    let now = unix_now();
+    let demoted = transaction.execute(
+        "UPDATE chat_group_members SET role = 'member'
+         WHERE group_id = ?1 AND role = 'owner'",
+        [group_id],
+    );
+    let promoted = transaction.execute(
+        "UPDATE chat_group_members SET role = 'owner'
+         WHERE group_id = ?1 AND user_id = ?2",
+        rusqlite::params![group_id, user_id],
+    );
+    let group_updated = transaction.execute(
+        "UPDATE chat_groups
+         SET owner_user_id = ?1, invite_nonce = '', updated_at = ?2
+         WHERE id = ?3",
+        rusqlite::params![user_id, now, group_id],
+    );
+    let audited = transaction.execute(
+        "INSERT INTO chat_official_group_governance_events (
+            group_id, action, actor_user_id, admin_assignment_id,
+            previous_owner_user_id, new_owner_user_id, created_at
+         ) VALUES (?1, 'control_claimed', ?2, ?3, ?4, ?2, ?5)",
+        rusqlite::params![
+            group_id,
+            user_id,
+            admin_context.assignment_id,
+            previous_owner,
+            now
+        ],
+    );
+    if demoted.is_err()
+        || promoted.ok() != Some(1)
+        || group_updated.ok() != Some(1)
+        || audited.is_err()
+        || transaction.commit().is_err()
+    {
+        return StatusCode::CONFLICT.into_response();
+    }
+    Redirect::to(&target).into_response()
 }
 
 pub async fn join_official_group(

@@ -42,6 +42,21 @@ pub fn initialize_connection(connection: &Connection) -> Result<()> {
          CREATE INDEX IF NOT EXISTS idx_chat_group_scopes_lookup
          ON chat_group_scopes(scope_type, scope_id, group_id);
 
+         CREATE TABLE IF NOT EXISTS chat_official_group_governance_events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            group_id INTEGER NOT NULL,
+            action TEXT NOT NULL CHECK (action IN ('created', 'control_claimed')),
+            actor_user_id INTEGER NOT NULL,
+            admin_assignment_id INTEGER NOT NULL,
+            previous_owner_user_id INTEGER NOT NULL DEFAULT 0,
+            new_owner_user_id INTEGER NOT NULL,
+            created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+            FOREIGN KEY(group_id) REFERENCES chat_groups(id) ON DELETE CASCADE
+         );
+
+         CREATE INDEX IF NOT EXISTS idx_official_group_governance_group
+         ON chat_official_group_governance_events(group_id, created_at DESC, id DESC);
+
          CREATE TRIGGER IF NOT EXISTS chat_group_scope_insert_guard
          BEFORE INSERT ON chat_group_scopes
          WHEN NOT (
@@ -198,8 +213,25 @@ mod tests {
         let connection = database();
         bind_group(&connection, 13, SCOPE_CITY, 4, 100).expect("city binding");
         connection
+            .execute(
+                "INSERT INTO chat_official_group_governance_events (
+                    group_id, action, actor_user_id, admin_assignment_id,
+                    previous_owner_user_id, new_owner_user_id, created_at
+                 ) VALUES (13, 'created', 70, 80, 0, 70, 100)",
+                [],
+            )
+            .expect("governance audit event");
+        connection
             .execute("DELETE FROM chat_groups WHERE id = 13", [])
             .expect("group deletion");
         assert_eq!(group_for_scope(&connection, SCOPE_CITY, 4), None);
+        let audit_count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM chat_official_group_governance_events WHERE group_id = 13",
+                [],
+                |row| row.get(0),
+            )
+            .expect("governance audit count");
+        assert_eq!(audit_count, 0);
     }
 }

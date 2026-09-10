@@ -1400,6 +1400,9 @@ pub struct GroupMembersPage<'a> {
     pub name: &'a str,
     pub description: &'a str,
     pub viewer_role: &'a str,
+    pub is_official: bool,
+    pub is_recorded_official_owner: bool,
+    pub can_claim_official: bool,
     pub members: Vec<(i64, String, String, i64)>,
     pub candidates: Vec<(i64, String)>,
     pub error: &'a str,
@@ -1412,6 +1415,9 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
         name,
         description,
         viewer_role,
+        is_official,
+        is_recorded_official_owner,
+        can_claim_official,
         members,
         candidates,
         error,
@@ -1429,6 +1435,7 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
             .iter()
             .map(|(id, member, role, muted_until)| {
                 let role_label = match role.as_str() {
+                    "owner" if is_official => "Текущий управляющий",
                     "owner" => "Владелец",
                     "admin" => "Администратор",
                     _ => "Участник",
@@ -1438,7 +1445,11 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
                 } else {
                     ""
                 };
-                let role_action = if is_owner && *id != viewer_user_id && role != "owner" {
+                let role_action = if !is_official
+                    && is_owner
+                    && *id != viewer_user_id
+                    && role != "owner"
+                {
                     let (next_role, label) = if role == "admin" {
                         ("member", "Сделать участником")
                     } else {
@@ -1453,7 +1464,11 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
                 } else {
                     String::new()
                 };
-                let transfer_action = if is_owner && *id != viewer_user_id && role != "owner" {
+                let transfer_action = if !is_official
+                    && is_owner
+                    && *id != viewer_user_id
+                    && role != "owner"
+                {
                     format!(
                         r#"<form method="post" action="/app/group/{group_id}/members/{id}/owner" data-confirm="Передать этому участнику права владельца группы?">
     <button type="submit" class="rm-group-action">Передать владение</button>
@@ -1519,7 +1534,7 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
             })
             .collect::<Vec<_>>()
             .join("");
-        let add = if !can_manage {
+        let add = if is_official || !can_manage {
             String::new()
         } else if candidates.is_empty() {
             r#"<section class="card rm-group-create"><div class="rm-profile-field-label">Добавить участников</div><p class="card-meta">Все доступные собеседники уже в этой группе.</p></section>"#.to_string()
@@ -1545,12 +1560,13 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
                 boxes = boxes,
             )
         };
+        let name_readonly = if is_official { "readonly" } else { "" };
         let rename = if can_manage {
             format!(
                 r#"<form method="post" action="/app/group/{group_id}/settings/name" class="card rm-group-create">
     <label class="rm-profile-field">
         <div class="rm-profile-field-label">Название группы</div>
-        <input class="ui-input" name="name" maxlength="80" required value="{name}">
+        <input class="ui-input" name="name" maxlength="80" required value="{name}" {name_readonly}>
     </label>
     <label class="rm-profile-field">
         <div class="rm-profile-field-label">Описание</div>
@@ -1560,11 +1576,12 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
 </form>"#,
                 name = escape_html(name),
                 description = escape_html(description),
+                name_readonly = name_readonly,
             )
         } else {
             String::new()
         };
-        let invite = if can_manage {
+        let invite = if can_manage && !is_official {
             format!(
                 r#"<section class="card rm-group-create">
     <div class="rm-profile-field-label">Приглашение в группу</div>
@@ -1612,7 +1629,11 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
         } else {
             String::new()
         };
-        let leave = if is_owner {
+        let leave = if is_official && is_recorded_official_owner && is_owner {
+            r#"<section class="card rm-group-create"><div class="rm-profile-field-label">Управление официальной группой активно</div><p class="card-meta">Контроль передаётся только через действующее административное назначение территории.</p></section>"#.to_string()
+        } else if is_official && is_recorded_official_owner {
+            r#"<section class="card rm-group-create"><div class="rm-profile-field-label">Требуется новый управляющий</div><p class="card-meta">Ваше административное назначение больше не даёт прав управления. Выйти из группы можно после того, как другой действующий администратор территории примет управление.</p></section>"#.to_string()
+        } else if is_owner {
             r#"<section class="card rm-group-create"><div class="rm-profile-field-label">Вы владелец группы</div><p class="card-meta">Перед выходом передайте владение другому участнику. Так группа не останется без управления.</p></section>"#.to_string()
         } else {
             format!(
@@ -1621,8 +1642,22 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
 </form>"#
             )
         };
+        let governance = if !is_official {
+            String::new()
+        } else if can_claim_official {
+            format!(
+                r#"<form method="post" action="/app/group/{group_id}/official-control" class="card rm-group-create" data-confirm="Принять управление этой официальной группой по вашей административной роли?">
+    <div class="rm-profile-field-label">Управление территорией</div>
+    <p class="card-meta">Ваше действующее назначение разрешает принять управление. Предыдущий управляющий станет обычным участником, а приглашения будут отозваны.</p>
+    <button type="submit" class="ui-button">Принять управление</button>
+</form>"#
+            )
+        } else {
+            r#"<section class="card rm-group-create"><div class="rm-profile-field-label">Официальная группа GRABIT</div><p class="card-meta">Права управления определяются действующим административным назначением территории, а не обычной ролью участника.</p></section>"#.to_string()
+        };
         format!(
-            r#"{rename}
+            r#"{governance}
+{rename}
 {avatar}
 {invite}
 <section class="card rm-group-create">
@@ -1670,6 +1705,7 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
 }})();
 </script>"#,
             rename = rename,
+            governance = governance,
             avatar = avatar,
             invite = invite,
             member_count = members.len(),

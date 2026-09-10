@@ -1744,7 +1744,9 @@ pub async fn api_group_delete(
         Ok(db) => db,
         Err(_) => return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable"),
     };
-    let actor_role = group_role(&db, group_id, user_id).unwrap_or_default();
+    let actor_role =
+        super::official_groups::group_management_role(&state, &headers, &db, group_id, user_id)
+            .unwrap_or_default();
     if actor_role.is_empty() {
         return json_error(StatusCode::FORBIDDEN, "not_a_member");
     }
@@ -1921,6 +1923,9 @@ pub async fn group_members_page(
                     name: "",
                     description: "",
                     viewer_role: "",
+                    is_official: false,
+                    is_recorded_official_owner: false,
+                    can_claim_official: false,
                     members: vec![],
                     candidates: vec![],
                     error: "",
@@ -1940,6 +1945,9 @@ pub async fn group_members_page(
                 name: "Группа",
                 description: "",
                 viewer_role: "",
+                is_official: false,
+                is_recorded_official_owner: false,
+                can_claim_official: false,
                 members: vec![],
                 candidates: vec![],
                 error: "Нет доступа",
@@ -1953,10 +1961,19 @@ pub async fn group_members_page(
             |row| Ok((row.get(0)?, row.get(1)?)),
         )
         .unwrap_or_else(|_| ("Группа".to_string(), String::new()));
-    let viewer_role = group_role(&db, group_id, user_id).unwrap_or_default();
+    let is_official = super::official_groups::is_official_group(&db, group_id);
+    let stored_role = group_role(&db, group_id, user_id).unwrap_or_default();
+    let viewer_role =
+        super::official_groups::group_management_role(&state, &headers, &db, group_id, user_id)
+            .unwrap_or_default();
+    let can_claim_official = is_official
+        && stored_role != GROUP_ROLE_OWNER
+        && super::official_groups::can_administer_official_group(
+            &state, &headers, &db, group_id, user_id,
+        );
     let members = load_group_member_names(&db, group_id);
     let current: std::collections::HashSet<i64> = members.iter().map(|(id, _, _, _)| *id).collect();
-    let candidates = if role_can_manage_members(&viewer_role) {
+    let candidates = if !is_official && role_can_manage_members(&viewer_role) {
         partners_for_picker(&db, user_id)
             .into_iter()
             .filter(|(id, _)| !current.contains(id))
@@ -1971,6 +1988,9 @@ pub async fn group_members_page(
             name: &name,
             description: &description,
             viewer_role: &viewer_role,
+            is_official,
+            is_recorded_official_owner: is_official && stored_role == GROUP_ROLE_OWNER,
+            can_claim_official,
             members,
             candidates,
             error: "",
@@ -2005,6 +2025,9 @@ pub async fn create_group_invite(
         Ok(db) => db,
         Err(_) => return Redirect::to(&target).into_response(),
     };
+    if super::official_groups::is_official_group(&db, group_id) {
+        return Redirect::to(&target).into_response();
+    }
     let changed = db
         .execute(
             "UPDATE chat_groups
@@ -2056,7 +2079,10 @@ pub async fn set_group_avatar(
         Ok(db) => db,
         Err(_) => return Redirect::to(&target).into_response(),
     };
-    if !role_can_manage_members(&group_role(&db, group_id, user_id).unwrap_or_default()) {
+    if !role_can_manage_members(
+        &super::official_groups::group_management_role(&state, &headers, &db, group_id, user_id)
+            .unwrap_or_default(),
+    ) {
         return Redirect::to("/app/messages").into_response();
     }
     let mut image = None;
@@ -2143,7 +2169,10 @@ pub async fn delete_group_avatar(
         Ok(db) => db,
         Err(_) => return Redirect::to(&target).into_response(),
     };
-    if !role_can_manage_members(&group_role(&db, group_id, user_id).unwrap_or_default()) {
+    if !role_can_manage_members(
+        &super::official_groups::group_management_role(&state, &headers, &db, group_id, user_id)
+            .unwrap_or_default(),
+    ) {
         return Redirect::to("/app/messages").into_response();
     }
     let previous = db
@@ -2242,6 +2271,9 @@ pub async fn revoke_group_invite(
         None => return Redirect::to("/login?next=/app/messages").into_response(),
     };
     if let Ok(db) = crate::db::pool::get_connection(&state.db_pool) {
+        if super::official_groups::is_official_group(&db, group_id) {
+            return Redirect::to(&target).into_response();
+        }
         let _ = db.execute(
             "UPDATE chat_groups
              SET invite_nonce = '', updated_at = ?1
@@ -2410,8 +2442,13 @@ pub async fn add_group_members(
         Ok(db) => db,
         Err(_) => return Redirect::to("/app/messages").into_response(),
     };
-    let actor_role = group_role(&db, group_id, user_id).unwrap_or_default();
-    if group_id <= 0 || !role_can_manage_members(&actor_role) {
+    let actor_role =
+        super::official_groups::group_management_role(&state, &headers, &db, group_id, user_id)
+            .unwrap_or_default();
+    if group_id <= 0
+        || super::official_groups::is_official_group(&db, group_id)
+        || !role_can_manage_members(&actor_role)
+    {
         return Redirect::to("/app/messages").into_response();
     }
     let allowed: std::collections::HashSet<i64> = partners_for_picker(&db, user_id)
@@ -2501,13 +2538,17 @@ pub async fn rename_group(
         Ok(db) => db,
         Err(_) => return Redirect::to(&target).into_response(),
     };
-    let role = group_role(&db, group_id, user_id).unwrap_or_default();
+    let role =
+        super::official_groups::group_management_role(&state, &headers, &db, group_id, user_id)
+            .unwrap_or_default();
     if !role_can_manage_members(&role) {
         return Redirect::to("/app/messages").into_response();
     }
+    let official = super::official_groups::is_official_group(&db, group_id);
     let _ = db.execute(
         "UPDATE chat_groups
-         SET name = ?1, description = ?2, updated_at = ?3
+         SET name = CASE WHEN ?8 = 1 THEN name ELSE ?1 END,
+             description = ?2, updated_at = ?3
          WHERE id = ?4
            AND EXISTS (
                 SELECT 1 FROM chat_group_members AS actor
@@ -2522,7 +2563,8 @@ pub async fn rename_group(
             group_id,
             user_id,
             GROUP_ROLE_OWNER,
-            GROUP_ROLE_ADMIN
+            GROUP_ROLE_ADMIN,
+            i64::from(official)
         ],
     );
     Redirect::to(&target).into_response()
@@ -2546,6 +2588,9 @@ pub async fn update_group_member_role(
         Ok(db) => db,
         Err(_) => return Redirect::to(&target).into_response(),
     };
+    if super::official_groups::is_official_group(&db, group_id) {
+        return Redirect::to(&target).into_response();
+    }
     if group_role(&db, group_id, user_id).as_deref() != Some(GROUP_ROLE_OWNER)
         || member_id == user_id
         || !matches!(form.role.as_str(), GROUP_ROLE_ADMIN | GROUP_ROLE_MEMBER)
@@ -2606,7 +2651,9 @@ pub async fn update_group_member_mute(
         Ok(db) => db,
         Err(_) => return Redirect::to(&target).into_response(),
     };
-    let actor_role = group_role(&db, group_id, user_id).unwrap_or_default();
+    let actor_role =
+        super::official_groups::group_management_role(&state, &headers, &db, group_id, user_id)
+            .unwrap_or_default();
     let target_role = group_role(&db, group_id, member_id).unwrap_or_default();
     if !role_can_remove(&actor_role, &target_role) {
         return Redirect::to(&target).into_response();
@@ -2670,6 +2717,9 @@ pub async fn transfer_group_ownership(
         Ok(db) => db,
         Err(_) => return Redirect::to(&target).into_response(),
     };
+    if super::official_groups::is_official_group(&db, group_id) {
+        return Redirect::to(&target).into_response();
+    }
     let _ = transfer_group_owner(&db, group_id, user_id, member_id, unix_now());
     Redirect::to(&target).into_response()
 }
@@ -2694,7 +2744,9 @@ pub async fn remove_group_member(
         Ok(db) => db,
         Err(_) => return Redirect::to(&target).into_response(),
     };
-    let actor_role = group_role(&db, group_id, user_id).unwrap_or_default();
+    let actor_role =
+        super::official_groups::group_management_role(&state, &headers, &db, group_id, user_id)
+            .unwrap_or_default();
     let member_role = group_role(&db, group_id, member_id).unwrap_or_default();
     if !role_can_remove(&actor_role, &member_role) {
         return Redirect::to(&target).into_response();
