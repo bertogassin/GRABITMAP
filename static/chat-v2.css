@@ -419,6 +419,17 @@
     padding: 6px 9px;
     width: auto;
 }
+
+.chat-official-group {
+    align-items: center;
+    color: var(--chat-accent, #efc37a);
+    display: inline-flex;
+    font-size: 11px;
+    font-weight: 700;
+    gap: 4px;
+    letter-spacing: 0.01em;
+    margin-top: 2px;
+}
 .chat-secondary-button {
     min-height: 34px;
     padding: 0 13px;

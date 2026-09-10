@@ -126,6 +126,22 @@ pub fn render_messages(
                 } else {
                     conversation_display_name(other_user_id, username, first_name, last_name)
                 };
+                let official_badge = if is_group && !conversation.group_scope_type.is_empty() {
+                    let label = match conversation.group_scope_type.as_str() {
+                        "world" => "Официальная группа мира",
+                        "continent" => "Официальная группа континента",
+                        "country" => "Официальная группа страны",
+                        "city" => "Официальная группа города",
+                        _ => "Официальная группа",
+                    };
+                    format!(
+                        r#"<span class="chat-official-group" data-scope-id="{}">✓ {}</span>"#,
+                        conversation.group_scope_id,
+                        escape_html(label),
+                    )
+                } else {
+                    String::new()
+                };
 
                 let safe_last_message = escape_html(&conversation_preview_text(last_message));
 
@@ -216,6 +232,8 @@ pub fn render_messages(
             {display_name}
         </div>
 
+        {official_badge}
+
         {username_html}
 
         <div class="card-meta chat-dialog-preview">
@@ -259,6 +277,7 @@ pub fn render_messages(
                         icon(if is_group { "users" } else { "message-circle" }).to_string()
                     },
                     display_name = display_name,
+                    official_badge = official_badge,
                     username_html = username_html,
                     last_message = last_message_html,
                     last_time = last_time,

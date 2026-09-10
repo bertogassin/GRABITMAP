@@ -601,6 +601,27 @@ test("group moderation limits senders and preserves role hierarchy", async () =>
   assert.match(chat, /!mine && !\(isGroup && canManagePins\)/);
 });
 
+test("official groups have one validated geographic scope", async () => {
+  const [database, groups, main, model, template] = await Promise.all([
+    readFile(new URL("src/db/group_geography.rs", root), "utf8"),
+    readFile(new URL("src/db/chat_groups.rs", root), "utf8"),
+    readFile(new URL("src/main.rs", root), "utf8"),
+    readFile(new URL("src/web/view_models.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+  ]);
+
+  assert.match(database, /UNIQUE\(scope_type, scope_id\)/);
+  assert.match(database, /invalid_group_scope/);
+  assert.match(database, /geo_continents/);
+  assert.match(database, /geo_countries/);
+  assert.match(database, /geo_cities/);
+  assert.match(groups, /CREATE TABLE IF NOT EXISTS chat_group_scopes/);
+  assert.match(main, /group_geography::initialize/);
+  assert.match(model, /group_scope_type: String/);
+  assert.match(template, /Официальная группа города/);
+  assert.match(template, /chat-official-group/);
+});
+
 test("user-facing copy no longer calls listings resources", async () => {
   const visibleFiles = [
     "static/share.js",

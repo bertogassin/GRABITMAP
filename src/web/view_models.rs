@@ -32,6 +32,8 @@ pub struct ConversationRow {
     pub pinned_at: i64,
     pub archived_at: i64,
     pub muted_until: i64,
+    pub group_scope_type: String,
+    pub group_scope_id: i64,
 }
 
 pub struct UserSessionRow {

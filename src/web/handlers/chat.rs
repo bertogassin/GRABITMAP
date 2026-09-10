@@ -224,6 +224,8 @@ pub(super) fn load_user_conversations(
                 pinned_at: row.get(9)?,
                 archived_at: row.get(10)?,
                 muted_until: row.get(11)?,
+                group_scope_type: String::new(),
+                group_scope_id: 0,
             })
         })?
         .collect::<Result<Vec<_>, _>>()

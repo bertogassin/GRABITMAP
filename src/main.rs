@@ -57,6 +57,8 @@ async fn main() {
 
     db::geography_v2::initialize().expect("Не удалось применить миграцию Geography V2");
 
+    db::group_geography::initialize().expect("Не удалось применить географию официальных групп");
+
     db::admin_geography::initialize()
         .expect("Не удалось синхронизировать административную географию");
 
