@@ -10,7 +10,9 @@ pub fn initialize(conn: &Connection) -> Result<()> {
             created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
             owner_user_id INTEGER NOT NULL DEFAULT 0,
             updated_at INTEGER NOT NULL DEFAULT 0,
-            invite_nonce TEXT NOT NULL DEFAULT ''
+            invite_nonce TEXT NOT NULL DEFAULT '',
+            description TEXT NOT NULL DEFAULT '',
+            avatar_path TEXT NOT NULL DEFAULT ''
         )",
         [],
     )?;
@@ -28,6 +30,16 @@ pub fn initialize(conn: &Connection) -> Result<()> {
     let _ = tx.execute(
         "ALTER TABLE chat_groups
          ADD COLUMN invite_nonce TEXT NOT NULL DEFAULT ''",
+        [],
+    );
+    let _ = tx.execute(
+        "ALTER TABLE chat_groups
+         ADD COLUMN description TEXT NOT NULL DEFAULT ''",
+        [],
+    );
+    let _ = tx.execute(
+        "ALTER TABLE chat_groups
+         ADD COLUMN avatar_path TEXT NOT NULL DEFAULT ''",
         [],
     );
 
@@ -254,6 +266,14 @@ mod tests {
             )
             .expect("invite nonce column");
         assert!(invite_nonce.is_empty());
+        let identity: (String, String) = connection
+            .query_row(
+                "SELECT description, avatar_path FROM chat_groups WHERE id = 7",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?)),
+            )
+            .expect("group identity columns");
+        assert_eq!(identity, (String::new(), String::new()));
         assert!(connection
             .execute(
                 "UPDATE chat_group_members SET role = 'invalid' WHERE group_id = 7 AND user_id = 12",

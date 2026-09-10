@@ -26,6 +26,7 @@ const GROUP_ROLE_OWNER: &str = "owner";
 const GROUP_ROLE_ADMIN: &str = "admin";
 const GROUP_ROLE_MEMBER: &str = "member";
 const GROUP_INVITE_LIFETIME_SECONDS: i64 = 7 * 24 * 60 * 60;
+const MAX_GROUP_AVATAR_BYTES: usize = 8 * 1024 * 1024;
 
 type HmacSha256 = Hmac<Sha256>;
 
@@ -39,6 +40,8 @@ pub struct CreateGroupForm {
 #[derive(Debug, Deserialize)]
 pub(crate) struct GroupNameForm {
     name: String,
+    #[serde(default)]
+    description: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -65,6 +68,21 @@ fn rate_limited(retry_after: u64) -> Response {
 
 fn positive_message_id(value: &str) -> Option<i64> {
     value.trim().parse::<i64>().ok().filter(|id| *id > 0)
+}
+
+fn group_avatar_root() -> std::path::PathBuf {
+    std::path::PathBuf::from("data/group-avatars")
+}
+
+fn group_avatar_name_is_safe(group_id: i64, value: &str) -> bool {
+    group_id > 0
+        && value.starts_with(&format!("{group_id}-"))
+        && !value.contains("..")
+        && !value.contains('/')
+        && !value.contains('\\')
+        && value
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'_' | b'.'))
 }
 
 #[derive(Debug, PartialEq)]
@@ -904,6 +922,7 @@ pub async fn group_chat_page(
                 0,
                 group_id,
                 "Группа",
+                "",
                 0,
                 vec![],
             ));
@@ -914,6 +933,7 @@ pub async fn group_chat_page(
             true,
             user_id,
             0,
+            "",
             "",
             0,
             vec![],
@@ -931,17 +951,18 @@ pub async fn group_chat_page(
             user_id,
             0,
             "Нет доступа",
+            "",
             0,
             vec![],
         ));
     }
-    let name: String = db
+    let (name, description): (String, String) = db
         .query_row(
-            "SELECT name FROM chat_groups WHERE id = ?1",
+            "SELECT name, COALESCE(description, '') FROM chat_groups WHERE id = ?1",
             rusqlite::params![group_id],
-            |row| row.get(0),
+            |row| Ok((row.get(0)?, row.get(1)?)),
         )
-        .unwrap_or_else(|_| "Группа".to_string());
+        .unwrap_or_else(|_| ("Группа".to_string(), String::new()));
     let member_count: i64 = db
         .query_row(
             "SELECT COUNT(*) FROM chat_group_members WHERE group_id = ?1",
@@ -960,6 +981,7 @@ pub async fn group_chat_page(
         user_id,
         group_id,
         &name,
+        &description,
         member_count,
         messages,
     ))
@@ -1777,13 +1799,16 @@ pub async fn group_members_page(
         Some(id) => id,
         None => {
             return Html(templates::render_group_members(
-                0,
-                0,
-                "",
-                "",
-                vec![],
-                vec![],
-                "",
+                templates::GroupMembersPage {
+                    viewer_user_id: 0,
+                    group_id: 0,
+                    name: "",
+                    description: "",
+                    viewer_role: "",
+                    members: vec![],
+                    candidates: vec![],
+                    error: "",
+                },
             ))
         }
     };
@@ -1793,22 +1818,25 @@ pub async fn group_members_page(
     };
     if group_id <= 0 || !is_member(&db, group_id, user_id) {
         return Html(templates::render_group_members(
-            user_id,
-            group_id,
-            "Группа",
-            "",
-            vec![],
-            vec![],
-            "Нет доступа",
+            templates::GroupMembersPage {
+                viewer_user_id: user_id,
+                group_id,
+                name: "Группа",
+                description: "",
+                viewer_role: "",
+                members: vec![],
+                candidates: vec![],
+                error: "Нет доступа",
+            },
         ));
     }
-    let name: String = db
+    let (name, description): (String, String) = db
         .query_row(
-            "SELECT name FROM chat_groups WHERE id = ?1",
+            "SELECT name, COALESCE(description, '') FROM chat_groups WHERE id = ?1",
             rusqlite::params![group_id],
-            |row| row.get(0),
+            |row| Ok((row.get(0)?, row.get(1)?)),
         )
-        .unwrap_or_else(|_| "Группа".to_string());
+        .unwrap_or_else(|_| ("Группа".to_string(), String::new()));
     let viewer_role = group_role(&db, group_id, user_id).unwrap_or_default();
     let members = load_group_member_names(&db, group_id);
     let current: std::collections::HashSet<i64> = members.iter().map(|(id, _, _)| *id).collect();
@@ -1821,13 +1849,16 @@ pub async fn group_members_page(
         vec![]
     };
     Html(templates::render_group_members(
-        user_id,
-        group_id,
-        &name,
-        &viewer_role,
-        members,
-        candidates,
-        "",
+        templates::GroupMembersPage {
+            viewer_user_id: user_id,
+            group_id,
+            name: &name,
+            description: &description,
+            viewer_role: &viewer_role,
+            members,
+            candidates,
+            error: "",
+        },
     ))
 }
 
@@ -1883,6 +1914,202 @@ pub async fn create_group_invite(
         return Redirect::to("/app/messages").into_response();
     }
     Redirect::to(&format!("{target}?invite={}", urlencoding::encode(&token))).into_response()
+}
+
+pub async fn set_group_avatar(
+    State(state): State<AppState>,
+    Path(group_id): Path<i64>,
+    headers: HeaderMap,
+    mut multipart: Multipart,
+) -> Response {
+    let target = format!("/app/group/{group_id}/members");
+    if request_is_cross_site(&headers) {
+        return Redirect::to(&target).into_response();
+    }
+    let user_id = match verify_user_session(&state, &headers) {
+        Some(id) => id,
+        None => return Redirect::to("/login?next=/app/messages").into_response(),
+    };
+    if rate_limit_retry_after(&state, user_id, "group_avatar_upload", 5, 300)
+        .await
+        .is_some()
+    {
+        return Redirect::to(&target).into_response();
+    }
+    let db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => return Redirect::to(&target).into_response(),
+    };
+    if !role_can_manage_members(&group_role(&db, group_id, user_id).unwrap_or_default()) {
+        return Redirect::to("/app/messages").into_response();
+    }
+    let mut image = None;
+    while let Ok(Some(field)) = multipart.next_field().await {
+        if matches!(field.name().unwrap_or(""), "image" | "file" | "avatar") {
+            if let Ok(bytes) = field.bytes().await {
+                image = Some(bytes.to_vec());
+            }
+            break;
+        }
+    }
+    let Some(bytes) = image else {
+        return Redirect::to(&target).into_response();
+    };
+    if bytes.len() > MAX_GROUP_AVATAR_BYTES {
+        return Redirect::to(&target).into_response();
+    }
+    let Some((_, mime)) = detect_image(&bytes) else {
+        return Redirect::to(&target).into_response();
+    };
+    let mut random = [0_u8; 8];
+    OsRng.fill_bytes(&mut random);
+    let relative = format!(
+        "{group_id}-{}.{}",
+        hex::encode(random),
+        extension_for_mime(mime)
+    );
+    let root = group_avatar_root();
+    if fs::create_dir_all(&root).is_err() || fs::write(root.join(&relative), &bytes).is_err() {
+        return Redirect::to(&target).into_response();
+    }
+    let previous = db
+        .query_row(
+            "SELECT COALESCE(avatar_path, '') FROM chat_groups WHERE id = ?1",
+            rusqlite::params![group_id],
+            |row| row.get::<_, String>(0),
+        )
+        .unwrap_or_default();
+    let changed = db
+        .execute(
+            "UPDATE chat_groups
+             SET avatar_path = ?1, updated_at = ?2
+             WHERE id = ?3
+               AND EXISTS (
+                    SELECT 1 FROM chat_group_members AS actor
+                    WHERE actor.group_id = chat_groups.id
+                      AND actor.user_id = ?4
+                      AND actor.role IN (?5, ?6)
+               )",
+            rusqlite::params![
+                relative,
+                unix_now(),
+                group_id,
+                user_id,
+                GROUP_ROLE_OWNER,
+                GROUP_ROLE_ADMIN
+            ],
+        )
+        .unwrap_or(0);
+    if changed != 1 {
+        let _ = fs::remove_file(root.join(&relative));
+        return Redirect::to(&target).into_response();
+    }
+    if previous != relative && group_avatar_name_is_safe(group_id, &previous) {
+        let _ = fs::remove_file(root.join(previous));
+    }
+    Redirect::to(&target).into_response()
+}
+
+pub async fn delete_group_avatar(
+    State(state): State<AppState>,
+    Path(group_id): Path<i64>,
+    headers: HeaderMap,
+) -> Response {
+    let target = format!("/app/group/{group_id}/members");
+    if request_is_cross_site(&headers) {
+        return Redirect::to(&target).into_response();
+    }
+    let user_id = match verify_user_session(&state, &headers) {
+        Some(id) => id,
+        None => return Redirect::to("/login?next=/app/messages").into_response(),
+    };
+    let db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => return Redirect::to(&target).into_response(),
+    };
+    if !role_can_manage_members(&group_role(&db, group_id, user_id).unwrap_or_default()) {
+        return Redirect::to("/app/messages").into_response();
+    }
+    let previous = db
+        .query_row(
+            "SELECT COALESCE(avatar_path, '') FROM chat_groups WHERE id = ?1",
+            rusqlite::params![group_id],
+            |row| row.get::<_, String>(0),
+        )
+        .unwrap_or_default();
+    let changed = db
+        .execute(
+            "UPDATE chat_groups SET avatar_path = '', updated_at = ?1
+             WHERE id = ?2
+               AND EXISTS (
+                    SELECT 1 FROM chat_group_members AS actor
+                    WHERE actor.group_id = chat_groups.id
+                      AND actor.user_id = ?3
+                      AND actor.role IN (?4, ?5)
+               )",
+            rusqlite::params![
+                unix_now(),
+                group_id,
+                user_id,
+                GROUP_ROLE_OWNER,
+                GROUP_ROLE_ADMIN
+            ],
+        )
+        .unwrap_or(0);
+    if changed == 1 && group_avatar_name_is_safe(group_id, &previous) {
+        let _ = fs::remove_file(group_avatar_root().join(previous));
+    }
+    Redirect::to(&target).into_response()
+}
+
+pub async fn get_group_avatar(
+    State(state): State<AppState>,
+    Path(group_id): Path<i64>,
+    headers: HeaderMap,
+) -> Response {
+    let user_id = match verify_user_session(&state, &headers) {
+        Some(id) => id,
+        None => return StatusCode::UNAUTHORIZED.into_response(),
+    };
+    let db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => return StatusCode::SERVICE_UNAVAILABLE.into_response(),
+    };
+    if !is_member(&db, group_id, user_id) {
+        return StatusCode::NOT_FOUND.into_response();
+    }
+    let relative = db
+        .query_row(
+            "SELECT COALESCE(avatar_path, '') FROM chat_groups WHERE id = ?1",
+            rusqlite::params![group_id],
+            |row| row.get::<_, String>(0),
+        )
+        .unwrap_or_default();
+    if !group_avatar_name_is_safe(group_id, &relative) {
+        return StatusCode::NOT_FOUND.into_response();
+    }
+    let bytes = match fs::read(group_avatar_root().join(&relative)) {
+        Ok(bytes) => bytes,
+        Err(_) => return StatusCode::NOT_FOUND.into_response(),
+    };
+    let mime = if relative.ends_with(".png") {
+        "image/png"
+    } else if relative.ends_with(".webp") {
+        "image/webp"
+    } else {
+        "image/jpeg"
+    };
+    (
+        [
+            (header::CONTENT_TYPE, HeaderValue::from_static(mime)),
+            (
+                header::CACHE_CONTROL,
+                HeaderValue::from_static("private, max-age=60, must-revalidate"),
+            ),
+        ],
+        bytes,
+    )
+        .into_response()
 }
 
 pub async fn revoke_group_invite(
@@ -2148,7 +2375,10 @@ pub async fn rename_group(
         None => return Redirect::to("/login?next=/app/messages").into_response(),
     };
     let name = form.name.trim();
-    if !input_text_is_valid(name, 1, 80) {
+    let description = form.description.trim();
+    if !input_text_is_valid(name, 1, 80)
+        || (!description.is_empty() && !input_text_is_valid(description, 1, 500))
+    {
         return Redirect::to(&target).into_response();
     }
     let db = match crate::db::pool::get_connection(&state.db_pool) {
@@ -2161,16 +2391,17 @@ pub async fn rename_group(
     }
     let _ = db.execute(
         "UPDATE chat_groups
-         SET name = ?1, updated_at = ?2
-         WHERE id = ?3
+         SET name = ?1, description = ?2, updated_at = ?3
+         WHERE id = ?4
            AND EXISTS (
                 SELECT 1 FROM chat_group_members AS actor
                 WHERE actor.group_id = chat_groups.id
-                  AND actor.user_id = ?4
-                  AND actor.role IN (?5, ?6)
+                  AND actor.user_id = ?5
+                  AND actor.role IN (?6, ?7)
            )",
         rusqlite::params![
             name,
+            description,
             unix_now(),
             group_id,
             user_id,
@@ -2400,6 +2631,7 @@ pub fn load_user_groups(
                   AND m.deleted_at = 0
                   AND m.id > COALESCE(mem.last_read_message_id, 0)
             ),
+            CASE WHEN trim(COALESCE(g.avatar_path, '')) <> '' THEN 1 ELSE 0 END,
             COALESCE(pref.pinned_at, 0),
             COALESCE(pref.archived_at, 0),
             COALESCE(pref.muted_until, 0)
@@ -2427,10 +2659,10 @@ pub fn load_user_groups(
                 updated_at: row.get(3)?,
                 is_group: true,
                 group_id: row.get(0)?,
-                has_avatar: false,
-                pinned_at: row.get(5)?,
-                archived_at: row.get(6)?,
-                muted_until: row.get(7)?,
+                has_avatar: row.get::<_, i64>(5)? != 0,
+                pinned_at: row.get(6)?,
+                archived_at: row.get(7)?,
+                muted_until: row.get(8)?,
             })
         })?
         .collect::<Result<Vec<_>, _>>()
@@ -2622,6 +2854,16 @@ mod tests {
     }
 
     #[test]
+    fn group_avatar_names_cannot_escape_the_private_directory() {
+        assert!(group_avatar_name_is_safe(7, "7-a1b2c3.webp"));
+        assert!(!group_avatar_name_is_safe(8, "7-a1b2c3.webp"));
+        assert!(!group_avatar_name_is_safe(7, "../secret.jpg"));
+        assert!(!group_avatar_name_is_safe(7, "nested/avatar.png"));
+        assert!(!group_avatar_name_is_safe(7, "nested\\avatar.png"));
+        assert!(!group_avatar_name_is_safe(7, ""));
+    }
+
+    #[test]
     fn group_send_accepts_an_explicit_null_reply() {
         let payload: GroupSendPayload = serde_json::from_str(
             r#"{"message":"Обычное сообщение","client_message_id":"1234567890abcdef","reply_to_message_id":null}"#,
@@ -2724,10 +2966,11 @@ mod tests {
                 "CREATE TABLE chat_groups (
                     id INTEGER PRIMARY KEY,
                     name TEXT NOT NULL,
-                    created_at INTEGER NOT NULL
+                    created_at INTEGER NOT NULL,
+                    avatar_path TEXT NOT NULL DEFAULT ''
                  );
-                 INSERT INTO chat_groups (id, name, created_at)
-                 VALUES (7, 'Команда', 100);
+                 INSERT INTO chat_groups (id, name, created_at, avatar_path)
+                 VALUES (7, 'Команда', 100, '7-avatar.webp');
                  INSERT INTO chat_group_members (
                     group_id, user_id, joined_at, last_read_message_id
                  ) VALUES (7, 1, 100, 0);
@@ -2744,5 +2987,6 @@ mod tests {
         assert_eq!(conversations.len(), 1);
         assert_eq!(conversations[0].last_message, "__image__");
         assert_eq!(conversations[0].archived_at, 150);
+        assert!(conversations[0].has_avatar);
     }
 }

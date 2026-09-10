@@ -239,7 +239,13 @@
                     conversation.last_message || (isGroup ? t("chat_new_group_preview", "Новая группа") : t("chat_new_dialog", "Новый диалог"))
                 );
             var fallbackAvatar = isGroup ? USERS_ICON : MESSAGE_ICON;
-            var avatarHtml = !isGroup && conversation.has_avatar && userId
+            var avatarHtml = isGroup && conversation.has_avatar && groupId
+                ? '<img class="rm-me-avatar-img" src="/api/group/'
+                  + encodeURIComponent(groupId)
+                  + '/avatar" alt="" onerror=\'this.onerror=null;var p=this.parentNode;this.remove();if(p)p.insertAdjacentHTML("beforeend",'
+                  + JSON.stringify(USERS_ICON)
+                  + ');\'>'
+                : !isGroup && conversation.has_avatar && userId
                 ? '<img class="rm-me-avatar-img" src="/api/avatars/'
                   + encodeURIComponent(userId)
                   + '" alt="" onerror=\'this.onerror=null;var p=this.parentNode;this.remove();if(p)p.insertAdjacentHTML("beforeend",'

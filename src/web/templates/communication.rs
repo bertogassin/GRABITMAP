@@ -246,7 +246,12 @@ pub fn render_messages(
                     other_user_id = other_user_id,
                     group_id = if group_id > 0 { group_id.to_string() } else { String::new() },
                     kind = kind,
-                    avatar_html = if !is_group && conversation.has_avatar && other_user_id > 0 {
+                    avatar_html = if is_group && conversation.has_avatar && group_id > 0 {
+                        format!(
+                            r#"<img class="rm-me-avatar-img" src="/api/group/{group_id}/avatar" alt="" onerror="this.remove()">{icon}"#,
+                            icon = icon("users")
+                        )
+                    } else if !is_group && conversation.has_avatar && other_user_id > 0 {
                         format!(
                             r#"<img class="rm-me-avatar-img" src="/api/avatars/{other_user_id}" alt="" onerror="this.remove()">"#
                         )
@@ -699,9 +704,15 @@ pub fn render_group_chat(
     viewer_user_id: i64,
     group_id: i64,
     group_name: &str,
+    group_description: &str,
     member_count: i64,
     messages: Vec<crate::web::view_models::ChatMessageRow>,
 ) -> String {
+    let subtitle = if group_description.trim().is_empty() {
+        ru_count(member_count, "участник", "участника", "участников")
+    } else {
+        group_description.trim().to_string()
+    };
     render_chat_thread(
         authenticated,
         viewer_user_id,
@@ -709,7 +720,7 @@ pub fn render_group_chat(
         group_id,
         "",
         group_name,
-        &ru_count(member_count, "участник", "участника", "участников"),
+        &subtitle,
         messages,
     )
 }
@@ -1043,7 +1054,10 @@ fn render_chat_thread(
                 icon = icon("user")
             )
         } else if group_id > 0 {
-            icon("users").to_string()
+            format!(
+                r#"<img class="rm-me-avatar-img" src="/api/group/{group_id}/avatar" alt="" onerror="this.remove()">{icon}"#,
+                icon = icon("users")
+            )
         } else {
             icon("user").to_string()
         },
@@ -1152,15 +1166,28 @@ pub fn render_new_group(authenticated: bool, partners: Vec<(i64, String)>, error
     )
 }
 
-pub fn render_group_members(
-    viewer_user_id: i64,
-    group_id: i64,
-    name: &str,
-    viewer_role: &str,
-    members: Vec<(i64, String, String)>,
-    candidates: Vec<(i64, String)>,
-    error: &str,
-) -> String {
+pub struct GroupMembersPage<'a> {
+    pub viewer_user_id: i64,
+    pub group_id: i64,
+    pub name: &'a str,
+    pub description: &'a str,
+    pub viewer_role: &'a str,
+    pub members: Vec<(i64, String, String)>,
+    pub candidates: Vec<(i64, String)>,
+    pub error: &'a str,
+}
+
+pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
+    let GroupMembersPage {
+        viewer_user_id,
+        group_id,
+        name,
+        description,
+        viewer_role,
+        members,
+        candidates,
+        error,
+    } = params;
     let authenticated = viewer_user_id > 0;
     let content = if !authenticated {
         guest_locked_section("Группа", &format!("/app/group/{group_id}/members"))
@@ -1264,9 +1291,14 @@ pub fn render_group_members(
         <div class="rm-profile-field-label">Название группы</div>
         <input class="ui-input" name="name" maxlength="80" required value="{name}">
     </label>
-    <button type="submit" class="ui-button ui-button--secondary">Сохранить название</button>
+    <label class="rm-profile-field">
+        <div class="rm-profile-field-label">Описание</div>
+        <textarea class="ui-input" name="description" maxlength="500" rows="4" placeholder="О чём эта группа">{description}</textarea>
+    </label>
+    <button type="submit" class="ui-button ui-button--secondary">Сохранить информацию</button>
 </form>"#,
                 name = escape_html(name),
+                description = escape_html(description),
             )
         } else {
             String::new()
@@ -1300,6 +1332,25 @@ pub fn render_group_members(
         } else {
             String::new()
         };
+        let avatar = if can_manage {
+            format!(
+                r#"<section class="card rm-group-create">
+    <div class="rm-profile-field-label">Фото группы</div>
+    <div class="rm-group-avatar-preview">
+        <img src="/api/group/{group_id}/avatar" alt="" onerror="this.hidden=true">
+    </div>
+    <form method="post" action="/app/group/{group_id}/avatar" enctype="multipart/form-data">
+        <input class="ui-input" type="file" name="image" accept="image/jpeg,image/png,image/webp" required>
+        <button type="submit" class="ui-button">Загрузить фото</button>
+    </form>
+    <form method="post" action="/app/group/{group_id}/avatar/delete" data-confirm="Удалить фото группы?">
+        <button type="submit" class="ui-button ui-button--secondary">Удалить фото</button>
+    </form>
+</section>"#
+            )
+        } else {
+            String::new()
+        };
         let leave = if is_owner {
             r#"<section class="card rm-group-create"><div class="rm-profile-field-label">Вы владелец группы</div><p class="card-meta">Перед выходом передайте владение другому участнику. Так группа не останется без управления.</p></section>"#.to_string()
         } else {
@@ -1311,6 +1362,7 @@ pub fn render_group_members(
         };
         format!(
             r#"{rename}
+{avatar}
 {invite}
 <section class="card rm-group-create">
     <div class="rm-group-section-head"><div class="rm-profile-field-label">Участники</div><span class="rm-group-count">{member_count} / 250</span></div>
@@ -1357,6 +1409,7 @@ pub fn render_group_members(
 }})();
 </script>"#,
             rename = rename,
+            avatar = avatar,
             invite = invite,
             member_count = members.len(),
             list = list,
