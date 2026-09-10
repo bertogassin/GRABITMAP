@@ -581,16 +581,53 @@ pub async fn api_chat_send_voice(
             }
         };
 
-    if transaction.execute(
-        "INSERT INTO messages (
-            conversation_id, sender_user_id, message, is_read, delivered_at, read_at, created_at,
-            reply_to_message_id, client_message_id, attachment_kind, attachment_mime, attachment_size, attachment_path
-         ) VALUES (?1,?2,'',0,0,0,?3,?4,?5,?6,?7,?8,?9)",
-        rusqlite::params![
-            conversation_id, user_id, now, reply_to_message_id, client_message_id,
-            kind, mime, file_bytes.len() as i64, relative
-        ],
-    ).unwrap_or(0) != 1 {
+    let inserted = transaction
+        .execute(
+            "INSERT OR IGNORE INTO messages (
+                conversation_id, sender_user_id, message, is_read, delivered_at, read_at, created_at,
+                reply_to_message_id, client_message_id, attachment_kind, attachment_mime, attachment_size, attachment_path
+             ) VALUES (?1,?2,'',0,0,0,?3,?4,?5,?6,?7,?8,?9)",
+            rusqlite::params![
+                conversation_id,
+                user_id,
+                now,
+                reply_to_message_id,
+                client_message_id,
+                kind,
+                mime,
+                file_bytes.len() as i64,
+                relative
+            ],
+        )
+        .unwrap_or(0);
+    if inserted == 0 {
+        let existing_id: Option<i64> = transaction
+            .query_row(
+                "SELECT id
+                 FROM messages
+                 WHERE conversation_id = ?1
+                   AND sender_user_id = ?2
+                   AND client_message_id = ?3
+                 LIMIT 1",
+                rusqlite::params![conversation_id, user_id, client_message_id],
+                |row| row.get(0),
+            )
+            .ok();
+        if let Some(existing_id) = existing_id {
+            if transaction.commit().is_err() {
+                let _ = fs::remove_file(&absolute);
+                return json_error(StatusCode::INTERNAL_SERVER_ERROR, "message_store_failed");
+            }
+            let _ = fs::remove_file(&absolute);
+            if let Some(message) = load_message(&connection, conversation_id, existing_id, user_id)
+            {
+                return (
+                    StatusCode::OK,
+                    Json(json!({"ok": true, "duplicate": true, "message": message})),
+                )
+                    .into_response();
+            }
+        }
         let _ = fs::remove_file(&absolute);
         return json_error(StatusCode::INTERNAL_SERVER_ERROR, "message_store_failed");
     }
@@ -713,5 +750,46 @@ mod tests {
         assert!(!media_path_is_safe("../votes.db"));
         assert!(!media_path_is_safe("groups/../../votes.db"));
         assert!(!media_path_is_safe("/etc/passwd"));
+    }
+
+    #[test]
+    fn media_retries_keep_one_message_per_client_id() {
+        let connection = rusqlite::Connection::open_in_memory().expect("database");
+        connection
+            .execute_batch(
+                "CREATE TABLE messages (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    conversation_id INTEGER NOT NULL,
+                    sender_user_id INTEGER NOT NULL,
+                    client_message_id TEXT NOT NULL,
+                    attachment_kind TEXT NOT NULL,
+                    UNIQUE(conversation_id, sender_user_id, client_message_id)
+                 );",
+            )
+            .expect("schema");
+
+        let first = connection
+            .execute(
+                "INSERT OR IGNORE INTO messages (
+                    conversation_id, sender_user_id, client_message_id, attachment_kind
+                 ) VALUES (7, 11, 'media_retry_123456', 'voice')",
+                [],
+            )
+            .expect("first insert");
+        let retry = connection
+            .execute(
+                "INSERT OR IGNORE INTO messages (
+                    conversation_id, sender_user_id, client_message_id, attachment_kind
+                 ) VALUES (7, 11, 'media_retry_123456', 'voice')",
+                [],
+            )
+            .expect("retry insert");
+        let count: i64 = connection
+            .query_row("SELECT COUNT(*) FROM messages", [], |row| row.get(0))
+            .expect("message count");
+
+        assert_eq!(first, 1);
+        assert_eq!(retry, 0);
+        assert_eq!(count, 1);
     }
 }

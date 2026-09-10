@@ -221,6 +221,8 @@
         var pendingSendKey =
             "grabit-chat-outbox:" + storageScope;
         var pendingQueue = [];
+        var mediaQueue = [];
+        var mediaSending = false;
         var peerOnline = false;
         var peerLastSeenAt = 0;
         var peerTyping = false;
@@ -404,6 +406,14 @@
 
             removePendingRow(clientId);
             savePendingQueue();
+
+            var mediaItem = mediaQueue.find(function (item) {
+                return item.clientMessageId === clientId;
+            });
+
+            if (mediaItem) {
+                removeMediaItem(mediaItem);
+            }
         }
 
         function emitTypingSignal(kind) {
@@ -645,10 +655,13 @@
                 return "";
             }
 
-            return new Intl.DateTimeFormat("ru", {
+            return new Intl.DateTimeFormat(
+                document.documentElement.lang || navigator.language || "ru",
+                {
                 hour: "2-digit",
                 minute: "2-digit"
-            }).format(date);
+                }
+            ).format(date);
         }
 
         function createMessageRow(message, animate) {
@@ -1514,7 +1527,370 @@
 
         var imageInput = document.getElementById("chat-image-input");
         var imageBtn = document.getElementById("chat-image-btn");
-        var mediaSending = false;
+
+        var MEDIA_DB_NAME = "grabit-chat-media-outbox";
+        var MEDIA_DB_VERSION = 1;
+        var MEDIA_STORE = "items";
+        var mediaRetryTimers = {};
+
+        function openMediaOutbox() {
+            return new Promise(function (resolve, reject) {
+                if (!window.indexedDB) {
+                    reject(new Error("indexeddb_unavailable"));
+                    return;
+                }
+
+                var request = window.indexedDB.open(
+                    MEDIA_DB_NAME,
+                    MEDIA_DB_VERSION
+                );
+
+                request.onupgradeneeded = function () {
+                    var db = request.result;
+                    if (!db.objectStoreNames.contains(MEDIA_STORE)) {
+                        var store = db.createObjectStore(MEDIA_STORE, {
+                            keyPath: "id"
+                        });
+                        store.createIndex("scope", "scope", {
+                            unique: false
+                        });
+                    }
+                };
+                request.onsuccess = function () {
+                    resolve(request.result);
+                };
+                request.onerror = function () {
+                    reject(request.error || new Error("indexeddb_failed"));
+                };
+            });
+        }
+
+        function mediaOutboxWrite(item) {
+            return openMediaOutbox().then(function (db) {
+                return new Promise(function (resolve, reject) {
+                    var tx = db.transaction(MEDIA_STORE, "readwrite");
+                    tx.objectStore(MEDIA_STORE).put({
+                        id: item.clientMessageId,
+                        scope: storageScope,
+                        kind: item.kind,
+                        blob: item.blob,
+                        mimeType: item.mimeType,
+                        caption: item.caption,
+                        replyToMessageId: item.replyToMessageId,
+                        createdAt: item.createdAt
+                    });
+                    tx.oncomplete = function () {
+                        db.close();
+                        resolve();
+                    };
+                    tx.onerror = function () {
+                        db.close();
+                        reject(tx.error || new Error("indexeddb_failed"));
+                    };
+                    tx.onabort = tx.onerror;
+                });
+            });
+        }
+
+        function mediaOutboxDelete(clientMessageId) {
+            return openMediaOutbox().then(function (db) {
+                return new Promise(function (resolve) {
+                    var tx = db.transaction(MEDIA_STORE, "readwrite");
+                    tx.objectStore(MEDIA_STORE).delete(clientMessageId);
+                    tx.oncomplete = function () {
+                        db.close();
+                        resolve();
+                    };
+                    tx.onerror = function () {
+                        db.close();
+                        resolve();
+                    };
+                });
+            }).catch(function () {
+                // Cleanup is best-effort after the server accepted the media.
+            });
+        }
+
+        function mediaOutboxLoad() {
+            return openMediaOutbox().then(function (db) {
+                return new Promise(function (resolve, reject) {
+                    var tx = db.transaction(MEDIA_STORE, "readonly");
+                    var index = tx.objectStore(MEDIA_STORE).index("scope");
+                    var request = index.getAll(storageScope);
+                    request.onsuccess = function () {
+                        db.close();
+                        resolve(request.result || []);
+                    };
+                    request.onerror = function () {
+                        db.close();
+                        reject(request.error || new Error("indexeddb_failed"));
+                    };
+                });
+            });
+        }
+
+        function mediaRow(item) {
+            return pendingRow(item.clientMessageId);
+        }
+
+        function releaseMediaPreview(item) {
+            if (item && item.previewUrl) {
+                URL.revokeObjectURL(item.previewUrl);
+                item.previewUrl = "";
+            }
+        }
+
+        function removeMediaItem(item) {
+            if (!item) {
+                return;
+            }
+            if (mediaRetryTimers[item.clientMessageId]) {
+                window.clearTimeout(
+                    mediaRetryTimers[item.clientMessageId]
+                );
+                delete mediaRetryTimers[item.clientMessageId];
+            }
+            var row = mediaRow(item);
+            if (row) {
+                row.remove();
+            }
+            releaseMediaPreview(item);
+            mediaQueue = mediaQueue.filter(function (candidate) {
+                return candidate.clientMessageId !== item.clientMessageId;
+            });
+            mediaOutboxDelete(item.clientMessageId);
+        }
+
+        function renderMediaItem(item) {
+            if (!item.previewUrl) {
+                item.previewUrl = URL.createObjectURL(item.blob);
+            }
+
+            var row = mediaRow(item);
+            if (!row) {
+                row = createMessageRow({
+                    id: "pending-media-" + item.clientMessageId,
+                    client_message_id: item.clientMessageId,
+                    message: item.caption || "",
+                    is_mine: true,
+                    delivered_at: 0,
+                    read_at: 0,
+                    created_at: item.createdAt,
+                    attachment_kind: item.kind,
+                    attachment_url: item.previewUrl
+                }, true);
+                row.dataset.clientMessageId = item.clientMessageId;
+                row.classList.add("is-pending", "is-media-pending");
+                var more = row.querySelector(".chat-message-more");
+                if (more) {
+                    more.hidden = true;
+                }
+                var meta = row.querySelector(".chat-message-meta");
+                if (meta) {
+                    var cancel = document.createElement("button");
+                    cancel.type = "button";
+                    cancel.className = "chat-media-cancel";
+                    cancel.textContent = "×";
+                    cancel.title = t("chat_cancel", "Отмена");
+                    cancel.setAttribute(
+                        "aria-label",
+                        t("chat_cancel", "Отмена")
+                    );
+                    cancel.addEventListener("click", function (event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        removeMediaItem(item);
+                    });
+                    meta.appendChild(cancel);
+                }
+                history.insertBefore(row, historyEnd);
+            }
+
+            var status = row.querySelector(".chat-message-status");
+            if (!status) {
+                return;
+            }
+            row.classList.toggle("is-send-error", item.state === "failed");
+            row.classList.toggle("is-sending", item.state === "sending");
+            var cancel = row.querySelector(".chat-media-cancel");
+            if (cancel) {
+                cancel.hidden = item.state === "sending";
+            }
+            status.classList.toggle("is-error", item.state === "failed");
+            status.classList.toggle("is-pending", item.state !== "failed");
+
+            if (item.state === "failed") {
+                status.textContent = "!";
+                status.title = t(
+                    "chat_send_failed_retry",
+                    "Не отправлено · нажмите повторить"
+                );
+                status.setAttribute("role", "button");
+                status.tabIndex = 0;
+                status.onclick = function (event) {
+                    event.stopPropagation();
+                    item.state = "queued";
+                    renderMediaItem(item);
+                    flushMediaQueue();
+                };
+                status.onkeydown = function (event) {
+                    if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        status.click();
+                    }
+                };
+            } else {
+                status.textContent = "…";
+                status.title = t("chat_status_sending", "Отправляется");
+                status.removeAttribute("role");
+                status.removeAttribute("tabindex");
+                status.onclick = null;
+                status.onkeydown = null;
+            }
+        }
+
+        function mediaRequest(item) {
+            var formData = new FormData();
+            var field = item.kind === "image" ? "image" : "voice";
+            var extension = item.kind === "image"
+                ? "jpg"
+                : (item.mimeType.indexOf("ogg") !== -1
+                    ? "ogg"
+                    : (item.mimeType.indexOf("mp4") !== -1 ? "m4a" : "webm"));
+            formData.append(field, item.blob, field + "." + extension);
+            formData.append("client_message_id", item.clientMessageId);
+            if (item.kind === "image") {
+                formData.append("caption", item.caption || "");
+            }
+            if (item.replyToMessageId) {
+                formData.append(
+                    "reply_to_message_id",
+                    String(item.replyToMessageId)
+                );
+            }
+
+            return fetch(
+                chatApi(item.kind === "image" ? "/send-image" : "/send-voice"),
+                {
+                    method: "POST",
+                    body: formData,
+                    credentials: "same-origin"
+                }
+            ).then(function (response) {
+                return response.json().catch(function () {
+                    return { ok: false, error: "invalid_response" };
+                }).then(function (data) {
+                    if (!response.ok || !data.ok) {
+                        var error = new Error(data.error || "send_failed");
+                        error.status = response.status;
+                        error.retryAfter = Number(data.retry_after || 0);
+                        throw error;
+                    }
+                    return data;
+                });
+            });
+        }
+
+        function scheduleMediaRetry(item, delay) {
+            if (mediaRetryTimers[item.clientMessageId]) {
+                window.clearTimeout(
+                    mediaRetryTimers[item.clientMessageId]
+                );
+            }
+            mediaRetryTimers[item.clientMessageId] = window.setTimeout(function () {
+                delete mediaRetryTimers[item.clientMessageId];
+                item.state = "queued";
+                flushMediaQueue();
+            }, delay);
+        }
+
+        function flushMediaQueue() {
+            if (mediaSending || navigator.onLine === false) {
+                return;
+            }
+            var item = mediaQueue.find(function (candidate) {
+                return candidate.state === "queued";
+            });
+            if (!item) {
+                return;
+            }
+
+            mediaSending = true;
+            item.state = "sending";
+            item.attempts = Number(item.attempts || 0) + 1;
+            renderMediaItem(item);
+            setMediaSending(true);
+            sendState.textContent = item.kind === "image"
+                ? t("chat_sending_photo", "Отправка фото…")
+                : t("chat_sending_voice", "Отправка голосового…");
+
+            mediaRequest(item).then(function (data) {
+                if (data.message) {
+                    appendMessages([data.message]);
+                }
+                removeMediaItem(item);
+                window.ResursMapChatReply = null;
+                var replyBarEl = document.getElementById("chat-reply-bar");
+                if (replyBarEl) {
+                    replyBarEl.hidden = true;
+                }
+                setConnection(t("chat_conn_ok", "Связь есть"), "is-online");
+                sendState.textContent = t(
+                    "chat_sent_hint",
+                    "Отправлено · Enter — отправить"
+                );
+                window.dispatchEvent(
+                    new CustomEvent("resursmap:chat-message-sent")
+                );
+                if (typeof window.playChatSend === "function") {
+                    window.playChatSend();
+                }
+            }).catch(function (error) {
+                var recoverable = isRecoverableError(error);
+                if (recoverable && item.attempts < MAX_AUTO_RETRIES) {
+                    item.state = "waiting";
+                    renderMediaItem(item);
+                    var delay = error.status === 429 && error.retryAfter > 0
+                        ? error.retryAfter * 1000
+                        : Math.min(1000 * Math.pow(2, item.attempts), 20000);
+                    scheduleMediaRetry(item, delay);
+                } else {
+                    item.state = "failed";
+                    renderMediaItem(item);
+                }
+                setConnection(
+                    item.kind === "image"
+                        ? t("chat_photo_error", "Ошибка фото")
+                        : t("chat_voice_error", "Ошибка голосового"),
+                    "is-error"
+                );
+                sendState.textContent = mediaErrorCopy(
+                    item.kind,
+                    error && error.message ? error.message : "send_failed"
+                );
+                if (typeof window.playChatError === "function") {
+                    window.playChatError();
+                }
+            }).finally(function () {
+                mediaSending = false;
+                setMediaSending(false);
+                flushMediaQueue();
+            });
+        }
+
+        function queueMedia(item) {
+            return mediaOutboxWrite(item).catch(function () {
+                // Keep current-tab delivery available when private storage
+                // is disabled or full.
+            }).then(function () {
+                item.state = "queued";
+                item.attempts = 0;
+                mediaQueue.push(item);
+                renderMediaItem(item);
+                scrollToBottom("smooth");
+                window.setTimeout(flushMediaQueue, 0);
+            });
+        }
 
         function setMediaSending(active) {
             mediaSending = Boolean(active);
@@ -1583,11 +1959,6 @@
                 setConnection(t("chat_photo_too_big", "Фото слишком большое"), "is-error");
                 return;
             }
-            if (navigator.onLine === false) {
-                setConnection(t("chat_photo_offline", "Нет сети — фото нельзя отправить офлайн"), "is-error");
-                sendState.textContent = t("chat_no_network", "Нет сети");
-                return;
-            }
             sendState.textContent = t("chat_compressing_photo", "Сжимаем фото…");
             setMediaSending(true);
             compressImageFile(file, 1600, 0.82).then(function (readyFile) {
@@ -1596,43 +1967,23 @@
                     sendState.textContent = t("chat_photo_failed", "Фото не отправлено");
                     return;
                 }
-                var clientMessageId = createClientMessageId();
-                var formData = new FormData();
-                formData.append("image", readyFile, "photo.jpg");
-                formData.append("client_message_id", clientMessageId);
-                formData.append("caption", input.value.trim());
+                var caption = input.value.trim();
                 var reply = window.ResursMapChatReply || null;
-                if (reply && reply.id) {
-                    formData.append("reply_to_message_id", String(reply.id));
-                }
-                sendState.textContent = t("chat_sending_photo", "Отправка фото…");
-                return fetch(chatApi("/send-image"), {
-                    method: "POST",
-                    body: formData,
-                    credentials: "same-origin"
-                }).then(function (res) { return res.json().then(function (data) { return { res: res, data: data }; }); })
-                  .then(function (pack) {
-                    if (!pack.res.ok || !pack.data || !pack.data.ok) {
-                        throw new Error((pack.data && pack.data.error) || "send_failed");
-                    }
+                return queueMedia({
+                    clientMessageId: createClientMessageId(),
+                    kind: "image",
+                    blob: readyFile,
+                    mimeType: readyFile.type || "image/jpeg",
+                    caption: caption,
+                    replyToMessageId: reply && reply.id ? Number(reply.id) : null,
+                    createdAt: Math.floor(Date.now() / 1000)
+                }).then(function () {
                     input.value = "";
                     updateComposer();
-                    if (pack.data.message) {
-                        appendMessages([pack.data.message]);
-                    }
-                    window.ResursMapChatReply = null;
-                    var replyBarEl =
-                        document.getElementById("chat-reply-bar");
-                    if (replyBarEl) {
-                        replyBarEl.hidden = true;
-                    }
-                    setConnection(t("chat_conn_ok", "Связь есть"), "is-online");
-                    sendState.textContent = t("chat_sent_hint", "Отправлено · Enter — отправить");
-                    window.dispatchEvent(new CustomEvent("resursmap:chat-message-sent"));
-                    if (typeof window.resursmapRefreshAttentionBadge === "function") {
-                        window.resursmapRefreshAttentionBadge();
-                    }
-                  });
+                    sendState.textContent = navigator.onLine === false
+                        ? t("chat_no_network", "Нет сети")
+                        : t("chat_sending_photo", "Отправка фото…");
+                });
             }).catch(function (error) {
                 setConnection(t("chat_photo_error", "Ошибка фото"), "is-error");
                 var code = error && error.message ? error.message : "send_failed";
@@ -1706,56 +2057,20 @@
             if (!blob || !blob.size || mediaSending) {
                 return;
             }
-            if (navigator.onLine === false) {
-                setConnection(t("chat_voice_offline", "Нет сети — голосовое нельзя отправить офлайн"), "is-error");
-                sendState.textContent = t("chat_no_network", "Нет сети");
-                return;
-            }
             setMediaSending(true);
-            var clientMessageId = createClientMessageId();
-            var formData = new FormData();
-            var extension = mimeType.indexOf("ogg") !== -1
-                ? "ogg"
-                : (mimeType.indexOf("mp4") !== -1 ? "m4a" : "webm");
-            formData.append("voice", blob, "voice." + extension);
-            formData.append("client_message_id", clientMessageId);
             var reply = window.ResursMapChatReply || null;
-            if (reply && reply.id) {
-                formData.append("reply_to_message_id", String(reply.id));
-            }
-            sendState.textContent = t("chat_sending_voice", "Отправка голосового…");
-            fetch(chatApi("/send-voice"), {
-                method: "POST",
-                body: formData,
-                credentials: "same-origin"
-            }).then(function (res) {
-                return res.json().then(function (data) {
-                    return { res: res, data: data };
-                });
-            }).then(function (pack) {
-                if (!pack.res.ok || !pack.data || !pack.data.ok) {
-                    throw new Error(
-                        (pack.data && pack.data.error) || "send_failed"
-                    );
-                }
-                if (pack.data.message) {
-                    appendMessages([pack.data.message]);
-                }
-                window.ResursMapChatReply = null;
-                var replyBarEl =
-                    document.getElementById("chat-reply-bar");
-                if (replyBarEl) {
-                    replyBarEl.hidden = true;
-                }
-                setConnection(t("chat_conn_ok", "Связь есть"), "is-online");
-                sendState.textContent = t("chat_sent_hint", "Отправлено · Enter — отправить");
-                window.dispatchEvent(new CustomEvent("resursmap:chat-message-sent"));
-                if (typeof window.resursmapRefreshAttentionBadge === "function") {
-                    window.resursmapRefreshAttentionBadge();
-                }
-                if (typeof window.playChatSend === "function") {
-                    window.playChatSend();
-                }
+            queueMedia({
+                clientMessageId: createClientMessageId(),
+                kind: "voice",
+                blob: blob,
+                mimeType: mimeType || blob.type || "audio/webm",
+                caption: "",
+                replyToMessageId: reply && reply.id ? Number(reply.id) : null,
+                createdAt: Math.floor(Date.now() / 1000)
+            }).then(function () {
+                sendState.textContent = navigator.onLine === false
+                    ? t("chat_no_network", "Нет сети")
+                    : t("chat_sending_voice", "Отправка голосового…");
             }).catch(function (error) {
                 setConnection(t("chat_voice_error", "Ошибка голосового"), "is-error");
                 var code = error && error.message ? error.message : "send_failed";
@@ -2045,6 +2360,12 @@
             function () {
                 pollMessages();
                 flushPendingQueue();
+                mediaQueue.forEach(function (item) {
+                    if (item.state === "waiting") {
+                        item.state = "queued";
+                    }
+                });
+                flushMediaQueue();
             }
         );
 
@@ -2199,6 +2520,7 @@
                 window.clearInterval(pollTimer);
                 window.clearInterval(safetyPollTimer);
                 window.clearInterval(presenceTimer);
+                mediaQueue.forEach(releaseMediaPreview);
 
                 if (typingStopTimer) {
                     window.clearTimeout(typingStopTimer);
@@ -2214,6 +2536,44 @@
         window.setTimeout(markReadAtBottomDebounced, 700);
 
         renderPendingQueue();
+
+        mediaOutboxLoad().then(function (items) {
+            mediaQueue = items
+                .filter(function (item) {
+                    return Boolean(
+                        item &&
+                        item.scope === storageScope &&
+                        typeof item.id === "string" &&
+                        (item.kind === "image" || item.kind === "voice") &&
+                        item.blob instanceof Blob
+                    );
+                })
+                .map(function (item) {
+                    return {
+                        clientMessageId: item.id,
+                        kind: item.kind,
+                        blob: item.blob,
+                        mimeType: String(item.mimeType || item.blob.type || ""),
+                        caption: String(item.caption || ""),
+                        replyToMessageId: Number(item.replyToMessageId || 0) || null,
+                        createdAt: Number(item.createdAt || 0) ||
+                            Math.floor(Date.now() / 1000),
+                        state: "queued",
+                        attempts: 0
+                    };
+                })
+                .filter(function (item) {
+                    return !storedClientMessageExists(item.clientMessageId);
+                });
+
+            mediaQueue.forEach(renderMediaItem);
+            if (mediaQueue.length > 0) {
+                scrollToBottom("auto");
+                flushMediaQueue();
+            }
+        }).catch(function () {
+            // Text chat remains available when IndexedDB is unavailable.
+        });
 
         if (
             pendingQueue.length > 0 &&
