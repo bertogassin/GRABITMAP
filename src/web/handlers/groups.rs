@@ -1759,10 +1759,14 @@ pub async fn api_group_delete(
         Ok(value) => value,
         Err(_) => return json_error(StatusCode::NOT_FOUND, "message_not_found"),
     };
-    let sender_role = group_role(&db, group_id, sender_user_id).unwrap_or_default();
+    let sender_role =
+        super::official_groups::group_member_governance_role(&state, &db, group_id, sender_user_id)
+            .unwrap_or_default();
     if !role_can_moderate_message(&actor_role, user_id, sender_user_id, &sender_role) {
         return json_error(StatusCode::FORBIDDEN, "moderator_required");
     }
+    let official_manager =
+        super::official_groups::is_official_group(&db, group_id) && actor_role == GROUP_ROLE_OWNER;
     let now = unix_now();
     if db
         .execute(
@@ -1790,6 +1794,7 @@ pub async fn api_group_delete(
                               AND protected_sender.role IN (?5, ?6)
                         )
                     )
+                    OR ?7 = 1
                )",
             rusqlite::params![
                 now,
@@ -1797,7 +1802,8 @@ pub async fn api_group_delete(
                 group_id,
                 user_id,
                 GROUP_ROLE_OWNER,
-                GROUP_ROLE_ADMIN
+                GROUP_ROLE_ADMIN,
+                i64::from(official_manager)
             ],
         )
         .unwrap_or(0)
@@ -1924,8 +1930,6 @@ pub async fn group_members_page(
                     description: "",
                     viewer_role: "",
                     is_official: false,
-                    is_recorded_official_owner: false,
-                    can_claim_official: false,
                     members: vec![],
                     candidates: vec![],
                     error: "",
@@ -1946,8 +1950,6 @@ pub async fn group_members_page(
                 description: "",
                 viewer_role: "",
                 is_official: false,
-                is_recorded_official_owner: false,
-                can_claim_official: false,
                 members: vec![],
                 candidates: vec![],
                 error: "Нет доступа",
@@ -1962,15 +1964,9 @@ pub async fn group_members_page(
         )
         .unwrap_or_else(|_| ("Группа".to_string(), String::new()));
     let is_official = super::official_groups::is_official_group(&db, group_id);
-    let stored_role = group_role(&db, group_id, user_id).unwrap_or_default();
     let viewer_role =
         super::official_groups::group_management_role(&state, &headers, &db, group_id, user_id)
             .unwrap_or_default();
-    let can_claim_official = is_official
-        && stored_role != GROUP_ROLE_OWNER
-        && super::official_groups::can_administer_official_group(
-            &state, &headers, &db, group_id, user_id,
-        );
     let members = load_group_member_names(&db, group_id);
     let current: std::collections::HashSet<i64> = members.iter().map(|(id, _, _, _)| *id).collect();
     let candidates = if !is_official && role_can_manage_members(&viewer_role) {
@@ -1989,8 +1985,6 @@ pub async fn group_members_page(
             description: &description,
             viewer_role: &viewer_role,
             is_official,
-            is_recorded_official_owner: is_official && stored_role == GROUP_ROLE_OWNER,
-            can_claim_official,
             members,
             candidates,
             error: "",
@@ -2079,12 +2073,14 @@ pub async fn set_group_avatar(
         Ok(db) => db,
         Err(_) => return Redirect::to(&target).into_response(),
     };
-    if !role_can_manage_members(
-        &super::official_groups::group_management_role(&state, &headers, &db, group_id, user_id)
-            .unwrap_or_default(),
-    ) {
+    let role =
+        super::official_groups::group_management_role(&state, &headers, &db, group_id, user_id)
+            .unwrap_or_default();
+    if !role_can_manage_members(&role) {
         return Redirect::to("/app/messages").into_response();
     }
+    let official_manager =
+        super::official_groups::is_official_group(&db, group_id) && role == GROUP_ROLE_OWNER;
     let mut image = None;
     while let Ok(Some(field)) = multipart.next_field().await {
         if matches!(field.name().unwrap_or(""), "image" | "file" | "avatar") {
@@ -2126,19 +2122,20 @@ pub async fn set_group_avatar(
             "UPDATE chat_groups
              SET avatar_path = ?1, updated_at = ?2
              WHERE id = ?3
-               AND EXISTS (
+               AND (?7 = 1 OR EXISTS (
                     SELECT 1 FROM chat_group_members AS actor
                     WHERE actor.group_id = chat_groups.id
                       AND actor.user_id = ?4
                       AND actor.role IN (?5, ?6)
-               )",
+               ))",
             rusqlite::params![
                 relative,
                 unix_now(),
                 group_id,
                 user_id,
                 GROUP_ROLE_OWNER,
-                GROUP_ROLE_ADMIN
+                GROUP_ROLE_ADMIN,
+                i64::from(official_manager)
             ],
         )
         .unwrap_or(0);
@@ -2169,12 +2166,14 @@ pub async fn delete_group_avatar(
         Ok(db) => db,
         Err(_) => return Redirect::to(&target).into_response(),
     };
-    if !role_can_manage_members(
-        &super::official_groups::group_management_role(&state, &headers, &db, group_id, user_id)
-            .unwrap_or_default(),
-    ) {
+    let role =
+        super::official_groups::group_management_role(&state, &headers, &db, group_id, user_id)
+            .unwrap_or_default();
+    if !role_can_manage_members(&role) {
         return Redirect::to("/app/messages").into_response();
     }
+    let official_manager =
+        super::official_groups::is_official_group(&db, group_id) && role == GROUP_ROLE_OWNER;
     let previous = db
         .query_row(
             "SELECT COALESCE(avatar_path, '') FROM chat_groups WHERE id = ?1",
@@ -2186,18 +2185,19 @@ pub async fn delete_group_avatar(
         .execute(
             "UPDATE chat_groups SET avatar_path = '', updated_at = ?1
              WHERE id = ?2
-               AND EXISTS (
+               AND (?6 = 1 OR EXISTS (
                     SELECT 1 FROM chat_group_members AS actor
                     WHERE actor.group_id = chat_groups.id
                       AND actor.user_id = ?3
                       AND actor.role IN (?4, ?5)
-               )",
+               ))",
             rusqlite::params![
                 unix_now(),
                 group_id,
                 user_id,
                 GROUP_ROLE_OWNER,
-                GROUP_ROLE_ADMIN
+                GROUP_ROLE_ADMIN,
+                i64::from(official_manager)
             ],
         )
         .unwrap_or(0);
@@ -2550,12 +2550,12 @@ pub async fn rename_group(
          SET name = CASE WHEN ?8 = 1 THEN name ELSE ?1 END,
              description = ?2, updated_at = ?3
          WHERE id = ?4
-           AND EXISTS (
+           AND (?8 = 1 OR EXISTS (
                 SELECT 1 FROM chat_group_members AS actor
                 WHERE actor.group_id = chat_groups.id
                   AND actor.user_id = ?5
                   AND actor.role IN (?6, ?7)
-           )",
+           ))",
         rusqlite::params![
             name,
             description,
@@ -2654,10 +2654,14 @@ pub async fn update_group_member_mute(
     let actor_role =
         super::official_groups::group_management_role(&state, &headers, &db, group_id, user_id)
             .unwrap_or_default();
-    let target_role = group_role(&db, group_id, member_id).unwrap_or_default();
+    let target_role =
+        super::official_groups::group_member_governance_role(&state, &db, group_id, member_id)
+            .unwrap_or_default();
     if !role_can_remove(&actor_role, &target_role) {
         return Redirect::to(&target).into_response();
     }
+    let official_manager =
+        super::official_groups::is_official_group(&db, group_id) && actor_role == GROUP_ROLE_OWNER;
     let now = unix_now();
     let muted_until = if form.seconds == 0 {
         0
@@ -2671,7 +2675,7 @@ pub async fn update_group_member_mute(
              WHERE group_id = ?2
                AND user_id = ?3
                AND role <> ?4
-               AND EXISTS (
+               AND (?8 = 1 OR EXISTS (
                     SELECT 1 FROM chat_group_members AS actor
                     WHERE actor.group_id = ?2
                       AND actor.user_id = ?5
@@ -2679,7 +2683,7 @@ pub async fn update_group_member_mute(
                            actor.role = ?4
                            OR (actor.role = ?6 AND chat_group_members.role = ?7)
                       )
-               )",
+               ))",
             rusqlite::params![
                 muted_until,
                 group_id,
@@ -2687,7 +2691,8 @@ pub async fn update_group_member_mute(
                 GROUP_ROLE_OWNER,
                 user_id,
                 GROUP_ROLE_ADMIN,
-                GROUP_ROLE_MEMBER
+                GROUP_ROLE_MEMBER,
+                i64::from(official_manager)
             ],
         )
         .unwrap_or(0);
@@ -2747,17 +2752,21 @@ pub async fn remove_group_member(
     let actor_role =
         super::official_groups::group_management_role(&state, &headers, &db, group_id, user_id)
             .unwrap_or_default();
-    let member_role = group_role(&db, group_id, member_id).unwrap_or_default();
+    let member_role =
+        super::official_groups::group_member_governance_role(&state, &db, group_id, member_id)
+            .unwrap_or_default();
     if !role_can_remove(&actor_role, &member_role) {
         return Redirect::to(&target).into_response();
     }
+    let official_manager =
+        super::official_groups::is_official_group(&db, group_id) && actor_role == GROUP_ROLE_OWNER;
     if db
         .execute(
             "DELETE FROM chat_group_members
              WHERE group_id = ?1
                AND user_id = ?2
                AND role <> ?3
-               AND EXISTS (
+               AND (?7 = 1 OR EXISTS (
                     SELECT 1 FROM chat_group_members AS actor
                     WHERE actor.group_id = ?1
                       AND actor.user_id = ?4
@@ -2765,14 +2774,15 @@ pub async fn remove_group_member(
                            actor.role = ?3
                            OR (actor.role = ?5 AND chat_group_members.role = ?6)
                       )
-               )",
+               ))",
             rusqlite::params![
                 group_id,
                 member_id,
                 GROUP_ROLE_OWNER,
                 user_id,
                 GROUP_ROLE_ADMIN,
-                GROUP_ROLE_MEMBER
+                GROUP_ROLE_MEMBER,
+                i64::from(official_manager)
             ],
         )
         .unwrap_or(0)

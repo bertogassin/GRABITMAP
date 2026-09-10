@@ -1128,7 +1128,6 @@ pub struct OfficialGroupsPage<'a> {
     pub group_id: i64,
     pub member_count: i64,
     pub is_member: bool,
-    pub can_create: bool,
     pub query: &'a str,
     pub children: Vec<OfficialGroupPlace>,
     pub error: &'a str,
@@ -1178,51 +1177,38 @@ pub fn render_official_groups(params: OfficialGroupsPage<'_>) -> String {
             members = params.member_count,
             group_id = params.group_id,
         )
-    } else if params.group_id > 0 && params.authenticated {
+    } else if params.authenticated {
         format!(
             r#"<form method="post" action="/app/official-groups/{scope_type}/{scope_id}/join" class="card official-group-current">
-    <span class="chat-official-group">✓ Официальная группа</span>
+    <span class="chat-official-group">✓ Официальная группа GRABIT</span>
     <h2>{name}</h2>
-    <p class="card-meta">{members} участников · старые сообщения останутся видны после вступления</p>
+    <p class="card-meta">{status} · история группы доступна после вступления</p>
     <button class="ui-button" type="submit">Вступить в группу</button>
 </form>"#,
             scope_type = params.scope_type,
             scope_id = params.scope_id,
             name = escape_html(params.name),
-            members = params.member_count,
+            status = if params.group_id > 0 {
+                format!("{} участников", params.member_count)
+            } else {
+                "Готова к первому участнику".to_string()
+            },
         )
-    } else if params.group_id > 0 {
+    } else {
         let next = urlencoding::encode(&current_href);
         format!(
             r#"<section class="card official-group-current">
-    <span class="chat-official-group">✓ Официальная группа</span>
+    <span class="chat-official-group">✓ Официальная группа GRABIT</span>
     <h2>{name}</h2>
-    <p class="card-meta">{members} участников</p>
+    <p class="card-meta">{status}</p>
     <a class="ui-button" href="/login?next={next}">Войти и вступить</a>
 </section>"#,
             name = escape_html(params.name),
-            members = params.member_count,
-        )
-    } else if params.can_create {
-        format!(
-            r#"<form method="post" action="/app/official-groups/{scope_type}/{scope_id}/create" class="card official-group-current">
-    <span class="chat-official-group">Управление GRABIT</span>
-    <h2>{name}</h2>
-    <p class="card-meta">Официальная группа здесь ещё не создана. Название и географическая привязка будут установлены автоматически.</p>
-    <button class="ui-button" type="submit">Создать официальную группу</button>
-</form>"#,
-            scope_type = params.scope_type,
-            scope_id = params.scope_id,
-            name = escape_html(params.name),
-        )
-    } else {
-        format!(
-            r#"<section class="card official-group-current official-group-current--empty">
-    <span class="chat-official-group">{level}</span>
-    <h2>{name}</h2>
-    <p class="card-meta">Официальная группа для этого места пока не открыта.</p>
-</section>"#,
-            name = escape_html(params.name),
+            status = if params.group_id > 0 {
+                format!("{} участников", params.member_count)
+            } else {
+                "Готова к первому участнику".to_string()
+            },
         )
     };
     let search = if params.scope_type == "city" {
@@ -1257,7 +1243,7 @@ pub fn render_official_groups(params: OfficialGroupsPage<'_>) -> String {
                 let status = if place.group_id > 0 {
                     format!("✓ Открыта · {} участников", place.member_count)
                 } else {
-                    "Пока не открыта".to_string()
+                    "Готова к вступлению".to_string()
                 };
                 format!(
                     r#"<a class="card official-group-place" href="/app/official-groups?scope_type={scope_type}&scope_id={scope_id}">
@@ -1297,7 +1283,7 @@ pub fn render_official_groups(params: OfficialGroupsPage<'_>) -> String {
         r#"{error_html}{group_card}
 <aside class="card official-group-note">
     <strong>Официальное пространство GRABIT</strong>
-    <span>Одна группа на одно место. Частные группы остаются отдельными. Вступление добровольное.</span>
+    <span>Группа принадлежит платформе и запускается автоматически при первом вступлении. Первый участник не получает особых прав.</span>
 </aside>
 {directory}"#
     );
@@ -1401,8 +1387,6 @@ pub struct GroupMembersPage<'a> {
     pub description: &'a str,
     pub viewer_role: &'a str,
     pub is_official: bool,
-    pub is_recorded_official_owner: bool,
-    pub can_claim_official: bool,
     pub members: Vec<(i64, String, String, i64)>,
     pub candidates: Vec<(i64, String)>,
     pub error: &'a str,
@@ -1416,8 +1400,6 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
         description,
         viewer_role,
         is_official,
-        is_recorded_official_owner,
-        can_claim_official,
         members,
         candidates,
         error,
@@ -1435,7 +1417,6 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
             .iter()
             .map(|(id, member, role, muted_until)| {
                 let role_label = match role.as_str() {
-                    "owner" if is_official => "Текущий управляющий",
                     "owner" => "Владелец",
                     "admin" => "Администратор",
                     _ => "Участник",
@@ -1629,11 +1610,7 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
         } else {
             String::new()
         };
-        let leave = if is_official && is_recorded_official_owner && is_owner {
-            r#"<section class="card rm-group-create"><div class="rm-profile-field-label">Управление официальной группой активно</div><p class="card-meta">Контроль передаётся только через действующее административное назначение территории.</p></section>"#.to_string()
-        } else if is_official && is_recorded_official_owner {
-            r#"<section class="card rm-group-create"><div class="rm-profile-field-label">Требуется новый управляющий</div><p class="card-meta">Ваше административное назначение больше не даёт прав управления. Выйти из группы можно после того, как другой действующий администратор территории примет управление.</p></section>"#.to_string()
-        } else if is_owner {
+        let leave = if is_owner && !is_official {
             r#"<section class="card rm-group-create"><div class="rm-profile-field-label">Вы владелец группы</div><p class="card-meta">Перед выходом передайте владение другому участнику. Так группа не останется без управления.</p></section>"#.to_string()
         } else {
             format!(
@@ -1644,16 +1621,10 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
         };
         let governance = if !is_official {
             String::new()
-        } else if can_claim_official {
-            format!(
-                r#"<form method="post" action="/app/group/{group_id}/official-control" class="card rm-group-create" data-confirm="Принять управление этой официальной группой по вашей административной роли?">
-    <div class="rm-profile-field-label">Управление территорией</div>
-    <p class="card-meta">Ваше действующее назначение разрешает принять управление. Предыдущий управляющий станет обычным участником, а приглашения будут отозваны.</p>
-    <button type="submit" class="ui-button">Принять управление</button>
-</form>"#
-            )
+        } else if can_manage {
+            r#"<section class="card rm-group-create"><div class="rm-profile-field-label">Вы управляете этой территорией</div><p class="card-meta">Права действуют по вашему административному назначению. Сама официальная группа принадлежит платформе GRABIT.</p></section>"#.to_string()
         } else {
-            r#"<section class="card rm-group-create"><div class="rm-profile-field-label">Официальная группа GRABIT</div><p class="card-meta">Права управления определяются действующим административным назначением территории, а не обычной ролью участника.</p></section>"#.to_string()
+            r#"<section class="card rm-group-create"><div class="rm-profile-field-label">Официальная группа GRABIT</div><p class="card-meta">У группы нет человеческого владельца. Права управления определяются только действующим административным назначением территории.</p></section>"#.to_string()
         };
         format!(
             r#"{governance}
