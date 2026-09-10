@@ -18,11 +18,26 @@ use serde_json::json;
 use std::fs;
 use std::io::Write;
 
+const MAX_GROUP_MEMBERS: i64 = 250;
+const GROUP_ROLE_OWNER: &str = "owner";
+const GROUP_ROLE_ADMIN: &str = "admin";
+const GROUP_ROLE_MEMBER: &str = "member";
+
 #[derive(Debug, Deserialize)]
 pub struct CreateGroupForm {
     name: String,
     #[serde(default)]
     member_ids: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub(crate) struct GroupNameForm {
+    name: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub(crate) struct GroupRoleForm {
+    role: String,
 }
 
 fn json_error(status: StatusCode, error: &str) -> Response {
@@ -163,6 +178,92 @@ fn is_member(db: &rusqlite::Connection, group_id: i64, user_id: i64) -> bool {
         |_| Ok(()),
     )
     .is_ok()
+}
+
+fn group_role(db: &rusqlite::Connection, group_id: i64, user_id: i64) -> Option<String> {
+    db.query_row(
+        "SELECT role FROM chat_group_members WHERE group_id = ?1 AND user_id = ?2",
+        rusqlite::params![group_id, user_id],
+        |row| row.get(0),
+    )
+    .ok()
+}
+
+fn role_can_manage_members(role: &str) -> bool {
+    role == GROUP_ROLE_OWNER || role == GROUP_ROLE_ADMIN
+}
+
+fn role_can_remove(actor_role: &str, target_role: &str) -> bool {
+    actor_role == GROUP_ROLE_OWNER && target_role != GROUP_ROLE_OWNER
+        || actor_role == GROUP_ROLE_ADMIN && target_role == GROUP_ROLE_MEMBER
+}
+
+fn selected_member_ids(
+    value: &str,
+    viewer_user_id: i64,
+    allowed: &std::collections::HashSet<i64>,
+) -> Vec<i64> {
+    let mut members = value
+        .split(',')
+        .filter_map(|item| item.trim().parse::<i64>().ok())
+        .filter(|id| *id > 0 && *id != viewer_user_id && allowed.contains(id))
+        .collect::<Vec<_>>();
+    members.sort_unstable();
+    members.dedup();
+    members
+}
+
+fn transfer_group_owner(
+    db: &rusqlite::Connection,
+    group_id: i64,
+    current_owner_id: i64,
+    new_owner_id: i64,
+    now: i64,
+) -> rusqlite::Result<bool> {
+    if group_id <= 0
+        || current_owner_id <= 0
+        || new_owner_id <= 0
+        || current_owner_id == new_owner_id
+    {
+        return Ok(false);
+    }
+    let tx = db.unchecked_transaction()?;
+    let current_role: Option<String> = tx
+        .query_row(
+            "SELECT role FROM chat_group_members WHERE group_id = ?1 AND user_id = ?2",
+            rusqlite::params![group_id, current_owner_id],
+            |row| row.get(0),
+        )
+        .ok();
+    let target_role: Option<String> = tx
+        .query_row(
+            "SELECT role FROM chat_group_members WHERE group_id = ?1 AND user_id = ?2",
+            rusqlite::params![group_id, new_owner_id],
+            |row| row.get(0),
+        )
+        .ok();
+    if current_role.as_deref() != Some(GROUP_ROLE_OWNER) || target_role.is_none() {
+        return Ok(false);
+    }
+    tx.execute(
+        "UPDATE chat_group_members SET role = ?1 WHERE group_id = ?2 AND user_id = ?3",
+        rusqlite::params![GROUP_ROLE_ADMIN, group_id, current_owner_id],
+    )?;
+    tx.execute(
+        "UPDATE chat_group_members SET role = ?1 WHERE group_id = ?2 AND user_id = ?3",
+        rusqlite::params![GROUP_ROLE_OWNER, group_id, new_owner_id],
+    )?;
+    let updated = tx.execute(
+        "UPDATE chat_groups
+         SET owner_user_id = ?1, updated_at = ?2
+         WHERE id = ?3 AND owner_user_id = ?4",
+        rusqlite::params![new_owner_id, now, group_id, current_owner_id],
+    )?;
+    if updated != 1 {
+        return Ok(false);
+    }
+    tx.commit()?;
+    Ok(true)
 }
 
 fn partners_for_picker(db: &rusqlite::Connection, user_id: i64) -> Vec<(i64, String)> {
@@ -639,15 +740,15 @@ pub async fn create_group(
         .into_iter()
         .map(|(id, _)| id)
         .collect();
-    let mut members: Vec<i64> = form
-        .member_ids
-        .split(',')
-        .filter_map(|value| value.trim().parse::<i64>().ok())
-        .filter(|id| *id > 0 && *id != user_id && allowed.contains(id))
-        .collect();
-    members.sort_unstable();
-    members.dedup();
-    members.insert(0, user_id);
+    let members = selected_member_ids(&form.member_ids, user_id, &allowed);
+    if members.len() as i64 + 1 > MAX_GROUP_MEMBERS {
+        return Html(templates::render_new_group(
+            true,
+            partners_for_picker(&db, user_id),
+            "В группе может быть не больше 250 участников.",
+        ))
+        .into_response();
+    }
 
     let now = unix_now();
     let tx = match db.unchecked_transaction() {
@@ -656,7 +757,8 @@ pub async fn create_group(
     };
     if tx
         .execute(
-            "INSERT INTO chat_groups (name, created_by, created_at) VALUES (?1, ?2, ?3)",
+            "INSERT INTO chat_groups (name, created_by, created_at, owner_user_id, updated_at)
+             VALUES (?1, ?2, ?3, ?2, ?3)",
             rusqlite::params![name, user_id, now],
         )
         .is_err()
@@ -664,12 +766,27 @@ pub async fn create_group(
         return Redirect::to("/app/groups/new").into_response();
     }
     let group_id = tx.last_insert_rowid();
+    if tx
+        .execute(
+            "INSERT INTO chat_group_members (group_id, user_id, joined_at, role)
+             VALUES (?1, ?2, ?3, ?4)",
+            rusqlite::params![group_id, user_id, now, GROUP_ROLE_OWNER],
+        )
+        .is_err()
+    {
+        return Redirect::to("/app/groups/new").into_response();
+    }
     for member in &members {
-        let _ = tx.execute(
-            "INSERT OR IGNORE INTO chat_group_members (group_id, user_id, joined_at)
-             VALUES (?1, ?2, ?3)",
-            rusqlite::params![group_id, member, now],
-        );
+        if tx
+            .execute(
+                "INSERT INTO chat_group_members (group_id, user_id, joined_at, role)
+                 VALUES (?1, ?2, ?3, ?4)",
+                rusqlite::params![group_id, member, now, GROUP_ROLE_MEMBER],
+            )
+            .is_err()
+        {
+            return Redirect::to("/app/groups/new").into_response();
+        }
     }
     if tx.commit().is_err() {
         return Redirect::to("/app/groups/new").into_response();
@@ -1561,8 +1678,9 @@ pub async fn group_members_page(
         Some(id) => id,
         None => {
             return Html(templates::render_group_members(
-                false,
                 0,
+                0,
+                "",
                 "",
                 vec![],
                 vec![],
@@ -1576,9 +1694,10 @@ pub async fn group_members_page(
     };
     if group_id <= 0 || !is_member(&db, group_id, user_id) {
         return Html(templates::render_group_members(
-            true,
+            user_id,
             group_id,
             "Группа",
+            "",
             vec![],
             vec![],
             "Нет доступа",
@@ -1591,14 +1710,25 @@ pub async fn group_members_page(
             |row| row.get(0),
         )
         .unwrap_or_else(|_| "Группа".to_string());
+    let viewer_role = group_role(&db, group_id, user_id).unwrap_or_default();
     let members = load_group_member_names(&db, group_id);
-    let current: std::collections::HashSet<i64> = members.iter().map(|(id, _)| *id).collect();
-    let candidates = partners_for_picker(&db, user_id)
-        .into_iter()
-        .filter(|(id, _)| !current.contains(id))
-        .collect();
+    let current: std::collections::HashSet<i64> = members.iter().map(|(id, _, _)| *id).collect();
+    let candidates = if role_can_manage_members(&viewer_role) {
+        partners_for_picker(&db, user_id)
+            .into_iter()
+            .filter(|(id, _)| !current.contains(id))
+            .collect()
+    } else {
+        vec![]
+    };
     Html(templates::render_group_members(
-        true, group_id, &name, members, candidates, "",
+        user_id,
+        group_id,
+        &name,
+        &viewer_role,
+        members,
+        candidates,
+        "",
     ))
 }
 
@@ -1619,26 +1749,246 @@ pub async fn add_group_members(
         Ok(db) => db,
         Err(_) => return Redirect::to("/app/messages").into_response(),
     };
-    if group_id <= 0 || !is_member(&db, group_id, user_id) {
+    let actor_role = group_role(&db, group_id, user_id).unwrap_or_default();
+    if group_id <= 0 || !role_can_manage_members(&actor_role) {
         return Redirect::to("/app/messages").into_response();
     }
     let allowed: std::collections::HashSet<i64> = partners_for_picker(&db, user_id)
         .into_iter()
         .map(|(id, _)| id)
         .collect();
+    let current: std::collections::HashSet<i64> =
+        group_member_ids(&db, group_id).into_iter().collect();
+    let members = selected_member_ids(&form.member_ids, user_id, &allowed)
+        .into_iter()
+        .filter(|id| !current.contains(id))
+        .collect::<Vec<_>>();
+    if current.len() as i64 + members.len() as i64 > MAX_GROUP_MEMBERS {
+        return Redirect::to(&format!("/app/group/{group_id}/members")).into_response();
+    }
     let now = unix_now();
-    for member in form.member_ids.split(',') {
-        if let Ok(id) = member.trim().parse::<i64>() {
-            if id > 0 && id != user_id && allowed.contains(&id) {
-                let _ = db.execute(
-                    "INSERT OR IGNORE INTO chat_group_members (group_id, user_id, joined_at)
-                     VALUES (?1, ?2, ?3)",
-                    rusqlite::params![group_id, id, now],
-                );
-            }
+    let tx = match db.unchecked_transaction() {
+        Ok(tx) => tx,
+        Err(_) => return Redirect::to(&format!("/app/group/{group_id}/members")).into_response(),
+    };
+    let transaction_role = tx
+        .query_row(
+            "SELECT role FROM chat_group_members WHERE group_id = ?1 AND user_id = ?2",
+            rusqlite::params![group_id, user_id],
+            |row| row.get::<_, String>(0),
+        )
+        .unwrap_or_default();
+    let transaction_count = tx
+        .query_row(
+            "SELECT COUNT(*) FROM chat_group_members WHERE group_id = ?1",
+            rusqlite::params![group_id],
+            |row| row.get::<_, i64>(0),
+        )
+        .unwrap_or(MAX_GROUP_MEMBERS);
+    if !role_can_manage_members(&transaction_role)
+        || transaction_count + members.len() as i64 > MAX_GROUP_MEMBERS
+    {
+        return Redirect::to(&format!("/app/group/{group_id}/members")).into_response();
+    }
+    for member in members {
+        if tx
+            .execute(
+                "INSERT INTO chat_group_members (group_id, user_id, joined_at, role)
+                 VALUES (?1, ?2, ?3, ?4)",
+                rusqlite::params![group_id, member, now, GROUP_ROLE_MEMBER],
+            )
+            .is_err()
+        {
+            return Redirect::to(&format!("/app/group/{group_id}/members")).into_response();
         }
     }
-    Redirect::to(&format!("/app/group/{group_id}")).into_response()
+    if tx
+        .execute(
+            "UPDATE chat_groups SET updated_at = ?1 WHERE id = ?2",
+            rusqlite::params![now, group_id],
+        )
+        .is_err()
+        || tx.commit().is_err()
+    {
+        return Redirect::to(&format!("/app/group/{group_id}/members")).into_response();
+    }
+    Redirect::to(&format!("/app/group/{group_id}/members")).into_response()
+}
+
+pub async fn rename_group(
+    State(state): State<AppState>,
+    Path(group_id): Path<i64>,
+    headers: HeaderMap,
+    Form(form): Form<GroupNameForm>,
+) -> Response {
+    let target = format!("/app/group/{group_id}/members");
+    if request_is_cross_site(&headers) {
+        return Redirect::to(&target).into_response();
+    }
+    let user_id = match verify_user_session(&state, &headers) {
+        Some(id) => id,
+        None => return Redirect::to("/login?next=/app/messages").into_response(),
+    };
+    let name = form.name.trim();
+    if !input_text_is_valid(name, 1, 80) {
+        return Redirect::to(&target).into_response();
+    }
+    let db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => return Redirect::to(&target).into_response(),
+    };
+    let role = group_role(&db, group_id, user_id).unwrap_or_default();
+    if !role_can_manage_members(&role) {
+        return Redirect::to("/app/messages").into_response();
+    }
+    let _ = db.execute(
+        "UPDATE chat_groups
+         SET name = ?1, updated_at = ?2
+         WHERE id = ?3
+           AND EXISTS (
+                SELECT 1 FROM chat_group_members AS actor
+                WHERE actor.group_id = chat_groups.id
+                  AND actor.user_id = ?4
+                  AND actor.role IN (?5, ?6)
+           )",
+        rusqlite::params![
+            name,
+            unix_now(),
+            group_id,
+            user_id,
+            GROUP_ROLE_OWNER,
+            GROUP_ROLE_ADMIN
+        ],
+    );
+    Redirect::to(&target).into_response()
+}
+
+pub async fn update_group_member_role(
+    State(state): State<AppState>,
+    Path((group_id, member_id)): Path<(i64, i64)>,
+    headers: HeaderMap,
+    Form(form): Form<GroupRoleForm>,
+) -> Response {
+    let target = format!("/app/group/{group_id}/members");
+    if request_is_cross_site(&headers) {
+        return Redirect::to(&target).into_response();
+    }
+    let user_id = match verify_user_session(&state, &headers) {
+        Some(id) => id,
+        None => return Redirect::to("/login?next=/app/messages").into_response(),
+    };
+    let db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => return Redirect::to(&target).into_response(),
+    };
+    if group_role(&db, group_id, user_id).as_deref() != Some(GROUP_ROLE_OWNER)
+        || member_id == user_id
+        || !matches!(form.role.as_str(), GROUP_ROLE_ADMIN | GROUP_ROLE_MEMBER)
+    {
+        return Redirect::to(&target).into_response();
+    }
+    let changed = db
+        .execute(
+            "UPDATE chat_group_members
+             SET role = ?1
+             WHERE group_id = ?2
+               AND user_id = ?3
+               AND role <> ?4
+               AND EXISTS (
+                    SELECT 1 FROM chat_group_members AS actor
+                    WHERE actor.group_id = ?2 AND actor.user_id = ?5 AND actor.role = ?4
+               )",
+            rusqlite::params![form.role, group_id, member_id, GROUP_ROLE_OWNER, user_id],
+        )
+        .unwrap_or(0);
+    if changed == 1 {
+        let _ = db.execute(
+            "UPDATE chat_groups SET updated_at = ?1 WHERE id = ?2",
+            rusqlite::params![unix_now(), group_id],
+        );
+    }
+    Redirect::to(&target).into_response()
+}
+
+pub async fn transfer_group_ownership(
+    State(state): State<AppState>,
+    Path((group_id, member_id)): Path<(i64, i64)>,
+    headers: HeaderMap,
+) -> Response {
+    let target = format!("/app/group/{group_id}/members");
+    if request_is_cross_site(&headers) {
+        return Redirect::to(&target).into_response();
+    }
+    let user_id = match verify_user_session(&state, &headers) {
+        Some(id) => id,
+        None => return Redirect::to("/login?next=/app/messages").into_response(),
+    };
+    let db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => return Redirect::to(&target).into_response(),
+    };
+    let _ = transfer_group_owner(&db, group_id, user_id, member_id, unix_now());
+    Redirect::to(&target).into_response()
+}
+
+pub async fn remove_group_member(
+    State(state): State<AppState>,
+    Path((group_id, member_id)): Path<(i64, i64)>,
+    headers: HeaderMap,
+) -> Response {
+    let target = format!("/app/group/{group_id}/members");
+    if request_is_cross_site(&headers) {
+        return Redirect::to(&target).into_response();
+    }
+    let user_id = match verify_user_session(&state, &headers) {
+        Some(id) => id,
+        None => return Redirect::to("/login?next=/app/messages").into_response(),
+    };
+    if member_id == user_id {
+        return Redirect::to(&target).into_response();
+    }
+    let db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => return Redirect::to(&target).into_response(),
+    };
+    let actor_role = group_role(&db, group_id, user_id).unwrap_or_default();
+    let member_role = group_role(&db, group_id, member_id).unwrap_or_default();
+    if !role_can_remove(&actor_role, &member_role) {
+        return Redirect::to(&target).into_response();
+    }
+    if db
+        .execute(
+            "DELETE FROM chat_group_members
+             WHERE group_id = ?1
+               AND user_id = ?2
+               AND role <> ?3
+               AND EXISTS (
+                    SELECT 1 FROM chat_group_members AS actor
+                    WHERE actor.group_id = ?1
+                      AND actor.user_id = ?4
+                      AND (
+                           actor.role = ?3
+                           OR (actor.role = ?5 AND chat_group_members.role = ?6)
+                      )
+               )",
+            rusqlite::params![
+                group_id,
+                member_id,
+                GROUP_ROLE_OWNER,
+                user_id,
+                GROUP_ROLE_ADMIN,
+                GROUP_ROLE_MEMBER
+            ],
+        )
+        .unwrap_or(0)
+        == 1
+    {
+        let _ = db.execute(
+            "UPDATE chat_groups SET updated_at = ?1 WHERE id = ?2",
+            rusqlite::params![unix_now(), group_id],
+        );
+    }
+    Redirect::to(&target).into_response()
 }
 
 pub async fn leave_group(
@@ -1657,6 +2007,9 @@ pub async fn leave_group(
         Ok(db) => db,
         Err(_) => return Redirect::to("/app/messages").into_response(),
     };
+    if group_role(&db, group_id, user_id).as_deref() == Some(GROUP_ROLE_OWNER) {
+        return Redirect::to(&format!("/app/group/{group_id}/members")).into_response();
+    }
     let _ = db.execute(
         "DELETE FROM chat_group_members WHERE group_id = ?1 AND user_id = ?2",
         rusqlite::params![group_id, user_id],
@@ -1664,16 +2017,34 @@ pub async fn leave_group(
     Redirect::to("/app/messages").into_response()
 }
 
-fn load_group_member_names(db: &rusqlite::Connection, group_id: i64) -> Vec<(i64, String)> {
-    db.prepare("SELECT user_id FROM chat_group_members WHERE group_id = ?1 ORDER BY joined_at ASC")
-        .and_then(|mut stmt| {
-            stmt.query_map(rusqlite::params![group_id], |row| row.get(0))?
-                .collect::<Result<Vec<i64>, _>>()
-        })
-        .unwrap_or_default()
-        .into_iter()
-        .map(|id| (id, profile_display_name(db, id)))
-        .collect()
+fn load_group_member_names(db: &rusqlite::Connection, group_id: i64) -> Vec<(i64, String, String)> {
+    db.prepare(
+        "SELECT member.user_id, member.role,
+                COALESCE(profile.username, ''),
+                COALESCE(profile.first_name, ''),
+                COALESCE(profile.last_name, '')
+         FROM chat_group_members AS member
+         LEFT JOIN profiles AS profile ON profile.user_id = member.user_id
+         WHERE member.group_id = ?1
+         ORDER BY CASE member.role WHEN 'owner' THEN 0 WHEN 'admin' THEN 1 ELSE 2 END,
+                  member.joined_at ASC, member.user_id ASC",
+    )
+    .and_then(|mut stmt| {
+        stmt.query_map(rusqlite::params![group_id], |row| {
+            let id = row.get::<_, i64>(0)?;
+            let role = row.get::<_, String>(1)?;
+            let username = row.get::<_, String>(2)?;
+            let first_name = row.get::<_, String>(3)?;
+            let last_name = row.get::<_, String>(4)?;
+            Ok((
+                id,
+                templates::conversation_display_name(id, &username, &first_name, &last_name),
+                role,
+            ))
+        })?
+        .collect::<Result<Vec<_>, _>>()
+    })
+    .unwrap_or_default()
 }
 
 pub fn load_user_groups(
@@ -1752,6 +2123,7 @@ mod tests {
                     user_id INTEGER NOT NULL,
                     joined_at INTEGER NOT NULL DEFAULT 0,
                     last_read_message_id INTEGER NOT NULL DEFAULT 0,
+                    role TEXT NOT NULL DEFAULT 'member',
                     PRIMARY KEY (group_id, user_id)
                 );
                 CREATE TABLE user_notifications (
@@ -1871,6 +2243,68 @@ mod tests {
         .expect("group send payload with no reply");
 
         assert_eq!(payload.reply_to_message_id, None);
+    }
+
+    #[test]
+    fn group_management_permissions_keep_owner_control_bounded() {
+        assert!(role_can_manage_members(GROUP_ROLE_OWNER));
+        assert!(role_can_manage_members(GROUP_ROLE_ADMIN));
+        assert!(!role_can_manage_members(GROUP_ROLE_MEMBER));
+        assert!(role_can_remove(GROUP_ROLE_OWNER, GROUP_ROLE_ADMIN));
+        assert!(role_can_remove(GROUP_ROLE_OWNER, GROUP_ROLE_MEMBER));
+        assert!(!role_can_remove(GROUP_ROLE_OWNER, GROUP_ROLE_OWNER));
+        assert!(role_can_remove(GROUP_ROLE_ADMIN, GROUP_ROLE_MEMBER));
+        assert!(!role_can_remove(GROUP_ROLE_ADMIN, GROUP_ROLE_ADMIN));
+        assert!(!role_can_remove(GROUP_ROLE_MEMBER, GROUP_ROLE_MEMBER));
+    }
+
+    #[test]
+    fn ownership_transfer_is_atomic_and_keeps_exactly_one_owner() {
+        let connection = group_database();
+        connection
+            .execute_batch(
+                "CREATE TABLE chat_groups (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    created_by INTEGER NOT NULL,
+                    created_at INTEGER NOT NULL,
+                    owner_user_id INTEGER NOT NULL,
+                    updated_at INTEGER NOT NULL
+                 );
+                 CREATE UNIQUE INDEX idx_chat_group_single_owner
+                 ON chat_group_members(group_id) WHERE role = 'owner';
+                 INSERT INTO chat_groups (
+                    id, name, created_by, created_at, owner_user_id, updated_at
+                 ) VALUES (7, 'Команда', 1, 100, 1, 100);
+                 INSERT INTO chat_group_members (group_id, user_id, joined_at, role)
+                 VALUES (7, 1, 100, 'owner'), (7, 2, 101, 'member');",
+            )
+            .expect("ownership fixtures");
+
+        assert!(transfer_group_owner(&connection, 7, 1, 2, 200).expect("ownership transfer"));
+        assert!(!transfer_group_owner(&connection, 7, 1, 2, 201).expect("stale owner rejected"));
+
+        let group: (i64, i64) = connection
+            .query_row(
+                "SELECT owner_user_id, updated_at FROM chat_groups WHERE id = 7",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?)),
+            )
+            .expect("group owner");
+        let roles: Vec<(i64, String)> = connection
+            .prepare(
+                "SELECT user_id, role FROM chat_group_members WHERE group_id = 7 ORDER BY user_id",
+            )
+            .expect("role query")
+            .query_map([], |row| Ok((row.get(0)?, row.get(1)?)))
+            .expect("role rows")
+            .collect::<Result<_, _>>()
+            .expect("role values");
+        let owner_count = roles.iter().filter(|(_, role)| role == "owner").count();
+
+        assert_eq!(group, (2, 200));
+        assert_eq!(roles, vec![(1, "admin".into()), (2, "owner".into())]);
+        assert_eq!(owner_count, 1);
     }
 
     #[test]

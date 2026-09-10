@@ -396,6 +396,32 @@ test("listing links become safe cards in direct and group chats", async () => {
   assert.doesNotMatch(chat, /fetch\(\s*listing\.url/);
 });
 
+test("group management preserves ownership and limits privileged actions", async () => {
+  const [migration, handlers, routes, template, common] = await Promise.all([
+    readFile(new URL("src/db/chat_groups.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
+    readFile(new URL("src/web/routes/communication.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/common.rs", root), "utf8"),
+  ]);
+
+  assert.match(migration, /owner_user_id INTEGER NOT NULL DEFAULT 0/);
+  assert.match(migration, /role TEXT NOT NULL DEFAULT 'member'/);
+  assert.match(migration, /idx_chat_group_single_owner/);
+  assert.match(handlers, /const MAX_GROUP_MEMBERS: i64 = 250/);
+  assert.match(handlers, /fn role_can_manage_members/);
+  assert.match(handlers, /fn transfer_group_owner/);
+  assert.match(handlers, /GROUP_ROLE_OWNER/);
+  assert.match(routes, /members\/\{member_id\}\/role/);
+  assert.match(routes, /members\/\{member_id\}\/owner/);
+  assert.match(routes, /members\/\{member_id\}\/remove/);
+  assert.match(template, /Владелец/);
+  assert.match(template, /Администратор/);
+  assert.match(template, /rm-group-member-search/);
+  assert.match(template, /form\[data-confirm\]/);
+  assert.match(common, /rm-group-member--managed/);
+});
+
 test("user-facing copy no longer calls listings resources", async () => {
   const visibleFiles = [
     "static/share.js",

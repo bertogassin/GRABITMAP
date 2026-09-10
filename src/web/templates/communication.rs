@@ -964,10 +964,7 @@ fn render_chat_thread(
         },
         group_menu = if group_id > 0 {
             format!(
-                r#"<a href="/app/group/{group_id}/members" class="chat-sound-toggle">Участники</a>
-                <form method="post" action="/app/group/{group_id}/leave">
-                    <button type="submit" class="chat-block-toggle">Выйти</button>
-                </form>"#
+                r#"<a href="/app/group/{group_id}/members" class="chat-sound-toggle">Управление группой</a>"#
             )
         } else {
             String::new()
@@ -1070,30 +1067,88 @@ pub fn render_new_group(authenticated: bool, partners: Vec<(i64, String)>, error
 }
 
 pub fn render_group_members(
-    authenticated: bool,
+    viewer_user_id: i64,
     group_id: i64,
     name: &str,
-    members: Vec<(i64, String)>,
+    viewer_role: &str,
+    members: Vec<(i64, String, String)>,
     candidates: Vec<(i64, String)>,
     error: &str,
 ) -> String {
+    let authenticated = viewer_user_id > 0;
     let content = if !authenticated {
         guest_locked_section("Группа", &format!("/app/group/{group_id}/members"))
     } else if error == "Нет доступа" {
         empty_state_card("Нет доступа", "Этой группы для вас нет.")
     } else {
+        let is_owner = viewer_role == "owner";
+        let can_manage = is_owner || viewer_role == "admin";
         let list = members
             .iter()
-            .map(|(_id, member)| {
+            .map(|(id, member, role)| {
+                let role_label = match role.as_str() {
+                    "owner" => "Владелец",
+                    "admin" => "Администратор",
+                    _ => "Участник",
+                };
+                let you = if *id == viewer_user_id {
+                    r#"<span class="rm-group-you">Вы</span>"#
+                } else {
+                    ""
+                };
+                let role_action = if is_owner && *id != viewer_user_id && role != "owner" {
+                    let (next_role, label) = if role == "admin" {
+                        ("member", "Сделать участником")
+                    } else {
+                        ("admin", "Сделать администратором")
+                    };
+                    format!(
+                        r#"<form method="post" action="/app/group/{group_id}/members/{id}/role">
+    <input type="hidden" name="role" value="{next_role}">
+    <button type="submit" class="rm-group-action">{label}</button>
+</form>"#
+                    )
+                } else {
+                    String::new()
+                };
+                let transfer_action = if is_owner && *id != viewer_user_id && role != "owner" {
+                    format!(
+                        r#"<form method="post" action="/app/group/{group_id}/members/{id}/owner" data-confirm="Передать этому участнику права владельца группы?">
+    <button type="submit" class="rm-group-action">Передать владение</button>
+</form>"#
+                    )
+                } else {
+                    String::new()
+                };
+                let can_remove = *id != viewer_user_id
+                    && ((viewer_role == "owner" && role != "owner")
+                        || (viewer_role == "admin" && role == "member"));
+                let remove_action = if can_remove {
+                    format!(
+                        r#"<form method="post" action="/app/group/{group_id}/members/{id}/remove" data-confirm="Удалить участника из группы?">
+    <button type="submit" class="rm-group-action rm-group-action--danger">Удалить</button>
+</form>"#
+                    )
+                } else {
+                    String::new()
+                };
                 format!(
-                    r#"<div class="rm-group-member"><span>{}</span></div>"#,
-                    escape_html(member)
+                    r#"<article class="rm-group-member rm-group-member--managed">
+    <div class="rm-group-member-copy">
+        <strong>{member}</strong>
+        <div class="rm-group-member-meta"><span class="rm-group-role rm-group-role--{role}">{role_label}</span>{you}</div>
+    </div>
+    <div class="rm-group-actions">{role_action}{transfer_action}{remove_action}</div>
+</article>"#,
+                    member = escape_html(member),
                 )
             })
             .collect::<Vec<_>>()
             .join("");
-        let add = if candidates.is_empty() {
+        let add = if !can_manage {
             String::new()
+        } else if candidates.is_empty() {
+            r#"<section class="card rm-group-create"><div class="rm-profile-field-label">Добавить участников</div><p class="card-meta">Все доступные собеседники уже в этой группе.</p></section>"#.to_string()
         } else {
             let boxes = candidates
                 .iter()
@@ -1107,36 +1162,75 @@ pub fn render_group_members(
                 .join("");
             format!(
                 r#"<form method="post" action="/app/group/{group_id}/members" class="card rm-group-create" id="rm-group-add">
-    <div class="rm-profile-field-label">Добавить</div>
+    <div class="rm-profile-field-label">Добавить участников</div>
+    <input class="ui-input" id="rm-group-member-search" type="search" placeholder="Найти по имени" autocomplete="off">
     <div class="rm-group-members">{boxes}</div>
     <input type="hidden" name="member_ids" id="rm-group-member-ids" value="">
     <button type="submit" class="ui-button">Добавить в группу</button>
-</form>
-<script>
-(function () {{
-    var form = document.getElementById("rm-group-add");
-    if (!form) return;
-    form.addEventListener("submit", function () {{
-        var ids = Array.prototype.map.call(form.querySelectorAll("input[name='member']:checked"), function (box) {{ return box.value; }});
-        var hidden = document.getElementById("rm-group-member-ids");
-        if (hidden) hidden.value = ids.join(",");
-    }});
-}})();
-</script>"#,
+</form>"#,
                 boxes = boxes,
             )
         };
+        let rename = if can_manage {
+            format!(
+                r#"<form method="post" action="/app/group/{group_id}/settings/name" class="card rm-group-create">
+    <label class="rm-profile-field">
+        <div class="rm-profile-field-label">Название группы</div>
+        <input class="ui-input" name="name" maxlength="80" required value="{name}">
+    </label>
+    <button type="submit" class="ui-button ui-button--secondary">Сохранить название</button>
+</form>"#,
+                name = escape_html(name),
+            )
+        } else {
+            String::new()
+        };
+        let leave = if is_owner {
+            r#"<section class="card rm-group-create"><div class="rm-profile-field-label">Вы владелец группы</div><p class="card-meta">Перед выходом передайте владение другому участнику. Так группа не останется без управления.</p></section>"#.to_string()
+        } else {
+            format!(
+                r#"<form method="post" action="/app/group/{group_id}/leave" class="card rm-group-create" data-confirm="Выйти из этой группы?">
+    <button type="submit" class="ui-button ui-button--danger">Выйти из группы</button>
+</form>"#
+            )
+        };
         format!(
-            r#"<section class="card rm-group-create">
-    <div class="rm-profile-field-label">Сейчас в группе</div>
+            r#"{rename}
+<section class="card rm-group-create">
+    <div class="rm-group-section-head"><div class="rm-profile-field-label">Участники</div><span class="rm-group-count">{member_count} / 250</span></div>
     <div class="rm-group-members">{list}</div>
 </section>
 {add}
-<form method="post" action="/app/group/{group_id}/leave" class="card rm-group-create">
-    <button type="submit" class="ui-button">Выйти из группы</button>
-</form>"#,
+{leave}
+<script>
+(function () {{
+    var addForm = document.getElementById("rm-group-add");
+    if (addForm) {{
+        addForm.addEventListener("submit", function () {{
+            var ids = Array.prototype.map.call(addForm.querySelectorAll("input[name='member']:checked"), function (box) {{ return box.value; }});
+            var hidden = document.getElementById("rm-group-member-ids");
+            if (hidden) hidden.value = ids.join(",");
+        }});
+        var search = document.getElementById("rm-group-member-search");
+        if (search) search.addEventListener("input", function () {{
+            var query = search.value.trim().toLocaleLowerCase();
+            addForm.querySelectorAll("label.rm-group-member").forEach(function (row) {{
+                row.hidden = query !== "" && !row.textContent.toLocaleLowerCase().includes(query);
+            }});
+        }});
+    }}
+    document.querySelectorAll("form[data-confirm]").forEach(function (form) {{
+        form.addEventListener("submit", function (event) {{
+            if (!window.confirm(form.getAttribute("data-confirm") || "Продолжить?")) event.preventDefault();
+        }});
+    }});
+}})();
+</script>"#,
+            rename = rename,
+            member_count = members.len(),
             list = list,
             add = add,
+            leave = leave,
         )
     };
 
@@ -1148,7 +1242,7 @@ pub fn render_group_members(
             "users",
             "Группа",
             name,
-            "Кто в группе и кого добавить.",
+            "Роли, участники и настройки группы.",
         ),
         &content,
         &bottom_nav("chats"),
