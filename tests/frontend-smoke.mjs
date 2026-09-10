@@ -580,6 +580,27 @@ test("pinned messages are scoped, authorized, and reveal their source", async ()
   assert.match(css, /\.chat-pinned-banner\[hidden\]/);
 });
 
+test("group moderation limits senders and preserves role hierarchy", async () => {
+  const [database, handlers, routes, template, chat] = await Promise.all([
+    readFile(new URL("src/db/chat_groups.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
+    readFile(new URL("src/web/routes/communication.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+  ]);
+
+  assert.match(database, /ADD COLUMN muted_until INTEGER NOT NULL DEFAULT 0/);
+  assert.match(database, /idx_chat_group_members_mute/);
+  assert.match(handlers, /fn role_can_moderate_message/);
+  assert.match(handlers, /"error": "member_muted"/);
+  assert.match(handlers, /group_message_delete/);
+  assert.match(handlers, /chat_kind = 'group'/);
+  assert.match(routes, /members\/\{member_id\}\/mute/);
+  assert.match(template, /name="seconds"/);
+  assert.match(template, /Не может писать/);
+  assert.match(chat, /!mine && !\(isGroup && canManagePins\)/);
+});
+
 test("user-facing copy no longer calls listings resources", async () => {
   const visibleFiles = [
     "static/share.js",

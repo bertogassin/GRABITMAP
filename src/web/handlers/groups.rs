@@ -49,6 +49,11 @@ pub(crate) struct GroupRoleForm {
     role: String,
 }
 
+#[derive(Debug, Deserialize)]
+pub(crate) struct GroupMuteForm {
+    seconds: i64,
+}
+
 fn json_error(status: StatusCode, error: &str) -> Response {
     (status, Json(json!({"ok": false, "error": error}))).into_response()
 }
@@ -300,6 +305,40 @@ fn role_can_manage_members(role: &str) -> bool {
 fn role_can_remove(actor_role: &str, target_role: &str) -> bool {
     actor_role == GROUP_ROLE_OWNER && target_role != GROUP_ROLE_OWNER
         || actor_role == GROUP_ROLE_ADMIN && target_role == GROUP_ROLE_MEMBER
+}
+
+fn role_can_moderate_message(
+    actor_role: &str,
+    actor_user_id: i64,
+    sender_user_id: i64,
+    sender_role: &str,
+) -> bool {
+    actor_user_id == sender_user_id
+        || actor_role == GROUP_ROLE_OWNER
+        || (actor_role == GROUP_ROLE_ADMIN
+            && (sender_role.is_empty() || sender_role == GROUP_ROLE_MEMBER))
+}
+
+fn group_member_muted_until(db: &rusqlite::Connection, group_id: i64, user_id: i64) -> i64 {
+    db.query_row(
+        "SELECT COALESCE(muted_until, 0)
+         FROM chat_group_members WHERE group_id = ?1 AND user_id = ?2",
+        rusqlite::params![group_id, user_id],
+        |row| row.get(0),
+    )
+    .unwrap_or(0)
+}
+
+fn muted_response(muted_until: i64) -> Response {
+    (
+        StatusCode::FORBIDDEN,
+        Json(json!({
+            "ok": false,
+            "error": "member_muted",
+            "muted_until": muted_until
+        })),
+    )
+        .into_response()
 }
 
 fn selected_member_ids(
@@ -1093,6 +1132,10 @@ pub async fn api_group_send(
     if group_id <= 0 || !is_member(&db, group_id, user_id) {
         return json_error(StatusCode::FORBIDDEN, "not_a_member");
     }
+    let muted_until = group_member_muted_until(&db, group_id, user_id);
+    if muted_until > unix_now() {
+        return muted_response(muted_until);
+    }
     let reply_to_message_id = payload.reply_to_message_id.unwrap_or(0).max(0);
     if !group_reply_is_valid(&db, group_id, reply_to_message_id) {
         return json_error(StatusCode::BAD_REQUEST, "invalid_reply");
@@ -1197,6 +1240,10 @@ pub async fn api_group_send_image(
         if group_id <= 0 || !is_member(&db, group_id, user_id) {
             return json_error(StatusCode::FORBIDDEN, "not_a_member");
         }
+        let muted_until = group_member_muted_until(&db, group_id, user_id);
+        if muted_until > unix_now() {
+            return muted_response(muted_until);
+        }
     }
     let mut caption = String::new();
     let mut client_message_id = String::new();
@@ -1243,6 +1290,10 @@ pub async fn api_group_send_image(
     };
     if !is_member(&db, group_id, user_id) {
         return json_error(StatusCode::FORBIDDEN, "not_a_member");
+    }
+    let muted_until = group_member_muted_until(&db, group_id, user_id);
+    if muted_until > unix_now() {
+        return muted_response(muted_until);
     }
     if !group_reply_is_valid(&db, group_id, reply_to_message_id) {
         return json_error(StatusCode::BAD_REQUEST, "invalid_reply");
@@ -1455,6 +1506,10 @@ pub async fn api_group_send_voice(
         if group_id <= 0 || !is_member(&db, group_id, user_id) {
             return json_error(StatusCode::FORBIDDEN, "not_a_member");
         }
+        let muted_until = group_member_muted_until(&db, group_id, user_id);
+        if muted_until > unix_now() {
+            return muted_response(muted_until);
+        }
     }
     let mut client_message_id = String::new();
     let mut reply_to_message_id = 0;
@@ -1492,6 +1547,10 @@ pub async fn api_group_send_voice(
     };
     if !is_member(&db, group_id, user_id) {
         return json_error(StatusCode::FORBIDDEN, "not_a_member");
+    }
+    let muted_until = group_member_muted_until(&db, group_id, user_id);
+    if muted_until > unix_now() {
+        return muted_response(muted_until);
     }
     if !group_reply_is_valid(&db, group_id, reply_to_message_id) {
         return json_error(StatusCode::BAD_REQUEST, "invalid_reply");
@@ -1673,25 +1732,82 @@ pub async fn api_group_delete(
         Some(id) => id,
         None => return json_error(StatusCode::UNAUTHORIZED, "login_required"),
     };
+    if group_id <= 0 || message_id <= 0 {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_request");
+    }
+    if let Some(retry_after) =
+        rate_limit_retry_after(&state, user_id, "group_message_delete", 30, 60).await
+    {
+        return rate_limited(retry_after);
+    }
     let db = match crate::db::pool::get_connection(&state.db_pool) {
         Ok(db) => db,
         Err(_) => return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable"),
     };
-    if group_id <= 0 || !is_member(&db, group_id, user_id) {
+    let actor_role = group_role(&db, group_id, user_id).unwrap_or_default();
+    if actor_role.is_empty() {
         return json_error(StatusCode::FORBIDDEN, "not_a_member");
+    }
+    let sender_user_id: i64 = match db.query_row(
+        "SELECT sender_user_id FROM group_messages
+         WHERE id = ?1 AND group_id = ?2 AND deleted_at = 0",
+        rusqlite::params![message_id, group_id],
+        |row| row.get(0),
+    ) {
+        Ok(value) => value,
+        Err(_) => return json_error(StatusCode::NOT_FOUND, "message_not_found"),
+    };
+    let sender_role = group_role(&db, group_id, sender_user_id).unwrap_or_default();
+    if !role_can_moderate_message(&actor_role, user_id, sender_user_id, &sender_role) {
+        return json_error(StatusCode::FORBIDDEN, "moderator_required");
     }
     let now = unix_now();
     if db
         .execute(
             "UPDATE group_messages SET deleted_at = ?1, message = ''
-             WHERE id = ?2 AND group_id = ?3 AND sender_user_id = ?4 AND deleted_at = 0",
-            rusqlite::params![now, message_id, group_id, user_id],
+             WHERE id = ?2 AND group_id = ?3 AND deleted_at = 0
+               AND (
+                    sender_user_id = ?4
+                    OR EXISTS (
+                        SELECT 1 FROM chat_group_members AS actor
+                        WHERE actor.group_id = ?3
+                          AND actor.user_id = ?4
+                          AND actor.role = ?5
+                    )
+                    OR (
+                        EXISTS (
+                            SELECT 1 FROM chat_group_members AS actor
+                            WHERE actor.group_id = ?3
+                              AND actor.user_id = ?4
+                              AND actor.role = ?6
+                        )
+                        AND NOT EXISTS (
+                            SELECT 1 FROM chat_group_members AS protected_sender
+                            WHERE protected_sender.group_id = ?3
+                              AND protected_sender.user_id = group_messages.sender_user_id
+                              AND protected_sender.role IN (?5, ?6)
+                        )
+                    )
+               )",
+            rusqlite::params![
+                now,
+                message_id,
+                group_id,
+                user_id,
+                GROUP_ROLE_OWNER,
+                GROUP_ROLE_ADMIN
+            ],
         )
         .unwrap_or(0)
         != 1
     {
         return json_error(StatusCode::NOT_FOUND, "message_not_found");
     }
+    let _ = db.execute(
+        "DELETE FROM chat_message_pins
+         WHERE chat_kind = 'group' AND target_id = ?1 AND message_id = ?2",
+        rusqlite::params![group_id, message_id],
+    );
     fanout_group_message(
         &state,
         &db,
@@ -1839,7 +1955,7 @@ pub async fn group_members_page(
         .unwrap_or_else(|_| ("Группа".to_string(), String::new()));
     let viewer_role = group_role(&db, group_id, user_id).unwrap_or_default();
     let members = load_group_member_names(&db, group_id);
-    let current: std::collections::HashSet<i64> = members.iter().map(|(id, _, _)| *id).collect();
+    let current: std::collections::HashSet<i64> = members.iter().map(|(id, _, _, _)| *id).collect();
     let candidates = if role_can_manage_members(&viewer_role) {
         partners_for_picker(&db, user_id)
             .into_iter()
@@ -2459,6 +2575,84 @@ pub async fn update_group_member_role(
     Redirect::to(&target).into_response()
 }
 
+pub async fn update_group_member_mute(
+    State(state): State<AppState>,
+    Path((group_id, member_id)): Path<(i64, i64)>,
+    headers: HeaderMap,
+    Form(form): Form<GroupMuteForm>,
+) -> Response {
+    let target = format!("/app/group/{group_id}/members");
+    if request_is_cross_site(&headers) {
+        return Redirect::to(&target).into_response();
+    }
+    let user_id = match verify_user_session(&state, &headers) {
+        Some(id) => id,
+        None => return Redirect::to("/login?next=/app/messages").into_response(),
+    };
+    if rate_limit_retry_after(&state, user_id, "group_member_mute", 30, 60)
+        .await
+        .is_some()
+    {
+        return Redirect::to(&target).into_response();
+    }
+    if group_id <= 0
+        || member_id <= 0
+        || member_id == user_id
+        || !matches!(form.seconds, 0 | 600 | 3600 | 86_400 | 604_800 | 2_592_000)
+    {
+        return Redirect::to(&target).into_response();
+    }
+    let db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => return Redirect::to(&target).into_response(),
+    };
+    let actor_role = group_role(&db, group_id, user_id).unwrap_or_default();
+    let target_role = group_role(&db, group_id, member_id).unwrap_or_default();
+    if !role_can_remove(&actor_role, &target_role) {
+        return Redirect::to(&target).into_response();
+    }
+    let now = unix_now();
+    let muted_until = if form.seconds == 0 {
+        0
+    } else {
+        now.saturating_add(form.seconds)
+    };
+    let changed = db
+        .execute(
+            "UPDATE chat_group_members
+             SET muted_until = ?1
+             WHERE group_id = ?2
+               AND user_id = ?3
+               AND role <> ?4
+               AND EXISTS (
+                    SELECT 1 FROM chat_group_members AS actor
+                    WHERE actor.group_id = ?2
+                      AND actor.user_id = ?5
+                      AND (
+                           actor.role = ?4
+                           OR (actor.role = ?6 AND chat_group_members.role = ?7)
+                      )
+               )",
+            rusqlite::params![
+                muted_until,
+                group_id,
+                member_id,
+                GROUP_ROLE_OWNER,
+                user_id,
+                GROUP_ROLE_ADMIN,
+                GROUP_ROLE_MEMBER
+            ],
+        )
+        .unwrap_or(0);
+    if changed == 1 {
+        let _ = db.execute(
+            "UPDATE chat_groups SET updated_at = ?1 WHERE id = ?2",
+            rusqlite::params![now, group_id],
+        );
+    }
+    Redirect::to(&target).into_response()
+}
+
 pub async fn transfer_group_ownership(
     State(state): State<AppState>,
     Path((group_id, member_id)): Path<(i64, i64)>,
@@ -2566,9 +2760,12 @@ pub async fn leave_group(
     Redirect::to("/app/messages").into_response()
 }
 
-fn load_group_member_names(db: &rusqlite::Connection, group_id: i64) -> Vec<(i64, String, String)> {
+fn load_group_member_names(
+    db: &rusqlite::Connection,
+    group_id: i64,
+) -> Vec<(i64, String, String, i64)> {
     db.prepare(
-        "SELECT member.user_id, member.role,
+        "SELECT member.user_id, member.role, COALESCE(member.muted_until, 0),
                 COALESCE(profile.username, ''),
                 COALESCE(profile.first_name, ''),
                 COALESCE(profile.last_name, '')
@@ -2582,13 +2779,15 @@ fn load_group_member_names(db: &rusqlite::Connection, group_id: i64) -> Vec<(i64
         stmt.query_map(rusqlite::params![group_id], |row| {
             let id = row.get::<_, i64>(0)?;
             let role = row.get::<_, String>(1)?;
-            let username = row.get::<_, String>(2)?;
-            let first_name = row.get::<_, String>(3)?;
-            let last_name = row.get::<_, String>(4)?;
+            let muted_until = row.get::<_, i64>(2)?;
+            let username = row.get::<_, String>(3)?;
+            let first_name = row.get::<_, String>(4)?;
+            let last_name = row.get::<_, String>(5)?;
             Ok((
                 id,
                 templates::conversation_display_name(id, &username, &first_name, &last_name),
                 role,
+                muted_until,
             ))
         })?
         .collect::<Result<Vec<_>, _>>()
@@ -2684,6 +2883,7 @@ mod tests {
                     joined_at INTEGER NOT NULL DEFAULT 0,
                     last_read_message_id INTEGER NOT NULL DEFAULT 0,
                     role TEXT NOT NULL DEFAULT 'member',
+                    muted_until INTEGER NOT NULL DEFAULT 0,
                     PRIMARY KEY (group_id, user_id)
                 );
                 CREATE TABLE user_notifications (
@@ -2884,6 +3084,29 @@ mod tests {
         assert!(role_can_remove(GROUP_ROLE_ADMIN, GROUP_ROLE_MEMBER));
         assert!(!role_can_remove(GROUP_ROLE_ADMIN, GROUP_ROLE_ADMIN));
         assert!(!role_can_remove(GROUP_ROLE_MEMBER, GROUP_ROLE_MEMBER));
+    }
+
+    #[test]
+    fn group_moderation_respects_role_hierarchy_and_mute_deadlines() {
+        assert!(role_can_moderate_message("member", 10, 10, "member"));
+        assert!(role_can_moderate_message("owner", 10, 20, "admin"));
+        assert!(role_can_moderate_message("admin", 10, 20, "member"));
+        assert!(role_can_moderate_message("admin", 10, 20, ""));
+        assert!(!role_can_moderate_message("admin", 10, 20, "admin"));
+        assert!(!role_can_moderate_message("admin", 10, 20, "owner"));
+        assert!(!role_can_moderate_message("member", 10, 20, "member"));
+
+        let connection = group_database();
+        connection
+            .execute(
+                "INSERT INTO chat_group_members (
+                    group_id, user_id, joined_at, role, muted_until
+                 ) VALUES (7, 20, 100, 'member', 900)",
+                [],
+            )
+            .expect("muted member fixture");
+        assert_eq!(group_member_muted_until(&connection, 7, 20), 900);
+        assert_eq!(group_member_muted_until(&connection, 7, 21), 0);
     }
 
     #[test]
