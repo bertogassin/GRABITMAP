@@ -8,7 +8,6 @@ use super::common::{
 
 pub struct RenderMeParams<'a> {
     pub authenticated: bool,
-    pub user_id: i64,
     pub username: &'a str,
     pub first_name: &'a str,
     pub last_name: &'a str,
@@ -178,7 +177,6 @@ fn count_badge(count: i64) -> String {
 pub fn render_me(params: RenderMeParams<'_>) -> String {
     let RenderMeParams {
         authenticated,
-        user_id,
         username,
         first_name,
         last_name,
@@ -244,10 +242,10 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
         String::new()
     };
 
-    let telegram_id_html = if authenticated {
+    let telegram_id_html = if authenticated && !invite_public_id.is_empty() {
         format!(
             r#"<div class="rm-me-account-id">Номер аккаунта · {}</div>"#,
-            user_id
+            escape_html(invite_public_id)
         )
     } else {
         String::new()
@@ -282,7 +280,10 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
 </div>
 "#,
             avatar_html = if has_avatar {
-                format!(r#"<img class="rm-me-avatar-img" src="/api/avatars/{user_id}" alt="">"#)
+                format!(
+                    r#"<img class="rm-me-avatar-img" src="/api/public-avatars/{}" alt="">"#,
+                    urlencoding::encode(invite_public_id)
+                )
             } else {
                 icon("user").to_string()
             },
@@ -1077,7 +1078,10 @@ body.light-theme .rm-command-icon {{
         language_picker = crate::i18n::language_picker_html("/app/me"),
         intent_status_text = intent_status_text,
         status_avatar = if has_avatar {
-            format!(r#"<img class="rm-me-avatar-img" src="/api/avatars/{user_id}" alt="">"#)
+            format!(
+                r#"<img class="rm-me-avatar-img" src="/api/public-avatars/{}" alt="">"#,
+                urlencoding::encode(invite_public_id)
+            )
         } else {
             icon("user").to_string()
         },
@@ -1989,7 +1993,6 @@ mod personal_center_tests {
     fn params(authenticated: bool) -> RenderMeParams<'static> {
         RenderMeParams {
             authenticated,
-            user_id: 42,
             username: "captain",
             first_name: "Amir",
             last_name: "",
@@ -2028,6 +2031,16 @@ mod personal_center_tests {
         assert!(html.contains("data-nav-menu-link"));
         assert!(html.contains("/app/join/abc123?to=steps"));
         assert!(html.contains(r#"<span class="nav-badge">5</span>"#));
+    }
+
+    #[test]
+    fn personal_center_uses_only_public_avatar_routes() {
+        let mut input = params(true);
+        input.has_avatar = true;
+        let html = render_me(input);
+
+        assert!(html.contains("/api/public-avatars/abc123"));
+        assert!(!html.contains("/api/avatars/"));
     }
 
     #[test]
