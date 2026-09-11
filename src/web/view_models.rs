@@ -12,6 +12,7 @@ pub type CategoryResourceRow = (
     i64,
     String,
     String,
+    String,
     i64,
 );
 pub type FavoriteResourceRow = (i64, String, String, String, String, f64, i64, i64, i64);
@@ -20,6 +21,7 @@ pub type NotificationRow = (i64, Option<i64>, String, String, String, i64, i64);
 pub struct ConversationRow {
     pub _id: i64,
     pub other_user_id: i64,
+    pub other_public_id: String,
     pub username: String,
     pub first_name: String,
     pub last_name: String,
@@ -127,6 +129,7 @@ pub type SearchResourceRow = (
     usize,
     usize,
     usize,
+    String,
     String,
     String,
     i64,

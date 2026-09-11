@@ -1,4 +1,5 @@
 use super::auth::verify_user_session;
+use super::chat_identity::active_user_id_by_chat_route;
 use super::common::{request_is_cross_site, unix_now};
 use crate::db::chat_preferences::{KIND_DIRECT, KIND_GROUP};
 use crate::state::app_state::AppState;
@@ -51,7 +52,7 @@ fn target_is_accessible(
 
 pub async fn update_chat_preference(
     State(state): State<AppState>,
-    Path((kind, target_id)): Path<(String, i64)>,
+    Path((kind, target_route)): Path<(String, String)>,
     headers: HeaderMap,
     Form(form): Form<ChatPreferenceForm>,
 ) -> Response {
@@ -68,12 +69,23 @@ pub async fn update_chat_preference(
         Some(id) => id,
         None => return Redirect::to("/login?next=/app/messages").into_response(),
     };
-    if target_id <= 0 || !matches!(kind.as_str(), KIND_DIRECT | KIND_GROUP) {
+    if !matches!(kind.as_str(), KIND_DIRECT | KIND_GROUP) {
         return Redirect::to(redirect).into_response();
     }
     let db = match crate::db::pool::get_connection(&state.db_pool) {
         Ok(db) => db,
         Err(_) => return Redirect::to(redirect).into_response(),
+    };
+    let target_id = if kind == KIND_DIRECT {
+        active_user_id_by_chat_route(&db, &target_route).filter(|target_id| *target_id != user_id)
+    } else {
+        target_route
+            .parse::<i64>()
+            .ok()
+            .filter(|target_id| *target_id > 0)
+    };
+    let Some(target_id) = target_id else {
+        return Redirect::to(redirect).into_response();
     };
     if !target_is_accessible(&db, user_id, &kind, target_id) {
         return Redirect::to(redirect).into_response();

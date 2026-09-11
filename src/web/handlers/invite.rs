@@ -45,10 +45,10 @@ fn display_name(username: &str, first: &str, last: &str) -> String {
     String::new()
 }
 
-fn destination(kind: &str, inviter_user_id: i64) -> String {
+fn destination(kind: &str, inviter_public_id: &str) -> String {
     match kind {
         "work" => "/app/search?kind=work".to_string(),
-        _ => format!("/app/chat/{inviter_user_id}"),
+        _ => format!("/app/chat/{inviter_public_id}"),
     }
 }
 
@@ -175,14 +175,14 @@ pub async fn join_invite(
 
     if joiner_user_id == inviter_user_id {
         drop(db);
-        return Redirect::to(&destination(kind, inviter_user_id)).into_response();
+        return Redirect::to(&destination(kind, &public_id)).into_response();
     }
 
     let _ = ensure_friend_conversation(&db, joiner_user_id, inviter_user_id);
     drop(db);
 
     (
-        [(header::LOCATION, destination(kind, inviter_user_id))],
+        [(header::LOCATION, destination(kind, &public_id))],
         StatusCode::SEE_OTHER,
     )
         .into_response()
@@ -200,5 +200,13 @@ mod tests {
         assert_eq!(invite_kind(Some("admin")), "");
         assert!(public_id_is_valid("ab12"));
         assert!(!public_id_is_valid("../x"));
+        assert_eq!(
+            destination("chat", "public-peer-7"),
+            "/app/chat/public-peer-7"
+        );
+        assert_eq!(
+            destination("work", "public-peer-7"),
+            "/app/search?kind=work"
+        );
     }
 }

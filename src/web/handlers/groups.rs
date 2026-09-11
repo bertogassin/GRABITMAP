@@ -1,6 +1,7 @@
 use super::auth::verify_user_session;
 use super::chat::load_user_conversations;
 use super::chat_api::{message_content_can_be_edited, message_is_valid, reaction_emoji_is_allowed};
+use super::chat_identity::active_public_id_by_user_id;
 use super::chat_media::{
     detect_audio, detect_image, extension_for_mime, media_path_is_safe, media_root, MAX_VOICE_BYTES,
 };
@@ -832,14 +833,13 @@ fn message_json(
 ) -> serde_json::Value {
     json!({
         "id": message.id,
-        "sender_user_id": message.sender_user_id.to_string(),
         "message": message.message,
         "is_mine": message.sender_user_id == viewer_user_id,
         "delivered_at": message.delivered_at,
         "read_at": message.read_at,
         "created_at": message.created_at,
         "reply_to_message_id": if message.reply_to_message_id > 0 { Some(message.reply_to_message_id) } else { None::<i64> },
-        "reply_sender_user_id": if message.reply_sender_user_id > 0 { Some(message.reply_sender_user_id) } else { None::<i64> },
+        "reply_is_mine": message.reply_sender_user_id == viewer_user_id,
         "reply_sender_name": message.reply_sender_name,
         "reply_message": message.reply_message,
         "edited_at": message.edited_at,
@@ -970,6 +970,7 @@ pub async fn group_chat_page(
             return Html(templates::render_group_chat(
                 false,
                 0,
+                "",
                 group_id,
                 "Группа",
                 "",
@@ -982,6 +983,7 @@ pub async fn group_chat_page(
         return Html(templates::render_group_chat(
             true,
             user_id,
+            "",
             0,
             "",
             "",
@@ -995,10 +997,12 @@ pub async fn group_chat_page(
             return Html("<h1>503</h1><p>База данных временно недоступна.</p>".to_string());
         }
     };
+    let viewer_public_id = active_public_id_by_user_id(&db, user_id).unwrap_or_default();
     if !is_member(&db, group_id, user_id) {
         return Html(templates::render_group_chat(
             true,
             user_id,
+            &viewer_public_id,
             0,
             "Нет доступа",
             "",
@@ -1029,6 +1033,7 @@ pub async fn group_chat_page(
     Html(templates::render_group_chat(
         true,
         user_id,
+        &viewer_public_id,
         group_id,
         &name,
         &description,
@@ -1214,7 +1219,6 @@ pub async fn api_group_send(
         .map(|row| message_json(row, user_id))
         .unwrap_or(json!({
             "id": message_id,
-            "sender_user_id": user_id.to_string(),
             "message": message,
             "is_mine": true,
             "created_at": now,
@@ -1409,7 +1413,6 @@ pub async fn api_group_send_image(
         .unwrap_or_else(|| {
             json!({
                 "id": message_id,
-                "sender_user_id": user_id.to_string(),
                 "message": caption,
                 "is_mine": true,
                 "created_at": now,
@@ -1655,7 +1658,6 @@ pub async fn api_group_send_voice(
         .unwrap_or_else(|| {
             json!({
                 "id": message_id,
-                "sender_user_id": user_id.to_string(),
                 "message": "",
                 "is_mine": true,
                 "created_at": now,
@@ -3196,6 +3198,7 @@ pub fn load_user_groups(
             Ok(crate::web::view_models::ConversationRow {
                 _id: row.get(0)?,
                 other_user_id: 0,
+                other_public_id: String::new(),
                 username: String::new(),
                 first_name: row.get(1)?,
                 last_name: String::new(),
@@ -3363,6 +3366,9 @@ mod tests {
 
         let response = message_json(&messages[1], 1);
         assert_eq!(response["reply_sender_name"], "Амир");
+        assert_eq!(response["reply_is_mine"], true);
+        assert!(response.get("sender_user_id").is_none());
+        assert!(response.get("reply_sender_user_id").is_none());
         assert_eq!(response["reactions"][0]["count"], 2);
     }
 

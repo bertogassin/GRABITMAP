@@ -90,7 +90,6 @@ pub async fn app_me(State(state): State<AppState>, headers: HeaderMap) -> Html<S
         None => {
             return Html(templates::render_me(templates::RenderMeParams {
                 authenticated: false,
-                user_id: 0,
                 username: "",
                 first_name: "",
                 last_name: "",
@@ -287,7 +286,6 @@ pub async fn app_me(State(state): State<AppState>, headers: HeaderMap) -> Html<S
 
     Html(templates::render_me(templates::RenderMeParams {
         authenticated: true,
-        user_id,
         username: &username,
         first_name: &first_name,
         last_name: &last_name,
@@ -1030,9 +1028,16 @@ pub async fn api_profile_avatar_set(
         "UPDATE profiles SET avatar_path = ?1, updated_at = ?2 WHERE user_id = ?3",
         rusqlite::params![relative, unix_now(), user_id],
     );
+    let public_id: String = db
+        .query_row(
+            "SELECT COALESCE(public_id, '') FROM profiles WHERE user_id = ?1",
+            rusqlite::params![user_id],
+            |row| row.get(0),
+        )
+        .unwrap_or_default();
     Json(json!({
         "ok": true,
-        "url": format!("/api/avatars/{user_id}"),
+        "url": format!("/api/public-avatars/{}", urlencoding::encode(&public_id)),
     }))
     .into_response()
 }
@@ -1066,58 +1071,6 @@ fn avatar_file_response(path: &str, cache_control: &'static str) -> Response {
         .into_response()
 }
 
-fn can_view_internal_avatar(
-    db: &rusqlite::Connection,
-    viewer_user_id: i64,
-    target_user_id: i64,
-) -> bool {
-    if viewer_user_id <= 0 || target_user_id <= 0 {
-        return false;
-    }
-    if viewer_user_id == target_user_id {
-        return true;
-    }
-    db.query_row(
-        "SELECT EXISTS(
-            SELECT 1 FROM conversations
-            WHERE (user1_id = ?1 AND user2_id = ?2)
-               OR (user1_id = ?2 AND user2_id = ?1)
-         )",
-        rusqlite::params![viewer_user_id, target_user_id],
-        |row| row.get::<_, i64>(0),
-    )
-    .unwrap_or(0)
-        == 1
-}
-
-pub async fn api_profile_avatar_get(
-    State(state): State<AppState>,
-    Path(user_id): Path<i64>,
-    headers: HeaderMap,
-) -> Response {
-    let Some(viewer_user_id) = verify_user_session(&state, &headers) else {
-        return StatusCode::UNAUTHORIZED.into_response();
-    };
-    if user_id <= 0 {
-        return StatusCode::NOT_FOUND.into_response();
-    }
-    let db = match crate::db::pool::get_connection(&state.db_pool) {
-        Ok(db) => db,
-        Err(_) => return StatusCode::SERVICE_UNAVAILABLE.into_response(),
-    };
-    if !can_view_internal_avatar(&db, viewer_user_id, user_id) {
-        return StatusCode::NOT_FOUND.into_response();
-    }
-    let path: String = db
-        .query_row(
-            "SELECT COALESCE(avatar_path, '') FROM profiles WHERE user_id = ?1",
-            rusqlite::params![user_id],
-            |row| row.get(0),
-        )
-        .unwrap_or_default();
-    avatar_file_response(&path, "private, max-age=60, must-revalidate")
-}
-
 pub async fn api_public_profile_avatar_get(
     State(state): State<AppState>,
     Path(public_id): Path<String>,
@@ -1147,31 +1100,4 @@ pub async fn api_public_profile_avatar_get(
         )
         .unwrap_or_default();
     avatar_file_response(&path, "public, max-age=300")
-}
-
-#[cfg(test)]
-mod avatar_privacy_tests {
-    use super::can_view_internal_avatar;
-
-    #[test]
-    fn internal_avatar_requires_self_or_existing_conversation() {
-        let connection = rusqlite::Connection::open_in_memory().expect("avatar database");
-        connection
-            .execute_batch(
-                "CREATE TABLE conversations (
-                    id INTEGER PRIMARY KEY,
-                    user1_id INTEGER NOT NULL,
-                    user2_id INTEGER NOT NULL
-                 );
-                 INSERT INTO conversations (id, user1_id, user2_id)
-                 VALUES (1, 10, 20);",
-            )
-            .expect("conversation schema");
-
-        assert!(can_view_internal_avatar(&connection, 10, 10));
-        assert!(can_view_internal_avatar(&connection, 10, 20));
-        assert!(can_view_internal_avatar(&connection, 20, 10));
-        assert!(!can_view_internal_avatar(&connection, 10, 30));
-        assert!(!can_view_internal_avatar(&connection, 0, 20));
-    }
 }

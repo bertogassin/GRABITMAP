@@ -1,4 +1,5 @@
 use super::auth::verify_user_session;
+use super::chat_identity::{active_public_id_by_user_id, active_user_id_by_chat_route};
 use crate::state::app_state::AppState;
 use crate::web::templates;
 use axum::{
@@ -145,6 +146,7 @@ pub(super) fn load_user_conversations(
                 ELSE c.user1_id
             END AS other_user_id,
 
+            COALESCE(p.public_id, ''),
             COALESCE(p.username, ''),
             COALESCE(p.first_name, ''),
             COALESCE(p.last_name, ''),
@@ -212,18 +214,19 @@ pub(super) fn load_user_conversations(
             Ok(crate::web::view_models::ConversationRow {
                 _id: row.get(0)?,
                 other_user_id: row.get(1)?,
-                username: row.get(2)?,
-                first_name: row.get(3)?,
-                last_name: row.get(4)?,
-                last_message: row.get(5)?,
-                unread_count: row.get(6)?,
-                updated_at: row.get(7)?,
+                other_public_id: row.get(2)?,
+                username: row.get(3)?,
+                first_name: row.get(4)?,
+                last_name: row.get(5)?,
+                last_message: row.get(6)?,
+                unread_count: row.get(7)?,
+                updated_at: row.get(8)?,
                 is_group: false,
                 group_id: 0,
-                has_avatar: row.get::<_, i64>(8)? != 0,
-                pinned_at: row.get(9)?,
-                archived_at: row.get(10)?,
-                muted_until: row.get(11)?,
+                has_avatar: row.get::<_, i64>(9)? != 0,
+                pinned_at: row.get(10)?,
+                archived_at: row.get(11)?,
+                muted_until: row.get(12)?,
                 group_scope_type: String::new(),
                 group_scope_id: 0,
             })
@@ -262,7 +265,7 @@ pub async fn messages_page(
         Some(id) => id,
 
         None => {
-            return Html(templates::render_messages(false, 0, vec![], None, false));
+            return Html(templates::render_messages(false, "", vec![], None, false));
         }
     };
 
@@ -277,12 +280,13 @@ pub async fn messages_page(
     let mut conversations = load_user_conversations(&db, user_id);
     conversations.extend(super::groups::load_user_groups(&db, user_id));
     let conversations = organize_conversations(conversations, archived);
+    let viewer_public_id = active_public_id_by_user_id(&db, user_id).unwrap_or_default();
 
     drop(db);
 
     Html(templates::render_messages(
         true,
-        user_id,
+        &viewer_public_id,
         conversations,
         share_listing_id,
         archived,
@@ -291,32 +295,24 @@ pub async fn messages_page(
 
 pub async fn chat_page(
     State(state): State<AppState>,
-    Path(other_user_id): Path<i64>,
+    Path(other_user_route): Path<String>,
     headers: HeaderMap,
 ) -> Html<String> {
     let user_id = match verify_user_session(&state, &headers) {
         Some(id) => id,
         None => {
-            return Html(templates::render_chat(false, 0, 0, "", "", "", vec![]));
+            return Html(templates::render_chat(
+                false,
+                0,
+                "",
+                0,
+                "",
+                "",
+                "",
+                "",
+                vec![],
+            ));
         }
-    };
-
-    if other_user_id <= 0 || other_user_id == user_id {
-        return Html(templates::render_chat(
-            true,
-            user_id,
-            other_user_id,
-            "",
-            "",
-            "",
-            vec![],
-        ));
-    }
-
-    let (user1_id, user2_id) = if user_id < other_user_id {
-        (user_id, other_user_id)
-    } else {
-        (other_user_id, user_id)
     };
 
     let db = match crate::db::pool::get_connection(&state.db_pool) {
@@ -324,6 +320,29 @@ pub async fn chat_page(
         Err(_) => {
             return Html("<h1>503</h1><p>База данных временно недоступна.</p>".to_string());
         }
+    };
+
+    let other_user_id = match active_user_id_by_chat_route(&db, &other_user_route) {
+        Some(other_user_id) if other_user_id > 0 && other_user_id != user_id => other_user_id,
+        _ => {
+            return Html(templates::render_chat(
+                true,
+                user_id,
+                "",
+                0,
+                "",
+                "",
+                "",
+                "",
+                vec![],
+            ));
+        }
+    };
+
+    let (user1_id, user2_id) = if user_id < other_user_id {
+        (user_id, other_user_id)
+    } else {
+        (other_user_id, user_id)
     };
 
     let _ = db.execute(
@@ -347,9 +366,10 @@ pub async fn chat_page(
 
     let conversation_id = conversation_id.unwrap_or(0);
 
-    let other_profile: Option<(String, String, String)> = db
+    let other_profile: Option<(String, String, String, String)> = db
         .query_row(
             "SELECT
+                COALESCE(public_id, ''),
                 COALESCE(username, ''),
                 COALESCE(first_name, ''),
                 COALESCE(last_name, '')
@@ -357,12 +377,12 @@ pub async fn chat_page(
              WHERE user_id = ?1
              LIMIT 1",
             rusqlite::params![other_user_id],
-            |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+            |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
         )
         .ok();
 
-    let (other_username, other_first_name, other_last_name) =
-        other_profile.unwrap_or_else(|| (String::new(), String::new(), String::new()));
+    let (other_public_id, other_username, other_first_name, other_last_name) = other_profile
+        .unwrap_or_else(|| (String::new(), String::new(), String::new(), String::new()));
 
     let mut messages: Vec<crate::web::view_models::ChatMessageRow> =
         load_recent_chat_messages(&db, conversation_id);
@@ -418,6 +438,8 @@ pub async fn chat_page(
         rusqlite::params![user_id, other_user_id],
     );
 
+    let viewer_public_id = active_public_id_by_user_id(&db, user_id).unwrap_or_default();
+
     drop(db);
 
     if read_changed > 0 {
@@ -433,7 +455,9 @@ pub async fn chat_page(
     Html(templates::render_chat(
         true,
         user_id,
+        &viewer_public_id,
         other_user_id,
+        &other_public_id,
         &other_username,
         &other_first_name,
         &other_last_name,
@@ -559,6 +583,7 @@ mod tests {
              );
              CREATE TABLE profiles (
                 user_id INTEGER PRIMARY KEY,
+                public_id TEXT NOT NULL DEFAULT '',
                 username TEXT,
                 first_name TEXT,
                 last_name TEXT,
@@ -586,7 +611,8 @@ mod tests {
              );
              INSERT INTO conversations (id, user1_id, user2_id, updated_at)
              VALUES (1, 10, 20, 100);
-             INSERT INTO profiles (user_id, first_name) VALUES (20, 'Друг');
+             INSERT INTO profiles (user_id, public_id, first_name)
+             VALUES (20, 'peer-public-20', 'Друг');
              INSERT INTO chat_preferences (
                 user_id, chat_kind, target_id, pinned_at, muted_until
              ) VALUES (10, 'direct', 20, 150, 500);
@@ -598,6 +624,7 @@ mod tests {
 
         let conversations = load_user_conversations(&db, 10);
         assert_eq!(conversations.len(), 1);
+        assert_eq!(conversations[0].other_public_id, "peer-public-20");
         assert_eq!(conversations[0].last_message, "__voice__");
         assert_eq!(conversations[0].pinned_at, 150);
         assert_eq!(conversations[0].muted_until, 500);

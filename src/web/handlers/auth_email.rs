@@ -235,8 +235,7 @@ pub(super) fn email_password_auth_response(
     let mut response = (
         StatusCode::OK,
         Json(json!({
-            "ok": true,
-            "user_id": user_id
+            "ok": true
         })),
     )
         .into_response();
@@ -390,7 +389,6 @@ pub async fn register_email(
             StatusCode::OK,
             Json(json!({
                 "ok": true,
-                "user_id": user_id,
                 "verification_required": true
             })),
         )

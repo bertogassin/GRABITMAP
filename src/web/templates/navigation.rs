@@ -1424,6 +1424,7 @@ pub fn render_search(
                     zi,
                     listing_type,
                     rubric,
+                    owner_public_id,
                     owner_user_id,
                 )| {
                     let location = world_data
@@ -1475,8 +1476,8 @@ pub fn render_search(
                         String::new()
                     };
 
-                    let write_href = if *owner_user_id > 0 {
-                        format!("/app/chat/{owner_user_id}")
+                    let write_href = if *owner_user_id > 0 && !owner_public_id.is_empty() {
+                        format!("/app/chat/{}", urlencoding::encode(owner_public_id))
                     } else {
                         String::new()
                     };

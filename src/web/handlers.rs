@@ -9,6 +9,7 @@ pub use contacts::*;
 
 mod chat;
 mod chat_api;
+mod chat_identity;
 mod chat_media;
 mod chat_pins;
 mod chat_preferences;

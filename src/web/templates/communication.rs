@@ -9,7 +9,7 @@ use super::common::{
 // ============================================================
 
 pub(crate) fn conversation_display_name(
-    other_user_id: i64,
+    _other_user_id: i64,
     username: &str,
     first_name: &str,
     last_name: &str,
@@ -27,7 +27,7 @@ pub(crate) fn conversation_display_name(
     } else if !safe_username.is_empty() {
         format!("@{safe_username}")
     } else {
-        format!("Участник · {:06}", other_user_id.rem_euclid(1_000_000))
+        "Участник GRABIT".to_string()
     }
 }
 
@@ -75,7 +75,7 @@ fn inbox_unread_caption(total_unread: i64) -> String {
 
 pub fn render_messages(
     authenticated: bool,
-    viewer_user_id: i64,
+    viewer_public_id: &str,
     conversations: Vec<crate::web::view_models::ConversationRow>,
     share_listing_id: Option<i64>,
     archived: bool,
@@ -99,6 +99,7 @@ pub fn render_messages(
             .iter()
             .map(|conversation| {
                 let other_user_id = conversation.other_user_id;
+                let other_public_id = &conversation.other_public_id;
                 let username = &conversation.username;
                 let first_name = &conversation.first_name;
                 let last_name = &conversation.last_name;
@@ -111,8 +112,10 @@ pub fn render_messages(
                 let group_id = conversation.group_id;
                 let base_href = if is_group && group_id > 0 {
                     format!("/app/group/{group_id}")
+                } else if !other_public_id.is_empty() {
+                    format!("/app/chat/{}", urlencoding::encode(other_public_id))
                 } else {
-                    format!("/app/chat/{other_user_id}")
+                    "/app/messages".to_string()
                 };
                 let href = match share_listing_id {
                     Some(listing_id) if listing_id > 0 => {
@@ -183,7 +186,11 @@ pub fn render_messages(
                 } else {
                     String::new()
                 };
-                let target_id = if is_group { group_id } else { other_user_id };
+                let target_id = if is_group {
+                    group_id.to_string()
+                } else {
+                    urlencoding::encode(other_public_id).into_owned()
+                };
                 let preference_kind = if is_group { "group" } else { "direct" };
                 let return_view = if archived { "archived" } else { "active" };
                 let muted = conversation.muted_until > chrono::Utc::now().timestamp();
@@ -218,7 +225,7 @@ pub fn render_messages(
 <article class="chat-dialog-entry" data-inbox-entry>
 <a href="{href}#chat-end"
    class="card chat-dialog-card"
-   data-other-user-id="{other_user_id}"
+   data-other-public-id="{other_public_id}"
    data-group-id="{group_id}"
    data-kind="{kind}">
 
@@ -261,7 +268,7 @@ pub fn render_messages(
 </article>
 "#,
                     href = href,
-                    other_user_id = other_user_id,
+                    other_public_id = escape_html(other_public_id),
                     group_id = if group_id > 0 { group_id.to_string() } else { String::new() },
                     kind = kind,
                     avatar_html = if is_group && conversation.has_avatar && group_id > 0 {
@@ -269,9 +276,13 @@ pub fn render_messages(
                             r#"<img class="rm-me-avatar-img" src="/api/group/{group_id}/avatar" alt="" onerror="this.remove()">{icon}"#,
                             icon = icon("users")
                         )
-                    } else if !is_group && conversation.has_avatar && other_user_id > 0 {
+                    } else if !is_group
+                        && conversation.has_avatar
+                        && !other_public_id.is_empty()
+                    {
                         format!(
-                            r#"<img class="rm-me-avatar-img" src="/api/avatars/{other_user_id}" alt="" onerror="this.remove()">"#
+                            r#"<img class="rm-me-avatar-img" src="/api/public-avatars/{}" alt="" onerror="this.remove()">"#,
+                            urlencoding::encode(other_public_id)
                         )
                     } else {
                         icon(if is_group { "users" } else { "message-circle" }).to_string()
@@ -315,8 +326,9 @@ pub fn render_messages(
 
     let list_attributes = if authenticated {
         format!(
-            r#" id="chat-dialog-list" data-inbox-live="1" data-viewer-user-id="{viewer_user_id}" data-inbox-view="{}""#,
-            if archived { "archived" } else { "active" }
+            r#" id="chat-dialog-list" data-inbox-live="1" data-viewer-public-id="{}" data-inbox-view="{}""#,
+            escape_html(viewer_public_id),
+            if archived { "archived" } else { "active" },
         )
     } else {
         String::new()
@@ -640,7 +652,7 @@ fn render_chat_message_row(
      data-edited-at="{edited_at}"
      data-reply-to="{reply_to}"
      data-reply-message="{reply_message}"
-     data-reply-sender="{reply_sender}"
+     data-reply-mine="{reply_mine}"
      data-reply-sender-name="{reply_sender_name}"
      data-sender-name="{sender_name}"
      data-read-at="{read_at}"
@@ -673,7 +685,11 @@ fn render_chat_message_row(
         edited_at = message.edited_at,
         reply_to = message.reply_to_message_id,
         reply_message = escape_html(&message.reply_message),
-        reply_sender = message.reply_sender_user_id,
+        reply_mine = if message.reply_sender_user_id == viewer_user_id {
+            "1"
+        } else {
+            "0"
+        },
         reply_sender_name = escape_html(&message.reply_sender_name),
         sender_name = escape_html(&message.sender_name),
         read_at = message.read_at,
@@ -701,7 +717,9 @@ fn render_chat_message_row(
 pub fn render_chat(
     authenticated: bool,
     viewer_user_id: i64,
+    viewer_public_id: &str,
     other_user_id: i64,
+    other_public_id: &str,
     username: &str,
     first_name: &str,
     last_name: &str,
@@ -710,7 +728,9 @@ pub fn render_chat(
     render_chat_thread(
         authenticated,
         viewer_user_id,
+        viewer_public_id,
         other_user_id,
+        other_public_id,
         0,
         username,
         first_name,
@@ -719,9 +739,11 @@ pub fn render_chat(
     )
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn render_group_chat(
     authenticated: bool,
     viewer_user_id: i64,
+    viewer_public_id: &str,
     group_id: i64,
     group_name: &str,
     group_description: &str,
@@ -736,7 +758,9 @@ pub fn render_group_chat(
     render_chat_thread(
         authenticated,
         viewer_user_id,
+        viewer_public_id,
         0,
+        "",
         group_id,
         "",
         group_name,
@@ -749,7 +773,9 @@ pub fn render_group_chat(
 fn render_chat_thread(
     authenticated: bool,
     viewer_user_id: i64,
+    viewer_public_id: &str,
     other_user_id: i64,
+    other_public_id: &str,
     group_id: i64,
     username: &str,
     first_name: &str,
@@ -771,7 +797,7 @@ fn render_chat_thread(
     } else if !safe_username.is_empty() {
         format!("@{}", safe_username)
     } else if other_user_id > 0 {
-        format!("Участник · {:06}", other_user_id.rem_euclid(1_000_000))
+        "Участник GRABIT".to_string()
     } else {
         "Группа".to_string()
     };
@@ -789,8 +815,10 @@ fn render_chat_thread(
             "Чат",
             &if group_id > 0 {
                 format!("/app/group/{group_id}")
+            } else if !other_public_id.is_empty() {
+                format!("/app/chat/{}", urlencoding::encode(other_public_id))
             } else {
-                format!("/app/chat/{other_user_id}")
+                "/app/messages".to_string()
             },
         )
     } else if group_id <= 0 && (other_user_id <= 0 || other_user_id == viewer_user_id) {
@@ -935,9 +963,9 @@ fn render_chat_thread(
     </div>
 
     <div id="chat-messages"
-         data-other-user-id="{other_user_id}"
+         data-other-public-id="{other_public_id}"
          data-group-id="{group_id_attr}"
-         data-viewer-user-id="{viewer_user_id}"
+         data-viewer-public-id="{viewer_public_id}"
          data-first-message-id="{first_message_id}"
          data-last-message-id="{last_message_id}"
          data-may-have-older="{may_have_older}"
@@ -978,13 +1006,13 @@ fn render_chat_thread(
             search_label = escape_html(&crate::i18n::t("nav_search")),
             search_placeholder = escape_html(&crate::i18n::t("search_what")),
             close_label = escape_html(&crate::i18n::t("chat_close")),
-            other_user_id = other_user_id,
+            other_public_id = escape_html(other_public_id),
+            viewer_public_id = escape_html(viewer_public_id),
             group_id_attr = if group_id > 0 {
                 group_id.to_string()
             } else {
                 String::new()
             },
-            viewer_user_id = viewer_user_id,
             first_message_id = first_message_id,
             last_message_id = last_message_id,
             may_have_older = may_have_older,
@@ -1068,9 +1096,10 @@ fn render_chat_thread(
 
 {content}"####,
         back_link = back_link("/app/messages", "Назад", "arrow-left"),
-        header_avatar = if other_user_id > 0 {
+        header_avatar = if other_user_id > 0 && !other_public_id.is_empty() {
             format!(
-                r#"<img class="rm-me-avatar-img" src="/api/avatars/{other_user_id}" alt="" onerror="this.remove()">{icon}"#,
+                r#"<img class="rm-me-avatar-img" src="/api/public-avatars/{public_id}" alt="" onerror="this.remove()">{icon}"#,
+                public_id = urlencoding::encode(other_public_id),
                 icon = icon("user")
             )
         } else if group_id > 0 {
@@ -1827,7 +1856,7 @@ pub fn render_group_invite(
 
 #[cfg(test)]
 mod communication_tests {
-    use super::conversation_preview_text;
+    use super::{conversation_display_name, conversation_preview_text};
 
     #[test]
     fn inbox_preview_never_exposes_internal_media_markers() {
@@ -1837,5 +1866,14 @@ mod communication_tests {
             assert_ne!(preview, marker);
         }
         assert_eq!(conversation_preview_text("Обычный текст"), "Обычный текст");
+    }
+
+    #[test]
+    fn anonymous_display_name_never_derives_from_internal_id() {
+        assert_eq!(
+            conversation_display_name(987_654, "", "", ""),
+            "Участник GRABIT"
+        );
+        assert!(!conversation_display_name(987_654, "", "", "").contains("987654"));
     }
 }

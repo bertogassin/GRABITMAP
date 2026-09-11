@@ -65,7 +65,8 @@ pub async fn app_cat(
     };
     let list_sql = format!(
         "SELECT r.id, r.title, r.description, r.contact, r.address, r.rating, r.votes, r.is_verified, r.is_premium,
-                COALESCE(r.listing_type, 'general'), COALESCE(r.rubric, ''), COALESCE(p.user_id, 0)
+                COALESCE(r.listing_type, 'general'), COALESCE(r.rubric, ''),
+                COALESCE(p.public_id, ''), COALESCE(p.user_id, 0)
          FROM resources r
          LEFT JOIN profiles p
            ON p.client_id = r.client_id
@@ -103,6 +104,7 @@ pub async fn app_cat(
                         row.get(9)?,
                         row.get(10)?,
                         row.get(11)?,
+                        row.get(12)?,
                     ))
                 },
             )?

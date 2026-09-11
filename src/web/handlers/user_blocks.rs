@@ -1,4 +1,5 @@
 use super::auth::verify_user_session;
+use super::chat_identity::active_user_id_by_chat_route;
 use super::common::{rate_limit_retry_after, request_is_cross_site};
 use crate::state::app_state::AppState;
 use axum::{
@@ -81,7 +82,7 @@ fn authenticated_user(state: &AppState, headers: &HeaderMap) -> Option<i64> {
 
 pub async fn api_chat_block_status(
     State(state): State<AppState>,
-    Path(other_user_id): Path<i64>,
+    Path(other_user_route): Path<String>,
     headers: HeaderMap,
 ) -> Response {
     let user_id = match authenticated_user(&state, &headers) {
@@ -91,15 +92,17 @@ pub async fn api_chat_block_status(
         }
     };
 
-    if other_user_id <= 0 || user_id == other_user_id {
-        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
-    }
-
     let connection = match state.db_pool.get() {
         Ok(connection) => connection,
         Err(_) => {
             return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable");
         }
+    };
+
+    let Some(other_user_id) = active_user_id_by_chat_route(&connection, &other_user_route)
+        .filter(|other_user_id| *other_user_id != user_id)
+    else {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
     };
 
     let blocked_by_me: bool = connection
@@ -141,7 +144,7 @@ pub async fn api_chat_block_status(
 
 pub async fn api_chat_block(
     State(state): State<AppState>,
-    Path(other_user_id): Path<i64>,
+    Path(other_user_route): Path<String>,
     headers: HeaderMap,
 ) -> Response {
     if request_is_cross_site(&headers) {
@@ -154,10 +157,6 @@ pub async fn api_chat_block(
             return json_error(StatusCode::UNAUTHORIZED, "login_required");
         }
     };
-
-    if other_user_id <= 0 || user_id == other_user_id {
-        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
-    }
 
     if let Some(retry_after) = rate_limit_retry_after(&state, user_id, "user_block", 12, 60).await {
         return (
@@ -177,6 +176,12 @@ pub async fn api_chat_block(
         Err(_) => {
             return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable");
         }
+    };
+
+    let Some(other_user_id) = active_user_id_by_chat_route(&connection, &other_user_route)
+        .filter(|other_user_id| *other_user_id != user_id)
+    else {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
     };
 
     let target_exists: i64 = connection
@@ -236,7 +241,7 @@ pub async fn api_chat_block(
 
 pub async fn api_chat_unblock(
     State(state): State<AppState>,
-    Path(other_user_id): Path<i64>,
+    Path(other_user_route): Path<String>,
     headers: HeaderMap,
 ) -> Response {
     if request_is_cross_site(&headers) {
@@ -250,15 +255,17 @@ pub async fn api_chat_unblock(
         }
     };
 
-    if other_user_id <= 0 || user_id == other_user_id {
-        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
-    }
-
     let connection = match state.db_pool.get() {
         Ok(connection) => connection,
         Err(_) => {
             return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable");
         }
+    };
+
+    let Some(other_user_id) = active_user_id_by_chat_route(&connection, &other_user_route)
+        .filter(|other_user_id| *other_user_id != user_id)
+    else {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
     };
 
     if connection

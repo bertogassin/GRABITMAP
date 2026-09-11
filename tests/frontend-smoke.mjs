@@ -75,8 +75,8 @@ test("inbox state is account scoped and dates follow the browser locale", async 
     readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
   ]);
 
-  assert.match(template, /data-viewer-user-id="\{viewer_user_id\}"/);
-  assert.match(inbox, /inbox-event-cursor:" \+ viewerUserId/);
+  assert.match(template, /data-viewer-public-id="\{viewer_public_id\}"/);
+  assert.match(inbox, /inbox-event-cursor:" \+ viewerPublicId/);
   assert.match(inbox, /new Intl\.DateTimeFormat\(locale/);
   assert.match(inbox, /unreadCount > 99 \? "99\+" : unreadCount/);
   assert.match(template, /id="inbox-search-input"/);
@@ -503,7 +503,7 @@ test("chat search is authorized, bounded, and navigates to results", async () =>
   assert.match(handler, /chat_group_members/);
   assert.match(handler, /deleted_at = 0/);
   assert.match(handler, /to_lowercase\(\)\.contains/);
-  assert.match(routes, /api\/chat\/\{other_user_id\}\/search/);
+  assert.match(routes, /api\/chat\/\{other_user_route\}\/search/);
   assert.match(routes, /api\/group\/\{group_id\}\/search/);
   assert.match(template, /chat-search-panel/);
   assert.match(template, /chat-search\.js/);
@@ -607,7 +607,7 @@ test("pinned messages are scoped, authorized, and reveal their source", async ()
   assert.match(handlers, /can_manage_group_pins/);
   assert.match(handlers, /message\.conversation_id = \?2/);
   assert.match(handlers, /message\.group_id = \?2/);
-  assert.match(routes, /\/api\/chat\/\{other_user_id\}\/pinned/);
+  assert.match(routes, /\/api\/chat\/\{other_user_route\}\/pinned/);
   assert.match(routes, /\/api\/group\/\{group_id\}\/pinned/);
   assert.match(chat, /function loadPinned/);
   assert.match(chat, /resursmapRevealChatMessage\(pinnedMessageId\)/);
@@ -863,8 +863,8 @@ test("official group member privacy hides bulk directory and internal identifier
   assert.match(search, /ON CONFLICT\(group_id, user_id\)/);
   assert.match(search, /privacy_version/);
 
-  assert.match(profiles, /can_view_internal_avatar/);
-  assert.match(profiles, /verify_user_session\(&state, &headers\)/);
+  assert.doesNotMatch(profiles, /can_view_internal_avatar/);
+  assert.doesNotMatch(routes, /\/api\/avatars\/\{user_id\}/);
   assert.match(profiles, /profile\.public_id = \?1/);
   assert.match(routes, /\/api\/public-avatars\/\{public_id\}/);
   assert.match(profileTemplate, /\/api\/public-avatars\//);

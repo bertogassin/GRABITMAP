@@ -1,5 +1,6 @@
 use super::auth::verify_user_session;
 use super::chat::load_user_conversations;
+use super::chat_identity::{active_public_id_by_user_id, active_user_id_by_chat_route};
 use super::common::{input_text_is_valid, rate_limit_retry_after, request_is_cross_site};
 use super::user_blocks::users_are_blocked;
 use crate::state::app_state::AppState;
@@ -76,16 +77,13 @@ struct MessageReaction {
 #[derive(Debug, Serialize)]
 struct ChatApiMessage {
     id: i64,
-    #[serde(serialize_with = "serialize_user_id")]
-    sender_user_id: i64,
     message: String,
     is_mine: bool,
     delivered_at: i64,
     read_at: i64,
     created_at: i64,
     reply_to_message_id: Option<i64>,
-    #[serde(serialize_with = "serialize_optional_user_id")]
-    reply_sender_user_id: Option<i64>,
+    reply_is_mine: bool,
     reply_message: String,
     edited_at: i64,
     deleted_at: i64,
@@ -100,23 +98,6 @@ struct ChatApiMessage {
     attachment_url: String,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     reactions: Vec<MessageReaction>,
-}
-
-fn serialize_user_id<S>(value: &i64, serializer: S) -> Result<S::Ok, S::Error>
-where
-    S: serde::Serializer,
-{
-    serializer.serialize_str(&value.to_string())
-}
-
-fn serialize_optional_user_id<S>(value: &Option<i64>, serializer: S) -> Result<S::Ok, S::Error>
-where
-    S: serde::Serializer,
-{
-    match value {
-        Some(value) => serializer.serialize_some(&value.to_string()),
-        None => serializer.serialize_none(),
-    }
 }
 
 const CHAT_REACTION_EMOJIS: &[&str] = &["❤️", "👍", "😂", "😮", "😢", "🙏"];
@@ -392,14 +373,13 @@ fn load_api_message_by_id(
             |row| {
                 Ok(ChatApiMessage {
                     id: row.get(0)?,
-                    sender_user_id: row.get(1)?,
                     message: row.get(2)?,
                     is_mine: row.get::<_, i64>(1)? == user_id,
                     delivered_at: row.get(3)?,
                     read_at: row.get(4)?,
                     created_at: row.get(5)?,
                     reply_to_message_id: row.get(6)?,
-                    reply_sender_user_id: row.get(7)?,
+                    reply_is_mine: row.get::<_, Option<i64>>(7)? == Some(user_id),
                     reply_message: row.get(8)?,
                     edited_at: row.get(9)?,
                     deleted_at: row.get(10)?,
@@ -441,7 +421,7 @@ fn json_error(status: StatusCode, error: &str) -> Response {
 
 pub async fn api_chat_messages(
     State(state): State<AppState>,
-    Path(other_user_id): Path<i64>,
+    Path(other_user_route): Path<String>,
     headers: HeaderMap,
     Query(query): Query<ChatMessagesQuery>,
 ) -> Response {
@@ -451,10 +431,6 @@ pub async fn api_chat_messages(
             return json_error(StatusCode::UNAUTHORIZED, "login_required");
         }
     };
-
-    if normalized_pair(user_id, other_user_id).is_none() {
-        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
-    }
 
     if query.before_id.is_some() && query.after_id.is_some() {
         return json_error(StatusCode::BAD_REQUEST, "conflicting_cursor");
@@ -473,6 +449,12 @@ pub async fn api_chat_messages(
         Err(_) => {
             return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable");
         }
+    };
+
+    let Some(other_user_id) = active_user_id_by_chat_route(&connection, &other_user_route)
+        .filter(|other_user_id| *other_user_id != user_id)
+    else {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
     };
 
     touch_profile_last_seen(&connection, user_id);
@@ -546,14 +528,13 @@ pub async fn api_chat_messages(
                         |row| {
                             Ok(ChatApiMessage {
                                 id: row.get(0)?,
-                                sender_user_id: row.get(1)?,
                                 message: row.get(2)?,
                                 is_mine: row.get::<_, i64>(1)? == user_id,
                                 delivered_at: row.get(3)?,
                                 read_at: row.get(4)?,
                                 created_at: row.get(5)?,
                                 reply_to_message_id: row.get(6)?,
-                                reply_sender_user_id: row.get(7)?,
+                                reply_is_mine: row.get::<_, Option<i64>>(7)? == Some(user_id),
                                 reply_message: row.get(8)?,
                                 edited_at: row.get(9)?,
                                 deleted_at: row.get(10)?,
@@ -628,14 +609,13 @@ pub async fn api_chat_messages(
                         |row| {
                             Ok(ChatApiMessage {
                                 id: row.get(0)?,
-                                sender_user_id: row.get(1)?,
                                 message: row.get(2)?,
                                 is_mine: row.get::<_, i64>(1)? == user_id,
                                 delivered_at: row.get(3)?,
                                 read_at: row.get(4)?,
                                 created_at: row.get(5)?,
                                 reply_to_message_id: row.get(6)?,
-                                reply_sender_user_id: row.get(7)?,
+                                reply_is_mine: row.get::<_, Option<i64>>(7)? == Some(user_id),
                                 reply_message: row.get(8)?,
                                 edited_at: row.get(9)?,
                                 deleted_at: row.get(10)?,
@@ -707,14 +687,13 @@ pub async fn api_chat_messages(
                     .query_map(rusqlite::params![conversation_id, fetch_limit], |row| {
                         Ok(ChatApiMessage {
                             id: row.get(0)?,
-                            sender_user_id: row.get(1)?,
                             message: row.get(2)?,
                             is_mine: row.get::<_, i64>(1)? == user_id,
                             delivered_at: row.get(3)?,
                             read_at: row.get(4)?,
                             created_at: row.get(5)?,
                             reply_to_message_id: row.get(6)?,
-                            reply_sender_user_id: row.get(7)?,
+                            reply_is_mine: row.get::<_, Option<i64>>(7)? == Some(user_id),
                             reply_message: row.get(8)?,
                             edited_at: row.get(9)?,
                             deleted_at: row.get(10)?,
@@ -856,7 +835,7 @@ pub async fn api_chat_messages(
 
 pub async fn api_chat_send(
     State(state): State<AppState>,
-    Path(other_user_id): Path<i64>,
+    Path(other_user_route): Path<String>,
     headers: HeaderMap,
     Json(payload): Json<ChatSendPayload>,
 ) -> Response {
@@ -870,10 +849,6 @@ pub async fn api_chat_send(
             return json_error(StatusCode::UNAUTHORIZED, "login_required");
         }
     };
-
-    if normalized_pair(user_id, other_user_id).is_none() {
-        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
-    }
 
     let message = payload.message.trim();
 
@@ -907,6 +882,12 @@ pub async fn api_chat_send(
         Err(_) => {
             return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable");
         }
+    };
+
+    let Some(other_user_id) = active_user_id_by_chat_route(&connection, &other_user_route)
+        .filter(|other_user_id| *other_user_id != user_id)
+    else {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
     };
 
     if users_are_blocked(&connection, user_id, other_user_id) {
@@ -1144,14 +1125,13 @@ pub async fn api_chat_send(
             "ok": true,
             "message": {
                 "id": message_id,
-                "sender_user_id": user_id.to_string(),
                 "message": message,
                 "is_mine": true,
                 "delivered_at": 0,
                 "read_at": 0,
                 "created_at": now,
                 "reply_to_message_id": reply_to_message_id,
-                "reply_sender_user_id": null,
+                "reply_is_mine": false,
                 "reply_message": "",
                 "edited_at": 0,
                 "deleted_at": 0,
@@ -1164,7 +1144,7 @@ pub async fn api_chat_send(
 
 pub async fn api_chat_edit(
     State(state): State<AppState>,
-    Path((other_user_id, message_id)): Path<(i64, i64)>,
+    Path((other_user_route, message_id)): Path<(String, i64)>,
     headers: HeaderMap,
     Json(payload): Json<ChatEditPayload>,
 ) -> Response {
@@ -1179,7 +1159,7 @@ pub async fn api_chat_edit(
         }
     };
 
-    if normalized_pair(user_id, other_user_id).is_none() || message_id <= 0 {
+    if message_id <= 0 {
         return json_error(StatusCode::BAD_REQUEST, "invalid_request");
     }
 
@@ -1207,6 +1187,12 @@ pub async fn api_chat_edit(
         Err(_) => {
             return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable");
         }
+    };
+
+    let Some(other_user_id) = active_user_id_by_chat_route(&connection, &other_user_route)
+        .filter(|other_user_id| *other_user_id != user_id)
+    else {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
     };
 
     let conversation_id = match conversation_id(&connection, user_id, other_user_id) {
@@ -1277,7 +1263,7 @@ pub async fn api_chat_edit(
 
 pub async fn api_chat_delete(
     State(state): State<AppState>,
-    Path((other_user_id, message_id)): Path<(i64, i64)>,
+    Path((other_user_route, message_id)): Path<(String, i64)>,
     headers: HeaderMap,
 ) -> Response {
     if request_is_cross_site(&headers) {
@@ -1291,7 +1277,7 @@ pub async fn api_chat_delete(
         }
     };
 
-    if normalized_pair(user_id, other_user_id).is_none() || message_id <= 0 {
+    if message_id <= 0 {
         return json_error(StatusCode::BAD_REQUEST, "invalid_request");
     }
 
@@ -1314,6 +1300,12 @@ pub async fn api_chat_delete(
         Err(_) => {
             return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable");
         }
+    };
+
+    let Some(other_user_id) = active_user_id_by_chat_route(&connection, &other_user_route)
+        .filter(|other_user_id| *other_user_id != user_id)
+    else {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
     };
 
     let conversation_id = match conversation_id(&connection, user_id, other_user_id) {
@@ -1364,7 +1356,7 @@ pub async fn api_chat_delete(
 
 pub async fn api_chat_peer(
     State(state): State<AppState>,
-    Path(other_user_id): Path<i64>,
+    Path(other_user_route): Path<String>,
     headers: HeaderMap,
 ) -> Response {
     if request_is_cross_site(&headers) {
@@ -1378,15 +1370,17 @@ pub async fn api_chat_peer(
         }
     };
 
-    if normalized_pair(user_id, other_user_id).is_none() {
-        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
-    }
-
     let connection = match state.db_pool.get() {
         Ok(connection) => connection,
         Err(_) => {
             return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable");
         }
+    };
+
+    let Some(other_user_id) = active_user_id_by_chat_route(&connection, &other_user_route)
+        .filter(|other_user_id| *other_user_id != user_id)
+    else {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
     };
 
     touch_profile_last_seen(&connection, user_id);
@@ -1406,12 +1400,14 @@ pub async fn api_chat_peer(
     let last_seen_at = peer_row.unwrap_or(0);
     let now = crate::web::handlers::common::unix_now();
     let online = last_seen_at > 0 && now.saturating_sub(last_seen_at) < 300;
+    let peer_public_id =
+        active_public_id_by_user_id(&connection, other_user_id).unwrap_or_default();
 
     (
         StatusCode::OK,
         Json(json!({
             "ok": true,
-            "peer_user_id": other_user_id.to_string(),
+            "peer_public_id": peer_public_id,
             "online": online,
             "last_seen_at": last_seen_at,
             "open_contact": true
@@ -1489,7 +1485,7 @@ pub async fn api_chat_conversations(
             };
 
             json!({
-                "other_user_id": conversation.other_user_id.to_string(),
+                "other_public_id": conversation.other_public_id,
                 "display_name": display_name,
                 "username": conversation.username,
                 "last_message": last_message,
@@ -1504,8 +1500,13 @@ pub async fn api_chat_conversations(
                 "muted_until": conversation.muted_until,
                 "href": if conversation.is_group && conversation.group_id > 0 {
                     format!("/app/group/{}", conversation.group_id)
+                } else if !conversation.other_public_id.is_empty() {
+                    format!(
+                        "/app/chat/{}",
+                        urlencoding::encode(&conversation.other_public_id)
+                    )
                 } else {
-                    format!("/app/chat/{}", conversation.other_user_id)
+                    "/app/messages".to_string()
                 },
             })
         })
@@ -1529,7 +1530,7 @@ pub struct ChatReactPayload {
 
 pub async fn api_chat_react(
     State(state): State<AppState>,
-    Path((other_user_id, message_id)): Path<(i64, i64)>,
+    Path((other_user_route, message_id)): Path<(String, i64)>,
     headers: HeaderMap,
     Json(payload): Json<ChatReactPayload>,
 ) -> Response {
@@ -1544,7 +1545,7 @@ pub async fn api_chat_react(
         }
     };
 
-    if normalized_pair(user_id, other_user_id).is_none() || message_id <= 0 {
+    if message_id <= 0 {
         return json_error(StatusCode::BAD_REQUEST, "invalid_request");
     }
 
@@ -1559,6 +1560,12 @@ pub async fn api_chat_react(
         Err(_) => {
             return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable");
         }
+    };
+
+    let Some(other_user_id) = active_user_id_by_chat_route(&connection, &other_user_route)
+        .filter(|other_user_id| *other_user_id != user_id)
+    else {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
     };
 
     if users_are_blocked(&connection, user_id, other_user_id) {
@@ -1671,17 +1678,16 @@ mod tests {
     }
 
     #[test]
-    fn chat_api_user_ids_serialize_without_javascript_rounding() {
+    fn chat_api_messages_do_not_serialize_internal_user_ids() {
         let message = ChatApiMessage {
             id: 159,
-            sender_user_id: 4_000_000_000_000_000_007,
             message: "Есть".to_string(),
             is_mine: false,
             delivered_at: 0,
             read_at: 0,
             created_at: 1,
             reply_to_message_id: Some(158),
-            reply_sender_user_id: Some(4_000_000_000_000_000_009),
+            reply_is_mine: true,
             reply_message: "Ответ".to_string(),
             edited_at: 0,
             deleted_at: 0,
@@ -1695,15 +1701,9 @@ mod tests {
 
         let value = serde_json::to_value(message).expect("serialize chat API message");
 
-        assert_eq!(value["sender_user_id"], "4000000000000000007");
-        assert_eq!(value["reply_sender_user_id"], "4000000000000000009");
-
-        let conversation = serde_json::json!({
-            "other_user_id":
-                4_000_000_000_000_000_007_i64.to_string()
-        });
-
-        assert_eq!(conversation["other_user_id"], "4000000000000000007");
+        assert!(value.get("sender_user_id").is_none());
+        assert!(value.get("reply_sender_user_id").is_none());
+        assert_eq!(value["reply_is_mine"], true);
     }
 
     #[test]

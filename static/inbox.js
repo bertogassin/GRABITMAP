@@ -62,9 +62,9 @@
         var retryTimer = null;
         var heartbeatTimer = null;
         var retryAttempt = 0;
-        var viewerUserId = String(list.dataset.viewerUserId || "").trim();
+        var viewerPublicId = String(list.dataset.viewerPublicId || "").trim();
         var inboxView = list.dataset.inboxView === "archived" ? "archived" : "active";
-        var cursorKey = "resursmap:inbox-event-cursor:" + viewerUserId;
+        var cursorKey = "resursmap:inbox-event-cursor:" + viewerPublicId;
         var shareListingValue = new URLSearchParams(
             window.location.search
         ).get("share");
@@ -131,7 +131,7 @@
         function conversationKey(conversation) {
             return [
                 conversation.is_group ? "g" : "d",
-                conversation.group_id || conversation.other_user_id,
+                conversation.group_id || conversation.other_public_id,
                 conversation.updated_at,
                 conversation.unread_count,
                 conversation.last_message,
@@ -199,12 +199,14 @@
         }
 
         function renderConversation(conversation) {
-            var userId = String(conversation.other_user_id || "").trim();
+            var userPublicId = String(
+                conversation.other_public_id || ""
+            ).trim();
             var groupId = String(conversation.group_id || "").trim();
             var isGroup = Boolean(conversation.is_group);
             var fallbackHref = isGroup && groupId
                     ? "/app/group/" + encodeURIComponent(groupId)
-                    : "/app/chat/" + encodeURIComponent(userId);
+                    : "/app/chat/" + encodeURIComponent(userPublicId);
             var href = internalHref(conversation.href, fallbackHref);
             if (shareListingId) {
                 var shareUrl = new URL(href, window.location.origin);
@@ -232,7 +234,7 @@
                   + escapeHtml(formattedTime)
                   + "</div>"
                 : '<div class="chat-dialog-time"></div>';
-            var typingKey = (isGroup ? "g:" : "d:") + (isGroup ? groupId : userId);
+            var typingKey = (isGroup ? "g:" : "d:") + (isGroup ? groupId : userPublicId);
             var previewText = activeTyping[typingKey]
                 ? typingPreviewHtml(isGroup ? typingNames(typingKey) : "")
                 : escapeHtml(
@@ -245,9 +247,9 @@
                   + '/avatar" alt="" onerror=\'this.onerror=null;var p=this.parentNode;this.remove();if(p)p.insertAdjacentHTML("beforeend",'
                   + JSON.stringify(USERS_ICON)
                   + ');\'>'
-                : !isGroup && conversation.has_avatar && userId
-                ? '<img class="rm-me-avatar-img" src="/api/avatars/'
-                  + encodeURIComponent(userId)
+                : !isGroup && conversation.has_avatar && userPublicId
+                ? '<img class="rm-me-avatar-img" src="/api/public-avatars/'
+                  + encodeURIComponent(userPublicId)
                   + '" alt="" onerror=\'this.onerror=null;var p=this.parentNode;this.remove();if(p)p.insertAdjacentHTML("beforeend",'
                   + JSON.stringify(MESSAGE_ICON)
                   + ');\'>'
@@ -256,8 +258,8 @@
             return (
                 '<article class="chat-dialog-entry" data-inbox-entry><a href="'
                 + escapeHtml(href)
-                + '#chat-end" class="card chat-dialog-card" data-other-user-id="'
-                + escapeHtml(userId)
+                + '#chat-end" class="card chat-dialog-card" data-other-public-id="'
+                + escapeHtml(userPublicId)
                 + '" data-group-id="'
                 + escapeHtml(groupId)
                 + '" data-kind="'
@@ -276,7 +278,7 @@
                 + '<div class="card-arrow">'
                 + CHEVRON_ICON
                 + "</div></div></a>"
-                + preferenceControls(conversation, isGroup, isGroup ? groupId : userId)
+                + preferenceControls(conversation, isGroup, isGroup ? groupId : userPublicId)
                 + "</article>"
             );
         }
@@ -337,7 +339,7 @@
 
             var selector = kind === "g"
                 ? '.chat-dialog-card[data-group-id="' + targetId + '"]'
-                : '.chat-dialog-card[data-other-user-id="' + targetId + '"]';
+                : '.chat-dialog-card[data-other-public-id="' + targetId + '"]';
             var card = list.querySelector(selector);
 
             if (!card) {
@@ -513,7 +515,7 @@
             }
 
             var event = payload.event;
-            var actorId = String(event.actor_user_id || "").trim();
+            var actorId = String(event.actor_public_id || "").trim();
             var groupId = String(event.group_id || "").trim();
 
             if (!actorId) {

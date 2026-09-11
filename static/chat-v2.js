@@ -181,20 +181,21 @@
             return text;
         }
 
-        var otherUserId = String(
-            history.dataset.otherUserId || ""
+        var otherPublicId = String(
+            history.dataset.otherPublicId || ""
         ).trim();
+        var otherUserRoute = otherPublicId;
         var groupId = String(
             history.dataset.groupId || ""
         ).trim();
         var isGroup = /^[1-9][0-9]{0,18}$/.test(groupId);
-        var viewerUserId = String(
-            history.dataset.viewerUserId || ""
+        var viewerPublicId = String(
+            history.dataset.viewerPublicId || ""
         ).trim();
 
         if (
             !isGroup &&
-            !/^[1-9][0-9]{0,18}$/.test(otherUserId)
+            !/^[A-Za-z0-9_-]{1,64}$/.test(otherUserRoute)
         ) {
             return;
         }
@@ -203,7 +204,9 @@
             if (isGroup) {
                 return "/api/group/" + groupId + suffix;
             }
-            return "/api/chat/" + otherUserId + suffix;
+            return "/api/chat/" +
+                encodeURIComponent(otherUserRoute) +
+                suffix;
         }
 
         var firstMessageId = Number(
@@ -219,7 +222,7 @@
         var loadingOlder = false;
         var pollTimer = null;
         var storageScope =
-            viewerUserId + ":" + (isGroup ? "g" + groupId : "d" + otherUserId);
+            viewerPublicId + ":" + (isGroup ? "g" + groupId : "d" + otherUserRoute);
         var draftKey = "grabit-chat-draft:" + storageScope;
         var pendingSendKey =
             "grabit-chat-outbox:" + storageScope;
@@ -410,8 +413,8 @@
         }
 
         function updateGroupTyping(detail) {
-            var actorId = String(detail.actor_user_id || "").trim();
-            if (!actorId || actorId === viewerUserId) {
+            var actorId = String(detail.actor_public_id || "").trim();
+            if (!actorId || actorId === viewerPublicId) {
                 return;
             }
             if (groupTypingTimers[actorId]) {
@@ -476,7 +479,7 @@
                     {
                         detail: {
                             type: kind,
-                            other_user_id: otherUserId
+                            other_public_id: otherUserRoute
                         }
                     }
                 )
@@ -1535,8 +1538,8 @@
 
                         data.message.reply_message =
                             item.replyMessage || "";
-                        data.message.reply_sender_user_id =
-                            item.replySenderUserId || null;
+                        data.message.reply_is_mine =
+                            Boolean(item.replyIsMine);
                     }
                     clearItemRetryTimer(item.clientMessageId);
                     removePendingRow(item.clientMessageId);
@@ -1630,8 +1633,8 @@
                     reply ? reply.id : null,
                 replyMessage:
                     reply ? reply.message : "",
-                replySenderUserId:
-                    reply ? reply.senderUserId : null,
+                replyIsMine:
+                    reply ? Boolean(reply.isMine) : false,
                 createdAt:
                     Math.floor(Date.now() / 1000),
                 state: "queued",
@@ -2547,9 +2550,7 @@
             "resursmap:chat-typing",
             function (event) {
                 var detail = event.detail || {};
-                var actorId = String(
-                    detail.actor_user_id || ""
-                ).trim();
+                var actorId = String(detail.actor_public_id || "").trim();
 
                 if (isGroup) {
                     if (String(detail.group_id || "") !== groupId) {
@@ -2559,7 +2560,7 @@
                     return;
                 }
 
-                if (actorId !== otherUserId) {
+                if (actorId !== otherUserRoute) {
                     return;
                 }
 
@@ -2803,9 +2804,10 @@
             return;
         }
 
-        var otherUserId = String(
-            history.dataset.otherUserId || ""
+        var otherPublicId = String(
+            history.dataset.otherPublicId || ""
         ).trim();
+        var otherUserRoute = otherPublicId;
         var groupId = String(
             history.dataset.groupId || ""
         ).trim();
@@ -2813,7 +2815,7 @@
 
         if (
             !isGroup &&
-            !/^[1-9][0-9]{0,18}$/.test(otherUserId)
+            !/^[A-Za-z0-9_-]{1,64}$/.test(otherUserRoute)
         ) {
             return;
         }
@@ -2822,7 +2824,9 @@
             if (isGroup) {
                 return "/api/group/" + groupId + suffix;
             }
-            return "/api/chat/" + otherUserId + suffix;
+            return "/api/chat/" +
+                encodeURIComponent(otherUserRoute) +
+                suffix;
         }
 
         function t(key, fallback, params) {
@@ -3059,7 +3063,7 @@
         var forwardList =
             document.getElementById("chat-forward-list");
         var forwardDraftKey =
-            "resursmap-chat-forward:" + (isGroup ? ("g:" + groupId) : ("d:" + otherUserId));
+            "resursmap-chat-forward:" + (isGroup ? ("g:" + groupId) : ("d:" + otherUserRoute));
 
         if (replyBar) {
             var replyHeading = replyBar.querySelector("strong");
@@ -3211,12 +3215,15 @@
 
                     var currentTarget = isGroup
                         ? ("g:" + groupId)
-                        : ("d:" + otherUserId);
+                        : ("d:" + otherUserRoute);
                     conversations = conversations.filter(
                         function (conversation) {
+                            var candidatePublicId = String(
+                                conversation.other_public_id || ""
+                            );
                             var candidate = conversation.is_group
                                 ? ("g:" + String(conversation.group_id || ""))
-                                : ("d:" + String(conversation.other_user_id || ""));
+                                : ("d:" + candidatePublicId);
                             return candidate !== currentTarget;
                         }
                     );
@@ -3235,18 +3242,23 @@
                     forwardList.innerHTML = conversations
                         .map(function (conversation) {
                             var isGroup = Boolean(conversation.is_group);
-                            var userId = String(
-                                conversation.other_user_id || ""
+                            var userPublicId = String(
+                                conversation.other_public_id || ""
                             );
+                            var userRoute = userPublicId;
                             var groupId = String(
                                 conversation.group_id || ""
                             );
-                            var target = isGroup ? ("g:" + groupId) : ("d:" + userId);
+                            var target = isGroup
+                                ? ("g:" + groupId)
+                                : ("d:" + userRoute);
                             var href = isGroup
                                 ? ("/app/group/" + encodeURIComponent(groupId))
-                                : ("/app/chat/" + encodeURIComponent(userId));
+                                : ("/app/chat/" + encodeURIComponent(userRoute));
                             var label = escapeHtml(String(
-                                conversation.display_name || userId || groupId
+                                conversation.display_name ||
+                                userPublicId ||
+                                groupId
                             ));
                             var meta = escapeHtml(String(
                                 conversation.last_message || ""
@@ -3282,7 +3294,7 @@
                                         buildForwardPayload(message);
                                     var currentKey = isGroup
                                         ? ("g:" + groupId)
-                                        : ("d:" + otherUserId);
+                                        : ("d:" + otherUserRoute);
 
                                     closeForwardPicker();
 
@@ -4111,7 +4123,7 @@
             row.dataset.editedAt = String(Number(message.edited_at) || 0);
             row.dataset.replyTo = String(Number(message.reply_to_message_id) || 0);
             row.dataset.replyMessage = String(message.reply_message || "");
-            row.dataset.replySender = String(message.reply_sender_user_id || "");
+            row.dataset.replyMine = message.reply_is_mine ? "1" : "0";
             row.dataset.replySenderName = String(message.reply_sender_name || "");
             row.dataset.createdAt = String(Number(message.created_at) || 0);
             row.dataset.attachmentKind = String(message.attachment_kind || "");
@@ -4189,18 +4201,14 @@
                 quote.dataset.targetMessageId =
                     String(message.reply_to_message_id);
 
-                var replySender = String(
-                    message.reply_sender_user_id || ""
-                ).trim();
                 var author = t("chat_message", "Сообщение");
 
                 if (isGroup && message.reply_sender_name) {
                     author = String(message.reply_sender_name);
-                } else if (replySender) {
-                    author =
-                        replySender === otherUserId
-                            ? t("chat_peer", "Собеседник")
-                            : t("chat_you", "Вы");
+                } else if (message.reply_is_mine) {
+                    author = t("chat_you", "Вы");
+                } else {
+                    author = t("chat_peer", "Собеседник");
                 }
 
                 var authorNode =
@@ -4258,10 +4266,6 @@
 
             return {
                 id: id,
-                sender_user_id:
-                    row.dataset.mine === "1"
-                        ? 0
-                        : otherUserId,
                 message:
                     row.dataset.messageText ||
                     (body ? body.textContent : ""),
@@ -4274,9 +4278,7 @@
                     Number(row.dataset.replyTo || 0) || null,
                 reply_message:
                     row.dataset.replyMessage || "",
-                reply_sender_user_id:
-                    String(row.dataset.replySender || "").trim() ||
-                    null,
+                reply_is_mine: row.dataset.replyMine === "1",
                 reply_sender_name:
                     String(row.dataset.replySenderName || "").trim(),
                 read_at:
@@ -4328,10 +4330,6 @@
                 var body = row.querySelector(".chat-message-body");
                 var message = {
                     id: id,
-                    sender_user_id:
-                        row.dataset.mine === "1"
-                            ? 0
-                            : otherUserId,
                     message:
                         row.dataset.messageText ||
                         (body ? body.textContent : ""),
@@ -4344,9 +4342,7 @@
                         Number(row.dataset.replyTo || 0) || null,
                     reply_message:
                         row.dataset.replyMessage || "",
-                    reply_sender_user_id:
-                        String(row.dataset.replySender || "").trim() ||
-                        null,
+                    reply_is_mine: row.dataset.replyMine === "1",
                     reply_sender_name:
                         String(row.dataset.replySenderName || "").trim(),
                     read_at:
@@ -4482,9 +4478,7 @@
 
             window.ResursMapChatReply = {
                 id: Number(message.id),
-                senderUserId: String(
-                    message.sender_user_id || ""
-                ).trim(),
+                isMine: Boolean(message.is_mine),
                 message: String(message.message || "")
             };
 
@@ -5001,13 +4995,18 @@
 
         function fallbackApi() {
             var groupId = String(history.dataset.groupId || "").trim();
-            var otherUserId = String(history.dataset.otherUserId || "").trim();
+            var otherPublicId = String(
+                history.dataset.otherPublicId || ""
+            ).trim();
+            var otherUserRoute = otherPublicId;
 
             if (/^[1-9][0-9]{0,18}$/.test(groupId)) {
                 return "/api/group/" + groupId + "/send";
             }
-            if (/^[1-9][0-9]{0,18}$/.test(otherUserId)) {
-                return "/api/chat/" + otherUserId + "/send";
+            if (/^[A-Za-z0-9_-]{1,64}$/.test(otherUserRoute)) {
+                return "/api/chat/" +
+                    encodeURIComponent(otherUserRoute) +
+                    "/send";
             }
             return "";
         }
@@ -5021,13 +5020,16 @@
         }
 
         function clearStoredDraft() {
-            var viewerUserId = String(history.dataset.viewerUserId || "").trim();
+            var viewerPublicId = String(history.dataset.viewerPublicId || "").trim();
             var groupId = String(history.dataset.groupId || "").trim();
-            var otherUserId = String(history.dataset.otherUserId || "").trim();
-            var scope = viewerUserId + ":" +
+            var otherPublicId = String(
+                history.dataset.otherPublicId || ""
+            ).trim();
+            var otherUserRoute = otherPublicId;
+            var scope = viewerPublicId + ":" +
                 (/^[1-9][0-9]{0,18}$/.test(groupId)
                     ? "g" + groupId
-                    : "d" + otherUserId);
+                    : "d" + otherUserRoute);
             try {
                 localStorage.removeItem("grabit-chat-draft:" + scope);
             } catch (_) {}
@@ -5171,7 +5173,11 @@
         var stopped = false;
         var retryAttempt = 0;
         var cursorKey = "resursmap:chat-event-cursor:" +
-            (history.dataset.groupId || history.dataset.otherUserId || "chat");
+            (
+                history.dataset.groupId ||
+                history.dataset.otherPublicId ||
+                "chat"
+            );
         var lastEventId = 0;
         var seenEventIds = new Set();
         try {

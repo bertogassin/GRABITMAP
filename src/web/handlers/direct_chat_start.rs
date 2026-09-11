@@ -1,4 +1,5 @@
 use super::auth::verify_user_session;
+use super::chat_identity::{active_user_id_by_public_id, public_id_is_valid};
 use super::common::{input_text_is_valid, rate_limit_retry_after, request_is_cross_site};
 use super::user_blocks::users_are_blocked;
 use crate::state::app_state::AppState;
@@ -16,14 +17,6 @@ use serde_json::json;
 pub struct StartDirectChatPayload {
     public_id: String,
     message: String,
-}
-
-fn public_id_is_valid(value: &str) -> bool {
-    !value.is_empty()
-        && value.len() <= 64
-        && value.chars().all(|character| {
-            character.is_ascii_alphanumeric() || character == '-' || character == '_'
-        })
 }
 
 fn first_message_is_valid(value: &str) -> bool {
@@ -102,20 +95,7 @@ pub async fn api_start_direct_chat(
         }
     };
 
-    let receiver: Option<i64> = connection
-        .query_row(
-            "SELECT profile.user_id
-             FROM profiles AS profile
-             JOIN users AS user
-               ON user.id = profile.user_id
-              AND user.is_active = 1
-             WHERE profile.public_id = ?1
-             LIMIT 1",
-            rusqlite::params![public_id],
-            |row| row.get(0),
-        )
-        .optional()
-        .unwrap_or(None);
+    let receiver = active_user_id_by_public_id(&connection, public_id);
 
     let Some(receiver_user_id) = receiver else {
         return json_error(StatusCode::NOT_FOUND, "user_not_found");
@@ -275,14 +255,13 @@ pub async fn api_start_direct_chat(
         StatusCode::CREATED,
         Json(json!({
             "ok": true,
-            "conversation_id": conversation_id,
             "message_id": message_id,
             "existing_conversation":
                 existing_conversation.is_some(),
             "status": "open",
             "chat_url": format!(
                 "/app/chat/{}#chat-end",
-                receiver_user_id
+                public_id
             )
         })),
     )

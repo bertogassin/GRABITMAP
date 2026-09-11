@@ -29,7 +29,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = "7.6.0";
+pub const STATIC_ASSET_VERSION: &str = "7.7.0";
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -4905,8 +4905,8 @@ pub(crate) fn search_people_cards(people: &[crate::web::view_models::SearchPerso
                     )
                 };
 
-                let write_href = if *user_id > 0 {
-                    Some(format!("/app/chat/{user_id}"))
+                let write_href = if *user_id > 0 && !public_id.is_empty() {
+                    Some(format!("/app/chat/{}", urlencoding::encode(public_id)))
                 } else {
                     None
                 };
@@ -6526,7 +6526,7 @@ mod public_entry_tests {
         let name = html.find("Иван").expect("person name");
         assert!(profession < name);
         assert!(html.contains("rm-search-person-name"));
-        assert!(html.contains("/app/chat/12"));
+        assert!(html.contains("/app/chat/pub-1"));
         assert!(html.contains("Написать"));
     }
 

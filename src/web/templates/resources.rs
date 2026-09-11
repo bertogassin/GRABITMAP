@@ -131,6 +131,7 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                     premium,
                     row_listing_type,
                     row_rubric,
+                    owner_public_id,
                     owner_user_id,
                 )| {
                     let safe_title = escape_html(title);
@@ -176,8 +177,8 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                         ""
                     };
 
-                    let write_href = if *owner_user_id > 0 {
-                        format!("/app/chat/{owner_user_id}")
+                    let write_href = if *owner_user_id > 0 && !owner_public_id.is_empty() {
+                        format!("/app/chat/{}", urlencoding::encode(owner_public_id))
                     } else {
                         String::new()
                     };
@@ -706,8 +707,8 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
             public_id = urlencoding::encode(owner_public_id),
             write_html = if owner_user_id > 0 && !owner_preview {
                 format!(
-                    r#"<a href="/app/chat/{owner_user_id}" class="rm-resource-owner-link">{write}</a>"#,
-                    owner_user_id = owner_user_id,
+                    r#"<a href="/app/chat/{public_id}" class="rm-resource-owner-link">{write}</a>"#,
+                    public_id = urlencoding::encode(owner_public_id),
                     write = crate::i18n::t("common_write"),
                 )
             } else {
@@ -725,8 +726,8 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
 
     let safe_contact_href = escape_html(&contact_href);
     let safe_map_href = escape_html(&map_href);
-    let write_href = if owner_user_id > 0 && !owner_preview {
-        format!("/app/chat/{owner_user_id}")
+    let write_href = if owner_user_id > 0 && !owner_preview && !owner_public_id.is_empty() {
+        format!("/app/chat/{}", urlencoding::encode(owner_public_id))
     } else {
         String::new()
     };

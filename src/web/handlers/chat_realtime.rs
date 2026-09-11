@@ -1,4 +1,5 @@
 use super::auth::verify_user_session;
+use super::chat_identity::active_user_id_by_chat_route;
 use super::common::request_is_cross_site;
 use super::user_blocks::users_are_blocked;
 use crate::state::app_state::AppState;
@@ -19,6 +20,7 @@ use tokio::sync::broadcast;
 struct ClientFrame {
     #[serde(rename = "type")]
     frame_type: String,
+    other_public_id: Option<String>,
     other_user_id: Option<String>,
     group_id: Option<String>,
 }
@@ -26,6 +28,15 @@ struct ClientFrame {
 #[derive(Debug, Deserialize)]
 pub(crate) struct RealtimeQuery {
     last_event_id: Option<u64>,
+}
+
+fn public_chat_event(event: &crate::state::app_state::ChatRealtimeEvent) -> serde_json::Value {
+    json!({
+        "event_id": event.event_id,
+        "kind": event.kind,
+        "message_id": event.message_id,
+        "group_id": event.group_id,
+    })
 }
 
 fn parse_other_user_id(value: Option<&str>) -> Option<i64> {
@@ -91,15 +102,27 @@ fn handle_client_frame(state: &AppState, user_id: i64, text: &str) -> bool {
     match frame.frame_type.as_str() {
         "ping" => true,
         "typing.start" | "typing.stop" => {
-            if let Some(other_user_id) = parse_other_user_id(frame.other_user_id.as_deref()) {
-                let connection = crate::db::pool::get_connection(&state.db_pool);
-                if connection.as_ref().is_ok_and(|connection| {
-                    direct_typing_is_allowed(connection, user_id, other_user_id)
-                }) {
-                    let _ = state.publish_typing_event(&frame.frame_type, user_id, other_user_id);
+            let direct_route = frame
+                .other_public_id
+                .as_deref()
+                .or(frame.other_user_id.as_deref());
+
+            if let Some(direct_route) = direct_route {
+                let connection = match crate::db::pool::get_connection(&state.db_pool) {
+                    Ok(connection) => connection,
+                    Err(_) => return false,
+                };
+                if let Some(other_user_id) = active_user_id_by_chat_route(&connection, direct_route)
+                    .filter(|other_user_id| *other_user_id != user_id)
+                {
+                    if direct_typing_is_allowed(&connection, user_id, other_user_id) {
+                        let _ =
+                            state.publish_typing_event(&frame.frame_type, user_id, other_user_id);
+                    }
                 }
                 return false;
             }
+
             let Some(group_id) = parse_other_user_id(frame.group_id.as_deref()) else {
                 return false;
             };
@@ -207,8 +230,7 @@ async fn chat_socket(mut socket: WebSocket, state: AppState, user_id: i64, last_
         &mut socket,
         json!({
             "type": "ready",
-            "protocol": "resursmap.chat.v5",
-            "user_id": user_id.to_string()
+            "protocol": "resursmap.chat.v5"
         }),
     )
     .await
@@ -277,7 +299,7 @@ async fn chat_socket(mut socket: WebSocket, state: AppState, user_id: i64, last_
                             &mut socket,
                             json!({
                                 "type": "chat_event",
-                                "event": event
+                                "event": public_chat_event(&event)
                             }),
                         )
                         .await
@@ -314,11 +336,40 @@ async fn chat_socket(mut socket: WebSocket, state: AppState, user_id: i64, last_
                             continue;
                         }
 
+                        let actor_public_id = crate::db::pool::get_connection(&state.db_pool)
+                            .ok()
+                            .and_then(|connection| {
+                                connection
+                                    .query_row(
+                                        "SELECT profile.public_id
+                                         FROM profiles AS profile
+                                         JOIN users AS user
+                                           ON user.id = profile.user_id
+                                          AND user.is_active = 1
+                                         WHERE profile.user_id = ?1
+                                           AND trim(profile.public_id) <> ''
+                                         LIMIT 1",
+                                        rusqlite::params![event.actor_user_id],
+                                        |row| row.get::<_, String>(0),
+                                    )
+                                    .ok()
+                            });
+
+                        let Some(actor_public_id) = actor_public_id else {
+                            continue;
+                        };
+
                         if !send_json(
                             &mut socket,
                             json!({
                                 "type": "typing_event",
-                                "event": event
+                                "event": {
+                                    "event_id": event.event_id,
+                                    "kind": event.kind,
+                                    "actor_public_id": actor_public_id,
+                                    "group_id": event.group_id,
+                                    "actor_name": event.actor_name
+                                }
                             }),
                         )
                         .await
@@ -340,7 +391,7 @@ async fn chat_socket(mut socket: WebSocket, state: AppState, user_id: i64, last_
 
 #[cfg(test)]
 mod tests {
-    use super::{direct_typing_is_allowed, parse_other_user_id, ClientFrame};
+    use super::{direct_typing_is_allowed, parse_other_user_id, public_chat_event, ClientFrame};
 
     #[test]
     fn other_user_id_parser_is_strict() {
@@ -354,11 +405,12 @@ mod tests {
     #[test]
     fn client_frame_parses_typing() {
         let frame: ClientFrame =
-            serde_json::from_str(r#"{"type":"typing.start","other_user_id":"18"}"#)
+            serde_json::from_str(r#"{"type":"typing.start","other_public_id":"peer-public-18"}"#)
                 .expect("typing frame");
 
         assert_eq!(frame.frame_type, "typing.start");
-        assert_eq!(frame.other_user_id.as_deref(), Some("18"));
+        assert_eq!(frame.other_public_id.as_deref(), Some("peer-public-18"));
+        assert!(frame.other_user_id.is_none());
         assert!(frame.group_id.is_none());
     }
 
@@ -369,6 +421,7 @@ mod tests {
 
         assert_eq!(frame.frame_type, "typing.start");
         assert_eq!(frame.group_id.as_deref(), Some("44"));
+        assert!(frame.other_public_id.is_none());
         assert!(frame.other_user_id.is_none());
     }
 
@@ -401,5 +454,27 @@ mod tests {
     #[test]
     fn realtime_protocol_name_is_stable() {
         assert_eq!("resursmap.chat.v5", "resursmap.chat.v5");
+    }
+
+    #[test]
+    fn outgoing_chat_event_hides_internal_routing_ids() {
+        let event = crate::state::app_state::ChatRealtimeEvent {
+            event_id: 11,
+            kind: "message.created".to_string(),
+            conversation_id: 22,
+            message_id: 33,
+            user1_id: 44,
+            user2_id: 55,
+            group_id: 0,
+            member_ids: Vec::new(),
+            membership_scoped: false,
+        };
+
+        let value = public_chat_event(&event);
+        assert_eq!(value["event_id"], 11);
+        assert_eq!(value["message_id"], 33);
+        assert!(value.get("conversation_id").is_none());
+        assert!(value.get("user1_id").is_none());
+        assert!(value.get("user2_id").is_none());
     }
 }

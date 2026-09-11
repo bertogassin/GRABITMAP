@@ -31,11 +31,15 @@
             return;
         }
 
-        var otherUserId = String(
-            history.dataset.otherUserId || ""
+        var otherPublicId = String(
+            history.dataset.otherPublicId || ""
         ).trim();
+        var otherUserRoute = otherPublicId;
 
-        if (!/^[1-9][0-9]{0,18}$/.test(otherUserId)) {
+        if (
+            !otherUserRoute ||
+            !/^[A-Za-z0-9_-]{1,64}$/.test(otherUserRoute)
+        ) {
             return;
         }
 
@@ -109,7 +113,7 @@
             try {
                 var data = await request(
                     "/api/chat/" +
-                    otherUserId +
+                    encodeURIComponent(otherUserRoute) +
                     "/block"
                 );
 
@@ -146,10 +150,10 @@
             try {
                 var endpoint = state.blockedByMe
                     ? "/api/chat/" +
-                        otherUserId +
+                        encodeURIComponent(otherUserRoute) +
                         "/unblock"
                     : "/api/chat/" +
-                        otherUserId +
+                        encodeURIComponent(otherUserRoute) +
                         "/block";
 
                 var data = await request(

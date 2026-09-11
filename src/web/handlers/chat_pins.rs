@@ -1,4 +1,5 @@
 use super::auth::verify_user_session;
+use super::chat_identity::active_user_id_by_chat_route;
 use super::common::{rate_limit_retry_after, request_is_cross_site, unix_now};
 use crate::db::chat_pins::{KIND_DIRECT, KIND_GROUP};
 use crate::state::app_state::AppState;
@@ -128,7 +129,7 @@ fn set_pin(
 
 pub async fn api_chat_pinned(
     State(state): State<AppState>,
-    Path(other_user_id): Path<i64>,
+    Path(other_user_route): Path<String>,
     headers: HeaderMap,
 ) -> Response {
     let user_id = match verify_user_session(&state, &headers) {
@@ -138,6 +139,11 @@ pub async fn api_chat_pinned(
     let db = match state.db_pool.get() {
         Ok(value) => value,
         Err(_) => return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable"),
+    };
+    let Some(other_user_id) = active_user_id_by_chat_route(&db, &other_user_route)
+        .filter(|other_user_id| *other_user_id != user_id)
+    else {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
     };
     let Some(conversation_id) = direct_conversation_id(&db, user_id, other_user_id) else {
         return json_error(StatusCode::NOT_FOUND, "conversation_not_found");
@@ -178,7 +184,7 @@ pub async fn api_group_pinned(
 
 pub async fn api_chat_pin(
     State(state): State<AppState>,
-    Path((other_user_id, message_id)): Path<(i64, i64)>,
+    Path((other_user_route, message_id)): Path<(String, i64)>,
     headers: HeaderMap,
     Json(payload): Json<PinMessagePayload>,
 ) -> Response {
@@ -203,6 +209,11 @@ pub async fn api_chat_pin(
     let db = match state.db_pool.get() {
         Ok(value) => value,
         Err(_) => return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable"),
+    };
+    let Some(other_user_id) = active_user_id_by_chat_route(&db, &other_user_route)
+        .filter(|other_user_id| *other_user_id != user_id)
+    else {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
     };
     let Some(conversation_id) = direct_conversation_id(&db, user_id, other_user_id) else {
         return json_error(StatusCode::FORBIDDEN, "conversation_not_open");

@@ -1,4 +1,5 @@
 use super::auth::verify_user_session;
+use super::chat_identity::active_user_id_by_chat_route;
 use super::common::rate_limit_retry_after;
 use crate::state::app_state::AppState;
 use axum::{
@@ -181,7 +182,7 @@ fn search_group_messages(
 
 pub async fn api_chat_search(
     State(state): State<AppState>,
-    Path(other_user_id): Path<i64>,
+    Path(other_user_route): Path<String>,
     headers: HeaderMap,
     Query(query): Query<ChatSearchQuery>,
 ) -> Response {
@@ -204,6 +205,11 @@ pub async fn api_chat_search(
     let db = match crate::db::pool::get_connection(&state.db_pool) {
         Ok(db) => db,
         Err(_) => return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable"),
+    };
+    let Some(other_user_id) = active_user_id_by_chat_route(&db, &other_user_route)
+        .filter(|other_user_id| *other_user_id != user_id)
+    else {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
     };
     let Some(conversation_id) = direct_conversation_id(&db, user_id, other_user_id) else {
         return json_error(StatusCode::NOT_FOUND, "conversation_not_found");
