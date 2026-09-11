@@ -20,7 +20,8 @@ pub fn initialize(conn: &Connection) -> Result<()> {
             last_user_id INTEGER NOT NULL DEFAULT 0,
             processed_count INTEGER NOT NULL DEFAULT 0,
             completed INTEGER NOT NULL DEFAULT 0 CHECK(completed IN (0, 1)),
-            updated_at INTEGER NOT NULL DEFAULT 0
+            updated_at INTEGER NOT NULL DEFAULT 0,
+            privacy_version INTEGER NOT NULL DEFAULT 1
          );
          INSERT OR IGNORE INTO chat_group_member_search_backfill(singleton)
          VALUES (1);
@@ -51,52 +52,76 @@ pub fn initialize(conn: &Connection) -> Result<()> {
             VALUES (NEW.id, NEW.search_text);
          END;
 
-         CREATE TRIGGER IF NOT EXISTS chat_group_member_search_member_ai
+         DROP TRIGGER IF EXISTS chat_group_member_search_member_ai;
+         DROP TRIGGER IF EXISTS chat_group_member_search_member_ad;
+         DROP TRIGGER IF EXISTS chat_group_member_search_profile_ai;
+         DROP TRIGGER IF EXISTS chat_group_member_search_profile_au;
+         DROP TRIGGER IF EXISTS chat_group_member_search_profile_ad;
+
+         CREATE TRIGGER chat_group_member_search_member_ai
          AFTER INSERT ON chat_group_members
          BEGIN
             INSERT OR IGNORE INTO chat_group_member_search(group_id, user_id, search_text)
             SELECT NEW.group_id, NEW.user_id,
                    trim(COALESCE(username, '') || ' ' || COALESCE(first_name, '') || ' ' ||
-                        COALESCE(last_name, '') || ' ' || CAST(NEW.user_id AS TEXT))
+                        COALESCE(last_name, ''))
             FROM profiles WHERE user_id = NEW.user_id;
          END;
 
-         CREATE TRIGGER IF NOT EXISTS chat_group_member_search_member_ad
+         CREATE TRIGGER chat_group_member_search_member_ad
          AFTER DELETE ON chat_group_members
          BEGIN
             DELETE FROM chat_group_member_search
             WHERE group_id = OLD.group_id AND user_id = OLD.user_id;
          END;
 
-         CREATE TRIGGER IF NOT EXISTS chat_group_member_search_profile_ai
+         CREATE TRIGGER chat_group_member_search_profile_ai
          AFTER INSERT ON profiles WHEN NEW.user_id IS NOT NULL
          BEGIN
             INSERT OR IGNORE INTO chat_group_member_search(group_id, user_id, search_text)
             SELECT member.group_id, NEW.user_id,
                    trim(COALESCE(NEW.username, '') || ' ' || COALESCE(NEW.first_name, '') || ' ' ||
-                        COALESCE(NEW.last_name, '') || ' ' || CAST(NEW.user_id AS TEXT))
+                        COALESCE(NEW.last_name, ''))
             FROM chat_group_members AS member WHERE member.user_id = NEW.user_id;
          END;
 
-         CREATE TRIGGER IF NOT EXISTS chat_group_member_search_profile_au
+         CREATE TRIGGER chat_group_member_search_profile_au
          AFTER UPDATE OF username, first_name, last_name, user_id ON profiles
          WHEN NEW.user_id IS NOT NULL
          BEGIN
             UPDATE chat_group_member_search
             SET search_text = trim(COALESCE(NEW.username, '') || ' ' ||
                                    COALESCE(NEW.first_name, '') || ' ' ||
-                                   COALESCE(NEW.last_name, '') || ' ' ||
-                                   CAST(NEW.user_id AS TEXT))
+                                   COALESCE(NEW.last_name, ''))
             WHERE user_id = NEW.user_id;
          END;
 
-         CREATE TRIGGER IF NOT EXISTS chat_group_member_search_profile_ad
+         CREATE TRIGGER chat_group_member_search_profile_ad
          AFTER DELETE ON profiles WHEN OLD.user_id IS NOT NULL
          BEGIN
             UPDATE chat_group_member_search
-            SET search_text = CAST(OLD.user_id AS TEXT)
+            SET search_text = ''
             WHERE user_id = OLD.user_id;
          END;",
+    )?;
+
+    // Старые версии индекса содержали внутренний user_id в search_text.
+    // Однократно сбрасываем курсор, а сам worker обновляет записи пакетами.
+    let _ = conn.execute(
+        "ALTER TABLE chat_group_member_search_backfill
+         ADD COLUMN privacy_version INTEGER NOT NULL DEFAULT 0",
+        [],
+    );
+    conn.execute(
+        "UPDATE chat_group_member_search_backfill
+         SET last_group_id = 0,
+             last_user_id = 0,
+             processed_count = 0,
+             completed = 0,
+             updated_at = strftime('%s','now'),
+             privacy_version = 1
+         WHERE singleton = 1 AND privacy_version = 0",
+        [],
     )?;
 
     Ok(())
@@ -131,8 +156,7 @@ pub fn backfill_batch(conn: &Connection) -> Result<BackfillProgress> {
             "SELECT member.group_id, member.user_id,
                     trim(COALESCE(profile.username, '') || ' ' ||
                          COALESCE(profile.first_name, '') || ' ' ||
-                         COALESCE(profile.last_name, '') || ' ' ||
-                         CAST(member.user_id AS TEXT))
+                         COALESCE(profile.last_name, ''))
              FROM chat_group_members AS member
              JOIN profiles AS profile ON profile.user_id = member.user_id
              WHERE member.group_id > ?1
@@ -151,8 +175,10 @@ pub fn backfill_batch(conn: &Connection) -> Result<BackfillProgress> {
 
     for (group_id, user_id, search_text) in &rows {
         tx.execute(
-            "INSERT OR IGNORE INTO chat_group_member_search(group_id, user_id, search_text)
-             VALUES (?1, ?2, ?3)",
+            "INSERT INTO chat_group_member_search(group_id, user_id, search_text)
+             VALUES (?1, ?2, ?3)
+             ON CONFLICT(group_id, user_id)
+             DO UPDATE SET search_text = excluded.search_text",
             rusqlite::params![group_id, user_id, search_text],
         )?;
     }

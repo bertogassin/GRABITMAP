@@ -1628,19 +1628,23 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
             )
         };
         let encoded_member_query = urlencoding::encode(&member_query);
-        let member_search = format!(
-            r#"<form method="get" action="/app/group/{group_id}/members" class="rm-group-member-search">
+        let member_search = if is_official && !can_manage {
+            String::new()
+        } else {
+            format!(
+                r#"<form method="get" action="/app/group/{group_id}/members" class="rm-group-member-search">
     <label class="rm-profile-field">
         <div class="rm-profile-field-label">Поиск участника</div>
-        <input class="ui-input" type="search" name="q" maxlength="80" value="{member_query}" placeholder="Имя, логин или ID" autocomplete="off">
+        <input class="ui-input" type="search" name="q" maxlength="80" value="{member_query}" placeholder="Имя или логин" autocomplete="off">
     </label>
     <div class="rm-group-invite-actions">
         <button type="submit" class="ui-button ui-button--secondary">Найти</button>
         <a class="ui-button ui-button--secondary" href="/app/group/{group_id}/members">Сбросить</a>
     </div>
 </form>"#,
-            member_query = escape_html(&member_query),
-        );
+                member_query = escape_html(&member_query),
+            )
+        };
         let next_members = next_after.map_or_else(String::new, |after| {
             format!(r#"<a class="ui-button ui-button--secondary" href="/app/group/{group_id}/members?q={encoded_member_query}&after={after}">Показать следующих</a>"#)
         });
@@ -1649,7 +1653,9 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
         } else {
             format!("{member_count} / 250")
         };
-        let empty_members = if members.is_empty() {
+        let empty_members = if is_official && !can_manage {
+            r#"<p class="card-meta">Список участников официальной группы скрыт для защиты приватности. Вы продолжаете видеть авторов сообщений внутри чата.</p>"#
+        } else if members.is_empty() {
             r#"<p class="card-meta">Участники не найдены.</p>"#
         } else {
             ""

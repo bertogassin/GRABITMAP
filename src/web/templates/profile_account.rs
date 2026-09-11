@@ -1599,7 +1599,6 @@ pub struct RenderPublicUserProfileParams<'a> {
     pub chat_user_id: Option<i64>,
     pub resources: Vec<crate::web::view_models::PublicProfileResourceRow>,
     pub has_avatar: bool,
-    pub profile_user_id: i64,
 }
 
 pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> String {
@@ -1613,7 +1612,6 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
         chat_user_id,
         resources,
         has_avatar,
-        profile_user_id,
     } = params;
     let profession = {
         if is_generic_profession_key(category) {
@@ -1832,8 +1830,11 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
 <section>
     {cards}
 </section>"####,
-        profile_avatar = if has_avatar && profile_user_id > 0 {
-            format!(r#"<img class="rm-me-avatar-img" src="/api/avatars/{profile_user_id}" alt="">"#)
+        profile_avatar = if has_avatar && !public_id.is_empty() {
+            format!(
+                r#"<img class="rm-me-avatar-img" src="/api/public-avatars/{}" alt="">"#,
+                urlencoding::encode(public_id)
+            )
         } else {
             icon("user").to_string()
         },
@@ -2078,7 +2079,6 @@ mod personal_center_tests {
             chat_user_id: None,
             resources: vec![],
             has_avatar: false,
-            profile_user_id: 7,
         });
 
         let profession = html.find("Охрана").expect("profession");
