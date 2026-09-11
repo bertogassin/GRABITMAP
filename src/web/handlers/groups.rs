@@ -3196,6 +3196,7 @@ pub fn load_user_groups(
             Ok(crate::web::view_models::ConversationRow {
                 _id: row.get(0)?,
                 other_user_id: 0,
+                other_public_id: String::new(),
                 username: String::new(),
                 first_name: row.get(1)?,
                 last_name: String::new(),
