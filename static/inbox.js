@@ -150,6 +150,11 @@
         var CHEVRON_ICON =
             '<svg class="icon small-icon" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>';
 
+        var MORE_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>';
+        var PIN_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 4 6 0-1 5 3 3v2H7v-2l3-3-1-5Z"/><path d="M12 14v6"/></svg>';
+        var BELL_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>';
+        var ARCHIVE_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v13H4z"/><path d="M3 3h18v4H3z"/><path d="M9 11h6"/></svg>';
+
         function preferenceControls(conversation, isGroup, targetId) {
             var pinned = Number(conversation.pinned_at || 0) > 0;
             var muted = Number(conversation.muted_until || 0) > Date.now() / 1000;
@@ -161,11 +166,12 @@
                     '<input type="hidden" name="return_view" value="' + inboxView + '">' +
                     '<button type="submit" title="' + label + '" aria-label="' + label + '">' + symbol + '</button></form>';
             }
-            return '<div class="chat-dialog-controls" aria-label="Действия с чатом">' +
-                control(pinned ? "unpin" : "pin", pinned ? "Открепить" : "Закрепить", pinned ? "★" : "☆") +
-                control(muted ? "unmute" : "mute", muted ? "Включить уведомления" : "Отключить уведомления", muted ? "🔕" : "🔔") +
-                control(inboxView === "archived" ? "unarchive" : "archive", inboxView === "archived" ? "Вернуть из архива" : "В архив", inboxView === "archived" ? "↩" : "▣") +
-                "</div>";
+            return '<details class="chat-dialog-controls"><summary aria-label="Действия с чатом">' + MORE_ICON + '</summary>' +
+                '<div class="chat-dialog-menu" role="menu">' +
+                control(pinned ? "unpin" : "pin", pinned ? "Открепить" : "Закрепить", PIN_ICON) +
+                control(muted ? "unmute" : "mute", muted ? "Включить уведомления" : "Отключить уведомления", BELL_ICON) +
+                control(inboxView === "archived" ? "unarchive" : "archive", inboxView === "archived" ? "Вернуть из архива" : "В архив", ARCHIVE_ICON) +
+                "</div></details>";
         }
 
         function formatConversationTime(timestamp) {
