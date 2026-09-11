@@ -24,10 +24,15 @@
         }
 
         var otherUserId = String(history.dataset.otherUserId || "").trim();
+        var otherPublicId = String(history.dataset.otherPublicId || "").trim();
+        var otherUserRoute = otherPublicId || otherUserId;
         var groupId = String(history.dataset.groupId || "").trim();
         var isGroup = /^[1-9][0-9]{0,18}$/.test(groupId);
-        var targetId = isGroup ? groupId : otherUserId;
-        if (!/^[1-9][0-9]{0,18}$/.test(targetId)) {
+        var targetIsValid = isGroup
+            ? /^[1-9][0-9]{0,18}$/.test(groupId)
+            : /^[A-Za-z0-9_-]{1,64}$/.test(otherUserRoute);
+
+        if (!targetIsValid) {
             toggle.hidden = true;
             return;
         }
@@ -56,7 +61,7 @@
         function endpoint(query) {
             var base = isGroup
                 ? "/api/group/" + groupId + "/search"
-                : "/api/chat/" + otherUserId + "/search";
+                : "/api/chat/" + encodeURIComponent(otherUserRoute) + "/search";
             return base + "?q=" + encodeURIComponent(query);
         }
 
