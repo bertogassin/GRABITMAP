@@ -3259,6 +3259,102 @@ html[dir="rtl"] .chat-message-more {
     }
 }
 
+/* === GRABITMAP 7.8 — mature inbox visual contract === */
+#inbox-section-head { align-items:center; margin-bottom:18px; }
+#inbox-section-head .section-title { font-size:clamp(20px,5vw,26px); letter-spacing:-.025em; }
+.inbox-head-actions { display:flex; gap:8px; align-items:center; }
+.inbox-group-btn {
+    min-height:36px!important; padding:0 13px!important; border-radius:11px!important;
+    box-shadow:none!important; font-size:12px!important;
+}
+.inbox-views {
+    display:inline-flex; width:auto; padding:3px; margin-bottom:12px;
+    border:1px solid var(--line); border-radius:12px;
+    background:color-mix(in srgb,var(--surface) 72%,transparent);
+}
+.inbox-views a {
+    min-width:96px; min-height:34px; padding:0 14px; border:0; border-radius:9px;
+    background:transparent; font-size:12px; font-weight:700;
+}
+.inbox-views a.is-active {
+    border:0; background:var(--surface-raised,rgba(255,255,255,.08));
+    box-shadow:0 1px 5px rgba(0,0,0,.16); color:var(--text);
+}
+.inbox-search {
+    min-height:44px; margin-bottom:14px; border-radius:12px;
+    background:color-mix(in srgb,var(--surface) 78%,transparent);
+}
+.inbox-search-icon,.inbox-search-icon svg { width:19px; height:19px; }
+.inbox-search-icon svg {
+    fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round;
+}
+.chat-dialog-list { gap:0; }
+.chat-dialog-entry {
+    position:relative; display:block;
+    border-bottom:1px solid color-mix(in srgb,var(--line) 72%,transparent);
+}
+.chat-dialog-card {
+    min-height:76px; padding:11px 46px 11px 4px!important; border:0!important;
+    border-radius:0!important; background:transparent!important; box-shadow:none!important;
+}
+.chat-dialog-card:hover {
+    transform:none; border:0!important;
+    background:color-mix(in srgb,var(--surface) 58%,transparent)!important;
+    box-shadow:none!important;
+}
+.chat-dialog-card:has(.chat-dialog-unread),.chat-dialog-card.is-peer-typing {
+    border:0!important; box-shadow:none!important;
+}
+.chat-dialog-card:has(.chat-dialog-unread) .card-title { color:var(--text); }
+.chat-dialog-card .card-icon,.chat-dialog-avatar {
+    width:48px; height:48px; flex-basis:48px; border-radius:50%; box-shadow:none;
+}
+.chat-dialog-card .card-title {
+    font-size:15px!important; font-weight:760!important; letter-spacing:-.01em;
+}
+.chat-dialog-card .card-meta { margin-top:3px!important; font-size:13px; color:var(--muted); }
+.rm-dialog-username { display:none!important; }
+.chat-dialog-side { gap:7px; }
+.chat-dialog-time { font-size:11px; }
+.chat-dialog-card .card-arrow { display:none; }
+.chat-dialog-unread {
+    min-width:20px; height:20px; padding:0 6px; border:0; background:var(--gold);
+    color:var(--on-gold,#17130a); font-size:10px;
+}
+.chat-dialog-controls {
+    position:absolute; z-index:12; top:50%; right:4px; transform:translateY(-50%);
+}
+.chat-dialog-controls summary {
+    width:36px; height:36px; display:grid; place-items:center; border-radius:50%;
+    color:var(--muted); cursor:pointer; list-style:none;
+}
+.chat-dialog-controls summary::-webkit-details-marker { display:none; }
+.chat-dialog-controls summary:hover { background:var(--surface); color:var(--text); }
+.chat-dialog-controls summary svg { width:20px; height:20px; fill:currentColor; }
+.chat-dialog-menu {
+    position:absolute; top:40px; right:0; width:220px; padding:6px;
+    border:1px solid var(--line); border-radius:14px;
+    background:var(--surface-raised,var(--surface)); box-shadow:0 18px 50px rgba(0,0,0,.32);
+}
+.chat-dialog-menu form { margin:0; }
+.chat-dialog-menu button {
+    width:100%; min-height:40px; display:flex; align-items:center; gap:11px;
+    padding:0 11px; border:0; border-radius:9px; background:transparent;
+    color:var(--text); font:inherit; font-size:13px; text-align:left;
+}
+.chat-dialog-menu button:hover { background:color-mix(in srgb,var(--text) 7%,transparent); }
+.chat-dialog-menu button svg {
+    width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.7;
+    stroke-linecap:round; stroke-linejoin:round;
+}
+@media (max-width:540px) {
+    .chat-dialog-card {
+        min-height:72px; padding:10px 44px 10px 2px!important; border-radius:0!important;
+    }
+    .chat-dialog-entry { gap:0; }
+    .inbox-group-btn { padding-inline:10px!important; }
+}
+
 .official-group-current,
 .official-group-note {
     display: grid;

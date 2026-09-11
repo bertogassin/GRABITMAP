@@ -195,29 +195,33 @@ pub fn render_messages(
                 let return_view = if archived { "archived" } else { "active" };
                 let muted = conversation.muted_until > chrono::Utc::now().timestamp();
                 let controls = format!(
-                    r#"<div class="chat-dialog-controls" aria-label="Действия с чатом">
+                    r#"<details class="chat-dialog-controls">
+    <summary aria-label="Действия с чатом">{more_icon}</summary>
+    <div class="chat-dialog-menu" role="menu">
     <form method="post" action="/app/chat-preference/{preference_kind}/{target_id}">
         <input type="hidden" name="action" value="{pin_action}"><input type="hidden" name="return_view" value="{return_view}">
-        <button type="submit" title="{pin_label}" aria-label="{pin_label}">{pin_icon}</button>
+        <button type="submit">{pin_icon}<span>{pin_label}</span></button>
     </form>
     <form method="post" action="/app/chat-preference/{preference_kind}/{target_id}">
         <input type="hidden" name="action" value="{mute_action}"><input type="hidden" name="return_view" value="{return_view}">
-        <button type="submit" title="{mute_label}" aria-label="{mute_label}">{mute_icon}</button>
+        <button type="submit">{mute_icon}<span>{mute_label}</span></button>
     </form>
     <form method="post" action="/app/chat-preference/{preference_kind}/{target_id}">
         <input type="hidden" name="action" value="{archive_action}"><input type="hidden" name="return_view" value="{return_view}">
-        <button type="submit" title="{archive_label}" aria-label="{archive_label}">{archive_icon}</button>
+        <button type="submit">{archive_icon}<span>{archive_label}</span></button>
     </form>
-</div>"#,
+</div>
+</details>"#,
+                    more_icon = r#"<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>"#,
                     pin_action = if conversation.pinned_at > 0 { "unpin" } else { "pin" },
                     pin_label = if conversation.pinned_at > 0 { "Открепить" } else { "Закрепить" },
-                    pin_icon = if conversation.pinned_at > 0 { "★" } else { "☆" },
+                    pin_icon = r#"<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 4 6 0-1 5 3 3v2H7v-2l3-3-1-5Z"/><path d="M12 14v6"/></svg>"#,
                     mute_action = if muted { "unmute" } else { "mute" },
                     mute_label = if muted { "Включить уведомления" } else { "Отключить уведомления" },
-                    mute_icon = if muted { "🔕" } else { "🔔" },
+                    mute_icon = r#"<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>"#,
                     archive_action = if archived { "unarchive" } else { "archive" },
                     archive_label = if archived { "Вернуть из архива" } else { "В архив" },
-                    archive_icon = if archived { "↩" } else { "▣" },
+                    archive_icon = r#"<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v13H4z"/><path d="M3 3h18v4H3z"/><path d="M9 11h6"/></svg>"#,
                 );
 
                 format!(
@@ -346,7 +350,7 @@ pub fn render_messages(
     let inbox_search = if authenticated {
         format!(
             r#"<label class="inbox-search" for="inbox-search-input">
-    <span class="inbox-search-icon" aria-hidden="true">⌕</span>
+    <span class="inbox-search-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg></span>
     <input id="inbox-search-input"
            type="search"
            autocomplete="off"
