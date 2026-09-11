@@ -200,11 +200,14 @@
 
         function renderConversation(conversation) {
             var userId = String(conversation.other_user_id || "").trim();
+            var userPublicId = String(
+                conversation.other_public_id || ""
+            ).trim();
             var groupId = String(conversation.group_id || "").trim();
             var isGroup = Boolean(conversation.is_group);
             var fallbackHref = isGroup && groupId
                     ? "/app/group/" + encodeURIComponent(groupId)
-                    : "/app/chat/" + encodeURIComponent(userId);
+                    : "/app/chat/" + encodeURIComponent(userPublicId || userId);
             var href = internalHref(conversation.href, fallbackHref);
             if (shareListingId) {
                 var shareUrl = new URL(href, window.location.origin);
@@ -245,9 +248,9 @@
                   + '/avatar" alt="" onerror=\'this.onerror=null;var p=this.parentNode;this.remove();if(p)p.insertAdjacentHTML("beforeend",'
                   + JSON.stringify(USERS_ICON)
                   + ');\'>'
-                : !isGroup && conversation.has_avatar && userId
-                ? '<img class="rm-me-avatar-img" src="/api/avatars/'
-                  + encodeURIComponent(userId)
+                : !isGroup && conversation.has_avatar && userPublicId
+                ? '<img class="rm-me-avatar-img" src="/api/public-avatars/'
+                  + encodeURIComponent(userPublicId)
                   + '" alt="" onerror=\'this.onerror=null;var p=this.parentNode;this.remove();if(p)p.insertAdjacentHTML("beforeend",'
                   + JSON.stringify(MESSAGE_ICON)
                   + ');\'>'
@@ -258,6 +261,8 @@
                 + escapeHtml(href)
                 + '#chat-end" class="card chat-dialog-card" data-other-user-id="'
                 + escapeHtml(userId)
+                + '" data-other-public-id="'
+                + escapeHtml(userPublicId)
                 + '" data-group-id="'
                 + escapeHtml(groupId)
                 + '" data-kind="'

@@ -1,4 +1,5 @@
 use super::auth::verify_user_session;
+use super::chat_identity::active_user_id_by_chat_route;
 use crate::state::app_state::AppState;
 use crate::web::templates;
 use axum::{
@@ -293,7 +294,7 @@ pub async fn messages_page(
 
 pub async fn chat_page(
     State(state): State<AppState>,
-    Path(other_user_id): Path<i64>,
+    Path(other_user_route): Path<String>,
     headers: HeaderMap,
 ) -> Html<String> {
     let user_id = match verify_user_session(&state, &headers) {
@@ -303,29 +304,24 @@ pub async fn chat_page(
         }
     };
 
-    if other_user_id <= 0 || other_user_id == user_id {
-        return Html(templates::render_chat(
-            true,
-            user_id,
-            other_user_id,
-            "",
-            "",
-            "",
-            vec![],
-        ));
-    }
-
-    let (user1_id, user2_id) = if user_id < other_user_id {
-        (user_id, other_user_id)
-    } else {
-        (other_user_id, user_id)
-    };
-
     let db = match crate::db::pool::get_connection(&state.db_pool) {
         Ok(db) => db,
         Err(_) => {
             return Html("<h1>503</h1><p>База данных временно недоступна.</p>".to_string());
         }
+    };
+
+    let other_user_id = match active_user_id_by_chat_route(&db, &other_user_route) {
+        Some(other_user_id) if other_user_id > 0 && other_user_id != user_id => other_user_id,
+        _ => {
+            return Html(templates::render_chat(true, user_id, 0, "", "", "", vec![]));
+        }
+    };
+
+    let (user1_id, user2_id) = if user_id < other_user_id {
+        (user_id, other_user_id)
+    } else {
+        (other_user_id, user_id)
     };
 
     let _ = db.execute(

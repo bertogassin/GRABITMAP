@@ -99,6 +99,7 @@ pub fn render_messages(
             .iter()
             .map(|conversation| {
                 let other_user_id = conversation.other_user_id;
+                let other_public_id = &conversation.other_public_id;
                 let username = &conversation.username;
                 let first_name = &conversation.first_name;
                 let last_name = &conversation.last_name;
@@ -111,6 +112,8 @@ pub fn render_messages(
                 let group_id = conversation.group_id;
                 let base_href = if is_group && group_id > 0 {
                     format!("/app/group/{group_id}")
+                } else if !other_public_id.is_empty() {
+                    format!("/app/chat/{}", urlencoding::encode(other_public_id))
                 } else {
                     format!("/app/chat/{other_user_id}")
                 };
@@ -219,6 +222,7 @@ pub fn render_messages(
 <a href="{href}#chat-end"
    class="card chat-dialog-card"
    data-other-user-id="{other_user_id}"
+   data-other-public-id="{other_public_id}"
    data-group-id="{group_id}"
    data-kind="{kind}">
 
@@ -262,6 +266,7 @@ pub fn render_messages(
 "#,
                     href = href,
                     other_user_id = other_user_id,
+                    other_public_id = escape_html(other_public_id),
                     group_id = if group_id > 0 { group_id.to_string() } else { String::new() },
                     kind = kind,
                     avatar_html = if is_group && conversation.has_avatar && group_id > 0 {
@@ -269,9 +274,13 @@ pub fn render_messages(
                             r#"<img class="rm-me-avatar-img" src="/api/group/{group_id}/avatar" alt="" onerror="this.remove()">{icon}"#,
                             icon = icon("users")
                         )
-                    } else if !is_group && conversation.has_avatar && other_user_id > 0 {
+                    } else if !is_group
+                        && conversation.has_avatar
+                        && !other_public_id.is_empty()
+                    {
                         format!(
-                            r#"<img class="rm-me-avatar-img" src="/api/avatars/{other_user_id}" alt="" onerror="this.remove()">"#
+                            r#"<img class="rm-me-avatar-img" src="/api/public-avatars/{}" alt="" onerror="this.remove()">"#,
+                            urlencoding::encode(other_public_id)
                         )
                     } else {
                         icon(if is_group { "users" } else { "message-circle" }).to_string()

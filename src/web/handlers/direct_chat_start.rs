@@ -262,7 +262,7 @@ pub async fn api_start_direct_chat(
             "status": "open",
             "chat_url": format!(
                 "/app/chat/{}#chat-end",
-                receiver_user_id
+                public_id
             )
         })),
     )

@@ -1505,6 +1505,11 @@ pub async fn api_chat_conversations(
                 "muted_until": conversation.muted_until,
                 "href": if conversation.is_group && conversation.group_id > 0 {
                     format!("/app/group/{}", conversation.group_id)
+                } else if !conversation.other_public_id.is_empty() {
+                    format!(
+                        "/app/chat/{}",
+                        urlencoding::encode(&conversation.other_public_id)
+                    )
                 } else {
                     format!("/app/chat/{}", conversation.other_user_id)
                 },

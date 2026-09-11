@@ -34,6 +34,33 @@ pub(super) fn active_user_id_by_public_id(connection: &Connection, public_id: &s
         .flatten()
 }
 
+pub(super) fn active_user_id_by_chat_route(
+    connection: &Connection,
+    route_key: &str,
+) -> Option<i64> {
+    let route_key = route_key.trim();
+
+    if let Some(user_id) = active_user_id_by_public_id(connection, route_key) {
+        return Some(user_id);
+    }
+
+    let legacy_user_id = route_key.parse::<i64>().ok().filter(|value| *value > 0)?;
+
+    connection
+        .query_row(
+            "SELECT id
+             FROM users
+             WHERE id = ?1
+               AND is_active = 1
+             LIMIT 1",
+            rusqlite::params![legacy_user_id],
+            |row| row.get(0),
+        )
+        .optional()
+        .ok()
+        .flatten()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -74,6 +101,19 @@ mod tests {
         assert!(!public_id_is_valid("../owner"));
         assert!(!public_id_is_valid("user id"));
         assert!(!public_id_is_valid(&"a".repeat(65)));
+    }
+
+    #[test]
+    fn chat_route_prefers_public_id_and_supports_legacy_numeric_links() {
+        let connection = identity_database();
+
+        assert_eq!(
+            active_user_id_by_chat_route(&connection, "f57ceb83b834b7aa4e0d694c11894014"),
+            Some(7)
+        );
+        assert_eq!(active_user_id_by_chat_route(&connection, "7"), Some(7));
+        assert_eq!(active_user_id_by_chat_route(&connection, "8"), None);
+        assert_eq!(active_user_id_by_chat_route(&connection, "../owner"), None);
     }
 
     #[test]
