@@ -658,6 +658,7 @@ fn map_search_resource_row(
         row.get(12)?,
         row.get(13)?,
         row.get(14)?,
+        row.get(15)?,
     ))
 }
 
@@ -763,6 +764,7 @@ pub async fn app_search(
                     r.city_index,
                     COALESCE(r.listing_type, 'general'),
                     COALESCE(r.rubric, ''),
+                    COALESCE(p.public_id, ''),
                     COALESCE(p.user_id, 0)";
 
         let mut sql = if use_fts {

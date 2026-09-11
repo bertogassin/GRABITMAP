@@ -1660,7 +1660,7 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
     let write_label = crate::i18n::t("common_write");
     let share_label = crate::i18n::t("common_share");
     let share_text = crate::i18n::t("profile_share_text");
-    let internal_contact_html = if let Some(chat_user_id) = chat_user_id {
+    let internal_contact_html = if chat_user_id.is_some() && !public_id.is_empty() {
         format!(
             r#"
 <section class="card rm-public-section">
@@ -1673,7 +1673,7 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
         {write_hint}
     </div>
 
-    <a href="/app/chat/{chat_user_id}" class="rm-public-chat-link">
+    <a href="/app/chat/{public_id}" class="rm-public-chat-link">
         {write_label}
     </a>
     <button type="button" class="ui-button" data-share data-share-title="GRABIT" data-share-text="{share_text}" data-share-url="/app/join/{public_id}" data-share-status="share-status">{share_label}</button>
@@ -1681,7 +1681,6 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
 
 </section>
 "#,
-            chat_user_id = chat_user_id,
             public_id = escape_html(public_id),
             write_label = escape_html(&write_label),
             write_hint = escape_html(&crate::i18n::t("profile_write_hint")),
