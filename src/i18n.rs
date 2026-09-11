@@ -255,18 +255,26 @@ pub fn language_picker_html(next_path: &str) -> String {
         ));
     }
     format!(
-        r#"<form class="rm-lang-picker" method="post" action="/app/locale" aria-label="{label}">
+        r#"<form class="rm-lang-picker" method="post" action="/app/locale" aria-label="{label}" data-empty-label="{empty_label}">
             <input type="hidden" name="next" value="{next}">
             <div class="rm-lang-head">
                 <strong>{title}</strong>
                 <small>{hint}</small>
             </div>
+            <label class="rm-lang-search">
+                <span class="sr-only">{search_label}</span>
+                <input type="search" autocomplete="off" inputmode="search"
+                       placeholder="{search_label}" data-language-filter>
+            </label>
+            <div class="rm-lang-search-status" data-language-status aria-live="polite"></div>
             <div class="rm-lang-grid">{buttons}</div>
         </form>"#,
         label = escape_attr(&t("menu_language")),
         next = escape_attr(next),
         title = escape_attr(&t("menu_language")),
         hint = escape_attr(&t("menu_language_hint")),
+        search_label = escape_attr(&t("nav_search")),
+        empty_label = escape_attr(&t("explore_empty")),
         buttons = buttons,
     )
 }

@@ -4387,7 +4387,7 @@ pub(crate) fn page_document(
 <html lang="{html_lang}" dir="{html_dir}">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="resursmap-asset-version" content="{asset_version}">
 <script>try{{if(localStorage.getItem('resursmap-theme')==='light'){{document.documentElement.classList.add('light-theme');document.documentElement.style.colorScheme='light';}}}}catch(e){{}}</script>
 <script>window.resursmapI18n={i18n_boot};</script>
@@ -4398,6 +4398,7 @@ pub(crate) fn page_document(
 <meta http-equiv="X-Frame-Options" content="DENY">
 <title>{title}</title>
 <style>{style}</style>
+<link rel="stylesheet" href="{mobile_foundation_css}">
 {head_extra}
 </head>
 
@@ -4444,6 +4445,7 @@ pub(crate) fn page_document(
 {bottom_nav}
 
 <script src="{mobile_diagnostics_js}" defer></script>
+<script src="{mobile_foundation_js}" defer></script>
 
 {body_after}
 
@@ -4482,6 +4484,8 @@ pub(crate) fn page_document(
         share_js = static_asset("share.js"),
         pwa_install_js = static_asset("pwa-install.js"),
         mobile_diagnostics_js = static_asset("mobile-diagnostics.js"),
+        mobile_foundation_css = static_asset("mobile-foundation.css"),
+        mobile_foundation_js = static_asset("mobile-foundation.js"),
     )
 }
 
