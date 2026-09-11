@@ -1,5 +1,6 @@
 use super::auth::verify_user_session;
 use super::chat_api::ensure_conversation_for_outgoing;
+use super::chat_identity::active_user_id_by_chat_route;
 use super::common::{input_text_is_valid, rate_limit_retry_after, request_is_cross_site, unix_now};
 use super::user_blocks::users_are_blocked;
 use crate::state::app_state::AppState;
@@ -45,17 +46,6 @@ struct MediaChatMessage {
 
 fn json_error(status: StatusCode, error: &str) -> Response {
     (status, Json(json!({"ok": false, "error": error}))).into_response()
-}
-
-fn normalized_pair(a: i64, b: i64) -> Option<(i64, i64)> {
-    if a <= 0 || b <= 0 || a == b {
-        return None;
-    }
-    if a < b {
-        Some((a, b))
-    } else {
-        Some((b, a))
-    }
 }
 
 fn client_message_id_is_valid(value: &str) -> bool {
@@ -180,7 +170,7 @@ fn load_message(
 
 pub async fn api_chat_send_image(
     State(state): State<AppState>,
-    Path(other_user_id): Path<i64>,
+    Path(other_user_route): Path<String>,
     headers: HeaderMap,
     mut multipart: Multipart,
 ) -> Response {
@@ -191,9 +181,6 @@ pub async fn api_chat_send_image(
         Some(v) => v,
         None => return json_error(StatusCode::UNAUTHORIZED, "login_required"),
     };
-    if normalized_pair(user_id, other_user_id).is_none() {
-        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
-    }
     if let Some(retry_after) =
         rate_limit_retry_after(&state, user_id, "chat_api_send_image", 20, 60).await
     {
@@ -262,6 +249,12 @@ pub async fn api_chat_send_image(
     let mut connection = match state.db_pool.get() {
         Ok(c) => c,
         Err(_) => return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable"),
+    };
+
+    let Some(other_user_id) = active_user_id_by_chat_route(&connection, &other_user_route)
+        .filter(|other_user_id| *other_user_id != user_id)
+    else {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
     };
     if users_are_blocked(&connection, user_id, other_user_id) {
         return json_error(StatusCode::FORBIDDEN, "user_blocked");
@@ -449,7 +442,7 @@ pub async fn api_chat_send_image(
 
 pub async fn api_chat_send_voice(
     State(state): State<AppState>,
-    Path(other_user_id): Path<i64>,
+    Path(other_user_route): Path<String>,
     headers: HeaderMap,
     mut multipart: Multipart,
 ) -> Response {
@@ -460,9 +453,6 @@ pub async fn api_chat_send_voice(
         Some(v) => v,
         None => return json_error(StatusCode::UNAUTHORIZED, "login_required"),
     };
-    if normalized_pair(user_id, other_user_id).is_none() {
-        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
-    }
     if let Some(retry_after) =
         rate_limit_retry_after(&state, user_id, "chat_api_send_voice", 12, 60).await
     {
@@ -522,6 +512,12 @@ pub async fn api_chat_send_voice(
     let mut connection = match state.db_pool.get() {
         Ok(c) => c,
         Err(_) => return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable"),
+    };
+
+    let Some(other_user_id) = active_user_id_by_chat_route(&connection, &other_user_route)
+        .filter(|other_user_id| *other_user_id != user_id)
+    else {
+        return json_error(StatusCode::BAD_REQUEST, "invalid_user");
     };
     if users_are_blocked(&connection, user_id, other_user_id) {
         return json_error(StatusCode::FORBIDDEN, "user_blocked");
