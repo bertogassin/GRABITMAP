@@ -184,6 +184,10 @@
         var otherUserId = String(
             history.dataset.otherUserId || ""
         ).trim();
+        var otherPublicId = String(
+            history.dataset.otherPublicId || ""
+        ).trim();
+        var otherUserRoute = otherPublicId || otherUserId;
         var groupId = String(
             history.dataset.groupId || ""
         ).trim();
@@ -194,7 +198,7 @@
 
         if (
             !isGroup &&
-            !/^[1-9][0-9]{0,18}$/.test(otherUserId)
+            !/^[A-Za-z0-9_-]{1,64}$/.test(otherUserRoute)
         ) {
             return;
         }
@@ -203,7 +207,9 @@
             if (isGroup) {
                 return "/api/group/" + groupId + suffix;
             }
-            return "/api/chat/" + otherUserId + suffix;
+            return "/api/chat/" +
+                encodeURIComponent(otherUserRoute) +
+                suffix;
         }
 
         var firstMessageId = Number(
@@ -219,7 +225,7 @@
         var loadingOlder = false;
         var pollTimer = null;
         var storageScope =
-            viewerUserId + ":" + (isGroup ? "g" + groupId : "d" + otherUserId);
+            viewerUserId + ":" + (isGroup ? "g" + groupId : "d" + otherUserRoute);
         var draftKey = "grabit-chat-draft:" + storageScope;
         var pendingSendKey =
             "grabit-chat-outbox:" + storageScope;
@@ -2806,6 +2812,10 @@
         var otherUserId = String(
             history.dataset.otherUserId || ""
         ).trim();
+        var otherPublicId = String(
+            history.dataset.otherPublicId || ""
+        ).trim();
+        var otherUserRoute = otherPublicId || otherUserId;
         var groupId = String(
             history.dataset.groupId || ""
         ).trim();
@@ -2813,7 +2823,7 @@
 
         if (
             !isGroup &&
-            !/^[1-9][0-9]{0,18}$/.test(otherUserId)
+            !/^[A-Za-z0-9_-]{1,64}$/.test(otherUserRoute)
         ) {
             return;
         }
@@ -2822,7 +2832,9 @@
             if (isGroup) {
                 return "/api/group/" + groupId + suffix;
             }
-            return "/api/chat/" + otherUserId + suffix;
+            return "/api/chat/" +
+                encodeURIComponent(otherUserRoute) +
+                suffix;
         }
 
         function t(key, fallback, params) {
@@ -3059,7 +3071,7 @@
         var forwardList =
             document.getElementById("chat-forward-list");
         var forwardDraftKey =
-            "resursmap-chat-forward:" + (isGroup ? ("g:" + groupId) : ("d:" + otherUserId));
+            "resursmap-chat-forward:" + (isGroup ? ("g:" + groupId) : ("d:" + otherUserRoute));
 
         if (replyBar) {
             var replyHeading = replyBar.querySelector("strong");
@@ -5002,12 +5014,18 @@
         function fallbackApi() {
             var groupId = String(history.dataset.groupId || "").trim();
             var otherUserId = String(history.dataset.otherUserId || "").trim();
+            var otherPublicId = String(
+                history.dataset.otherPublicId || ""
+            ).trim();
+            var otherUserRoute = otherPublicId || otherUserId;
 
             if (/^[1-9][0-9]{0,18}$/.test(groupId)) {
                 return "/api/group/" + groupId + "/send";
             }
-            if (/^[1-9][0-9]{0,18}$/.test(otherUserId)) {
-                return "/api/chat/" + otherUserId + "/send";
+            if (/^[A-Za-z0-9_-]{1,64}$/.test(otherUserRoute)) {
+                return "/api/chat/" +
+                    encodeURIComponent(otherUserRoute) +
+                    "/send";
             }
             return "";
         }
@@ -5024,10 +5042,14 @@
             var viewerUserId = String(history.dataset.viewerUserId || "").trim();
             var groupId = String(history.dataset.groupId || "").trim();
             var otherUserId = String(history.dataset.otherUserId || "").trim();
+            var otherPublicId = String(
+                history.dataset.otherPublicId || ""
+            ).trim();
+            var otherUserRoute = otherPublicId || otherUserId;
             var scope = viewerUserId + ":" +
                 (/^[1-9][0-9]{0,18}$/.test(groupId)
                     ? "g" + groupId
-                    : "d" + otherUserId);
+                    : "d" + otherUserRoute);
             try {
                 localStorage.removeItem("grabit-chat-draft:" + scope);
             } catch (_) {}
@@ -5171,7 +5193,12 @@
         var stopped = false;
         var retryAttempt = 0;
         var cursorKey = "resursmap:chat-event-cursor:" +
-            (history.dataset.groupId || history.dataset.otherUserId || "chat");
+            (
+                history.dataset.groupId ||
+                history.dataset.otherPublicId ||
+                history.dataset.otherUserId ||
+                "chat"
+            );
         var lastEventId = 0;
         var seenEventIds = new Set();
         try {
