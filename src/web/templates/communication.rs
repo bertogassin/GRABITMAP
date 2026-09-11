@@ -739,6 +739,7 @@ pub fn render_chat(
     )
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn render_group_chat(
     authenticated: bool,
     viewer_user_id: i64,
