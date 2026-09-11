@@ -918,6 +918,8 @@ fn render_chat_thread(
             r#"
 <link rel="stylesheet"
       href="{chat_css}">
+<link rel="stylesheet"
+      href="{chat_mature_css}">
 
 <section class="card chat-shell">
 
@@ -1003,6 +1005,7 @@ fn render_chat_thread(
 
 "#,
             chat_css = static_asset("chat-v2.css"),
+            chat_mature_css = static_asset("chat-mature.css"),
             chat_voice_js = static_asset("chat-voice-player.js"),
             chat_js = static_asset("chat-v2.js"),
             chat_search_js = static_asset("chat-search.js"),
@@ -1313,12 +1316,14 @@ pub fn render_official_groups(params: OfficialGroupsPage<'_>) -> String {
         )
     };
     let content = format!(
-        r#"{error_html}{group_card}
+        r#"<link rel="stylesheet" href="{chat_mature_css}">
+{error_html}{group_card}
 <aside class="card official-group-note">
     <strong>Официальное пространство GRABIT</strong>
     <span>Группа принадлежит платформе и запускается автоматически при первом вступлении. Первый участник не получает особых прав.</span>
 </aside>
-{directory}"#
+{directory}"#,
+        chat_mature_css = static_asset("chat-mature.css"),
     );
     page_shell(
         "Официальные группы · GRABIT",

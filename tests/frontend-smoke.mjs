@@ -112,6 +112,20 @@ test("mobile chat composer keeps media, text, and send in one action row", async
   assert.match(chat, /mediaErrorCopy\("voice", code\)/);
 });
 
+test("mature chat layout is loaded last and stays mobile safe", async () => {
+  const [template, css] = await Promise.all([
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+    readFile(new URL("static/chat-mature.css", root), "utf8"),
+  ]);
+
+  assert.match(template, /static_asset\("chat-mature\.css"\)/);
+  assert.match(css, /html\[data-page="chat"\] \.topbar \{ display: none/);
+  assert.match(css, /\.chat-header-menu[\s\S]*background: #191e26 !important/);
+  assert.match(css, /\.chat-message-row \.chat-bubble[\s\S]*min-width: 108px/);
+  assert.match(css, /\.chat-composer-footer \{ display: none !important/);
+  assert.match(css, /\.official-group-place \.card-content/);
+});
+
 test("chat photo viewer is isolated, keyboard accessible, and downloadable", async () => {
   const [chat, css] = await Promise.all([
     readFile(new URL("static/chat-v2.js", root), "utf8"),
