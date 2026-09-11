@@ -126,6 +126,20 @@ test("mature chat layout is loaded last and stays mobile safe", async () => {
   assert.match(css, /\.official-group-place \.card-content/);
 });
 
+test("communication polish keeps inbox and group pages compact and mobile safe", async () => {
+  const [template, css] = await Promise.all([
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+    readFile(new URL("static/communication-polish.css", root), "utf8"),
+  ]);
+
+  assert.match(template, /static_asset\("communication-polish\.css"\)/);
+  assert.match(css, /\.hero[\s\S]*padding: 20px 22px !important/);
+  assert.match(css, /\.official-group-current[\s\S]*grid-template-areas/);
+  assert.match(css, /\.chat-dialog-preview[\s\S]*text-overflow: ellipsis/);
+  assert.match(css, /main\.page[\s\S]*104px \+ env\(safe-area-inset-bottom\)/);
+  assert.match(css, /\.rm-group-member input\[type="checkbox"\]/);
+});
+
 test("chat photo viewer is isolated, keyboard accessible, and downloadable", async () => {
   const [chat, css] = await Promise.all([
     readFile(new URL("static/chat-v2.js", root), "utf8"),

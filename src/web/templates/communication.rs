@@ -397,6 +397,7 @@ pub fn render_messages(
     let content_html = format!(
         r####"<link rel="stylesheet"
       href="{chat_css}">
+<link rel="stylesheet" href="{communication_polish_css}">
 
 {share_notice}
 
@@ -414,6 +415,7 @@ pub fn render_messages(
 
 {inbox_script}"####,
         chat_css = static_asset("chat-v2.css"),
+        communication_polish_css = static_asset("communication-polish.css"),
         share_notice = share_notice,
         section_head_dialogs = section_head_dialogs,
         inbox_search = inbox_search,
@@ -1317,6 +1319,7 @@ pub fn render_official_groups(params: OfficialGroupsPage<'_>) -> String {
     };
     let content = format!(
         r#"<link rel="stylesheet" href="{chat_mature_css}">
+<link rel="stylesheet" href="{communication_polish_css}">
 {error_html}{group_card}
 <aside class="card official-group-note">
     <strong>Официальное пространство GRABIT</strong>
@@ -1324,6 +1327,7 @@ pub fn render_official_groups(params: OfficialGroupsPage<'_>) -> String {
 </aside>
 {directory}"#,
         chat_mature_css = static_asset("chat-mature.css"),
+        communication_polish_css = static_asset("communication-polish.css"),
     );
     page_shell(
         "Официальные группы · GRABIT",
@@ -1341,7 +1345,7 @@ pub fn render_official_groups(params: OfficialGroupsPage<'_>) -> String {
 }
 
 pub fn render_new_group(authenticated: bool, partners: Vec<(i64, String)>, error: &str) -> String {
-    let content = if !authenticated {
+    let page_content = if !authenticated {
         guest_locked_section("Группа", "/app/groups/new")
     } else {
         let people = if partners.is_empty() {
@@ -1403,6 +1407,12 @@ pub fn render_new_group(authenticated: bool, partners: Vec<(i64, String)>, error
         )
     };
 
+    let content = format!(
+        r#"<link rel="stylesheet" href="{}">{}"#,
+        static_asset("communication-polish.css"),
+        page_content,
+    );
+
     page_shell(
         "Новая группа · GRABIT",
         &topbar("Группа", "users"),
@@ -1451,7 +1461,7 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
         error,
     } = params;
     let authenticated = viewer_user_id > 0;
-    let content = if !authenticated {
+    let page_content = if !authenticated {
         guest_locked_section("Группа", &format!("/app/group/{group_id}/members"))
     } else if error == "Нет доступа" {
         empty_state_card("Нет доступа", "Этой группы для вас нет.")
@@ -1793,6 +1803,12 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
             leave = leave,
         )
     };
+
+    let content = format!(
+        r#"<link rel="stylesheet" href="{}">{}"#,
+        static_asset("communication-polish.css"),
+        page_content,
+    );
 
     page_shell(
         "Участники · GRABIT",
