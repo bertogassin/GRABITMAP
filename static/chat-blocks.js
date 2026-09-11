@@ -69,11 +69,18 @@
             toggle.hidden = false;
             toggle.disabled = state.busy;
 
+            var toggleLabel = toggle.querySelector(
+                ".chat-header-menu-label"
+            );
             if (state.blockedByMe) {
-                toggle.textContent = "Разблокировать";
+                if (toggleLabel) {
+                    toggleLabel.textContent = "Разблокировать";
+                }
                 toggle.classList.add("is-unblock");
             } else {
-                toggle.textContent = "Заблокировать";
+                if (toggleLabel) {
+                    toggleLabel.textContent = "Заблокировать";
+                }
                 toggle.classList.remove("is-unblock");
             }
 
