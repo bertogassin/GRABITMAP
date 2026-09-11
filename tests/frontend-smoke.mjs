@@ -818,3 +818,24 @@ test("group moderation is transactional bounded and blocks rejoining", async () 
   assert.match(template, /Заблокированные/);
   assert.match(template, /Восстановить доступ/);
 });
+
+test("official group notifications are virtual and account scoped", async () => {
+  const [notifications, handler, groups] = await Promise.all([
+    readFile(new URL("src/db/official_group_notifications.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/notifications.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
+  ]);
+
+  assert.match(notifications, /official_group_message/);
+  assert.match(notifications, /-group_id/);
+  assert.match(notifications, /member\.user_id = \?1/);
+  assert.match(notifications, /preference\.muted_until/);
+  assert.match(notifications, /LIMIT 100/);
+  assert.match(notifications, /last_read_message_id/);
+  assert.doesNotMatch(notifications, /INSERT INTO user_notifications/);
+  assert.match(handler, /official_group_notifications::load/);
+  assert.match(handler, /official_group_notifications::unread_count/);
+  assert.match(handler, /official_group_notifications::resolve_group/);
+  assert.match(handler, /official_group_notifications::mark_all_read/);
+  assert.match(groups, /publish_membership_scoped_group_chat_event/);
+});

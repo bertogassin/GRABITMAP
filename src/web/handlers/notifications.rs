@@ -147,7 +147,7 @@ pub async fn notifications_page(State(state): State<AppState>, headers: HeaderMa
 
     let _ = ensure_daily_nudges(&db, user_id);
 
-    let notifications: Vec<crate::web::view_models::NotificationRow> = db
+    let mut notifications: Vec<crate::web::view_models::NotificationRow> = db
         .prepare(
             "SELECT
                 id,
@@ -181,6 +181,19 @@ pub async fn notifications_page(State(state): State<AppState>, headers: HeaderMa
             .collect::<Result<Vec<_>, _>>()
         })
         .unwrap_or_default();
+    notifications.extend(crate::db::official_group_notifications::load(
+        &db,
+        user_id,
+        chrono::Utc::now().timestamp(),
+    ));
+    notifications.sort_by_key(|notification| {
+        (
+            notification.5,
+            std::cmp::Reverse(notification.6),
+            std::cmp::Reverse(notification.0),
+        )
+    });
+    notifications.truncate(100);
 
     drop(db);
 
@@ -206,6 +219,19 @@ pub async fn open_notification(
             return Redirect::temporary("/app/notifications").into_response();
         }
     };
+
+    if notification_id < 0 {
+        return match crate::db::official_group_notifications::resolve_group(
+            &db,
+            user_id,
+            notification_id,
+        ) {
+            Some(group_id) => {
+                Redirect::temporary(&format!("/app/group/{group_id}")).into_response()
+            }
+            None => Redirect::temporary("/app/notifications").into_response(),
+        };
+    }
 
     let row: Option<(Option<i64>, String)> = db
         .query_row(
@@ -267,6 +293,7 @@ pub async fn mark_all_notifications_read(
                AND is_read = 0",
             rusqlite::params![user_id],
         );
+        crate::db::official_group_notifications::mark_all_read(&db, user_id);
     }
 
     Redirect::temporary("/app/notifications").into_response()
@@ -287,14 +314,22 @@ pub async fn unread_count(State(state): State<AppState>, headers: HeaderMap) -> 
         .db_pool
         .get()
         .ok()
-        .and_then(|conn| {
+        .map(|conn| {
             let _ = ensure_daily_nudges(&conn, user.user_id);
-            conn.query_row(
-                "SELECT COUNT(*) FROM user_notifications WHERE user_id = ?1 AND is_read = 0 AND kind NOT IN ('contact_rejected')",
-                rusqlite::params![user.user_id],
-                |row| row.get::<_, i64>(0),
+            let stored = conn
+                .query_row(
+                    "SELECT COUNT(*) FROM user_notifications WHERE user_id = ?1 AND is_read = 0 AND kind NOT IN ('contact_rejected')",
+                    rusqlite::params![user.user_id],
+                    |row| row.get::<_, i64>(0),
+                )
+                .unwrap_or(0);
+            stored.saturating_add(
+                crate::db::official_group_notifications::unread_count(
+                    &conn,
+                    user.user_id,
+                    chrono::Utc::now().timestamp(),
+                ),
             )
-            .ok()
         })
         .unwrap_or(0);
 

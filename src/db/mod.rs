@@ -9,6 +9,7 @@ pub mod group_geography;
 pub mod group_member_search;
 pub mod group_moderation;
 pub mod moderation_legacy;
+pub mod official_group_notifications;
 pub mod owner_bootstrap;
 pub mod path;
 pub mod pool;
