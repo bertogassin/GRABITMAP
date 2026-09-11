@@ -1,0 +1,306 @@
+/* GRABITMAP 7.10 — final communications polish */
+
+/* Communication pages use a compact title block instead of a landing-page hero. */
+.hero {
+    padding: 20px 22px !important;
+    border-radius: 20px !important;
+    box-shadow: 0 12px 34px rgba(0, 0, 0, .18) !important;
+}
+
+.hero::before,
+.hero::after {
+    opacity: .42 !important;
+}
+
+.hero .back-link {
+    margin-bottom: 16px !important;
+}
+
+.hero .eyebrow {
+    margin-bottom: 10px !important;
+    font-size: 11px !important;
+}
+
+.hero h1 {
+    margin-bottom: 7px !important;
+    font-size: clamp(25px, 6vw, 34px) !important;
+    line-height: 1.08 !important;
+}
+
+.hero p {
+    margin: 0 !important;
+    font-size: 14px !important;
+    line-height: 1.42 !important;
+}
+
+/* Inbox: preserve the clean list while removing the remaining oversized spacing. */
+#inbox-section-head {
+    gap: 14px !important;
+    margin: 24px 6px 14px !important;
+}
+
+#inbox-section-head .section-caption {
+    margin-top: 2px !important;
+}
+
+.inbox-head-actions {
+    flex-wrap: nowrap !important;
+}
+
+.inbox-live-badge {
+    white-space: nowrap;
+}
+
+.chat-dialog-preview {
+    max-width: min(68vw, 520px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.chat-dialog-list .rm-empty-state {
+    margin-top: 8px;
+}
+
+/* Official directory: one readable flow, never three compressed columns. */
+.official-group-current {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-areas:
+        "badge action"
+        "title action"
+        "meta action" !important;
+    gap: 5px 20px !important;
+    padding: 20px 22px !important;
+}
+
+.official-group-current .chat-official-group {
+    grid-area: badge !important;
+}
+
+.official-group-current h2 {
+    grid-area: title !important;
+    font-size: clamp(22px, 5vw, 28px) !important;
+}
+
+.official-group-current .card-meta {
+    grid-area: meta !important;
+    max-width: 46ch;
+    line-height: 1.42;
+}
+
+.official-group-current .ui-button {
+    grid-area: action !important;
+    align-self: center;
+    white-space: nowrap;
+}
+
+.official-group-note {
+    display: grid !important;
+    grid-template-columns: minmax(180px, .7fr) minmax(0, 1.3fr) !important;
+    gap: 18px !important;
+    padding: 18px 22px !important;
+}
+
+.official-group-note strong,
+.official-group-note span {
+    min-width: 0;
+}
+
+.official-group-search {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+}
+
+.official-group-place {
+    min-height: 68px !important;
+    padding: 11px 14px !important;
+}
+
+.official-group-place .card-content {
+    min-width: 0;
+}
+
+.official-group-place .card-content strong,
+.official-group-place .card-meta {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Create/manage group: turn technical cards into calm settings sections. */
+.rm-group-create {
+    gap: 16px !important;
+    margin-bottom: 12px;
+    padding: 18px 20px !important;
+    border-radius: 18px !important;
+    box-shadow: none !important;
+}
+
+.rm-group-create:hover {
+    transform: none !important;
+}
+
+.rm-profile-field {
+    gap: 8px !important;
+}
+
+.rm-profile-field-label {
+    font-size: 13px !important;
+    letter-spacing: .01em;
+}
+
+.rm-group-create .ui-input {
+    min-height: 48px;
+    border-radius: 12px !important;
+}
+
+.rm-group-create textarea.ui-input {
+    min-height: 112px;
+    resize: vertical;
+}
+
+.rm-group-members {
+    gap: 0 !important;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--line) 72%, transparent);
+    border-radius: 13px;
+}
+
+.rm-group-member {
+    min-height: 52px !important;
+    padding: 8px 10px;
+    border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+}
+
+.rm-group-member:last-child {
+    border-bottom: 0;
+}
+
+.rm-group-member--managed {
+    border: 0 !important;
+    border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+}
+
+.rm-group-member input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    accent-color: var(--gold);
+}
+
+.rm-group-avatar-preview {
+    width: 82px !important;
+    height: 82px !important;
+    border-radius: 50% !important;
+}
+
+.rm-group-create > .ui-button,
+.rm-group-create > button.ui-button {
+    justify-self: start;
+}
+
+@media (max-width: 600px) {
+    main.page {
+        padding-bottom: calc(104px + env(safe-area-inset-bottom)) !important;
+    }
+
+    .topbar {
+        margin-bottom: 18px !important;
+    }
+
+    .hero {
+        padding: 17px 16px !important;
+        border-radius: 18px !important;
+    }
+
+    .hero .back-link {
+        margin-bottom: 13px !important;
+    }
+
+    .hero h1 {
+        font-size: 27px !important;
+    }
+
+    #inbox-section-head {
+        align-items: flex-start !important;
+        margin-top: 20px !important;
+    }
+
+    .inbox-head-actions {
+        display: grid !important;
+        grid-template-columns: auto auto !important;
+        gap: 7px !important;
+    }
+
+    .inbox-live-badge {
+        grid-column: 1 / -1;
+        justify-self: end;
+    }
+
+    .official-group-current {
+        grid-template-columns: 1fr !important;
+        grid-template-areas: "badge" "title" "meta" "action" !important;
+        gap: 7px !important;
+        padding: 17px !important;
+    }
+
+    .official-group-current .ui-button {
+        width: 100%;
+        margin-top: 5px;
+    }
+
+    .official-group-note {
+        grid-template-columns: 1fr !important;
+        gap: 7px !important;
+        padding: 17px !important;
+    }
+
+    .official-group-search {
+        grid-template-columns: 1fr !important;
+    }
+
+    .official-group-search .ui-button {
+        width: 100%;
+    }
+
+    .rm-group-create {
+        padding: 16px !important;
+    }
+
+    .rm-group-create > .ui-button,
+    .rm-group-create > button.ui-button,
+    .rm-group-create form > .ui-button {
+        width: 100%;
+    }
+
+    .rm-group-avatar-preview {
+        width: 72px !important;
+        height: 72px !important;
+    }
+
+    .rm-group-actions {
+        width: 100%;
+        max-width: none !important;
+    }
+
+    .rm-group-action {
+        flex: 1 1 auto;
+    }
+}
+
+@media (max-width: 390px) {
+    #inbox-section-head {
+        display: grid !important;
+    }
+
+    .inbox-head-actions {
+        justify-self: stretch;
+    }
+
+    .inbox-group-btn {
+        width: 100%;
+    }
+}
