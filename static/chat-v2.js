@@ -416,7 +416,11 @@
         }
 
         function updateGroupTyping(detail) {
-            var actorId = String(detail.actor_user_id || "").trim();
+            var actorId = String(
+                detail.actor_public_id ||
+                detail.actor_user_id ||
+                ""
+            ).trim();
             if (!actorId || actorId === viewerUserId) {
                 return;
             }
@@ -2554,7 +2558,9 @@
             function (event) {
                 var detail = event.detail || {};
                 var actorId = String(
-                    detail.actor_user_id || ""
+                    detail.actor_public_id ||
+                    detail.actor_user_id ||
+                    ""
                 ).trim();
 
                 if (isGroup) {
@@ -2565,7 +2571,7 @@
                     return;
                 }
 
-                if (actorId !== otherUserId) {
+                if (actorId !== otherUserRoute) {
                     return;
                 }
 

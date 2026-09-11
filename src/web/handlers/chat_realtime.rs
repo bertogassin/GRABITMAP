@@ -328,11 +328,40 @@ async fn chat_socket(mut socket: WebSocket, state: AppState, user_id: i64, last_
                             continue;
                         }
 
+                        let actor_public_id = crate::db::pool::get_connection(&state.db_pool)
+                            .ok()
+                            .and_then(|connection| {
+                                connection
+                                    .query_row(
+                                        "SELECT profile.public_id
+                                         FROM profiles AS profile
+                                         JOIN users AS user
+                                           ON user.id = profile.user_id
+                                          AND user.is_active = 1
+                                         WHERE profile.user_id = ?1
+                                           AND trim(profile.public_id) <> ''
+                                         LIMIT 1",
+                                        rusqlite::params![event.actor_user_id],
+                                        |row| row.get::<_, String>(0),
+                                    )
+                                    .ok()
+                            });
+
+                        let Some(actor_public_id) = actor_public_id else {
+                            continue;
+                        };
+
                         if !send_json(
                             &mut socket,
                             json!({
                                 "type": "typing_event",
-                                "event": event
+                                "event": {
+                                    "event_id": event.event_id,
+                                    "kind": event.kind,
+                                    "actor_public_id": actor_public_id,
+                                    "group_id": event.group_id,
+                                    "actor_name": event.actor_name
+                                }
                             }),
                         )
                         .await
