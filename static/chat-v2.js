@@ -3223,12 +3223,17 @@
 
                     var currentTarget = isGroup
                         ? ("g:" + groupId)
-                        : ("d:" + otherUserId);
+                        : ("d:" + otherUserRoute);
                     conversations = conversations.filter(
                         function (conversation) {
+                            var candidatePublicId = String(
+                                conversation.other_public_id ||
+                                conversation.other_user_id ||
+                                ""
+                            );
                             var candidate = conversation.is_group
                                 ? ("g:" + String(conversation.group_id || ""))
-                                : ("d:" + String(conversation.other_user_id || ""));
+                                : ("d:" + candidatePublicId);
                             return candidate !== currentTarget;
                         }
                     );
@@ -3250,15 +3255,24 @@
                             var userId = String(
                                 conversation.other_user_id || ""
                             );
+                            var userPublicId = String(
+                                conversation.other_public_id || ""
+                            );
+                            var userRoute = userPublicId || userId;
                             var groupId = String(
                                 conversation.group_id || ""
                             );
-                            var target = isGroup ? ("g:" + groupId) : ("d:" + userId);
+                            var target = isGroup
+                                ? ("g:" + groupId)
+                                : ("d:" + userRoute);
                             var href = isGroup
                                 ? ("/app/group/" + encodeURIComponent(groupId))
-                                : ("/app/chat/" + encodeURIComponent(userId));
+                                : ("/app/chat/" + encodeURIComponent(userRoute));
                             var label = escapeHtml(String(
-                                conversation.display_name || userId || groupId
+                                conversation.display_name ||
+                                userPublicId ||
+                                userId ||
+                                groupId
                             ));
                             var meta = escapeHtml(String(
                                 conversation.last_message || ""
@@ -3294,7 +3308,7 @@
                                         buildForwardPayload(message);
                                     var currentKey = isGroup
                                         ? ("g:" + groupId)
-                                        : ("d:" + otherUserId);
+                                        : ("d:" + otherUserRoute);
 
                                     closeForwardPicker();
 
