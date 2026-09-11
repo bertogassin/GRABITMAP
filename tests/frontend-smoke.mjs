@@ -57,6 +57,31 @@ test("mobile foundation hides assistive labels and clears Android system navigat
   assert.match(css, /#chat-form\.chat-composer[\s\S]*margin-bottom: 0 !important/);
 });
 
+test("functional reliability prevents duplicate writes and reports connectivity", async () => {
+  const reliability = await readFile("static/app-reliability.js", "utf8");
+  const common = await readFile("src/web/templates/common.rs", "utf8");
+  const mobile = await readFile("static/mobile-foundation.css", "utf8");
+  assert.match(reliability, /WeakSet/);
+  assert.match(reliability, /event\.defaultPrevented/);
+  assert.match(reliability, /form\.checkValidity\(\)/);
+  assert.match(reliability, /event\.submitter/);
+  assert.match(reliability, /addEventListener\("pageshow"/);
+  assert.match(reliability, /addEventListener\("offline"/);
+  assert.match(reliability, /addEventListener\("online"/);
+  assert.match(common, /app-reliability\.js/);
+  assert.match(mobile, /\.rm-connectivity-status/);
+  const serviceWorker = await readFile("static/resursmap-sw.js", "utf8");
+  assert.match(serviceWorker, /\/static\/app-reliability\.js/);
+});
+
+test("listing actions reject failed responses and serialize rating writes", async () => {
+  const resources = await readFile("src/web/templates/resources.rs", "utf8");
+  assert.match(resources, /async function responseData\(response\)/);
+  assert.match(resources, /if \(!response\.ok\)/);
+  assert.match(resources, /stars\.forEach\(\(item\) => \{\{ item\.disabled = true;/);
+  assert.match(resources, /finally \{\{/);
+});
+
 test("locale switching validates and canonicalizes locale tags", async () => {
   const runtime = await readFile(new URL("static/i18n-runtime.js", root), "utf8");
   assert.match(runtime, /normalizeLocale/);
