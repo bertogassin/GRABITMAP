@@ -482,7 +482,7 @@
                     {
                         detail: {
                             type: kind,
-                            other_user_id: otherUserId
+                            other_public_id: otherUserRoute
                         }
                     }
                 )

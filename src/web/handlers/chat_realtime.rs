@@ -1,4 +1,5 @@
 use super::auth::verify_user_session;
+use super::chat_identity::active_user_id_by_chat_route;
 use super::common::request_is_cross_site;
 use super::user_blocks::users_are_blocked;
 use crate::state::app_state::AppState;
@@ -19,6 +20,7 @@ use tokio::sync::broadcast;
 struct ClientFrame {
     #[serde(rename = "type")]
     frame_type: String,
+    other_public_id: Option<String>,
     other_user_id: Option<String>,
     group_id: Option<String>,
 }
@@ -91,15 +93,27 @@ fn handle_client_frame(state: &AppState, user_id: i64, text: &str) -> bool {
     match frame.frame_type.as_str() {
         "ping" => true,
         "typing.start" | "typing.stop" => {
-            if let Some(other_user_id) = parse_other_user_id(frame.other_user_id.as_deref()) {
-                let connection = crate::db::pool::get_connection(&state.db_pool);
-                if connection.as_ref().is_ok_and(|connection| {
-                    direct_typing_is_allowed(connection, user_id, other_user_id)
-                }) {
-                    let _ = state.publish_typing_event(&frame.frame_type, user_id, other_user_id);
+            let direct_route = frame
+                .other_public_id
+                .as_deref()
+                .or(frame.other_user_id.as_deref());
+
+            if let Some(direct_route) = direct_route {
+                let connection = match crate::db::pool::get_connection(&state.db_pool) {
+                    Ok(connection) => connection,
+                    Err(_) => return false,
+                };
+                if let Some(other_user_id) = active_user_id_by_chat_route(&connection, direct_route)
+                    .filter(|other_user_id| *other_user_id != user_id)
+                {
+                    if direct_typing_is_allowed(&connection, user_id, other_user_id) {
+                        let _ =
+                            state.publish_typing_event(&frame.frame_type, user_id, other_user_id);
+                    }
                 }
                 return false;
             }
+
             let Some(group_id) = parse_other_user_id(frame.group_id.as_deref()) else {
                 return false;
             };
@@ -354,11 +368,12 @@ mod tests {
     #[test]
     fn client_frame_parses_typing() {
         let frame: ClientFrame =
-            serde_json::from_str(r#"{"type":"typing.start","other_user_id":"18"}"#)
+            serde_json::from_str(r#"{"type":"typing.start","other_public_id":"peer-public-18"}"#)
                 .expect("typing frame");
 
         assert_eq!(frame.frame_type, "typing.start");
-        assert_eq!(frame.other_user_id.as_deref(), Some("18"));
+        assert_eq!(frame.other_public_id.as_deref(), Some("peer-public-18"));
+        assert!(frame.other_user_id.is_none());
         assert!(frame.group_id.is_none());
     }
 
@@ -369,6 +384,7 @@ mod tests {
 
         assert_eq!(frame.frame_type, "typing.start");
         assert_eq!(frame.group_id.as_deref(), Some("44"));
+        assert!(frame.other_public_id.is_none());
         assert!(frame.other_user_id.is_none());
     }
 
