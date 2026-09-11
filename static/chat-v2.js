@@ -3219,9 +3219,7 @@
                     conversations = conversations.filter(
                         function (conversation) {
                             var candidatePublicId = String(
-                                conversation.other_public_id ||
-                                conversation.other_user_id ||
-                                ""
+                                conversation.other_public_id || ""
                             );
                             var candidate = conversation.is_group
                                 ? ("g:" + String(conversation.group_id || ""))
@@ -3244,13 +3242,10 @@
                     forwardList.innerHTML = conversations
                         .map(function (conversation) {
                             var isGroup = Boolean(conversation.is_group);
-                            var userId = String(
-                                conversation.other_user_id || ""
-                            );
                             var userPublicId = String(
                                 conversation.other_public_id || ""
                             );
-                            var userRoute = userPublicId || userId;
+                            var userRoute = userPublicId;
                             var groupId = String(
                                 conversation.group_id || ""
                             );
@@ -3263,7 +3258,6 @@
                             var label = escapeHtml(String(
                                 conversation.display_name ||
                                 userPublicId ||
-                                userId ||
                                 groupId
                             ));
                             var meta = escapeHtml(String(

@@ -9,7 +9,7 @@ use super::common::{
 // ============================================================
 
 pub(crate) fn conversation_display_name(
-    other_user_id: i64,
+    _other_user_id: i64,
     username: &str,
     first_name: &str,
     last_name: &str,
@@ -27,7 +27,7 @@ pub(crate) fn conversation_display_name(
     } else if !safe_username.is_empty() {
         format!("@{safe_username}")
     } else {
-        format!("Участник · {:06}", other_user_id.rem_euclid(1_000_000))
+        "Участник GRABIT".to_string()
     }
 }
 
@@ -115,7 +115,7 @@ pub fn render_messages(
                 } else if !other_public_id.is_empty() {
                     format!("/app/chat/{}", urlencoding::encode(other_public_id))
                 } else {
-                    format!("/app/chat/{other_user_id}")
+                    "/app/messages".to_string()
                 };
                 let href = match share_listing_id {
                     Some(listing_id) if listing_id > 0 => {
@@ -796,7 +796,7 @@ fn render_chat_thread(
     } else if !safe_username.is_empty() {
         format!("@{}", safe_username)
     } else if other_user_id > 0 {
-        format!("Участник · {:06}", other_user_id.rem_euclid(1_000_000))
+        "Участник GRABIT".to_string()
     } else {
         "Группа".to_string()
     };
@@ -817,7 +817,7 @@ fn render_chat_thread(
             } else if !other_public_id.is_empty() {
                 format!("/app/chat/{}", urlencoding::encode(other_public_id))
             } else {
-                format!("/app/chat/{other_user_id}")
+                "/app/messages".to_string()
             },
         )
     } else if group_id <= 0 && (other_user_id <= 0 || other_user_id == viewer_user_id) {
@@ -1855,7 +1855,7 @@ pub fn render_group_invite(
 
 #[cfg(test)]
 mod communication_tests {
-    use super::conversation_preview_text;
+    use super::{conversation_display_name, conversation_preview_text};
 
     #[test]
     fn inbox_preview_never_exposes_internal_media_markers() {
@@ -1865,5 +1865,14 @@ mod communication_tests {
             assert_ne!(preview, marker);
         }
         assert_eq!(conversation_preview_text("Обычный текст"), "Обычный текст");
+    }
+
+    #[test]
+    fn anonymous_display_name_never_derives_from_internal_id() {
+        assert_eq!(
+            conversation_display_name(987_654, "", "", ""),
+            "Участник GRABIT"
+        );
+        assert!(!conversation_display_name(987_654, "", "", "").contains("987654"));
     }
 }

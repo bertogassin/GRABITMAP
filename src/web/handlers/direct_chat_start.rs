@@ -255,7 +255,6 @@ pub async fn api_start_direct_chat(
         StatusCode::CREATED,
         Json(json!({
             "ok": true,
-            "conversation_id": conversation_id,
             "message_id": message_id,
             "existing_conversation":
                 existing_conversation.is_some(),

@@ -35,7 +35,7 @@ pub(super) fn routes() -> Router<AppState> {
             "/app/contact-request/{id}/reject",
             get(retired_contact_decision).post(retired_contact_decision),
         )
-        .route("/app/chat/{other_user_id}", get(chat_page))
+        .route("/app/chat/{other_user_route}", get(chat_page))
         .route(
             "/app/chat-preference/{kind}/{target_id}",
             post(update_chat_preference),
@@ -120,40 +120,46 @@ pub(super) fn routes() -> Router<AppState> {
             post(api_group_pin),
         )
         .route("/api/chat/conversations", get(api_chat_conversations))
-        .route("/api/chat/{other_user_id}/messages", get(api_chat_messages))
-        .route("/api/chat/{other_user_id}/pinned", get(api_chat_pinned))
-        .route("/api/chat/{other_user_id}/search", get(api_chat_search))
-        .route("/api/chat/{other_user_id}/peer", get(api_chat_peer))
-        .route("/api/chat/realtime", get(api_chat_realtime))
-        .route("/api/chat/{other_user_id}/send", post(api_chat_send))
         .route(
-            "/api/chat/{other_user_id}/send-image",
+            "/api/chat/{other_user_route}/messages",
+            get(api_chat_messages),
+        )
+        .route("/api/chat/{other_user_route}/pinned", get(api_chat_pinned))
+        .route("/api/chat/{other_user_route}/search", get(api_chat_search))
+        .route("/api/chat/{other_user_route}/peer", get(api_chat_peer))
+        .route("/api/chat/realtime", get(api_chat_realtime))
+        .route("/api/chat/{other_user_route}/send", post(api_chat_send))
+        .route(
+            "/api/chat/{other_user_route}/send-image",
             post(api_chat_send_image),
         )
         .route(
-            "/api/chat/{other_user_id}/send-voice",
+            "/api/chat/{other_user_route}/send-voice",
             post(api_chat_send_voice),
         )
         .route("/api/chat/media/{message_id}", get(api_chat_media))
         .route(
-            "/api/chat/{other_user_id}/block",
+            "/api/chat/{other_user_route}/block",
             get(api_chat_block_status).post(api_chat_block),
         )
-        .route("/api/chat/{other_user_id}/unblock", post(api_chat_unblock))
         .route(
-            "/api/chat/{other_user_id}/messages/{message_id}/edit",
+            "/api/chat/{other_user_route}/unblock",
+            post(api_chat_unblock),
+        )
+        .route(
+            "/api/chat/{other_user_route}/messages/{message_id}/edit",
             post(api_chat_edit),
         )
         .route(
-            "/api/chat/{other_user_id}/messages/{message_id}/delete",
+            "/api/chat/{other_user_route}/messages/{message_id}/delete",
             post(api_chat_delete),
         )
         .route(
-            "/api/chat/{other_user_id}/messages/{message_id}/react",
+            "/api/chat/{other_user_route}/messages/{message_id}/react",
             post(api_chat_react),
         )
         .route(
-            "/api/chat/{other_user_id}/messages/{message_id}/pin",
+            "/api/chat/{other_user_route}/messages/{message_id}/pin",
             post(api_chat_pin),
         )
         .route("/api/contact/request", post(api_start_direct_chat))

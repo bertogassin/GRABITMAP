@@ -695,8 +695,7 @@ pub async fn email_auth_verify(
     let mut response = (
         StatusCode::OK,
         Json(json!({
-            "ok": true,
-            "user_id": user_id
+            "ok": true
         })),
     )
         .into_response();
