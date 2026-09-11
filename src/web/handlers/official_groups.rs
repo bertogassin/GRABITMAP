@@ -499,6 +499,9 @@ pub async fn join_official_group(
         Ok(group_id) => group_id,
         Err(_) => return StatusCode::CONFLICT.into_response(),
     };
+    if crate::db::group_moderation::member_is_blocked(&transaction, group_id, user_id) {
+        return StatusCode::FORBIDDEN.into_response();
+    }
     if transaction
         .execute(
             "INSERT OR IGNORE INTO chat_group_members (group_id, user_id, joined_at, role)
