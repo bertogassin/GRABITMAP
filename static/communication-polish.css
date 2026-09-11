@@ -58,6 +58,14 @@
     white-space: nowrap;
 }
 
+.chat-dialog-menu-label {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .chat-dialog-list .rm-empty-state {
     margin-top: 8px;
 }
@@ -212,16 +220,25 @@
     }
 
     .hero {
-        padding: 17px 16px !important;
+        padding: 14px 15px !important;
         border-radius: 18px !important;
     }
 
     .hero .back-link {
-        margin-bottom: 13px !important;
+        margin-bottom: 10px !important;
     }
 
     .hero h1 {
-        font-size: 27px !important;
+        margin-bottom: 5px !important;
+        font-size: 24px !important;
+    }
+
+    .hero .eyebrow {
+        margin-bottom: 7px !important;
+    }
+
+    .hero p {
+        font-size: 13px !important;
     }
 
     #inbox-section-head {

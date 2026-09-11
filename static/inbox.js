@@ -164,7 +164,8 @@
                 return '<form method="post" action="' + escapeHtml(action) + '">' +
                     '<input type="hidden" name="action" value="' + value + '">' +
                     '<input type="hidden" name="return_view" value="' + inboxView + '">' +
-                    '<button type="submit" title="' + label + '" aria-label="' + label + '">' + symbol + '</button></form>';
+                    '<button type="submit" title="' + label + '" aria-label="' + label + '">' +
+                    symbol + '<span class="chat-dialog-menu-label">' + escapeHtml(label) + '</span></button></form>';
             }
             return '<details class="chat-dialog-controls"><summary aria-label="Действия с чатом">' + MORE_ICON + '</summary>' +
                 '<div class="chat-dialog-menu" role="menu">' +
