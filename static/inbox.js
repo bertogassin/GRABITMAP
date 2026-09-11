@@ -515,9 +515,7 @@
             }
 
             var event = payload.event;
-            var actorId = String(
-                event.actor_public_id || event.actor_user_id || ""
-            ).trim();
+            var actorId = String(event.actor_public_id || "").trim();
             var groupId = String(event.group_id || "").trim();
 
             if (!actorId) {

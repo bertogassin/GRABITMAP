@@ -23,9 +23,8 @@
             return;
         }
 
-        var otherUserId = String(history.dataset.otherUserId || "").trim();
         var otherPublicId = String(history.dataset.otherPublicId || "").trim();
-        var otherUserRoute = otherPublicId || otherUserId;
+        var otherUserRoute = otherPublicId;
         var groupId = String(history.dataset.groupId || "").trim();
         var isGroup = /^[1-9][0-9]{0,18}$/.test(groupId);
         var targetIsValid = isGroup

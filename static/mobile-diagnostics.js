@@ -116,10 +116,10 @@
                 add(list, "Ядро чата", form.dataset.chatCoreReady === "1",
                     "chatCoreReady=" + (form.dataset.chatCoreReady || "нет"));
                 var history = document.getElementById("chat-messages");
-                var other = history ? String(history.dataset.otherUserId || "") : "";
+                var other = history ? String(history.dataset.otherPublicId || "") : "";
                 var group = history ? String(history.dataset.groupId || "") : "";
                 var url = group ? "/api/group/" + group + "/messages?limit=1" :
-                    (other ? "/api/chat/" + other + "/messages?limit=1&mark_read=0" : "");
+                    (other ? "/api/chat/" + encodeURIComponent(other) + "/messages?limit=1&mark_read=0" : "");
                 if (url) {
                     var chatApi = await responseStatus(url);
                     add(list, "API чата", chatApi.ok, chatApi.detail);

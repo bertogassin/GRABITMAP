@@ -1,6 +1,6 @@
 use super::auth::verify_user_session;
 use super::chat::load_user_conversations;
-use super::chat_identity::active_user_id_by_chat_route;
+use super::chat_identity::{active_public_id_by_user_id, active_user_id_by_chat_route};
 use super::common::{input_text_is_valid, rate_limit_retry_after, request_is_cross_site};
 use super::user_blocks::users_are_blocked;
 use crate::state::app_state::AppState;
@@ -1400,12 +1400,14 @@ pub async fn api_chat_peer(
     let last_seen_at = peer_row.unwrap_or(0);
     let now = crate::web::handlers::common::unix_now();
     let online = last_seen_at > 0 && now.saturating_sub(last_seen_at) < 300;
+    let peer_public_id =
+        active_public_id_by_user_id(&connection, other_user_id).unwrap_or_default();
 
     (
         StatusCode::OK,
         Json(json!({
             "ok": true,
-            "peer_user_id": other_user_id.to_string(),
+            "peer_public_id": peer_public_id,
             "online": online,
             "last_seen_at": last_seen_at,
             "open_contact": true

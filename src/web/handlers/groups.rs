@@ -833,14 +833,13 @@ fn message_json(
 ) -> serde_json::Value {
     json!({
         "id": message.id,
-        "sender_user_id": message.sender_user_id.to_string(),
         "message": message.message,
         "is_mine": message.sender_user_id == viewer_user_id,
         "delivered_at": message.delivered_at,
         "read_at": message.read_at,
         "created_at": message.created_at,
         "reply_to_message_id": if message.reply_to_message_id > 0 { Some(message.reply_to_message_id) } else { None::<i64> },
-        "reply_sender_user_id": if message.reply_sender_user_id > 0 { Some(message.reply_sender_user_id) } else { None::<i64> },
+        "reply_is_mine": message.reply_sender_user_id == viewer_user_id,
         "reply_sender_name": message.reply_sender_name,
         "reply_message": message.reply_message,
         "edited_at": message.edited_at,
@@ -1220,7 +1219,6 @@ pub async fn api_group_send(
         .map(|row| message_json(row, user_id))
         .unwrap_or(json!({
             "id": message_id,
-            "sender_user_id": user_id.to_string(),
             "message": message,
             "is_mine": true,
             "created_at": now,
@@ -1415,7 +1413,6 @@ pub async fn api_group_send_image(
         .unwrap_or_else(|| {
             json!({
                 "id": message_id,
-                "sender_user_id": user_id.to_string(),
                 "message": caption,
                 "is_mine": true,
                 "created_at": now,
@@ -1661,7 +1658,6 @@ pub async fn api_group_send_voice(
         .unwrap_or_else(|| {
             json!({
                 "id": message_id,
-                "sender_user_id": user_id.to_string(),
                 "message": "",
                 "is_mine": true,
                 "created_at": now,
@@ -3370,6 +3366,9 @@ mod tests {
 
         let response = message_json(&messages[1], 1);
         assert_eq!(response["reply_sender_name"], "Амир");
+        assert_eq!(response["reply_is_mine"], true);
+        assert!(response.get("sender_user_id").is_none());
+        assert!(response.get("reply_sender_user_id").is_none());
         assert_eq!(response["reactions"][0]["count"], 2);
     }
 

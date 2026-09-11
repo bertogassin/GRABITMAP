@@ -413,11 +413,7 @@
         }
 
         function updateGroupTyping(detail) {
-            var actorId = String(
-                detail.actor_public_id ||
-                detail.actor_user_id ||
-                ""
-            ).trim();
+            var actorId = String(detail.actor_public_id || "").trim();
             if (!actorId || actorId === viewerPublicId) {
                 return;
             }
@@ -2554,11 +2550,7 @@
             "resursmap:chat-typing",
             function (event) {
                 var detail = event.detail || {};
-                var actorId = String(
-                    detail.actor_public_id ||
-                    detail.actor_user_id ||
-                    ""
-                ).trim();
+                var actorId = String(detail.actor_public_id || "").trim();
 
                 if (isGroup) {
                     if (String(detail.group_id || "") !== groupId) {

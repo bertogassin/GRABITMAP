@@ -30,6 +30,15 @@ pub(crate) struct RealtimeQuery {
     last_event_id: Option<u64>,
 }
 
+fn public_chat_event(event: &crate::state::app_state::ChatRealtimeEvent) -> serde_json::Value {
+    json!({
+        "event_id": event.event_id,
+        "kind": event.kind,
+        "message_id": event.message_id,
+        "group_id": event.group_id,
+    })
+}
+
 fn parse_other_user_id(value: Option<&str>) -> Option<i64> {
     let raw = value?.trim();
     if raw.is_empty() || !raw.bytes().all(|byte| byte.is_ascii_digit()) {
@@ -290,7 +299,7 @@ async fn chat_socket(mut socket: WebSocket, state: AppState, user_id: i64, last_
                             &mut socket,
                             json!({
                                 "type": "chat_event",
-                                "event": event
+                                "event": public_chat_event(&event)
                             }),
                         )
                         .await
@@ -382,7 +391,7 @@ async fn chat_socket(mut socket: WebSocket, state: AppState, user_id: i64, last_
 
 #[cfg(test)]
 mod tests {
-    use super::{direct_typing_is_allowed, parse_other_user_id, ClientFrame};
+    use super::{direct_typing_is_allowed, parse_other_user_id, public_chat_event, ClientFrame};
 
     #[test]
     fn other_user_id_parser_is_strict() {
@@ -445,5 +454,27 @@ mod tests {
     #[test]
     fn realtime_protocol_name_is_stable() {
         assert_eq!("resursmap.chat.v5", "resursmap.chat.v5");
+    }
+
+    #[test]
+    fn outgoing_chat_event_hides_internal_routing_ids() {
+        let event = crate::state::app_state::ChatRealtimeEvent {
+            event_id: 11,
+            kind: "message.created".to_string(),
+            conversation_id: 22,
+            message_id: 33,
+            user1_id: 44,
+            user2_id: 55,
+            group_id: 0,
+            member_ids: Vec::new(),
+            membership_scoped: false,
+        };
+
+        let value = public_chat_event(&event);
+        assert_eq!(value["event_id"], 11);
+        assert_eq!(value["message_id"], 33);
+        assert!(value.get("conversation_id").is_none());
+        assert!(value.get("user1_id").is_none());
+        assert!(value.get("user2_id").is_none());
     }
 }

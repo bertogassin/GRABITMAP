@@ -31,13 +31,10 @@
             return;
         }
 
-        var otherUserId = String(
-            history.dataset.otherUserId || ""
-        ).trim();
         var otherPublicId = String(
             history.dataset.otherPublicId || ""
         ).trim();
-        var otherUserRoute = otherPublicId || otherUserId;
+        var otherUserRoute = otherPublicId;
 
         if (
             !otherUserRoute ||
