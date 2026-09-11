@@ -48,6 +48,15 @@ test("mobile product foundation locks accidental zoom and contains narrow layout
   assert.match(runtime, /button\.hidden = !matches/);
 });
 
+test("mobile foundation hides assistive labels and clears Android system navigation", async () => {
+  const css = await readFile(new URL("static/mobile-foundation.css", root), "utf8");
+
+  assert.match(css, /\.sr-only[\s\S]*clip: rect\(0, 0, 0, 0\) !important/);
+  assert.match(css, /html\[data-page="chat"\] main\.page[\s\S]*38px/);
+  assert.match(css, /env\(safe-area-inset-bottom\) \+ 18px/);
+  assert.match(css, /#chat-form\.chat-composer[\s\S]*margin-bottom: 0 !important/);
+});
+
 test("locale switching validates and canonicalizes locale tags", async () => {
   const runtime = await readFile(new URL("static/i18n-runtime.js", root), "utf8");
   assert.match(runtime, /normalizeLocale/);
