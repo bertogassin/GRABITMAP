@@ -4446,6 +4446,7 @@ pub(crate) fn page_document(
 
 <script src="{mobile_diagnostics_js}" defer></script>
 <script src="{mobile_foundation_js}" defer></script>
+<script src="{app_reliability_js}" defer></script>
 
 {body_after}
 
@@ -4486,6 +4487,7 @@ pub(crate) fn page_document(
         mobile_diagnostics_js = static_asset("mobile-diagnostics.js"),
         mobile_foundation_css = static_asset("mobile-foundation.css"),
         mobile_foundation_js = static_asset("mobile-foundation.js"),
+        app_reliability_js = static_asset("app-reliability.js"),
     )
 }
 

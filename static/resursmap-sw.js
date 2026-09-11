@@ -14,6 +14,7 @@ const STATIC_ASSETS = [
     "/static/grabit-mascot-v2.png",
     "/static/grabit-share-cover.png",
     "/static/nav-badge.js",
+    "/static/app-reliability.js",
     "/static/i18n-boot.js",
     "/static/i18n-runtime.js",
     "/static/paraglide/messages.js",

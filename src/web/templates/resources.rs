@@ -865,6 +865,18 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
                 : "В избранное";
     }}
 
+    async function responseData(response) {{
+        if (response.status === 401) {{
+            window.location.href =
+                "/login?next=" + encodeURIComponent("/app/resource/" + resourceId);
+            return null;
+        }}
+        if (!response.ok) {{
+            throw new Error("request_failed");
+        }}
+        return response.json();
+    }}
+
     if (favoriteButton) {{
         favoriteButton.addEventListener("click", async () => {{
             favoriteButton.disabled = true;
@@ -881,13 +893,8 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
                     }}
                 );
 
-                if (response.status === 401) {{
-                    window.location.href =
-                        "/login?next=" + encodeURIComponent("/app/resource/" + resourceId);
-                    return;
-                }}
-
-                const data = await response.json();
+                const data = await responseData(response);
+                if (!data) return;
 
                 if (data.ok) {{
                     renderFavorite(Boolean(data.favorite));
@@ -898,6 +905,8 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
                                 ? "✓ Добавлено в избранное"
                                 : "Удалено из избранного";
                     }}
+                }} else if (favoriteStatus) {{
+                    favoriteStatus.textContent = "Не удалось изменить избранное.";
                 }}
             }} catch (_) {{
                 if (favoriteStatus) {{
@@ -940,13 +949,8 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
                     }}
                 );
 
-                if (response.status === 401) {{
-                    window.location.href =
-                        "/login?next=" + encodeURIComponent("/app/resource/" + resourceId);
-                    return;
-                }}
-
-                const data = await response.json();
+                const data = await responseData(response);
+                if (!data) return;
                 if (reportStatus) {{
                     reportStatus.textContent = data.ok
                         ? "Жалоба отправлена"
@@ -995,6 +999,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
             const score = Number(star.dataset.score);
 
             status.textContent = "Сохраняем...";
+            stars.forEach((item) => {{ item.disabled = true; }});
 
             try {{
                 const response = await fetch(
@@ -1008,13 +1013,8 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
                     }}
                 );
 
-                const data = await response.json();
-
-                if (response.status === 401) {{
-                    window.location.href =
-                        "/login?next=" + encodeURIComponent("/app/resource/" + resourceId);
-                    return;
-                }}
+                const data = await responseData(response);
+                if (!data) return;
 
                 if (!data.ok) {{
                     status.textContent = "Не удалось сохранить оценку.";
@@ -1041,6 +1041,8 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
                 status.textContent = "Оценка сохранена";
             }} catch (_) {{
                 status.textContent = "Ошибка соединения.";
+            }} finally {{
+                stars.forEach((item) => {{ item.disabled = false; }});
             }}
         }});
     }});

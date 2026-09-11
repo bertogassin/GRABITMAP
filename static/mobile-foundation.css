@@ -12,6 +12,35 @@
     border: 0 !important;
 }
 
+.rm-connectivity-status {
+    position: fixed;
+    z-index: 10050;
+    left: 50%;
+    bottom: calc(var(--rm-bottom-nav-height, 84px) + max(12px, env(safe-area-inset-bottom)));
+    max-width: min(92vw, 420px);
+    transform: translateX(-50%);
+    padding: 10px 16px;
+    border: 1px solid rgba(129, 220, 179, .55);
+    border-radius: 999px;
+    background: #18372d;
+    color: #d9ffec;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .38);
+    font-weight: 700;
+    text-align: center;
+}
+
+.rm-connectivity-status.is-offline {
+    border-color: rgba(255, 151, 164, .62);
+    background: #3c2027;
+    color: #ffe3e7;
+}
+
+form[aria-busy="true"] .is-submitting {
+    cursor: wait;
+    opacity: .72;
+    pointer-events: none;
+}
+
 html {
     width: 100%;
     overflow-x: hidden;
