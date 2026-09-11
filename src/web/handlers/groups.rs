@@ -1975,6 +1975,12 @@ pub async fn group_members_page(
             ))
         }
     };
+    if rate_limit_retry_after(&state, user_id, "group_member_directory", 120, 60)
+        .await
+        .is_some()
+    {
+        return Html("<h1>429</h1><p>Слишком много запросов. Попробуйте позже.</p>".to_string());
+    }
     let db = match crate::db::pool::get_connection(&state.db_pool) {
         Ok(db) => db,
         Err(_) => return Html("<h1>503</h1><p>База данных временно недоступна.</p>".to_string()),
@@ -2009,9 +2015,17 @@ pub async fn group_members_page(
     let viewer_role =
         super::official_groups::group_management_role(&state, &headers, &db, group_id, user_id)
             .unwrap_or_default();
-    let member_query = normalized_group_member_query(&query.q);
-    let (members, next_after) =
-        load_group_member_names(&db, group_id, &member_query, query.after.max(0));
+    let can_browse_members = !is_official || role_can_manage_members(&viewer_role);
+    let member_query = if can_browse_members {
+        normalized_group_member_query(&query.q)
+    } else {
+        String::new()
+    };
+    let (members, next_after) = if can_browse_members {
+        load_group_member_names(&db, group_id, &member_query, query.after.max(0))
+    } else {
+        (vec![], None)
+    };
     let member_count = db
         .query_row(
             "SELECT member_count FROM chat_groups WHERE id = ?1",

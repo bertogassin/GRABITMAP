@@ -839,3 +839,37 @@ test("official group notifications are virtual and account scoped", async () => 
   assert.match(handler, /official_group_notifications::mark_all_read/);
   assert.match(groups, /publish_membership_scoped_group_chat_event/);
 });
+
+
+test("official group member privacy hides bulk directory and internal identifiers", async () => {
+  const [groups, template, search, profiles, routes, profileTemplate] =
+    await Promise.all([
+      readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
+      readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+      readFile(new URL("src/db/group_member_search.rs", root), "utf8"),
+      readFile(new URL("src/web/handlers/profiles.rs", root), "utf8"),
+      readFile(new URL("src/web/routes/account.rs", root), "utf8"),
+      readFile(new URL("src/web/templates/profile_account.rs", root), "utf8"),
+    ]);
+
+  assert.match(groups, /can_browse_members = !is_official \|\| role_can_manage_members/);
+  assert.match(groups, /group_member_directory/);
+  assert.match(template, /Список участников официальной группы скрыт/);
+  assert.match(template, /is_official && !can_manage/);
+  assert.doesNotMatch(template, /placeholder="Имя, логин или ID"/);
+
+  assert.doesNotMatch(search, /CAST\(NEW\.user_id AS TEXT\)/);
+  assert.doesNotMatch(search, /CAST\(member\.user_id AS TEXT\)/);
+  assert.match(search, /ON CONFLICT\(group_id, user_id\)/);
+  assert.match(search, /privacy_version/);
+
+  assert.match(profiles, /can_view_internal_avatar/);
+  assert.match(profiles, /verify_user_session\(&state, &headers\)/);
+  assert.match(profiles, /profile\.public_id = \?1/);
+  assert.match(routes, /\/api\/public-avatars\/\{public_id\}/);
+  assert.match(profileTemplate, /\/api\/public-avatars\//);
+  assert.doesNotMatch(
+    profileTemplate,
+    /profile_avatar = if has_avatar && profile_user_id > 0/
+  );
+});
