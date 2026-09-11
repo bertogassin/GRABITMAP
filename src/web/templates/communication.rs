@@ -1073,27 +1073,31 @@ fn render_chat_thread(
                 <button id="chat-search-toggle"
                         type="button"
                         class="chat-sound-toggle">
-                    {search_label}
+                    <svg class="chat-header-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg>
+                    <span class="chat-header-menu-label">{search_label}</span>
                 </button>
                 <button id="chat-sound-toggle"
                         type="button"
                         class="chat-sound-toggle"
                         aria-label="Звуки чата"
                         aria-pressed="true">
-                    Звук
+                    <svg class="chat-header-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4Z"/><path d="M15 9a4 4 0 0 1 0 6"/><path d="M18 6a8 8 0 0 1 0 12"/></svg>
+                    <span class="chat-header-menu-label">Звуки включены</span>
                 </button>
                 <button id="chat-haptic-toggle"
                         type="button"
                         class="chat-sound-toggle chat-haptic-toggle"
                         aria-label="Вибрация чата"
                         aria-pressed="true">
-                    Вибро
+                    <svg class="chat-header-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M4 8v8M20 8v8"/></svg>
+                    <span class="chat-header-menu-label">Вибрация включена</span>
                 </button>
                 <button id="chat-block-toggle"
                         type="button"
                         class="chat-block-toggle"
                         hidden>
-                    Заблокировать
+                    <svg class="chat-header-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></svg>
+                    <span class="chat-header-menu-label">Заблокировать</span>
                 </button>
                 {group_menu}
             </div>

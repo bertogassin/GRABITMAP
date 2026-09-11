@@ -2422,7 +2422,14 @@
                     "aria-pressed",
                     enabled ? "true" : "false"
                 );
-                soundToggle.textContent = enabled ? "🔊" : "🔇";
+                var soundLabel = soundToggle.querySelector(
+                    ".chat-header-menu-label"
+                );
+                if (soundLabel) {
+                    soundLabel.textContent = enabled
+                        ? "Звуки включены"
+                        : "Звуки выключены";
+                }
                 soundToggle.classList.toggle("is-muted", !enabled);
             }
 
@@ -2453,7 +2460,14 @@
                     "aria-pressed",
                     enabled ? "true" : "false"
                 );
-                hapticToggle.textContent = enabled ? "📳" : "🔕";
+                var hapticLabel = hapticToggle.querySelector(
+                    ".chat-header-menu-label"
+                );
+                if (hapticLabel) {
+                    hapticLabel.textContent = enabled
+                        ? "Вибрация включена"
+                        : "Вибрация выключена";
+                }
                 hapticToggle.classList.toggle("is-muted", !enabled);
             }
 

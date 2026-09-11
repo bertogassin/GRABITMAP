@@ -121,7 +121,7 @@ test("mature chat layout is loaded last and stays mobile safe", async () => {
   assert.match(template, /static_asset\("chat-mature\.css"\)/);
   assert.match(css, /html\[data-page="chat"\] \.topbar \{ display: none/);
   assert.match(css, /\.chat-header-menu[\s\S]*background: #191e26 !important/);
-  assert.match(css, /\.chat-message-row \.chat-bubble[\s\S]*min-width: 108px/);
+  assert.match(css, /\.chat-message-row \.chat-bubble[\s\S]*min-width: 84px/);
   assert.match(css, /\.chat-composer-footer \{ display: none !important/);
   assert.match(css, /\.official-group-place \.card-content/);
 });
@@ -152,6 +152,27 @@ test("communication finishing pass labels inbox actions and clears Android navig
   assert.match(polish, /\.chat-dialog-menu-label/);
   assert.match(mature, /max\(22px,env\(safe-area-inset-bottom\)\)/);
   assert.match(polish, /\.hero h1[\s\S]*font-size: 24px !important/);
+});
+
+test("open chat actions use readable labels and compact media geometry", async () => {
+  const [template, chat, blocks, css] = await Promise.all([
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("static/chat-blocks.js", root), "utf8"),
+    readFile(new URL("static/chat-mature.css", root), "utf8"),
+  ]);
+
+  assert.match(template, /chat-header-menu-icon/);
+  assert.match(template, /chat-header-menu-label/);
+  assert.match(template, /Звуки включены/);
+  assert.match(template, /Вибрация включена/);
+  assert.match(chat, /soundLabel\.textContent/);
+  assert.match(chat, /hapticLabel\.textContent/);
+  assert.doesNotMatch(chat, /soundToggle\.textContent = enabled \? "🔊"/);
+  assert.doesNotMatch(chat, /hapticToggle\.textContent = enabled \? "📳"/);
+  assert.match(blocks, /toggleLabel\.textContent/);
+  assert.match(css, /width: min\(230px, 59vw\)/);
+  assert.match(css, /min-width: 84px/);
 });
 
 test("chat photo viewer is isolated, keyboard accessible, and downloadable", async () => {
