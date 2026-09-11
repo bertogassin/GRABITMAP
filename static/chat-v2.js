@@ -181,19 +181,16 @@
             return text;
         }
 
-        var otherUserId = String(
-            history.dataset.otherUserId || ""
-        ).trim();
         var otherPublicId = String(
             history.dataset.otherPublicId || ""
         ).trim();
-        var otherUserRoute = otherPublicId || otherUserId;
+        var otherUserRoute = otherPublicId;
         var groupId = String(
             history.dataset.groupId || ""
         ).trim();
         var isGroup = /^[1-9][0-9]{0,18}$/.test(groupId);
-        var viewerUserId = String(
-            history.dataset.viewerUserId || ""
+        var viewerPublicId = String(
+            history.dataset.viewerPublicId || ""
         ).trim();
 
         if (
@@ -225,7 +222,7 @@
         var loadingOlder = false;
         var pollTimer = null;
         var storageScope =
-            viewerUserId + ":" + (isGroup ? "g" + groupId : "d" + otherUserRoute);
+            viewerPublicId + ":" + (isGroup ? "g" + groupId : "d" + otherUserRoute);
         var draftKey = "grabit-chat-draft:" + storageScope;
         var pendingSendKey =
             "grabit-chat-outbox:" + storageScope;
@@ -421,7 +418,7 @@
                 detail.actor_user_id ||
                 ""
             ).trim();
-            if (!actorId || actorId === viewerUserId) {
+            if (!actorId || actorId === viewerPublicId) {
                 return;
             }
             if (groupTypingTimers[actorId]) {
@@ -1545,8 +1542,8 @@
 
                         data.message.reply_message =
                             item.replyMessage || "";
-                        data.message.reply_sender_user_id =
-                            item.replySenderUserId || null;
+                        data.message.reply_is_mine =
+                            Boolean(item.replyIsMine);
                     }
                     clearItemRetryTimer(item.clientMessageId);
                     removePendingRow(item.clientMessageId);
@@ -1640,8 +1637,8 @@
                     reply ? reply.id : null,
                 replyMessage:
                     reply ? reply.message : "",
-                replySenderUserId:
-                    reply ? reply.senderUserId : null,
+                replyIsMine:
+                    reply ? Boolean(reply.isMine) : false,
                 createdAt:
                     Math.floor(Date.now() / 1000),
                 state: "queued",
@@ -2815,13 +2812,10 @@
             return;
         }
 
-        var otherUserId = String(
-            history.dataset.otherUserId || ""
-        ).trim();
         var otherPublicId = String(
             history.dataset.otherPublicId || ""
         ).trim();
-        var otherUserRoute = otherPublicId || otherUserId;
+        var otherUserRoute = otherPublicId;
         var groupId = String(
             history.dataset.groupId || ""
         ).trim();
@@ -4143,7 +4137,7 @@
             row.dataset.editedAt = String(Number(message.edited_at) || 0);
             row.dataset.replyTo = String(Number(message.reply_to_message_id) || 0);
             row.dataset.replyMessage = String(message.reply_message || "");
-            row.dataset.replySender = String(message.reply_sender_user_id || "");
+            row.dataset.replyMine = message.reply_is_mine ? "1" : "0";
             row.dataset.replySenderName = String(message.reply_sender_name || "");
             row.dataset.createdAt = String(Number(message.created_at) || 0);
             row.dataset.attachmentKind = String(message.attachment_kind || "");
@@ -4221,18 +4215,14 @@
                 quote.dataset.targetMessageId =
                     String(message.reply_to_message_id);
 
-                var replySender = String(
-                    message.reply_sender_user_id || ""
-                ).trim();
                 var author = t("chat_message", "Сообщение");
 
                 if (isGroup && message.reply_sender_name) {
                     author = String(message.reply_sender_name);
-                } else if (replySender) {
-                    author =
-                        replySender === otherUserId
-                            ? t("chat_peer", "Собеседник")
-                            : t("chat_you", "Вы");
+                } else if (message.reply_is_mine) {
+                    author = t("chat_you", "Вы");
+                } else {
+                    author = t("chat_peer", "Собеседник");
                 }
 
                 var authorNode =
@@ -4290,10 +4280,6 @@
 
             return {
                 id: id,
-                sender_user_id:
-                    row.dataset.mine === "1"
-                        ? 0
-                        : otherUserId,
                 message:
                     row.dataset.messageText ||
                     (body ? body.textContent : ""),
@@ -4306,9 +4292,7 @@
                     Number(row.dataset.replyTo || 0) || null,
                 reply_message:
                     row.dataset.replyMessage || "",
-                reply_sender_user_id:
-                    String(row.dataset.replySender || "").trim() ||
-                    null,
+                reply_is_mine: row.dataset.replyMine === "1",
                 reply_sender_name:
                     String(row.dataset.replySenderName || "").trim(),
                 read_at:
@@ -4360,10 +4344,6 @@
                 var body = row.querySelector(".chat-message-body");
                 var message = {
                     id: id,
-                    sender_user_id:
-                        row.dataset.mine === "1"
-                            ? 0
-                            : otherUserId,
                     message:
                         row.dataset.messageText ||
                         (body ? body.textContent : ""),
@@ -4376,9 +4356,7 @@
                         Number(row.dataset.replyTo || 0) || null,
                     reply_message:
                         row.dataset.replyMessage || "",
-                    reply_sender_user_id:
-                        String(row.dataset.replySender || "").trim() ||
-                        null,
+                    reply_is_mine: row.dataset.replyMine === "1",
                     reply_sender_name:
                         String(row.dataset.replySenderName || "").trim(),
                     read_at:
@@ -4514,9 +4492,7 @@
 
             window.ResursMapChatReply = {
                 id: Number(message.id),
-                senderUserId: String(
-                    message.sender_user_id || ""
-                ).trim(),
+                isMine: Boolean(message.is_mine),
                 message: String(message.message || "")
             };
 
@@ -5033,11 +5009,10 @@
 
         function fallbackApi() {
             var groupId = String(history.dataset.groupId || "").trim();
-            var otherUserId = String(history.dataset.otherUserId || "").trim();
             var otherPublicId = String(
                 history.dataset.otherPublicId || ""
             ).trim();
-            var otherUserRoute = otherPublicId || otherUserId;
+            var otherUserRoute = otherPublicId;
 
             if (/^[1-9][0-9]{0,18}$/.test(groupId)) {
                 return "/api/group/" + groupId + "/send";
@@ -5059,14 +5034,13 @@
         }
 
         function clearStoredDraft() {
-            var viewerUserId = String(history.dataset.viewerUserId || "").trim();
+            var viewerPublicId = String(history.dataset.viewerPublicId || "").trim();
             var groupId = String(history.dataset.groupId || "").trim();
-            var otherUserId = String(history.dataset.otherUserId || "").trim();
             var otherPublicId = String(
                 history.dataset.otherPublicId || ""
             ).trim();
-            var otherUserRoute = otherPublicId || otherUserId;
-            var scope = viewerUserId + ":" +
+            var otherUserRoute = otherPublicId;
+            var scope = viewerPublicId + ":" +
                 (/^[1-9][0-9]{0,18}$/.test(groupId)
                     ? "g" + groupId
                     : "d" + otherUserRoute);
@@ -5216,7 +5190,6 @@
             (
                 history.dataset.groupId ||
                 history.dataset.otherPublicId ||
-                history.dataset.otherUserId ||
                 "chat"
             );
         var lastEventId = 0;

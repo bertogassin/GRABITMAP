@@ -22,14 +22,13 @@ pub(crate) const MAX_VOICE_BYTES: usize = 8 * 1024 * 1024;
 #[derive(Debug, Serialize)]
 struct MediaChatMessage {
     id: i64,
-    sender_user_id: i64,
     message: String,
     is_mine: bool,
     delivered_at: i64,
     read_at: i64,
     created_at: i64,
     reply_to_message_id: Option<i64>,
-    reply_sender_user_id: Option<i64>,
+    reply_is_mine: bool,
     reply_message: String,
     edited_at: i64,
     deleted_at: i64,
@@ -157,9 +156,10 @@ fn load_message(
                 format!("/api/chat/media/{id}")
             } else { String::new() };
             Ok(MediaChatMessage {
-                id, sender_user_id: sender, message: row.get(2)?, is_mine: sender == user_id,
+                id, message: row.get(2)?, is_mine: sender == user_id,
                 delivered_at: row.get(3)?, read_at: row.get(4)?, created_at: row.get(5)?,
-                reply_to_message_id: row.get(6)?, reply_sender_user_id: row.get(7)?,
+                reply_to_message_id: row.get(6)?,
+                reply_is_mine: row.get::<_, Option<i64>>(7)? == Some(user_id),
                 reply_message: row.get(8)?, edited_at: row.get(9)?, deleted_at,
                 client_message_id: row.get(11)?, attachment_kind: kind,
                 attachment_mime: row.get(13)?, attachment_size: row.get(14)?, attachment_url,

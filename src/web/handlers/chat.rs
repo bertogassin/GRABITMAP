@@ -301,7 +301,17 @@ pub async fn chat_page(
     let user_id = match verify_user_session(&state, &headers) {
         Some(id) => id,
         None => {
-            return Html(templates::render_chat(false, 0, 0, "", "", "", "", vec![]));
+            return Html(templates::render_chat(
+                false,
+                0,
+                "",
+                0,
+                "",
+                "",
+                "",
+                "",
+                vec![],
+            ));
         }
     };
 
@@ -318,6 +328,7 @@ pub async fn chat_page(
             return Html(templates::render_chat(
                 true,
                 user_id,
+                "",
                 0,
                 "",
                 "",
@@ -427,6 +438,8 @@ pub async fn chat_page(
         rusqlite::params![user_id, other_user_id],
     );
 
+    let viewer_public_id = active_public_id_by_user_id(&db, user_id).unwrap_or_default();
+
     drop(db);
 
     if read_changed > 0 {
@@ -442,6 +455,7 @@ pub async fn chat_page(
     Html(templates::render_chat(
         true,
         user_id,
+        &viewer_public_id,
         other_user_id,
         &other_public_id,
         &other_username,

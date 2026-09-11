@@ -652,7 +652,7 @@ fn render_chat_message_row(
      data-edited-at="{edited_at}"
      data-reply-to="{reply_to}"
      data-reply-message="{reply_message}"
-     data-reply-sender="{reply_sender}"
+     data-reply-mine="{reply_mine}"
      data-reply-sender-name="{reply_sender_name}"
      data-sender-name="{sender_name}"
      data-read-at="{read_at}"
@@ -685,7 +685,11 @@ fn render_chat_message_row(
         edited_at = message.edited_at,
         reply_to = message.reply_to_message_id,
         reply_message = escape_html(&message.reply_message),
-        reply_sender = message.reply_sender_user_id,
+        reply_mine = if message.reply_sender_user_id == viewer_user_id {
+            "1"
+        } else {
+            "0"
+        },
         reply_sender_name = escape_html(&message.reply_sender_name),
         sender_name = escape_html(&message.sender_name),
         read_at = message.read_at,
@@ -713,6 +717,7 @@ fn render_chat_message_row(
 pub fn render_chat(
     authenticated: bool,
     viewer_user_id: i64,
+    viewer_public_id: &str,
     other_user_id: i64,
     other_public_id: &str,
     username: &str,
@@ -723,6 +728,7 @@ pub fn render_chat(
     render_chat_thread(
         authenticated,
         viewer_user_id,
+        viewer_public_id,
         other_user_id,
         other_public_id,
         0,
@@ -736,6 +742,7 @@ pub fn render_chat(
 pub fn render_group_chat(
     authenticated: bool,
     viewer_user_id: i64,
+    viewer_public_id: &str,
     group_id: i64,
     group_name: &str,
     group_description: &str,
@@ -750,6 +757,7 @@ pub fn render_group_chat(
     render_chat_thread(
         authenticated,
         viewer_user_id,
+        viewer_public_id,
         0,
         "",
         group_id,
@@ -764,6 +772,7 @@ pub fn render_group_chat(
 fn render_chat_thread(
     authenticated: bool,
     viewer_user_id: i64,
+    viewer_public_id: &str,
     other_user_id: i64,
     other_public_id: &str,
     group_id: i64,
@@ -953,10 +962,9 @@ fn render_chat_thread(
     </div>
 
     <div id="chat-messages"
-         data-other-user-id="{other_user_id}"
          data-other-public-id="{other_public_id}"
          data-group-id="{group_id_attr}"
-         data-viewer-user-id="{viewer_user_id}"
+         data-viewer-public-id="{viewer_public_id}"
          data-first-message-id="{first_message_id}"
          data-last-message-id="{last_message_id}"
          data-may-have-older="{may_have_older}"
@@ -997,14 +1005,13 @@ fn render_chat_thread(
             search_label = escape_html(&crate::i18n::t("nav_search")),
             search_placeholder = escape_html(&crate::i18n::t("search_what")),
             close_label = escape_html(&crate::i18n::t("chat_close")),
-            other_user_id = other_user_id,
             other_public_id = escape_html(other_public_id),
+            viewer_public_id = escape_html(viewer_public_id),
             group_id_attr = if group_id > 0 {
                 group_id.to_string()
             } else {
                 String::new()
             },
-            viewer_user_id = viewer_user_id,
             first_message_id = first_message_id,
             last_message_id = last_message_id,
             may_have_older = may_have_older,

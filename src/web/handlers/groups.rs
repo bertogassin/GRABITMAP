@@ -1,6 +1,7 @@
 use super::auth::verify_user_session;
 use super::chat::load_user_conversations;
 use super::chat_api::{message_content_can_be_edited, message_is_valid, reaction_emoji_is_allowed};
+use super::chat_identity::active_public_id_by_user_id;
 use super::chat_media::{
     detect_audio, detect_image, extension_for_mime, media_path_is_safe, media_root, MAX_VOICE_BYTES,
 };
@@ -970,6 +971,7 @@ pub async fn group_chat_page(
             return Html(templates::render_group_chat(
                 false,
                 0,
+                "",
                 group_id,
                 "Группа",
                 "",
@@ -982,6 +984,7 @@ pub async fn group_chat_page(
         return Html(templates::render_group_chat(
             true,
             user_id,
+            "",
             0,
             "",
             "",
@@ -995,10 +998,12 @@ pub async fn group_chat_page(
             return Html("<h1>503</h1><p>База данных временно недоступна.</p>".to_string());
         }
     };
+    let viewer_public_id = active_public_id_by_user_id(&db, user_id).unwrap_or_default();
     if !is_member(&db, group_id, user_id) {
         return Html(templates::render_group_chat(
             true,
             user_id,
+            &viewer_public_id,
             0,
             "Нет доступа",
             "",
@@ -1029,6 +1034,7 @@ pub async fn group_chat_page(
     Html(templates::render_group_chat(
         true,
         user_id,
+        &viewer_public_id,
         group_id,
         &name,
         &description,

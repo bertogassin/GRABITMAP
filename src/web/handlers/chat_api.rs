@@ -77,16 +77,13 @@ struct MessageReaction {
 #[derive(Debug, Serialize)]
 struct ChatApiMessage {
     id: i64,
-    #[serde(serialize_with = "serialize_user_id")]
-    sender_user_id: i64,
     message: String,
     is_mine: bool,
     delivered_at: i64,
     read_at: i64,
     created_at: i64,
     reply_to_message_id: Option<i64>,
-    #[serde(serialize_with = "serialize_optional_user_id")]
-    reply_sender_user_id: Option<i64>,
+    reply_is_mine: bool,
     reply_message: String,
     edited_at: i64,
     deleted_at: i64,
@@ -101,23 +98,6 @@ struct ChatApiMessage {
     attachment_url: String,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     reactions: Vec<MessageReaction>,
-}
-
-fn serialize_user_id<S>(value: &i64, serializer: S) -> Result<S::Ok, S::Error>
-where
-    S: serde::Serializer,
-{
-    serializer.serialize_str(&value.to_string())
-}
-
-fn serialize_optional_user_id<S>(value: &Option<i64>, serializer: S) -> Result<S::Ok, S::Error>
-where
-    S: serde::Serializer,
-{
-    match value {
-        Some(value) => serializer.serialize_some(&value.to_string()),
-        None => serializer.serialize_none(),
-    }
 }
 
 const CHAT_REACTION_EMOJIS: &[&str] = &["❤️", "👍", "😂", "😮", "😢", "🙏"];
@@ -393,14 +373,13 @@ fn load_api_message_by_id(
             |row| {
                 Ok(ChatApiMessage {
                     id: row.get(0)?,
-                    sender_user_id: row.get(1)?,
                     message: row.get(2)?,
                     is_mine: row.get::<_, i64>(1)? == user_id,
                     delivered_at: row.get(3)?,
                     read_at: row.get(4)?,
                     created_at: row.get(5)?,
                     reply_to_message_id: row.get(6)?,
-                    reply_sender_user_id: row.get(7)?,
+                    reply_is_mine: row.get::<_, Option<i64>>(7)? == Some(user_id),
                     reply_message: row.get(8)?,
                     edited_at: row.get(9)?,
                     deleted_at: row.get(10)?,
@@ -549,14 +528,13 @@ pub async fn api_chat_messages(
                         |row| {
                             Ok(ChatApiMessage {
                                 id: row.get(0)?,
-                                sender_user_id: row.get(1)?,
                                 message: row.get(2)?,
                                 is_mine: row.get::<_, i64>(1)? == user_id,
                                 delivered_at: row.get(3)?,
                                 read_at: row.get(4)?,
                                 created_at: row.get(5)?,
                                 reply_to_message_id: row.get(6)?,
-                                reply_sender_user_id: row.get(7)?,
+                                reply_is_mine: row.get::<_, Option<i64>>(7)? == Some(user_id),
                                 reply_message: row.get(8)?,
                                 edited_at: row.get(9)?,
                                 deleted_at: row.get(10)?,
@@ -631,14 +609,13 @@ pub async fn api_chat_messages(
                         |row| {
                             Ok(ChatApiMessage {
                                 id: row.get(0)?,
-                                sender_user_id: row.get(1)?,
                                 message: row.get(2)?,
                                 is_mine: row.get::<_, i64>(1)? == user_id,
                                 delivered_at: row.get(3)?,
                                 read_at: row.get(4)?,
                                 created_at: row.get(5)?,
                                 reply_to_message_id: row.get(6)?,
-                                reply_sender_user_id: row.get(7)?,
+                                reply_is_mine: row.get::<_, Option<i64>>(7)? == Some(user_id),
                                 reply_message: row.get(8)?,
                                 edited_at: row.get(9)?,
                                 deleted_at: row.get(10)?,
@@ -710,14 +687,13 @@ pub async fn api_chat_messages(
                     .query_map(rusqlite::params![conversation_id, fetch_limit], |row| {
                         Ok(ChatApiMessage {
                             id: row.get(0)?,
-                            sender_user_id: row.get(1)?,
                             message: row.get(2)?,
                             is_mine: row.get::<_, i64>(1)? == user_id,
                             delivered_at: row.get(3)?,
                             read_at: row.get(4)?,
                             created_at: row.get(5)?,
                             reply_to_message_id: row.get(6)?,
-                            reply_sender_user_id: row.get(7)?,
+                            reply_is_mine: row.get::<_, Option<i64>>(7)? == Some(user_id),
                             reply_message: row.get(8)?,
                             edited_at: row.get(9)?,
                             deleted_at: row.get(10)?,
@@ -1149,14 +1125,13 @@ pub async fn api_chat_send(
             "ok": true,
             "message": {
                 "id": message_id,
-                "sender_user_id": user_id.to_string(),
                 "message": message,
                 "is_mine": true,
                 "delivered_at": 0,
                 "read_at": 0,
                 "created_at": now,
                 "reply_to_message_id": reply_to_message_id,
-                "reply_sender_user_id": null,
+                "reply_is_mine": false,
                 "reply_message": "",
                 "edited_at": 0,
                 "deleted_at": 0,
@@ -1701,17 +1676,16 @@ mod tests {
     }
 
     #[test]
-    fn chat_api_user_ids_serialize_without_javascript_rounding() {
+    fn chat_api_messages_do_not_serialize_internal_user_ids() {
         let message = ChatApiMessage {
             id: 159,
-            sender_user_id: 4_000_000_000_000_000_007,
             message: "Есть".to_string(),
             is_mine: false,
             delivered_at: 0,
             read_at: 0,
             created_at: 1,
             reply_to_message_id: Some(158),
-            reply_sender_user_id: Some(4_000_000_000_000_000_009),
+            reply_is_mine: true,
             reply_message: "Ответ".to_string(),
             edited_at: 0,
             deleted_at: 0,
@@ -1725,15 +1699,9 @@ mod tests {
 
         let value = serde_json::to_value(message).expect("serialize chat API message");
 
-        assert_eq!(value["sender_user_id"], "4000000000000000007");
-        assert_eq!(value["reply_sender_user_id"], "4000000000000000009");
-
-        let conversation = serde_json::json!({
-            "other_user_id":
-                4_000_000_000_000_000_007_i64.to_string()
-        });
-
-        assert_eq!(conversation["other_user_id"], "4000000000000000007");
+        assert!(value.get("sender_user_id").is_none());
+        assert!(value.get("reply_sender_user_id").is_none());
+        assert_eq!(value["reply_is_mine"], true);
     }
 
     #[test]
