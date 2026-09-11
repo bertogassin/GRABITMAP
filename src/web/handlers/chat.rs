@@ -300,7 +300,7 @@ pub async fn chat_page(
     let user_id = match verify_user_session(&state, &headers) {
         Some(id) => id,
         None => {
-            return Html(templates::render_chat(false, 0, 0, "", "", "", vec![]));
+            return Html(templates::render_chat(false, 0, 0, "", "", "", "", vec![]));
         }
     };
 
@@ -314,7 +314,16 @@ pub async fn chat_page(
     let other_user_id = match active_user_id_by_chat_route(&db, &other_user_route) {
         Some(other_user_id) if other_user_id > 0 && other_user_id != user_id => other_user_id,
         _ => {
-            return Html(templates::render_chat(true, user_id, 0, "", "", "", vec![]));
+            return Html(templates::render_chat(
+                true,
+                user_id,
+                0,
+                "",
+                "",
+                "",
+                "",
+                vec![],
+            ));
         }
     };
 
@@ -345,9 +354,10 @@ pub async fn chat_page(
 
     let conversation_id = conversation_id.unwrap_or(0);
 
-    let other_profile: Option<(String, String, String)> = db
+    let other_profile: Option<(String, String, String, String)> = db
         .query_row(
             "SELECT
+                COALESCE(public_id, ''),
                 COALESCE(username, ''),
                 COALESCE(first_name, ''),
                 COALESCE(last_name, '')
@@ -355,12 +365,12 @@ pub async fn chat_page(
              WHERE user_id = ?1
              LIMIT 1",
             rusqlite::params![other_user_id],
-            |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+            |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
         )
         .ok();
 
-    let (other_username, other_first_name, other_last_name) =
-        other_profile.unwrap_or_else(|| (String::new(), String::new(), String::new()));
+    let (other_public_id, other_username, other_first_name, other_last_name) = other_profile
+        .unwrap_or_else(|| (String::new(), String::new(), String::new(), String::new()));
 
     let mut messages: Vec<crate::web::view_models::ChatMessageRow> =
         load_recent_chat_messages(&db, conversation_id);
@@ -432,6 +442,7 @@ pub async fn chat_page(
         true,
         user_id,
         other_user_id,
+        &other_public_id,
         &other_username,
         &other_first_name,
         &other_last_name,
@@ -557,6 +568,7 @@ mod tests {
              );
              CREATE TABLE profiles (
                 user_id INTEGER PRIMARY KEY,
+                public_id TEXT NOT NULL DEFAULT '',
                 username TEXT,
                 first_name TEXT,
                 last_name TEXT,
@@ -584,7 +596,8 @@ mod tests {
              );
              INSERT INTO conversations (id, user1_id, user2_id, updated_at)
              VALUES (1, 10, 20, 100);
-             INSERT INTO profiles (user_id, first_name) VALUES (20, 'Друг');
+             INSERT INTO profiles (user_id, public_id, first_name)
+             VALUES (20, 'peer-public-20', 'Друг');
              INSERT INTO chat_preferences (
                 user_id, chat_kind, target_id, pinned_at, muted_until
              ) VALUES (10, 'direct', 20, 150, 500);
@@ -596,6 +609,7 @@ mod tests {
 
         let conversations = load_user_conversations(&db, 10);
         assert_eq!(conversations.len(), 1);
+        assert_eq!(conversations[0].other_public_id, "peer-public-20");
         assert_eq!(conversations[0].last_message, "__voice__");
         assert_eq!(conversations[0].pinned_at, 150);
         assert_eq!(conversations[0].muted_until, 500);

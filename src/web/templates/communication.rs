@@ -711,6 +711,7 @@ pub fn render_chat(
     authenticated: bool,
     viewer_user_id: i64,
     other_user_id: i64,
+    other_public_id: &str,
     username: &str,
     first_name: &str,
     last_name: &str,
@@ -720,6 +721,7 @@ pub fn render_chat(
         authenticated,
         viewer_user_id,
         other_user_id,
+        other_public_id,
         0,
         username,
         first_name,
@@ -746,6 +748,7 @@ pub fn render_group_chat(
         authenticated,
         viewer_user_id,
         0,
+        "",
         group_id,
         "",
         group_name,
@@ -759,6 +762,7 @@ fn render_chat_thread(
     authenticated: bool,
     viewer_user_id: i64,
     other_user_id: i64,
+    other_public_id: &str,
     group_id: i64,
     username: &str,
     first_name: &str,
@@ -798,6 +802,8 @@ fn render_chat_thread(
             "Чат",
             &if group_id > 0 {
                 format!("/app/group/{group_id}")
+            } else if !other_public_id.is_empty() {
+                format!("/app/chat/{}", urlencoding::encode(other_public_id))
             } else {
                 format!("/app/chat/{other_user_id}")
             },
@@ -945,6 +951,7 @@ fn render_chat_thread(
 
     <div id="chat-messages"
          data-other-user-id="{other_user_id}"
+         data-other-public-id="{other_public_id}"
          data-group-id="{group_id_attr}"
          data-viewer-user-id="{viewer_user_id}"
          data-first-message-id="{first_message_id}"
@@ -988,6 +995,7 @@ fn render_chat_thread(
             search_placeholder = escape_html(&crate::i18n::t("search_what")),
             close_label = escape_html(&crate::i18n::t("chat_close")),
             other_user_id = other_user_id,
+            other_public_id = escape_html(other_public_id),
             group_id_attr = if group_id > 0 {
                 group_id.to_string()
             } else {
@@ -1077,9 +1085,10 @@ fn render_chat_thread(
 
 {content}"####,
         back_link = back_link("/app/messages", "Назад", "arrow-left"),
-        header_avatar = if other_user_id > 0 {
+        header_avatar = if other_user_id > 0 && !other_public_id.is_empty() {
             format!(
-                r#"<img class="rm-me-avatar-img" src="/api/avatars/{other_user_id}" alt="" onerror="this.remove()">{icon}"#,
+                r#"<img class="rm-me-avatar-img" src="/api/public-avatars/{public_id}" alt="" onerror="this.remove()">{icon}"#,
+                public_id = urlencoding::encode(other_public_id),
                 icon = icon("user")
             )
         } else if group_id > 0 {
