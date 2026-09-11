@@ -1,0 +1,277 @@
+/* GRABITMAP 7.11 — mobile product foundation */
+
+html {
+    width: 100%;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overscroll-behavior-x: none;
+}
+
+body {
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+    touch-action: pan-x pan-y;
+}
+
+main,
+section,
+article,
+header,
+footer,
+nav,
+.page,
+.card,
+.card-content,
+.hero,
+.section-head,
+.topbar {
+    min-width: 0;
+    max-width: 100%;
+}
+
+img,
+video,
+audio,
+canvas,
+svg {
+    max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+p,
+.card-title,
+.card-meta,
+.section-title,
+.section-caption,
+.rm-menu-row-copy,
+.chat-dialog-name,
+.chat-dialog-username,
+.chat-dialog-preview {
+    overflow-wrap: anywhere;
+}
+
+a,
+button,
+input,
+select,
+textarea,
+[role="button"] {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+    outline: 2px solid var(--gold-light);
+    outline-offset: 3px;
+}
+
+.bottom-nav {
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+
+.rm-version-footer {
+    margin-bottom: calc(84px + env(safe-area-inset-bottom)) !important;
+}
+
+@media (max-width: 600px) {
+    input,
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+
+    .page {
+        width: 100%;
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+
+    .topbar {
+        gap: 12px;
+    }
+
+    .topbar > *,
+    .hero > *,
+    .section-head > * {
+        min-width: 0;
+    }
+
+    .grid,
+    .rm-map-grid {
+        gap: 10px !important;
+    }
+
+    .grid .card,
+    .rm-map-grid .card {
+        min-height: 72px !important;
+        padding: 12px 14px !important;
+        gap: 12px !important;
+        border-radius: 18px !important;
+    }
+
+    .grid .card-icon,
+    .rm-map-grid .card-icon {
+        width: 44px !important;
+        height: 44px !important;
+        flex-basis: 44px !important;
+        border-radius: 14px !important;
+    }
+
+    .grid .card-title,
+    .rm-map-grid .card-title {
+        font-size: 15px !important;
+        line-height: 1.25 !important;
+    }
+
+    .grid .card-meta,
+    .rm-map-grid .card-meta {
+        margin-top: 3px !important;
+        font-size: 12px !important;
+        line-height: 1.35 !important;
+    }
+
+    .rm-kind-chips {
+        gap: 7px !important;
+    }
+
+    .rm-kind-chip {
+        min-height: 34px !important;
+        padding: 0 11px !important;
+        font-size: 12px !important;
+    }
+
+    .rm-settings-card {
+        padding: 14px !important;
+    }
+
+    .rm-menu-row,
+    .rm-settings-theme-btn,
+    .rm-settings-toggle-btn,
+    .rm-settings-sound-btn {
+        min-height: 52px !important;
+        padding: 8px 2px !important;
+    }
+
+    .rm-lang-picker {
+        margin-top: 12px !important;
+        padding: 12px !important;
+        border-radius: 16px !important;
+    }
+
+    .rm-lang-grid {
+        gap: 7px !important;
+        max-height: 274px !important;
+        scrollbar-gutter: stable;
+    }
+
+    .rm-lang-search {
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .rm-lang-search input {
+        width: 100%;
+        min-height: 44px;
+        padding: 9px 12px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(0, 0, 0, .14);
+        color: var(--text);
+        font: inherit;
+    }
+
+    .rm-lang-search input:focus {
+        border-color: rgba(232, 204, 150, .58);
+        box-shadow: 0 0 0 3px rgba(232, 204, 150, .10);
+    }
+
+    .rm-lang-search-status {
+        min-height: 0;
+        color: var(--muted);
+        font-size: 11px;
+    }
+
+    .rm-lang-search-status:not(:empty) {
+        margin: -2px 0 8px;
+    }
+
+    .rm-lang-btn[hidden] {
+        display: none !important;
+    }
+
+    .rm-lang-btn {
+        min-height: 50px !important;
+        padding: 7px 10px !important;
+        border-radius: 12px !important;
+    }
+
+    .rm-lang-btn span {
+        font-size: 13px !important;
+    }
+
+    .rm-lang-btn small {
+        font-size: 10px !important;
+    }
+
+    .rm-empty-state {
+        padding: 20px 16px !important;
+    }
+
+    .rm-empty-state-actions {
+        width: 100%;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px !important;
+    }
+
+    .rm-empty-state-actions > * {
+        min-width: 0;
+        white-space: normal !important;
+        text-align: center;
+    }
+
+    .chat-dialog-row,
+    .chat-dialog-main,
+    .chat-dialog-copy {
+        min-width: 0;
+    }
+
+    .chat-dialog-name,
+    .chat-dialog-username,
+    .chat-dialog-preview {
+        max-width: 100% !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 390px) {
+    .page {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    .rm-empty-state-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .rm-lang-grid {
+        grid-template-columns: 1fr 1fr !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}

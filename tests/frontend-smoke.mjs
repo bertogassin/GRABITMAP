@@ -22,6 +22,32 @@ test("RTL runtime and mobile PWA metadata are present", async () => {
   assert.ok(manifest.icons?.length > 0);
 });
 
+test("mobile product foundation locks accidental zoom and contains narrow layouts", async () => {
+  const [template, i18n, css, runtime] = await Promise.all([
+    readFile(new URL("src/web/templates/common.rs", root), "utf8"),
+    readFile(new URL("src/i18n.rs", root), "utf8"),
+    readFile(new URL("static/mobile-foundation.css", root), "utf8"),
+    readFile(new URL("static/mobile-foundation.js", root), "utf8"),
+  ]);
+
+  assert.match(template, /maximum-scale=1, user-scalable=no/);
+  assert.match(template, /static_asset\("mobile-foundation\.css"\)/);
+  assert.match(template, /static_asset\("mobile-foundation\.js"\)/);
+  assert.match(css, /touch-action: pan-x pan-y/);
+  assert.match(css, /input,[\s\S]*font-size: 16px !important/);
+  assert.match(css, /\.rm-map-grid \.card[\s\S]*min-height: 72px !important/);
+  assert.match(css, /\.rm-lang-grid[\s\S]*max-height: 274px !important/);
+  assert.match(css, /\.chat-dialog-preview[\s\S]*text-overflow: ellipsis/);
+  assert.match(css, /prefers-reduced-motion: reduce/);
+  assert.match(runtime, /gesturestart/);
+  assert.match(runtime, /dblclick/);
+  assert.match(runtime, /passive: false/);
+  assert.match(i18n, /data-language-filter/);
+  assert.match(i18n, /data-empty-label/);
+  assert.match(runtime, /bindLanguageFilter/);
+  assert.match(runtime, /button\.hidden = !matches/);
+});
+
 test("locale switching validates and canonicalizes locale tags", async () => {
   const runtime = await readFile(new URL("static/i18n-runtime.js", root), "utf8");
   assert.match(runtime, /normalizeLocale/);
