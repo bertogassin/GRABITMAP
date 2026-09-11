@@ -127,7 +127,7 @@ html[data-page="chat"] .chat-shell {
     html[data-page="chat"] .topbar { display: none !important; }
     html[data-page="chat"] main.page {
         padding: 8px max(6px,env(safe-area-inset-left))
-            max(12px,env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-right)) !important;
+            max(22px,env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-right)) !important;
     }
     html[data-page="chat"] .chat-header-premium { padding: 9px 10px !important; }
     html[data-page="chat"] .chat-header-premium > .back-link { margin-bottom: 7px !important; }
@@ -136,6 +136,7 @@ html[data-page="chat"] .chat-shell {
     #chat-form.chat-composer {
         grid-template-columns: 40px 40px minmax(0,1fr) 46px !important;
         gap: 6px !important; flex-shrink: 0 !important;
+        margin-bottom: 2px !important;
     }
     #chat-form.chat-composer button { min-height: 40px !important; }
     .official-group-current,.official-group-note {

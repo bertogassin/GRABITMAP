@@ -140,6 +140,20 @@ test("communication polish keeps inbox and group pages compact and mobile safe",
   assert.match(css, /\.rm-group-member input\[type="checkbox"\]/);
 });
 
+test("communication finishing pass labels inbox actions and clears Android navigation", async () => {
+  const [inbox, mature, polish] = await Promise.all([
+    readFile(new URL("static/inbox.js", root), "utf8"),
+    readFile(new URL("static/chat-mature.css", root), "utf8"),
+    readFile(new URL("static/communication-polish.css", root), "utf8"),
+  ]);
+
+  assert.match(inbox, /chat-dialog-menu-label/);
+  assert.match(inbox, /escapeHtml\(label\)/);
+  assert.match(polish, /\.chat-dialog-menu-label/);
+  assert.match(mature, /max\(22px,env\(safe-area-inset-bottom\)\)/);
+  assert.match(polish, /\.hero h1[\s\S]*font-size: 24px !important/);
+});
+
 test("chat photo viewer is isolated, keyboard accessible, and downloadable", async () => {
   const [chat, css] = await Promise.all([
     readFile(new URL("static/chat-v2.js", root), "utf8"),
