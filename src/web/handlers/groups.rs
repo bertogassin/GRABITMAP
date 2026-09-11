@@ -1969,6 +1969,7 @@ pub async fn group_members_page(
                     next_after: None,
                     members: vec![],
                     candidates: vec![],
+                    blocked_members: vec![],
                     error: "",
                 },
             ))
@@ -1992,6 +1993,7 @@ pub async fn group_members_page(
                 next_after: None,
                 members: vec![],
                 candidates: vec![],
+                blocked_members: vec![],
                 error: "Нет доступа",
             },
         ));
@@ -2026,6 +2028,11 @@ pub async fn group_members_page(
     } else {
         vec![]
     };
+    let blocked_members = if is_official && role_can_manage_members(&viewer_role) {
+        load_blocked_group_members(&db, group_id)
+    } else {
+        vec![]
+    };
     Html(templates::render_group_members(
         templates::GroupMembersPage {
             viewer_user_id: user_id,
@@ -2039,6 +2046,7 @@ pub async fn group_members_page(
             next_after,
             members,
             candidates,
+            blocked_members,
             error: "",
         },
     ))
@@ -2720,7 +2728,11 @@ pub async fn update_group_member_mute(
     } else {
         now.saturating_add(form.seconds)
     };
-    let changed = db
+    let transaction = match db.unchecked_transaction() {
+        Ok(transaction) => transaction,
+        Err(_) => return Redirect::to(&target).into_response(),
+    };
+    let changed = transaction
         .execute(
             "UPDATE chat_group_members
              SET muted_until = ?1
@@ -2748,11 +2760,34 @@ pub async fn update_group_member_mute(
             ],
         )
         .unwrap_or(0);
-    if changed == 1 {
-        let _ = db.execute(
-            "UPDATE chat_groups SET updated_at = ?1 WHERE id = ?2",
-            rusqlite::params![now, group_id],
-        );
+    let action = if form.seconds == 0 {
+        crate::db::group_moderation::ACTION_UNMUTE
+    } else {
+        crate::db::group_moderation::ACTION_MUTE
+    };
+    if changed != 1
+        || crate::db::group_moderation::record_event(
+            &transaction,
+            &crate::db::group_moderation::NewModerationEvent {
+                group_id,
+                actor_user_id: user_id,
+                target_user_id: member_id,
+                action,
+                duration_seconds: form.seconds,
+                reason: "Управление участниками группы",
+                created_at: now,
+            },
+        )
+        .is_err()
+        || transaction
+            .execute(
+                "UPDATE chat_groups SET updated_at = ?1 WHERE id = ?2",
+                rusqlite::params![now, group_id],
+            )
+            .is_err()
+        || transaction.commit().is_err()
+    {
+        return Redirect::to(&target).into_response();
     }
     Redirect::to(&target).into_response()
 }
@@ -2794,7 +2829,13 @@ pub async fn remove_group_member(
         Some(id) => id,
         None => return Redirect::to("/login?next=/app/messages").into_response(),
     };
-    if member_id == user_id {
+    if rate_limit_retry_after(&state, user_id, "group_member_remove", 20, 60)
+        .await
+        .is_some()
+        || group_id <= 0
+        || member_id <= 0
+        || member_id == user_id
+    {
         return Redirect::to(&target).into_response();
     }
     let db = match crate::db::pool::get_connection(&state.db_pool) {
@@ -2810,9 +2851,14 @@ pub async fn remove_group_member(
     if !role_can_remove(&actor_role, &member_role) {
         return Redirect::to(&target).into_response();
     }
-    let official_manager =
-        super::official_groups::is_official_group(&db, group_id) && actor_role == GROUP_ROLE_OWNER;
-    if db
+    let is_official = super::official_groups::is_official_group(&db, group_id);
+    let official_manager = is_official && actor_role == GROUP_ROLE_OWNER;
+    let now = unix_now();
+    let transaction = match db.unchecked_transaction() {
+        Ok(transaction) => transaction,
+        Err(_) => return Redirect::to(&target).into_response(),
+    };
+    let changed = transaction
         .execute(
             "DELETE FROM chat_group_members
              WHERE group_id = ?1
@@ -2837,13 +2883,94 @@ pub async fn remove_group_member(
                 i64::from(official_manager)
             ],
         )
-        .unwrap_or(0)
-        == 1
+        .unwrap_or(0);
+    if changed != 1 {
+        return Redirect::to(&target).into_response();
+    }
+    let moderation_result = if is_official {
+        crate::db::group_moderation::block_member(
+            &transaction,
+            group_id,
+            user_id,
+            member_id,
+            "Удаление из официальной группы",
+            now,
+        )
+    } else {
+        crate::db::group_moderation::record_event(
+            &transaction,
+            &crate::db::group_moderation::NewModerationEvent {
+                group_id,
+                actor_user_id: user_id,
+                target_user_id: member_id,
+                action: crate::db::group_moderation::ACTION_REMOVE,
+                duration_seconds: 0,
+                reason: "Удаление из частной группы",
+                created_at: now,
+            },
+        )
+    };
+    if moderation_result.is_err()
+        || transaction
+            .execute(
+                "UPDATE chat_groups SET updated_at = ?1 WHERE id = ?2",
+                rusqlite::params![now, group_id],
+            )
+            .is_err()
+        || transaction.commit().is_err()
     {
-        let _ = db.execute(
-            "UPDATE chat_groups SET updated_at = ?1 WHERE id = ?2",
-            rusqlite::params![unix_now(), group_id],
-        );
+        return Redirect::to(&target).into_response();
+    }
+    Redirect::to(&target).into_response()
+}
+
+pub async fn restore_group_member(
+    State(state): State<AppState>,
+    Path((group_id, member_id)): Path<(i64, i64)>,
+    headers: HeaderMap,
+) -> Response {
+    let target = format!("/app/group/{group_id}/members");
+    if request_is_cross_site(&headers) {
+        return Redirect::to(&target).into_response();
+    }
+    let user_id = match verify_user_session(&state, &headers) {
+        Some(id) => id,
+        None => return Redirect::to("/login?next=/app/messages").into_response(),
+    };
+    if rate_limit_retry_after(&state, user_id, "group_member_restore", 20, 60)
+        .await
+        .is_some()
+        || group_id <= 0
+        || member_id <= 0
+        || member_id == user_id
+    {
+        return Redirect::to(&target).into_response();
+    }
+    let db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => return Redirect::to(&target).into_response(),
+    };
+    let actor_role =
+        super::official_groups::group_management_role(&state, &headers, &db, group_id, user_id)
+            .unwrap_or_default();
+    if !super::official_groups::is_official_group(&db, group_id) || actor_role != GROUP_ROLE_OWNER {
+        return Redirect::to(&target).into_response();
+    }
+    let transaction = match db.unchecked_transaction() {
+        Ok(transaction) => transaction,
+        Err(_) => return Redirect::to(&target).into_response(),
+    };
+    let restored = crate::db::group_moderation::restore_member(
+        &transaction,
+        group_id,
+        user_id,
+        member_id,
+        "Восстановление доступа управляющим территории",
+        unix_now(),
+    )
+    .unwrap_or(false);
+    if !restored || transaction.commit().is_err() {
+        return Redirect::to(&target).into_response();
     }
     Redirect::to(&target).into_response()
 }
@@ -2882,6 +3009,35 @@ fn group_member_fts_query(query: &str) -> String {
         .take(8)
         .collect::<Vec<_>>()
         .join(" AND ")
+}
+
+fn load_blocked_group_members(db: &rusqlite::Connection, group_id: i64) -> Vec<(i64, String)> {
+    db.prepare(
+        "SELECT block.user_id,
+                COALESCE(profile.username, ''),
+                COALESCE(profile.first_name, ''),
+                COALESCE(profile.last_name, '')
+         FROM chat_group_member_blocks AS block
+         LEFT JOIN profiles AS profile ON profile.user_id = block.user_id
+         WHERE block.group_id = ?1 AND block.revoked_at = 0
+         ORDER BY block.user_id ASC
+         LIMIT 50",
+    )
+    .and_then(|mut statement| {
+        statement
+            .query_map(rusqlite::params![group_id], |row| {
+                let id = row.get::<_, i64>(0)?;
+                let username = row.get::<_, String>(1)?;
+                let first_name = row.get::<_, String>(2)?;
+                let last_name = row.get::<_, String>(3)?;
+                Ok((
+                    id,
+                    templates::conversation_display_name(id, &username, &first_name, &last_name),
+                ))
+            })?
+            .collect::<Result<Vec<_>, _>>()
+    })
+    .unwrap_or_default()
 }
 
 fn load_group_member_names(

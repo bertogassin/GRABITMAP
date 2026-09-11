@@ -796,3 +796,25 @@ test("member index backfill is bounded resumable and observable", async () => {
   assert.match(health, /grabitmap_group_member_index_processed/);
   assert.match(health, /grabitmap_group_member_index_completed/);
 });
+
+test("group moderation is transactional bounded and blocks rejoining", async () => {
+  const [moderation, groups, official, routes, template] = await Promise.all([
+    readFile(new URL("src/db/group_moderation.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/official_groups.rs", root), "utf8"),
+    readFile(new URL("src/web/routes/communication.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+  ]);
+
+  assert.match(moderation, /chat_group_member_blocks/);
+  assert.match(moderation, /chat_group_moderation_events_no_update/);
+  assert.match(moderation, /chat_group_moderation_events_no_delete/);
+  assert.match(moderation, /idx_chat_group_member_blocks_active/);
+  assert.match(groups, /group_member_remove/);
+  assert.match(groups, /group_member_restore/);
+  assert.match(groups, /LIMIT 50/);
+  assert.match(official, /group_moderation::member_is_blocked/);
+  assert.match(routes, /members\/\{member_id\}\/restore/);
+  assert.match(template, /Заблокированные/);
+  assert.match(template, /Восстановить доступ/);
+});

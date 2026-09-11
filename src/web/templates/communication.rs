@@ -1392,6 +1392,7 @@ pub struct GroupMembersPage<'a> {
     pub next_after: Option<i64>,
     pub members: Vec<(i64, String, String, i64)>,
     pub candidates: Vec<(i64, String)>,
+    pub blocked_members: Vec<(i64, String)>,
     pub error: &'a str,
 }
 
@@ -1408,6 +1409,7 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
         next_after,
         members,
         candidates,
+        blocked_members,
         error,
     } = params;
     let authenticated = viewer_user_id > 0;
@@ -1652,6 +1654,27 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
         } else {
             ""
         };
+        let blocked = if !is_official || !can_manage || blocked_members.is_empty() {
+            String::new()
+        } else {
+            let rows = blocked_members
+                .iter()
+                .map(|(id, member)| {
+                    format!(
+                        r#"<article class="rm-group-member rm-group-member--managed">
+    <div class="rm-group-member-copy"><strong>{member}</strong><div class="rm-group-member-meta"><span class="rm-group-you">Доступ заблокирован</span></div></div>
+    <div class="rm-group-actions"><form method="post" action="/app/group/{group_id}/members/{id}/restore" data-confirm="Восстановить возможность вступления в официальную группу?"><button type="submit" class="rm-group-action">Восстановить доступ</button></form></div>
+</article>"#,
+                        member = escape_html(member),
+                    )
+                })
+                .collect::<Vec<_>>()
+                .join("");
+            format!(
+                r#"<section class="card rm-group-create"><div class="rm-group-section-head"><div class="rm-profile-field-label">Заблокированные</div><span class="rm-group-count">{count}</span></div><div class="rm-group-members">{rows}</div></section>"#,
+                count = blocked_members.len(),
+            )
+        };
         let governance = if !is_official {
             String::new()
         } else if can_manage {
@@ -1671,6 +1694,7 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
     {empty_members}
     {next_members}
 </section>
+{blocked}
 {add}
 {leave}
 <script>
@@ -1720,6 +1744,7 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
             empty_members = empty_members,
             next_members = next_members,
             list = list,
+            blocked = blocked,
             add = add,
             leave = leave,
         )
