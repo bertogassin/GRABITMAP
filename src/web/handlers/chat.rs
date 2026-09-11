@@ -1,5 +1,5 @@
 use super::auth::verify_user_session;
-use super::chat_identity::active_user_id_by_chat_route;
+use super::chat_identity::{active_public_id_by_user_id, active_user_id_by_chat_route};
 use crate::state::app_state::AppState;
 use crate::web::templates;
 use axum::{
@@ -265,7 +265,7 @@ pub async fn messages_page(
         Some(id) => id,
 
         None => {
-            return Html(templates::render_messages(false, 0, vec![], None, false));
+            return Html(templates::render_messages(false, "", vec![], None, false));
         }
     };
 
@@ -280,12 +280,13 @@ pub async fn messages_page(
     let mut conversations = load_user_conversations(&db, user_id);
     conversations.extend(super::groups::load_user_groups(&db, user_id));
     let conversations = organize_conversations(conversations, archived);
+    let viewer_public_id = active_public_id_by_user_id(&db, user_id).unwrap_or_default();
 
     drop(db);
 
     Html(templates::render_messages(
         true,
-        user_id,
+        &viewer_public_id,
         conversations,
         share_listing_id,
         archived,

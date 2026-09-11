@@ -221,8 +221,7 @@ async fn chat_socket(mut socket: WebSocket, state: AppState, user_id: i64, last_
         &mut socket,
         json!({
             "type": "ready",
-            "protocol": "resursmap.chat.v5",
-            "user_id": user_id.to_string()
+            "protocol": "resursmap.chat.v5"
         }),
     )
     .await

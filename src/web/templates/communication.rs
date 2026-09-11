@@ -75,7 +75,7 @@ fn inbox_unread_caption(total_unread: i64) -> String {
 
 pub fn render_messages(
     authenticated: bool,
-    viewer_user_id: i64,
+    viewer_public_id: &str,
     conversations: Vec<crate::web::view_models::ConversationRow>,
     share_listing_id: Option<i64>,
     archived: bool,
@@ -186,7 +186,11 @@ pub fn render_messages(
                 } else {
                     String::new()
                 };
-                let target_id = if is_group { group_id } else { other_user_id };
+                let target_id = if is_group {
+                    group_id.to_string()
+                } else {
+                    urlencoding::encode(other_public_id).into_owned()
+                };
                 let preference_kind = if is_group { "group" } else { "direct" };
                 let return_view = if archived { "archived" } else { "active" };
                 let muted = conversation.muted_until > chrono::Utc::now().timestamp();
@@ -221,7 +225,6 @@ pub fn render_messages(
 <article class="chat-dialog-entry" data-inbox-entry>
 <a href="{href}#chat-end"
    class="card chat-dialog-card"
-   data-other-user-id="{other_user_id}"
    data-other-public-id="{other_public_id}"
    data-group-id="{group_id}"
    data-kind="{kind}">
@@ -265,7 +268,6 @@ pub fn render_messages(
 </article>
 "#,
                     href = href,
-                    other_user_id = other_user_id,
                     other_public_id = escape_html(other_public_id),
                     group_id = if group_id > 0 { group_id.to_string() } else { String::new() },
                     kind = kind,
@@ -324,8 +326,9 @@ pub fn render_messages(
 
     let list_attributes = if authenticated {
         format!(
-            r#" id="chat-dialog-list" data-inbox-live="1" data-viewer-user-id="{viewer_user_id}" data-inbox-view="{}""#,
-            if archived { "archived" } else { "active" }
+            r#" id="chat-dialog-list" data-inbox-live="1" data-viewer-public-id="{}" data-inbox-view="{}""#,
+            escape_html(viewer_public_id),
+            if archived { "archived" } else { "active" },
         )
     } else {
         String::new()

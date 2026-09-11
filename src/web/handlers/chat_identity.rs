@@ -61,6 +61,29 @@ pub(super) fn active_user_id_by_chat_route(
         .flatten()
 }
 
+pub(super) fn active_public_id_by_user_id(connection: &Connection, user_id: i64) -> Option<String> {
+    if user_id <= 0 {
+        return None;
+    }
+
+    connection
+        .query_row(
+            "SELECT profile.public_id
+             FROM profiles AS profile
+             JOIN users AS user
+               ON user.id = profile.user_id
+              AND user.is_active = 1
+             WHERE profile.user_id = ?1
+               AND trim(profile.public_id) <> ''
+             LIMIT 1",
+            rusqlite::params![user_id],
+            |row| row.get(0),
+        )
+        .optional()
+        .ok()
+        .flatten()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -129,5 +152,17 @@ mod tests {
             None
         );
         assert_eq!(active_user_id_by_public_id(&connection, "../owner"), None);
+    }
+
+    #[test]
+    fn internal_identifier_resolves_to_active_public_identifier() {
+        let connection = identity_database();
+
+        assert_eq!(
+            active_public_id_by_user_id(&connection, 7).as_deref(),
+            Some("f57ceb83b834b7aa4e0d694c11894014")
+        );
+        assert_eq!(active_public_id_by_user_id(&connection, 8), None);
+        assert_eq!(active_public_id_by_user_id(&connection, 0), None);
     }
 }

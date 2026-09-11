@@ -1508,7 +1508,6 @@ pub async fn api_chat_conversations(
             };
 
             json!({
-                "other_user_id": conversation.other_user_id.to_string(),
                 "other_public_id": conversation.other_public_id,
                 "display_name": display_name,
                 "username": conversation.username,
@@ -1530,7 +1529,7 @@ pub async fn api_chat_conversations(
                         urlencoding::encode(&conversation.other_public_id)
                     )
                 } else {
-                    format!("/app/chat/{}", conversation.other_user_id)
+                    "/app/messages".to_string()
                 },
             })
         })
