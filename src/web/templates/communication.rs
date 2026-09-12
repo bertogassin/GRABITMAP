@@ -900,9 +900,17 @@ fn render_chat_thread(
                 .join("")
         };
 
-        let composer = r#"
+        let composer_action = if group_id > 0 {
+            format!("/app/group/{group_id}/send")
+        } else {
+            String::new()
+        };
+        let composer = format!(
+            r#"
 <form id="chat-form"
-      class="ui-form chat-composer">
+      class="ui-form chat-composer"
+      method="post"
+      action="{composer_action}">
 
     <div id="chat-reply-bar"
          class="chat-reply-bar"
@@ -935,16 +943,17 @@ fn render_chat_thread(
     </div>
 
     <div class="chat-composer-main">
+        <button id="chat-attach-btn" type="button" class="chat-attach-btn" aria-label="Добавить вложение" aria-expanded="false">+</button>
         <textarea id="chat-input" name="message" rows="1" maxlength="2000" required autocomplete="off" enterkeyhint="send" aria-label="Текст сообщения" placeholder="Сообщение…" class="ui-textarea chat-input"></textarea>
+        <button id="chat-image-btn" type="button" class="chat-image-btn" aria-label="Добавить фото">
+            <span class="chat-action-icon" aria-hidden="true">▣</span>
+            <span class="chat-action-label">Фото</span>
+        </button>
     </div>
     <input type="file" id="chat-image-input" accept="image/jpeg,image/png,image/webp" class="chat-file-input">
     <button id="chat-voice-btn" type="button" class="chat-voice-btn">
         <span class="chat-action-icon" aria-hidden="true">●</span>
         <span class="chat-action-label">Голос</span>
-    </button>
-    <button id="chat-image-btn" type="button" class="chat-image-btn">
-        <span class="chat-action-icon" aria-hidden="true">▣</span>
-        <span class="chat-action-label">Фото</span>
     </button>
     <button id="chat-send" type="submit" class="ui-button chat-send-button">
         <span class="chat-action-icon" aria-hidden="true">➤</span>
@@ -952,7 +961,9 @@ fn render_chat_thread(
     </button>
     <div class="chat-composer-footer"><span id="chat-send-state">Enter — отправить · Shift+Enter — новая строка</span><span id="chat-counter">0 / 2000</span></div>
 </form>
-"#;
+"#,
+            composer_action = escape_html(&composer_action)
+        );
 
         format!(
             r#"

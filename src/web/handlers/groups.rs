@@ -1119,6 +1119,71 @@ pub(crate) struct GroupSendPayload {
     reply_to_message_id: Option<i64>,
 }
 
+#[derive(Debug, Deserialize)]
+pub(crate) struct GroupSendForm {
+    message: String,
+}
+
+/// Progressive-enhancement fallback for browsers where the chat JavaScript
+/// failed to initialize. The normal composer uses the JSON API, while this
+/// route guarantees that a member can still send a plain text message.
+pub async fn send_group_form(
+    State(state): State<AppState>,
+    Path(group_id): Path<i64>,
+    headers: HeaderMap,
+    Form(payload): Form<GroupSendForm>,
+) -> Response {
+    let target = format!("/app/group/{group_id}");
+    if request_is_cross_site(&headers) || group_id <= 0 {
+        return Redirect::to(&target).into_response();
+    }
+    let Some(user_id) = verify_user_session(&state, &headers) else {
+        return Redirect::to("/login?next=/app/messages").into_response();
+    };
+    if rate_limit_retry_after(&state, user_id, "group_form_send", 30, 60)
+        .await
+        .is_some()
+    {
+        return Redirect::to(&target).into_response();
+    }
+    let message = payload.message.trim();
+    if !input_text_is_valid(message, 1, 2000) {
+        return Redirect::to(&target).into_response();
+    }
+    let db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => return Redirect::to(&target).into_response(),
+    };
+    if !is_member(&db, group_id, user_id)
+        || group_member_muted_until(&db, group_id, user_id) > unix_now()
+    {
+        return Redirect::to(&target).into_response();
+    }
+    let now = unix_now();
+    if db
+        .execute(
+            "INSERT INTO group_messages (
+                group_id, sender_user_id, message, created_at
+             ) VALUES (?1, ?2, ?3, ?4)",
+            rusqlite::params![group_id, user_id, message, now],
+        )
+        .is_err()
+    {
+        return Redirect::to(&target).into_response();
+    }
+    let message_id = db.last_insert_rowid();
+    fanout_group_message(
+        &state,
+        &db,
+        "message.created",
+        group_id,
+        message_id,
+        user_id,
+        message,
+    );
+    Redirect::to(&target).into_response()
+}
+
 pub async fn api_group_send(
     State(state): State<AppState>,
     Path(group_id): Path<i64>,

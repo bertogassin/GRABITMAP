@@ -422,6 +422,24 @@ test("chat has one active submit owner and accepts practical voice sizes", async
   assert.match(groups, /bytes\.len\(\) > MAX_VOICE_BYTES/);
 });
 
+test("group text chat keeps a native fallback and the composer has one adaptive action", async () => {
+  const [handlers, routes, template, chat, mature] = await Promise.all([
+    readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
+    readFile(new URL("src/web/routes/communication.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("static/chat-mature.css", root), "utf8"),
+  ]);
+  assert.match(handlers, /pub async fn send_group_form/);
+  assert.match(routes, /group\/\{group_id\}\/send/);
+  assert.match(template, /action="\{composer_action\}"/);
+  assert.match(chat, /form\.classList\.toggle\("has-message", hasMessage\)/);
+  assert.match(chat, /controller\.abort\(\)/);
+  assert.match(chat, /Math\.max\(46, input\.scrollHeight \|\| 46\)/);
+  assert.match(mature, /grid-template-areas:[\s\S]*"main action"/);
+  assert.match(mature, /#chat-form\.has-message \.chat-send-button/);
+});
+
 test("mobile diagnostics probes session chat microphone and motion", async () => {
   const diagnostics = await readFile(new URL("static/mobile-diagnostics.js", root), "utf8");
   assert.match(diagnostics, /grabit-mobile-diagnostic/);

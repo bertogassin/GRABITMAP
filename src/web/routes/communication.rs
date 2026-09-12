@@ -9,8 +9,9 @@ use super::super::handlers::{
     delete_group, delete_group_avatar, get_group_avatar, group_chat_page, group_invite_page,
     group_members_page, join_group_invite, join_official_group, leave_group, messages_page,
     new_group_page, official_groups_page, remove_group_member, rename_group, restore_group_member,
-    retired_contact_decision, revoke_group_invite, set_group_avatar, transfer_group_ownership,
-    update_chat_preference, update_group_member_mute, update_group_member_role,
+    retired_contact_decision, revoke_group_invite, send_group_form, set_group_avatar,
+    transfer_group_ownership, update_chat_preference, update_group_member_mute,
+    update_group_member_role,
 };
 use crate::state::app_state::AppState;
 use axum::{
@@ -52,6 +53,7 @@ pub(super) fn routes() -> Router<AppState> {
             get(group_invite_page).post(join_group_invite),
         )
         .route("/app/group/{group_id}", get(group_chat_page))
+        .route("/app/group/{group_id}/send", post(send_group_form))
         .route("/app/group/{group_id}/members", get(group_members_page))
         .route("/app/group/{group_id}/members", post(add_group_members))
         .route("/app/group/{group_id}/delete", post(delete_group))
