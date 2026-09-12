@@ -17,15 +17,13 @@ pub fn invite_share_block(public_id: &str) -> String {
     format!(
         r#"<section class="card rm-invite-card">
     <div class="card-title">Пригласить друга</div>
-    <div class="card-meta">Одна ссылка. После входа он сразу пишет вам и может открыть шагомер или работу.</div>
+    <div class="card-meta">Отправьте личную ссылку для чата или поиска работы.</div>
     <div class="rm-invite-actions">
-        <button type="button" class="ui-button" data-share data-share-title="GRABIT · шагомер" data-share-text="Считаем шаги в GRABIT. Цель — 10 000. Заходи по моей ссылке." data-share-url="{steps}" data-share-status="rm-invite-status">Шагомер</button>
         <button type="button" class="ui-button" data-share data-share-title="GRABIT · написать" data-share-text="Напиши мне в GRABIT. Чат сразу, без заявки." data-share-url="{chat}" data-share-status="rm-invite-status">Чат</button>
         <button type="button" class="ui-button" data-share data-share-title="GRABIT · работа" data-share-text="Ищем работу рядом в GRABIT. Заходи по ссылке." data-share-url="{work}" data-share-status="rm-invite-status">Работа</button>
     </div>
     <p id="rm-invite-status" class="rm-step-hint" role="status"></p>
 </section>"#,
-        steps = escape_html(&invite_path(public_id, "steps")),
         chat = escape_html(&invite_path(public_id, "chat")),
         work = escape_html(&invite_path(public_id, "work")),
     )
@@ -44,7 +42,7 @@ pub fn render_invite_landing(name: &str, public_id: &str, to: &str) -> String {
         "steps" => "Цель дня — 10 000 шагов. Войдите и шагомер откроется, а чат с другом будет уже на месте.",
         "chat" => "Напишите сразу. Потом можно заблокировать или удалить.",
         "work" => "После входа откроется поиск работы, и вы сразу сможете написать другу.",
-        _ => "Шагомер, чат и работа рядом. Войдите — и вы уже у друга.",
+        _ => "Чат и поиск работы рядом. Войдите — и вы уже у друга.",
     };
     let who = if name.trim().is_empty() {
         "Участник GRABIT".to_string()
@@ -95,7 +93,9 @@ mod tests {
         assert!(html.contains("/register?next="));
         assert!(html.contains("Анна"));
         let share = invite_share_block("abc123");
-        assert!(share.contains("/app/join/abc123?to=steps"));
+        assert!(!share.contains("/app/join/abc123?to=steps"));
+        assert!(share.contains("/app/join/abc123?to=chat"));
+        assert!(share.contains("/app/join/abc123?to=work"));
         assert!(share.contains("Пригласить друга"));
     }
 }

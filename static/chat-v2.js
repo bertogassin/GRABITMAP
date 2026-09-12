@@ -546,6 +546,11 @@
             );
 
             document.documentElement.style.setProperty(
+                "--chat-visible-bottom",
+                Math.round(offsetTop + height) + "px"
+            );
+
+            document.documentElement.style.setProperty(
                 "--chat-viewport-offset-top",
                 Math.round(offsetTop) + "px"
             );

@@ -2029,7 +2029,9 @@ mod personal_center_tests {
         assert!(html.contains("data-nav-chats-link"));
         assert!(html.contains(r#"<span class="nav-badge">6</span>"#));
         assert!(html.contains("data-nav-menu-link"));
-        assert!(html.contains("/app/join/abc123?to=steps"));
+        assert!(!html.contains("/app/join/abc123?to=steps"));
+        assert!(html.contains("/app/join/abc123?to=chat"));
+        assert!(html.contains("/app/join/abc123?to=work"));
         assert!(html.contains(r#"<span class="nav-badge">5</span>"#));
     }
 

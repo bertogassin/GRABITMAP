@@ -1916,7 +1916,9 @@ mod search_catalog_tests {
     fn menu_and_home_keep_continue_hosts() {
         let menu = render_menu("abc123", 0);
         assert!(menu.contains("id=\"rm-continue-menu\""));
-        assert!(menu.contains("/app/join/abc123?to=steps"));
+        assert!(!menu.contains("/app/join/abc123?to=steps"));
+        assert!(menu.contains("/app/join/abc123?to=chat"));
+        assert!(menu.contains("/app/join/abc123?to=work"));
         assert!(menu.contains("theme-toggle-btn"));
         assert!(menu.contains("data-nav-map-link"));
         assert!(menu.contains("data-nav-search-link"));
