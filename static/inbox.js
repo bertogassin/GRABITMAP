@@ -92,12 +92,42 @@
         var activeTyping = Object.create(null);
         var typingTimers = Object.create(null);
 
+        function closeOtherDialogMenus(current) {
+            list.querySelectorAll("details.chat-dialog-controls[open]").forEach(function (details) {
+                if (details !== current) details.open = false;
+            });
+        }
+
+        list.addEventListener("toggle", function (event) {
+            var details = event.target;
+            if (details instanceof HTMLDetailsElement && details.matches(".chat-dialog-controls") && details.open) {
+                closeOtherDialogMenus(details);
+            }
+        }, true);
+        document.addEventListener("click", function (event) {
+            if (!event.target.closest(".chat-dialog-controls")) closeOtherDialogMenus(null);
+        });
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") closeOtherDialogMenus(null);
+        });
+
         function escapeHtml(value) {
             return String(value || "")
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;");
+        }
+
+        function conversationPreview(value) {
+            var text = String(value || "").trim();
+            if (/^(?:https?:\/\/[^/]+)?\/app\/(?:listing|resource)\/[1-9][0-9]*(?:[/?#].*)?$/i.test(text)) {
+                return t("common_listing", "Объявление GRABIT");
+            }
+            if (text === "__image__") return t("chat_photo", "Фото");
+            if (text === "__voice__") return t("chat_voice", "Голосовое");
+            if (text === "__deleted__") return t("chat_deleted", "Сообщение удалено");
+            return text;
         }
 
         function typingPreviewHtml(actorName) {
@@ -245,7 +275,7 @@
             var previewText = activeTyping[typingKey]
                 ? typingPreviewHtml(isGroup ? typingNames(typingKey) : "")
                 : escapeHtml(
-                    conversation.last_message || (isGroup ? t("chat_new_group_preview", "Новая группа") : t("chat_new_dialog", "Новый диалог"))
+                    conversationPreview(conversation.last_message) || (isGroup ? t("chat_new_group_preview", "Новая группа") : t("chat_new_dialog", "Новый диалог"))
                 );
             var fallbackAvatar = isGroup ? USERS_ICON : MESSAGE_ICON;
             var avatarHtml = isGroup && conversation.has_avatar && groupId

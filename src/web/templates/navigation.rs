@@ -54,7 +54,7 @@ fn search_rubric_chips(
     for rubric in crate::catalog::by_kind(filter_kind) {
         chips.push_str(&kind_chip(
             active.is_some_and(|item| item.id == rubric.id),
-            &search_page_href(q, kind, Some(rubric.id), city_id),
+            &search_page_href("", kind, Some(rubric.id), city_id),
             rubric.label,
         ));
     }

@@ -1938,6 +1938,8 @@ pub struct GroupMembersQuery {
     q: String,
     #[serde(default)]
     after: i64,
+    #[serde(default)]
+    invite: String,
 }
 
 fn normalized_group_member_query(value: &str) -> String {
@@ -1972,6 +1974,7 @@ pub async fn group_members_page(
                     members: vec![],
                     candidates: vec![],
                     blocked_members: vec![],
+                    invite_token: String::new(),
                     error: "",
                 },
             ))
@@ -2002,6 +2005,7 @@ pub async fn group_members_page(
                 members: vec![],
                 candidates: vec![],
                 blocked_members: vec![],
+                invite_token: String::new(),
                 error: "Нет доступа",
             },
         ));
@@ -2049,6 +2053,18 @@ pub async fn group_members_page(
     } else {
         vec![]
     };
+    let invite_token = parse_group_invite_token(&state.admin_key, &query.invite, unix_now())
+        .filter(|invite| invite.group_id == group_id)
+        .filter(|invite| {
+            db.query_row(
+                "SELECT invite_nonce FROM chat_groups WHERE id = ?1",
+                rusqlite::params![group_id],
+                |row| row.get::<_, String>(0),
+            )
+            .is_ok_and(|nonce| !nonce.is_empty() && nonce == invite.nonce)
+        })
+        .map(|_| query.invite)
+        .unwrap_or_default();
     Html(templates::render_group_members(
         templates::GroupMembersPage {
             viewer_user_id: user_id,
@@ -2063,9 +2079,117 @@ pub async fn group_members_page(
             members,
             candidates,
             blocked_members,
+            invite_token,
             error: "",
         },
     ))
+}
+
+pub async fn delete_group(
+    State(state): State<AppState>,
+    Path(group_id): Path<i64>,
+    headers: HeaderMap,
+) -> Response {
+    if request_is_cross_site(&headers) || group_id <= 0 {
+        return Redirect::to("/app/messages").into_response();
+    }
+    let Some(user_id) = verify_user_session(&state, &headers) else {
+        return Redirect::to("/login?next=/app/messages").into_response();
+    };
+    if rate_limit_retry_after(&state, user_id, "group_delete", 5, 600)
+        .await
+        .is_some()
+    {
+        return Redirect::to(&format!("/app/group/{group_id}/members")).into_response();
+    }
+    let mut db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => return Redirect::to(&format!("/app/group/{group_id}/members")).into_response(),
+    };
+    if super::official_groups::is_official_group(&db, group_id)
+        || group_role(&db, group_id, user_id).as_deref() != Some(GROUP_ROLE_OWNER)
+    {
+        return Redirect::to(&format!("/app/group/{group_id}/members")).into_response();
+    }
+
+    let media_paths = db
+        .prepare("SELECT attachment_path FROM group_messages WHERE group_id = ?1 AND attachment_path != ''")
+        .and_then(|mut stmt| {
+            stmt.query_map(rusqlite::params![group_id], |row| row.get::<_, String>(0))?
+                .collect::<Result<Vec<_>, _>>()
+        })
+        .unwrap_or_default();
+    let avatar_path: String = db
+        .query_row(
+            "SELECT avatar_path FROM chat_groups WHERE id = ?1",
+            rusqlite::params![group_id],
+            |row| row.get(0),
+        )
+        .unwrap_or_default();
+    let tx = match db.transaction() {
+        Ok(tx) => tx,
+        Err(_) => return Redirect::to(&format!("/app/group/{group_id}/members")).into_response(),
+    };
+    let result = tx
+        .execute(
+            "DELETE FROM group_message_reactions
+         WHERE message_id IN (SELECT id FROM group_messages WHERE group_id = ?1)",
+            rusqlite::params![group_id],
+        )
+        .and_then(|_| {
+            tx.execute(
+                "DELETE FROM group_messages WHERE group_id = ?1",
+                rusqlite::params![group_id],
+            )
+        })
+        .and_then(|_| {
+            tx.execute(
+                "DELETE FROM chat_pins WHERE chat_kind = 'group' AND target_id = ?1",
+                rusqlite::params![group_id],
+            )
+        })
+        .and_then(|_| {
+            tx.execute(
+                "DELETE FROM chat_preferences WHERE chat_kind = 'group' AND target_id = ?1",
+                rusqlite::params![group_id],
+            )
+        })
+        .and_then(|_| {
+            tx.execute(
+                "DELETE FROM user_notifications WHERE kind = 'group_message' AND resource_id = ?1",
+                rusqlite::params![group_id],
+            )
+        })
+        .and_then(|_| {
+            tx.execute(
+                "DELETE FROM chat_group_member_blocks WHERE group_id = ?1",
+                rusqlite::params![group_id],
+            )
+        })
+        .and_then(|_| {
+            tx.execute(
+                "DELETE FROM chat_group_members WHERE group_id = ?1",
+                rusqlite::params![group_id],
+            )
+        })
+        .and_then(|_| {
+            tx.execute(
+                "DELETE FROM chat_groups WHERE id = ?1 AND owner_user_id = ?2",
+                rusqlite::params![group_id, user_id],
+            )
+        });
+    if !matches!(result, Ok(1)) || tx.commit().is_err() {
+        return Redirect::to(&format!("/app/group/{group_id}/members")).into_response();
+    }
+    for path in media_paths {
+        if media_path_is_safe(&path) {
+            let _ = fs::remove_file(media_root().join(path));
+        }
+    }
+    if group_avatar_name_is_safe(group_id, &avatar_path) {
+        let _ = fs::remove_file(group_avatar_root().join(avatar_path));
+    }
+    Redirect::to("/app/messages").into_response()
 }
 
 pub async fn create_group_invite(

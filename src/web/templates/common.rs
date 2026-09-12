@@ -2283,6 +2283,11 @@ a.feature.rm-feature-add {
 .rm-group-invite-ready[hidden] {
     display: none;
 }
+
+.rm-group-danger-zone {
+    border-color: rgba(255, 112, 132, .34);
+    background: linear-gradient(145deg, rgba(255, 112, 132, .08), rgba(255,255,255,.02));
+}
 .rm-group-avatar-preview {
     width: 96px;
     height: 96px;

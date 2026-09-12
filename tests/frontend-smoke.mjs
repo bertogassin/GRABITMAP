@@ -658,6 +658,8 @@ test("inbox organization is account scoped and controls notifications", async ()
   assert.match(template, /chat-dialog-controls/);
   assert.match(inbox, /preferenceControls/);
   assert.match(inbox, /dataset\.inboxView/);
+  assert.match(inbox, /function closeOtherDialogMenus/);
+  assert.match(inbox, /event\.key === "Escape"/);
   assert.match(routes, /chat-preference\/\{kind\}\/\{target_id\}/);
 });
 
@@ -741,7 +743,30 @@ test("group invites are signed, revocable, expiring, and capacity bounded", asyn
   assert.match(handlers, /SET invite_nonce = ''/);
   assert.match(routes, /\/app\/group-invite\/\{token\}/);
   assert.match(template, /data-share-title="GRABIT · группа"/);
+  assert.match(template, /value="\{invite_url\}"/);
   assert.match(template, /history\.replaceState/);
+  assert.match(routes, /group\/\{group_id\}\/delete/);
+  assert.match(handlers, /pub async fn delete_group/);
+  assert.match(handlers, /role\(.*GROUP_ROLE_OWNER|GROUP_ROLE_OWNER/s);
+  assert.match(template, /Удалить группу/);
+});
+
+test("notification reads do not manufacture engagement notifications", async () => {
+  const handler = await readFile(new URL("src/web/handlers/notifications.rs", root), "utf8");
+  const page = handler.slice(handler.indexOf("pub async fn notifications_page"), handler.indexOf("pub async fn open_notification"));
+  const unread = handler.slice(handler.indexOf("pub async fn unread_count"), handler.indexOf("#[cfg(test)]"));
+  assert.doesNotMatch(page, /ensure_daily_nudges/);
+  assert.doesNotMatch(unread, /ensure_daily_nudges/);
+});
+
+test("inbox previews replace raw internal listing links", async () => {
+  const [template, inbox] = await Promise.all([
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+    readFile(new URL("static/inbox.js", root), "utf8"),
+  ]);
+  assert.match(template, /listing_id_from_message\(value\)/);
+  assert.match(inbox, /function conversationPreview/);
+  assert.match(inbox, /Объявление GRABIT/);
 });
 
 test("group identity supports private avatars and bounded descriptions", async () => {
