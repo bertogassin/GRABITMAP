@@ -1720,7 +1720,8 @@
 
         var imageInput = document.getElementById("chat-image-input");
         var imageBtn = document.getElementById("chat-image-btn");
-        var attachBtn = document.getElementById("chat-attach-btn");
+        var emojiBtn = document.getElementById("chat-emoji-btn");
+        var emojiPanel = document.getElementById("chat-emoji-panel");
 
         var MEDIA_DB_NAME = "grabit-chat-media-outbox";
         var MEDIA_DB_VERSION = 1;
@@ -2151,9 +2152,37 @@
             imageInput.click();
         });
 
-        if (attachBtn) {
-            attachBtn.addEventListener("click", function () {
-                if (!mediaSending) imageInput.click();
+        if (emojiBtn && emojiPanel) {
+            emojiBtn.addEventListener("click", function () {
+                var willOpen = emojiPanel.hidden;
+                emojiPanel.hidden = !willOpen;
+                emojiBtn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+            });
+
+            emojiPanel.addEventListener("click", function (event) {
+                var button = event.target.closest("[data-chat-emoji]");
+                if (!button) return;
+                var emoji = button.getAttribute("data-chat-emoji") || "";
+                var start = input.selectionStart == null ? input.value.length : input.selectionStart;
+                var end = input.selectionEnd == null ? input.value.length : input.selectionEnd;
+                input.setRangeText(emoji, start, end, "end");
+                input.dispatchEvent(new Event("input", { bubbles: true }));
+                input.focus();
+            });
+
+            document.addEventListener("pointerdown", function (event) {
+                if (emojiPanel.hidden || emojiPanel.contains(event.target) || emojiBtn.contains(event.target)) {
+                    return;
+                }
+                emojiPanel.hidden = true;
+                emojiBtn.setAttribute("aria-expanded", "false");
+            });
+
+            document.addEventListener("keydown", function (event) {
+                if (event.key !== "Escape" || emojiPanel.hidden) return;
+                emojiPanel.hidden = true;
+                emojiBtn.setAttribute("aria-expanded", "false");
+                emojiBtn.focus();
             });
         }
 
@@ -2664,7 +2693,7 @@
             window.scrollTo(0, 0);
         });
 
-        ["chat-send", "chat-image-btn"].forEach(function (id) {
+        ["chat-send", "chat-image-btn", "chat-emoji-btn"].forEach(function (id) {
             var button = document.getElementById(id);
             if (!button) {
                 return;

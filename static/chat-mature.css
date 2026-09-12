@@ -171,6 +171,7 @@ html[data-page="chat"] #chat-form.chat-composer {
     grid-template-areas:
         "reply reply"
         "forward forward"
+        "emoji emoji"
         "main action" !important;
     align-items: end !important;
     gap: 6px !important;
@@ -182,11 +183,12 @@ html[data-page="chat"] #chat-form.chat-composer {
 
 #chat-form .chat-reply-bar { grid-area: reply; }
 #chat-form .chat-forward-bar { grid-area: forward; }
+#chat-form .chat-emoji-panel { grid-area: emoji; }
 #chat-form .chat-composer-main {
     grid-area: main;
     display: grid;
     grid-template-columns: 38px minmax(0, 1fr) 40px;
-    align-items: end;
+    align-items: center;
     min-height: 48px;
     border: 1px solid color-mix(in srgb, var(--text) 13%, transparent);
     border-radius: 22px;
@@ -195,6 +197,8 @@ html[data-page="chat"] #chat-form.chat-composer {
 
 #chat-form #chat-input {
     grid-column: 2;
+    grid-row: 1;
+    align-self: end;
     min-width: 0;
     min-height: 46px !important;
     height: 46px !important;
@@ -206,8 +210,10 @@ html[data-page="chat"] #chat-form.chat-composer {
     box-shadow: none !important;
 }
 
-#chat-form .chat-attach-btn,
+#chat-form .chat-emoji-btn,
 #chat-form .chat-image-btn {
+    grid-row: 1;
+    align-self: center;
     width: 38px !important;
     height: 46px !important;
     min-height: 46px !important;
@@ -218,15 +224,49 @@ html[data-page="chat"] #chat-form.chat-composer {
     box-shadow: none !important;
 }
 
-#chat-form .chat-attach-btn {
+#chat-form .chat-emoji-btn {
     grid-column: 1;
-    font-size: 28px;
+    font-size: 23px;
     line-height: 1;
 }
 
 #chat-form .chat-image-btn {
     grid-column: 3;
     font-size: 20px;
+}
+
+#chat-form .chat-emoji-panel {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    overflow-x: auto;
+    padding: 3px 4px 1px;
+    scrollbar-width: none;
+}
+
+#chat-form .chat-emoji-panel[hidden] {
+    display: none !important;
+}
+
+#chat-form .chat-emoji-panel::-webkit-scrollbar {
+    display: none;
+}
+
+#chat-form .chat-emoji-panel button {
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    min-height: 38px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 50%;
+    background: transparent !important;
+    box-shadow: none !important;
+    font-size: 22px;
+}
+
+#chat-form .chat-emoji-panel button:active {
+    background: color-mix(in srgb, var(--accent) 18%, transparent) !important;
 }
 
 #chat-form .chat-voice-btn,
@@ -262,6 +302,7 @@ html[data-page="chat"] #chat-form.chat-composer {
     html[data-page="chat"] #chat-form.chat-composer {
         grid-template-columns: minmax(0, 1fr) 48px !important;
         margin: 0 !important;
+        box-sizing: border-box;
         padding-bottom: max(6px, env(safe-area-inset-bottom)) !important;
     }
 }

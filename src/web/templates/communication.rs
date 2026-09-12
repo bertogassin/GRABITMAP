@@ -942,8 +942,19 @@ fn render_chat_thread(
         </button>
     </div>
 
+    <div id="chat-emoji-panel" class="chat-emoji-panel" hidden aria-label="Быстрые эмодзи">
+        <button type="button" data-chat-emoji="😀" aria-label="Улыбка">😀</button>
+        <button type="button" data-chat-emoji="😂" aria-label="Смех">😂</button>
+        <button type="button" data-chat-emoji="❤️" aria-label="Сердце">❤️</button>
+        <button type="button" data-chat-emoji="👍" aria-label="Нравится">👍</button>
+        <button type="button" data-chat-emoji="🙏" aria-label="Спасибо">🙏</button>
+        <button type="button" data-chat-emoji="🔥" aria-label="Огонь">🔥</button>
+        <button type="button" data-chat-emoji="🎉" aria-label="Праздник">🎉</button>
+        <button type="button" data-chat-emoji="🤝" aria-label="Договорились">🤝</button>
+    </div>
+
     <div class="chat-composer-main">
-        <button id="chat-attach-btn" type="button" class="chat-attach-btn" aria-label="Добавить вложение" aria-expanded="false">+</button>
+        <button id="chat-emoji-btn" type="button" class="chat-emoji-btn" aria-label="Открыть эмодзи" aria-controls="chat-emoji-panel" aria-expanded="false">☺</button>
         <textarea id="chat-input" name="message" rows="1" maxlength="2000" required autocomplete="off" enterkeyhint="send" aria-label="Текст сообщения" placeholder="Сообщение…" class="ui-textarea chat-input"></textarea>
         <button id="chat-image-btn" type="button" class="chat-image-btn" aria-label="Добавить фото">
             <span class="chat-action-icon" aria-hidden="true">▣</span>

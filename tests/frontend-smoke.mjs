@@ -440,6 +440,21 @@ test("group text chat keeps a native fallback and the composer has one adaptive 
   assert.match(mature, /#chat-form\.has-message \.chat-send-button/);
 });
 
+test("mobile composer keeps every control aligned and offers working quick emoji", async () => {
+  const [template, chat, mature] = await Promise.all([
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("static/chat-mature.css", root), "utf8"),
+  ]);
+  assert.match(template, /id="chat-emoji-panel"[\s\S]*data-chat-emoji="😀"/);
+  assert.match(template, /id="chat-emoji-btn"[\s\S]*aria-controls="chat-emoji-panel"/);
+  assert.match(chat, /input\.setRangeText\(emoji, start, end, "end"\)/);
+  assert.match(chat, /emojiPanel\.hidden = true/);
+  assert.match(mature, /#chat-form #chat-input \{[\s\S]*grid-row: 1/);
+  assert.match(mature, /#chat-form \.chat-emoji-btn,[\s\S]*grid-row: 1/);
+  assert.match(mature, /#chat-form \.chat-emoji-panel\[hidden\]/);
+});
+
 test("mobile diagnostics probes session chat microphone and motion", async () => {
   const diagnostics = await readFile(new URL("static/mobile-diagnostics.js", root), "utf8");
   assert.match(diagnostics, /grabit-mobile-diagnostic/);
