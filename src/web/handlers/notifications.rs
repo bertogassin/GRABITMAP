@@ -43,67 +43,6 @@ fn today_start_unix() -> i64 {
         .unwrap_or(0)
 }
 
-fn already_nudged_today(db: &rusqlite::Connection, user_id: i64, kind: &str, since: i64) -> bool {
-    db.query_row(
-        "SELECT EXISTS(
-            SELECT 1
-            FROM user_notifications
-            WHERE user_id = ?1
-              AND kind = ?2
-              AND created_at >= ?3
-         )",
-        rusqlite::params![user_id, kind, since],
-        |row| row.get::<_, i64>(0),
-    )
-    .unwrap_or(0)
-        == 1
-}
-
-fn insert_nudge(db: &rusqlite::Connection, user_id: i64, nudge: &DailyNudge) -> bool {
-    db.execute(
-        "INSERT INTO user_notifications (
-            user_id,
-            resource_id,
-            kind,
-            title,
-            message,
-            is_read,
-            created_at
-         )
-         VALUES (?1, NULL, ?2, ?3, ?4, 0, strftime('%s','now'))",
-        rusqlite::params![user_id, nudge.kind, nudge.title, nudge.message],
-    )
-    .unwrap_or(0)
-        == 1
-}
-
-pub fn ensure_daily_nudges(db: &rusqlite::Connection, user_id: i64) -> Vec<DailyNudge> {
-    if user_id <= 0 {
-        return Vec::new();
-    }
-
-    let since = today_start_unix();
-    let mut created = Vec::new();
-
-    let _ = db.execute(
-        "UPDATE user_notifications
-         SET is_read = 1
-         WHERE user_id = ?1
-           AND kind = 'work_nudge'
-           AND is_read = 0
-           AND created_at < ?2",
-        rusqlite::params![user_id, since],
-    );
-
-    if !already_nudged_today(db, user_id, WORK_NUDGE.kind, since)
-        && insert_nudge(db, user_id, &WORK_NUDGE)
-    {
-        created.push(WORK_NUDGE);
-    }
-
-    created
-}
-
 pub fn list_unread_daily_nudges(db: &rusqlite::Connection, user_id: i64) -> Vec<DailyNudge> {
     if user_id <= 0 {
         return Vec::new();
@@ -144,8 +83,6 @@ pub async fn notifications_page(State(state): State<AppState>, headers: HeaderMa
             return Html("<h1>503</h1><p>База данных временно недоступна.</p>".to_string());
         }
     };
-
-    let _ = ensure_daily_nudges(&db, user_id);
 
     let mut notifications: Vec<crate::web::view_models::NotificationRow> = db
         .prepare(
@@ -315,7 +252,6 @@ pub async fn unread_count(State(state): State<AppState>, headers: HeaderMap) -> 
         .get()
         .ok()
         .map(|conn| {
-            let _ = ensure_daily_nudges(&conn, user.user_id);
             let stored = conn
                 .query_row(
                     "SELECT COUNT(*) FROM user_notifications WHERE user_id = ?1 AND is_read = 0 AND kind NOT IN ('contact_rejected')",
@@ -334,40 +270,4 @@ pub async fn unread_count(State(state): State<AppState>, headers: HeaderMap) -> 
         .unwrap_or(0);
 
     Json(json!({ "count": count })).into_response()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn daily_work_nudge_inserts_once() {
-        let db = rusqlite::Connection::open_in_memory().expect("database");
-        db.execute_batch(
-            "CREATE TABLE user_notifications (
-                id INTEGER PRIMARY KEY,
-                user_id INTEGER NOT NULL,
-                resource_id INTEGER,
-                kind TEXT NOT NULL,
-                title TEXT NOT NULL,
-                message TEXT NOT NULL,
-                is_read INTEGER NOT NULL DEFAULT 0,
-                created_at INTEGER NOT NULL DEFAULT (strftime('%s','now'))
-             );",
-        )
-        .expect("notifications");
-        let first = ensure_daily_nudges(&db, 9);
-        assert_eq!(first.len(), 1);
-        let second = ensure_daily_nudges(&db, 9);
-        assert!(second.is_empty());
-
-        let count: i64 = db
-            .query_row(
-                "SELECT COUNT(*) FROM user_notifications WHERE user_id = 9",
-                [],
-                |row| row.get(0),
-            )
-            .expect("count");
-        assert_eq!(count, 1);
-    }
 }

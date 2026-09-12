@@ -937,10 +937,6 @@ body.light-theme .rm-command-icon {{
             </div>
         </div>
 
-        <div class="rm-profile-icon-box">
-            {settings_icon}
-        </div>
-
     </div>
 
 
@@ -1072,7 +1068,6 @@ body.light-theme .rm-command-icon {{
         account_header = account_header,
         invite = super::invite::invite_share_block(invite_public_id),
         statistics = statistics,
-        settings_icon = icon("settings"),
         settings_kicker = crate::i18n::t("profile_settings"),
         settings_link = crate::i18n::t("profile_settings_sound"),
         language_picker = crate::i18n::language_picker_html("/app/me"),

@@ -54,11 +54,29 @@ pub(crate) fn format_inbox_time(updated_at: i64) -> String {
     }
 }
 
+fn listing_id_from_message(value: &str) -> Option<i64> {
+    value.split_whitespace().find_map(|part| {
+        let path = part
+            .strip_prefix("https://grabitmap.com")
+            .or_else(|| part.strip_prefix("http://grabitmap.com"))
+            .or_else(|| part.strip_prefix("https://www.grabitmap.com"))
+            .unwrap_or(part);
+
+        ["/app/listing/", "/app/resource/"]
+            .iter()
+            .find_map(|prefix| path.strip_prefix(prefix))
+            .and_then(|tail| tail.split(['/', '?', '#']).next())
+            .and_then(|id| id.parse::<i64>().ok())
+            .filter(|id| *id > 0)
+    })
+}
+
 pub(crate) fn conversation_preview_text(value: &str) -> String {
     match value {
         "__deleted__" => crate::i18n::t("chat_deleted"),
         "__image__" => crate::i18n::t("chat_photo"),
         "__voice__" => crate::i18n::t("chat_voice"),
+        _ if listing_id_from_message(value).is_some() => "Объявление GRABIT".to_string(),
         _ => value.to_string(),
     }
 }
@@ -1465,6 +1483,7 @@ pub struct GroupMembersPage<'a> {
     pub members: Vec<(i64, String, String, i64)>,
     pub candidates: Vec<(i64, String)>,
     pub blocked_members: Vec<(i64, String)>,
+    pub invite_token: String,
     pub error: &'a str,
 }
 
@@ -1482,6 +1501,7 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
         members,
         candidates,
         blocked_members,
+        invite_token,
         error,
     } = params;
     let authenticated = viewer_user_id > 0;
@@ -1642,6 +1662,12 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
         } else {
             String::new()
         };
+        let invite_url = if invite_token.is_empty() {
+            String::new()
+        } else {
+            format!("/app/group-invite/{}", urlencoding::encode(&invite_token))
+        };
+        let invite_ready_hidden = if invite_url.is_empty() { "hidden" } else { "" };
         let invite = if can_manage && !is_official {
             format!(
                 r#"<section class="card rm-group-create">
@@ -1655,18 +1681,21 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
             <button type="submit" class="ui-button ui-button--secondary">Отключить ссылку</button>
         </form>
     </div>
-    <div id="rm-group-invite-ready" class="rm-group-invite-ready" hidden>
+    <div id="rm-group-invite-ready" class="rm-group-invite-ready" {invite_ready_hidden}>
         <label class="rm-profile-field">
             <div class="rm-profile-field-label">Готовая ссылка</div>
-            <input id="rm-group-invite-url" class="ui-input" readonly>
+            <input id="rm-group-invite-url" class="ui-input" readonly value="{invite_url}">
         </label>
         <button id="rm-group-invite-share" type="button" class="ui-button" data-share
                 data-share-title="GRABIT · группа"
-                data-share-text="Присоединяйтесь к нашей группе в GRABIT.">
+                data-share-text="Присоединяйтесь к нашей группе в GRABIT."
+                data-share-url="{invite_url}">
             Отправить приглашение
         </button>
     </div>
-</section>"#
+</section>"#,
+                invite_url = escape_html(&invite_url),
+                invite_ready_hidden = invite_ready_hidden,
             )
         } else {
             String::new()
@@ -1698,6 +1727,17 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
     <button type="submit" class="ui-button ui-button--danger">Выйти из группы</button>
 </form>"#
             )
+        };
+        let delete_group = if is_owner && !is_official {
+            format!(
+                r#"<form method="post" action="/app/group/{group_id}/delete" class="card rm-group-create rm-group-danger-zone" data-confirm="Удалить группу навсегда? Сообщения и приглашение будут удалены для всех участников.">
+    <div class="rm-profile-field-label">Удаление группы</div>
+    <p class="card-meta">Это действие доступно только владельцу и не отменяется.</p>
+    <button type="submit" class="ui-button ui-button--danger">Удалить группу</button>
+</form>"#
+            )
+        } else {
+            String::new()
         };
         let encoded_member_query = urlencoding::encode(&member_query);
         let member_search = if is_official && !can_manage {
@@ -1775,6 +1815,7 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
 {blocked}
 {add}
 {leave}
+{delete_group}
 <script>
 (function () {{
     var query = new URLSearchParams(window.location.search);
@@ -1825,6 +1866,7 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
             blocked = blocked,
             add = add,
             leave = leave,
+            delete_group = delete_group,
         )
     };
 
@@ -1915,6 +1957,14 @@ mod communication_tests {
             assert_ne!(preview, marker);
         }
         assert_eq!(conversation_preview_text("Обычный текст"), "Обычный текст");
+        assert_eq!(
+            conversation_preview_text("https://grabitmap.com/app/listing/42"),
+            "Объявление GRABIT"
+        );
+        assert_eq!(
+            conversation_preview_text("/app/resource/42"),
+            "Объявление GRABIT"
+        );
     }
 
     #[test]
