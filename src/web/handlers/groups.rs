@@ -3,7 +3,9 @@ use super::chat::load_user_conversations;
 use super::chat_api::{message_content_can_be_edited, message_is_valid, reaction_emoji_is_allowed};
 use super::chat_identity::active_public_id_by_user_id;
 use super::chat_media::{
-    detect_audio, detect_image, extension_for_mime, media_path_is_safe, media_root, MAX_VOICE_BYTES,
+    detect_attachment, detect_audio, detect_image, extension_for_mime, media_path_is_safe,
+    media_root, private_media_response, safe_attachment_name, video_duration_is_allowed,
+    MAX_VOICE_BYTES,
 };
 use super::common::{input_text_is_valid, rate_limit_retry_after, request_is_cross_site, unix_now};
 use crate::state::app_state::AppState;
@@ -814,7 +816,10 @@ fn map_group_message_row(
         deleted_at,
         attachment_kind: attachment_kind.clone(),
         attachment_url: if deleted_at == 0
-            && (attachment_kind == "image" || attachment_kind == "voice")
+            && matches!(
+                attachment_kind.as_str(),
+                "image" | "voice" | "video" | "document"
+            )
             && !attachment_path.is_empty()
         {
             format!("/api/group/media/{message_id}")
@@ -1329,6 +1334,7 @@ pub async fn api_group_send_image(
     let mut client_message_id = String::new();
     let mut reply_to_message_id = 0;
     let mut file_bytes: Option<Vec<u8>> = None;
+    let mut original_name = String::new();
     while let Ok(Some(field)) = multipart.next_field().await {
         let name = field.name().unwrap_or("").to_string();
         match name.as_str() {
@@ -1348,6 +1354,7 @@ pub async fn api_group_send_image(
                 }
             }
             "image" | "file" => {
+                original_name = field.file_name().unwrap_or("").to_string();
                 if let Ok(bytes) = field.bytes().await {
                     file_bytes = Some(bytes.to_vec());
                 }
@@ -1390,13 +1397,17 @@ pub async fn api_group_send_image(
             .into_response();
         }
     }
-    if bytes.len() > 8 * 1024 * 1024 {
-        return json_error(StatusCode::PAYLOAD_TOO_LARGE, "image_too_large");
-    }
-    let Some((_, mime)) = detect_image(&bytes) else {
-        return json_error(StatusCode::BAD_REQUEST, "unsupported_image");
+    let Some(detected) = detect_attachment(&bytes, &original_name) else {
+        return json_error(StatusCode::BAD_REQUEST, "unsupported_attachment");
     };
-    let ext = extension_for_mime(mime);
+    if bytes.len() > detected.max_bytes {
+        return json_error(StatusCode::PAYLOAD_TOO_LARGE, "attachment_too_large");
+    }
+    if detected.kind == "video" && !video_duration_is_allowed(&bytes, detected.mime) {
+        return json_error(StatusCode::BAD_REQUEST, "video_duration_invalid");
+    }
+    let mime = detected.mime;
+    let ext = detected.extension;
     let unique = format!(
         "{}-{}",
         unix_now(),
@@ -1426,7 +1437,7 @@ pub async fn api_group_send_image(
                 group_id, sender_user_id, message, created_at, client_message_id,
                 reply_to_message_id, attachment_kind, attachment_path, attachment_mime,
                 attachment_size
-             ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, 'image', ?7, ?8, ?9)",
+             ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
             rusqlite::params![
                 group_id,
                 user_id,
@@ -1434,6 +1445,7 @@ pub async fn api_group_send_image(
                 now,
                 client_message_id,
                 reply_to_message_id,
+                detected.kind,
                 relative,
                 mime,
                 bytes.len() as i64
@@ -1466,7 +1478,11 @@ pub async fn api_group_send_image(
         message_id,
         user_id,
         if caption.is_empty() {
-            "Фото"
+            match detected.kind {
+                "video" => "Видео",
+                "document" => "Документ",
+                _ => "Фото",
+            }
         } else {
             caption.as_str()
         },
@@ -1483,7 +1499,7 @@ pub async fn api_group_send_image(
                 "created_at": now,
                 "sender_name": profile_display_name(&db, user_id),
                 "reply_to_message_id": if reply_to_message_id > 0 { Some(reply_to_message_id) } else { None },
-                "attachment_kind": "image",
+                "attachment_kind": detected.kind,
                 "attachment_url": format!("/api/group/media/{message_id}"),
             })
         });
@@ -1503,9 +1519,9 @@ pub async fn api_group_media(
         Ok(db) => db,
         Err(_) => return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable"),
     };
-    let row: Option<(i64, String, String, String, i64)> = db
+    let row: Option<(i64, String, String, String, i64, String)> = db
         .query_row(
-            "SELECT group_id, attachment_path, attachment_mime, attachment_kind, deleted_at
+            "SELECT group_id, attachment_path, attachment_mime, attachment_kind, deleted_at, message
              FROM group_messages WHERE id = ?1",
             rusqlite::params![message_id],
             |row| {
@@ -1515,17 +1531,20 @@ pub async fn api_group_media(
                     row.get(2)?,
                     row.get(3)?,
                     row.get(4)?,
+                    row.get(5)?,
                 ))
             },
         )
         .ok();
-    let Some((group_id, path, mime, kind, deleted_at)) = row else {
+    let Some((group_id, path, mime, kind, deleted_at, message)) = row else {
         return json_error(StatusCode::NOT_FOUND, "not_found");
     };
     if deleted_at > 0 || !is_member(&db, group_id, user_id) {
         return json_error(StatusCode::FORBIDDEN, "not_a_member");
     }
-    if !media_path_is_safe(&path) || (kind != "image" && kind != "voice") {
+    if !media_path_is_safe(&path)
+        || !matches!(kind.as_str(), "image" | "voice" | "video" | "document")
+    {
         return json_error(StatusCode::NOT_FOUND, "not_found");
     }
     let absolute = media_root().join(&path);
@@ -1533,30 +1552,9 @@ pub async fn api_group_media(
         Ok(bytes) => bytes,
         Err(_) => return json_error(StatusCode::NOT_FOUND, "not_found"),
     };
-    let content_type = if mime.is_empty() {
-        "application/octet-stream"
-    } else {
-        mime.as_str()
-    };
-    (
-        [
-            (
-                header::CONTENT_TYPE,
-                HeaderValue::from_str(content_type)
-                    .unwrap_or_else(|_| HeaderValue::from_static("application/octet-stream")),
-            ),
-            (
-                header::CACHE_CONTROL,
-                HeaderValue::from_static("private, max-age=3600"),
-            ),
-            (
-                header::X_CONTENT_TYPE_OPTIONS,
-                HeaderValue::from_static("nosniff"),
-            ),
-        ],
-        bytes,
-    )
-        .into_response()
+    let download_name =
+        (kind == "document").then(|| safe_attachment_name(&message, extension_for_mime(&mime)));
+    private_media_response(bytes, &mime, &headers, download_name.as_deref())
 }
 
 pub async fn api_group_send_voice(

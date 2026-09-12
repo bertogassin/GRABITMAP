@@ -127,7 +127,10 @@
             }
             if (typeof window.rmT === "function") {
                 var translated = window.rmT(key, params);
-                if (translated && translated !== key) {
+                var looksLikeMachineKey =
+                    typeof translated === "string" &&
+                    /^[a-z][a-z0-9]*(?:[._][a-z0-9_]+)+$/.test(translated);
+                if (translated && translated !== key && !looksLikeMachineKey) {
                     return translated;
                 }
             }
@@ -229,6 +232,9 @@
         var pendingQueue = [];
         var mediaQueue = [];
         var mediaSending = false;
+        var activeMediaRequests = Object.create(null);
+        var attachmentDraft = null;
+        var MAX_MEDIA_QUEUE = 8;
         var peerOnline = false;
         var peerLastSeenAt = 0;
         var peerTyping = false;
@@ -623,7 +629,7 @@
 
         function updateComposer() {
             var length = Array.from(input.value).length;
-            var hasMessage = input.value.trim().length > 0;
+            var hasMessage = input.value.trim().length > 0 || Boolean(attachmentDraft);
 
             counter.textContent = length + " / 2000";
             counter.classList.toggle(
@@ -829,6 +835,31 @@
                     cap.textContent = String(message.message);
                     body.appendChild(cap);
                 }
+            } else if (message.attachment_kind === "video" && message.attachment_url) {
+                var video = document.createElement("video");
+                video.className = "chat-message-video";
+                video.src = String(message.attachment_url);
+                video.controls = true;
+                video.preload = "metadata";
+                video.playsInline = true;
+                body.textContent = "";
+                body.classList.add("chat-message-body--video");
+                body.appendChild(video);
+                if (message.message) {
+                    var videoCap = document.createElement("div");
+                    videoCap.className = "chat-message-caption";
+                    videoCap.textContent = String(message.message);
+                    body.appendChild(videoCap);
+                }
+            } else if (message.attachment_kind === "document" && message.attachment_url) {
+                var documentLink = document.createElement("a");
+                documentLink.className = "chat-document-link";
+                documentLink.href = String(message.attachment_url);
+                documentLink.textContent = "📄 " + String(message.message || t("chat_document", "Документ"));
+                documentLink.setAttribute("download", "");
+                body.textContent = "";
+                body.classList.add("chat-message-body--document");
+                body.appendChild(documentLink);
             }
             meta.className = "chat-message-meta";
             time.textContent = formatTime(
@@ -1640,6 +1671,31 @@
 
             var message = input.value.trim();
 
+            if (attachmentDraft) {
+                var mediaDraft = attachmentDraft;
+                attachmentDraft = null;
+                var preview = document.getElementById("chat-attachment-preview");
+                if (preview) preview.remove();
+                if (mediaDraft.previewUrl) {
+                    URL.revokeObjectURL(mediaDraft.previewUrl);
+                    mediaDraft.previewUrl = "";
+                }
+                var mediaReply = window.ResursMapChatReply || null;
+                queueMedia({
+                    clientMessageId: createClientMessageId(),
+                    kind: mediaDraft.kind,
+                    blob: mediaDraft.blob,
+                    mimeType: mediaDraft.mimeType,
+                    fileName: mediaDraft.fileName,
+                    caption: message || (mediaDraft.kind === "document" ? mediaDraft.fileName : ""),
+                    replyToMessageId: mediaReply && mediaReply.id ? Number(mediaReply.id) : null,
+                    createdAt: Math.floor(Date.now() / 1000)
+                });
+                input.value = "";
+                updateComposer();
+                return;
+            }
+
             if (!message) {
                 return;
             }
@@ -1845,6 +1901,11 @@
                 );
                 delete mediaRetryTimers[item.clientMessageId];
             }
+            var activeRequest = activeMediaRequests[item.clientMessageId];
+            if (activeRequest) {
+                delete activeMediaRequests[item.clientMessageId];
+                activeRequest.abort();
+            }
             var row = mediaRow(item);
             if (row) {
                 row.remove();
@@ -1952,9 +2013,13 @@
                 : (item.mimeType.indexOf("ogg") !== -1
                     ? "ogg"
                     : (item.mimeType.indexOf("mp4") !== -1 ? "m4a" : "webm"));
-            formData.append(field, item.blob, field + "." + extension);
+            if (item.kind === "video" || item.kind === "document") {
+                field = "file";
+                extension = String(item.fileName || "attachment.bin").split(".").pop();
+            }
+            formData.append(field, item.blob, item.fileName || (field + "." + extension));
             formData.append("client_message_id", item.clientMessageId);
-            if (item.kind === "image") {
+            if (item.kind !== "voice") {
                 formData.append("caption", item.caption || "");
             }
             if (item.replyToMessageId) {
@@ -1964,25 +2029,47 @@
                 );
             }
 
-            return fetch(
-                chatApi(item.kind === "image" ? "/send-image" : "/send-voice"),
-                {
-                    method: "POST",
-                    body: formData,
-                    credentials: "same-origin"
-                }
-            ).then(function (response) {
-                return response.json().catch(function () {
-                    return { ok: false, error: "invalid_response" };
-                }).then(function (data) {
-                    if (!response.ok || !data.ok) {
+            var endpoint = item.kind === "voice" ? "/send-voice" : "/send-attachment";
+            return new Promise(function (resolve, reject) {
+                var request = new XMLHttpRequest();
+                activeMediaRequests[item.clientMessageId] = request;
+                request.open("POST", chatApi(endpoint));
+                request.withCredentials = true;
+                request.timeout = 90000;
+                request.upload.onprogress = function (event) {
+                    if (!event.lengthComputable) return;
+                    item.progress = Math.round(event.loaded * 100 / event.total);
+                    var row = mediaRow(item);
+                    var status = row && row.querySelector(".chat-message-status");
+                    if (status) status.textContent = item.progress + "%";
+                };
+                request.onload = function () {
+                    delete activeMediaRequests[item.clientMessageId];
+                    var data;
+                    try { data = JSON.parse(request.responseText); }
+                    catch (_) { data = { ok: false, error: "invalid_response" }; }
+                    if (request.status < 200 || request.status >= 300 || !data.ok) {
                         var error = new Error(data.error || "send_failed");
-                        error.status = response.status;
+                        error.status = request.status;
                         error.retryAfter = Number(data.retry_after || 0);
-                        throw error;
+                        reject(error);
+                        return;
                     }
-                    return data;
-                });
+                    resolve(data);
+                };
+                request.onerror = function () {
+                    delete activeMediaRequests[item.clientMessageId];
+                    reject(new Error("network_error"));
+                };
+                request.ontimeout = function () {
+                    delete activeMediaRequests[item.clientMessageId];
+                    reject(new Error("upload_timeout"));
+                };
+                request.onabort = function () {
+                    delete activeMediaRequests[item.clientMessageId];
+                    reject(new Error("upload_cancelled"));
+                };
+                request.send(formData);
             });
         }
 
@@ -2015,9 +2102,9 @@
             item.attempts = Number(item.attempts || 0) + 1;
             renderMediaItem(item);
             setMediaSending(true);
-            sendState.textContent = item.kind === "image"
-                ? t("chat_sending_photo", "Отправка фото…")
-                : t("chat_sending_voice", "Отправка голосового…");
+            sendState.textContent = item.kind === "voice"
+                ? t("chat_sending_voice", "Отправка голосового…")
+                : t("chat_sending_attachment", "Отправка вложения…");
 
             mediaRequest(item).then(function (data) {
                 if (data.message) {
@@ -2054,9 +2141,9 @@
                     renderMediaItem(item);
                 }
                 setConnection(
-                    item.kind === "image"
-                        ? t("chat_photo_error", "Ошибка фото")
-                        : t("chat_voice_error", "Ошибка голосового"),
+                    item.kind === "voice"
+                        ? t("chat_voice_error", "Ошибка голосового")
+                        : t("chat_attachment_error", "Ошибка вложения"),
                     "is-error"
                 );
                 sendState.textContent = mediaErrorCopy(
@@ -2074,6 +2161,9 @@
         }
 
         function queueMedia(item) {
+            if (mediaQueue.length >= MAX_MEDIA_QUEUE) {
+                return Promise.reject(new Error("media_queue_full"));
+            }
             return mediaOutboxWrite(item).catch(function () {
                 // Keep current-tab delivery available when private storage
                 // is disabled or full.
@@ -2118,9 +2208,20 @@
             if (code === "voice_too_large") {
                 return t("chat_voice_too_large", "Запись слишком длинная — максимум 2 минуты");
             }
+            if (code === "attachment_too_large") {
+                return t("chat_attachment_too_large", "Файл превышает допустимый размер");
+            }
+            if (code === "video_duration_invalid") {
+                return t("chat_video_duration", "Видео должно быть не длиннее 3 минут");
+            }
+            if (code === "unsupported_attachment") {
+                return t("chat_attachment_type", "Этот тип файла не поддерживается");
+            }
             return kind === "image"
                 ? t("chat_photo_failed", "Фото не отправлено")
-                : t("chat_voice_failed", "Голосовое не отправлено");
+                : (kind === "voice"
+                    ? t("chat_voice_failed", "Голосовое не отправлено")
+                    : t("chat_attachment_failed", "Вложение не отправлено"));
         }
 
         if (!imageInput) {
@@ -2143,14 +2244,108 @@
             }
         }
 
-        labelAction(imageBtn, "chat_photo", "Фото");
+        labelAction(imageBtn, "chat_attachment", "Вложение");
+        imageBtn.setAttribute("aria-haspopup", "dialog");
+        imageBtn.setAttribute("aria-expanded", "false");
+
+        var videoInput = document.createElement("input");
+        videoInput.type = "file";
+        videoInput.accept = "video/mp4,video/webm";
+        videoInput.className = "chat-file-input";
+        videoInput.id = "chat-video-input";
+        form.appendChild(videoInput);
+
+        var documentInput = document.createElement("input");
+        documentInput.type = "file";
+        documentInput.accept = ".pdf,.docx,.xlsx,.txt,.csv,.rtf,application/pdf,text/plain,text/csv,application/rtf";
+        documentInput.className = "chat-file-input";
+        documentInput.id = "chat-document-input";
+        form.appendChild(documentInput);
+
+        var attachmentMenu = document.createElement("div");
+        attachmentMenu.id = "chat-attachment-menu";
+        attachmentMenu.className = "chat-attachment-menu";
+        attachmentMenu.hidden = true;
+        attachmentMenu.innerHTML =
+            '<button type="button" class="chat-attachment-backdrop" data-attachment-close aria-label="Закрыть меню вложений"></button>' +
+            '<section class="chat-attachment-sheet" role="dialog" aria-modal="true" aria-label="Добавить вложение">' +
+                '<span class="chat-attachment-handle" aria-hidden="true"></span>' +
+                '<header><strong>Добавить вложение</strong><button type="button" data-attachment-close aria-label="Закрыть">×</button></header>' +
+                '<div class="chat-attachment-actions">' +
+                    '<button type="button" data-attachment="photo"><span aria-hidden="true">📷</span><strong>Фото</strong><small>JPEG, PNG, WebP</small></button>' +
+                    '<button type="button" data-attachment="video"><span aria-hidden="true">🎬</span><strong>Видео</strong><small>MP4 или WebM</small></button>' +
+                    '<button type="button" data-attachment="document"><span aria-hidden="true">📄</span><strong>Документ</strong><small>PDF, Office, текст</small></button>' +
+                '</div>' +
+            '</section>';
+        document.body.appendChild(attachmentMenu);
+
+        function closeAttachmentMenu() {
+            attachmentMenu.hidden = true;
+            imageBtn.setAttribute("aria-expanded", "false");
+        }
 
         imageBtn.addEventListener("click", function () {
             if (mediaSending) {
                 return;
             }
-            imageInput.click();
+            attachmentMenu.hidden = !attachmentMenu.hidden;
+            imageBtn.setAttribute("aria-expanded", attachmentMenu.hidden ? "false" : "true");
+            if (!attachmentMenu.hidden) {
+                var firstChoice = attachmentMenu.querySelector("[data-attachment]");
+                if (firstChoice) firstChoice.focus();
+            }
         });
+
+        attachmentMenu.addEventListener("click", function (event) {
+            if (event.target.closest("[data-attachment-close]")) {
+                closeAttachmentMenu();
+                imageBtn.focus();
+                return;
+            }
+            var choice = event.target.closest("[data-attachment]");
+            if (!choice) return;
+            var kind = choice.getAttribute("data-attachment");
+            closeAttachmentMenu();
+            if (kind === "video") videoInput.click();
+            else if (kind === "document") documentInput.click();
+            else imageInput.click();
+        });
+
+        document.addEventListener("pointerdown", function (event) {
+            if (!attachmentMenu.hidden && !attachmentMenu.contains(event.target) && !imageBtn.contains(event.target)) closeAttachmentMenu();
+        });
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape" && !attachmentMenu.hidden) {
+                closeAttachmentMenu();
+                imageBtn.focus();
+            }
+        });
+
+        function showAttachmentDraft(file, kind, mimeType) {
+            if (attachmentDraft && attachmentDraft.previewUrl) URL.revokeObjectURL(attachmentDraft.previewUrl);
+            attachmentDraft = { kind: kind, blob: file, mimeType: mimeType || file.type, fileName: file.name, previewUrl: URL.createObjectURL(file) };
+            var old = document.getElementById("chat-attachment-preview");
+            if (old) old.remove();
+            var preview = document.createElement("div");
+            preview.id = "chat-attachment-preview";
+            preview.className = "chat-attachment-preview";
+            var visual = kind === "image"
+                ? '<img alt="Предпросмотр">'
+                : (kind === "video" ? '<video muted playsinline preload="metadata"></video>' : '<span class="chat-document-icon">📄</span>');
+            preview.innerHTML = visual + '<span class="chat-attachment-name"></span><button type="button" aria-label="Удалить вложение">×</button>';
+            var media = preview.querySelector("img,video");
+            if (media) media.src = attachmentDraft.previewUrl;
+            preview.querySelector(".chat-attachment-name").textContent = file.name + " · " + Math.ceil(file.size / 1024) + " KB";
+            preview.querySelector("button").addEventListener("click", function () {
+                URL.revokeObjectURL(attachmentDraft.previewUrl);
+                attachmentDraft = null;
+                preview.remove();
+                updateComposer();
+            });
+            form.insertBefore(preview, form.firstChild);
+            updateComposer();
+            input.focus();
+        }
 
         if (emojiBtn && emojiPanel) {
             emojiBtn.addEventListener("click", function () {
@@ -2202,23 +2397,8 @@
                     sendState.textContent = t("chat_photo_failed", "Фото не отправлено");
                     return;
                 }
-                var caption = input.value.trim();
-                var reply = window.ResursMapChatReply || null;
-                return queueMedia({
-                    clientMessageId: createClientMessageId(),
-                    kind: "image",
-                    blob: readyFile,
-                    mimeType: readyFile.type || "image/jpeg",
-                    caption: caption,
-                    replyToMessageId: reply && reply.id ? Number(reply.id) : null,
-                    createdAt: Math.floor(Date.now() / 1000)
-                }).then(function () {
-                    input.value = "";
-                    updateComposer();
-                    sendState.textContent = navigator.onLine === false
-                        ? t("chat_no_network", "Нет сети")
-                        : t("chat_sending_photo", "Отправка фото…");
-                });
+                showAttachmentDraft(readyFile, "image", readyFile.type || "image/jpeg");
+                sendState.textContent = t("chat_attachment_ready", "Вложение готово · добавьте подпись");
             }).catch(function (error) {
                 setConnection(t("chat_photo_error", "Ошибка фото"), "is-error");
                 var code = error && error.message ? error.message : "send_failed";
@@ -2226,6 +2406,51 @@
             }).finally(function () {
                 setMediaSending(false);
             });
+        });
+
+        videoInput.addEventListener("change", function () {
+            var file = videoInput.files && videoInput.files[0];
+            videoInput.value = "";
+            if (!file) return;
+            if (!/^(video\/mp4|video\/webm)$/.test(file.type) || file.size > 40 * 1024 * 1024) {
+                sendState.textContent = t("chat_video_invalid", "Видео: MP4/WebM, максимум 40 МБ");
+                return;
+            }
+            var probeUrl = URL.createObjectURL(file);
+            var probe = document.createElement("video");
+            probe.preload = "metadata";
+            probe.onloadedmetadata = function () {
+                URL.revokeObjectURL(probeUrl);
+                var duration = Number(probe.duration || 0);
+                probe.removeAttribute("src");
+                if (Number.isFinite(duration) && duration > 180) {
+                    sendState.textContent = t("chat_video_duration", "Видео должно быть не длиннее 3 минут");
+                    return;
+                }
+                showAttachmentDraft(file, "video", file.type);
+            };
+            probe.onerror = function () {
+                URL.revokeObjectURL(probeUrl);
+                probe.removeAttribute("src");
+                showAttachmentDraft(file, "video", file.type || "video/mp4");
+                sendState.textContent = t(
+                    "chat_video_preview_unavailable",
+                    "Предпросмотр недоступен · файл проверит сервер"
+                );
+            };
+            probe.src = probeUrl;
+        });
+
+        documentInput.addEventListener("change", function () {
+            var file = documentInput.files && documentInput.files[0];
+            documentInput.value = "";
+            if (!file) return;
+            var allowed = /\.(pdf|docx|xlsx|txt|csv|rtf)$/i.test(file.name);
+            if (!allowed || file.size > 16 * 1024 * 1024) {
+                sendState.textContent = t("chat_document_invalid", "Недопустимый документ или размер больше 16 МБ");
+                return;
+            }
+            showAttachmentDraft(file, "document", file.type || "application/octet-stream");
         });
 
         var voiceBtn = document.getElementById("chat-voice-btn");
