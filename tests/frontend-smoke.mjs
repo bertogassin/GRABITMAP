@@ -455,6 +455,18 @@ test("mobile composer keeps every control aligned and offers working quick emoji
   assert.match(mature, /#chat-form \.chat-emoji-panel\[hidden\]/);
 });
 
+test("chat text hitbox cannot be covered by the photo picker", async () => {
+  const [chat, mature] = await Promise.all([
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("static/chat-mature.css", root), "utf8"),
+  ]);
+  assert.match(mature, /#chat-form #chat-input \{[\s\S]*grid-column: 2 !important;[\s\S]*pointer-events: auto !important/);
+  assert.match(mature, /#chat-form #chat-image-btn \{[\s\S]*grid-column: 3 !important;[\s\S]*width: 40px !important/);
+  assert.match(mature, /#chat-form #chat-image-input\.chat-file-input \{[\s\S]*display: none !important;[\s\S]*pointer-events: none !important/);
+  assert.match(chat, /imageBtn\.addEventListener\("click"[\s\S]*imageInput\.click\(\)/);
+  assert.doesNotMatch(chat, /input\.addEventListener\("click"[\s\S]*imageInput\.click\(\)/);
+});
+
 test("mobile diagnostics probes session chat microphone and motion", async () => {
   const diagnostics = await readFile(new URL("static/mobile-diagnostics.js", root), "utf8");
   assert.match(diagnostics, /grabit-mobile-diagnostic/);
