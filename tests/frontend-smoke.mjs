@@ -747,6 +747,10 @@ test("group invites are signed, revocable, expiring, and capacity bounded", asyn
   assert.match(template, /history\.replaceState/);
   assert.match(routes, /group\/\{group_id\}\/delete/);
   assert.match(handlers, /pub async fn delete_group/);
+  assert.match(handlers, /DELETE FROM chat_message_pins/);
+  assert.doesNotMatch(handlers, /DELETE FROM chat_pins/);
+  assert.match(handlers, /\[&query\.invite, &stored_invite_token\]/);
+  assert.match(handlers, /current_nonce != token/);
   assert.match(handlers, /role\(.*GROUP_ROLE_OWNER|GROUP_ROLE_OWNER/s);
   assert.match(template, /Удалить группу/);
 });
