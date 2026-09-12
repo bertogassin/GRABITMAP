@@ -82,6 +82,22 @@ test("listing actions reject failed responses and serialize rating writes", asyn
   assert.match(resources, /finally \{\{/);
 });
 
+test("critical mobile layouts remain readable and listing links always become cards", async () => {
+  const [security, mobile, chat] = await Promise.all([
+    readFile(new URL("src/web/templates/admin_security.rs", root), "utf8"),
+    readFile(new URL("static/mobile-foundation.css", root), "utf8"),
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+  ]);
+
+  assert.match(security, /\.replace\("\{\{", "\{"\)/);
+  assert.match(security, /\.replace\("\}\}", "\}"\)/);
+  assert.match(security, /\.hero,\.card\{\{[\s\S]*display:block/);
+  assert.match(mobile, /\.rm-continue-card[\s\S]*display: block !important/);
+  assert.match(mobile, /\.rm-continue-card > \.rm-kind-chips[\s\S]*margin: 14px 0 0/);
+  assert.match(chat, /renderListingCard\(body, \{[\s\S]*url: "\/app\/listing\/" \+ id/);
+  assert.match(chat, /messageCache\.set\(id, message\);[\s\S]*enhanceListingBody\(body, message\)/);
+});
+
 test("locale switching validates and canonicalizes locale tags", async () => {
   const runtime = await readFile(new URL("static/i18n-runtime.js", root), "utf8");
   assert.match(runtime, /normalizeLocale/);

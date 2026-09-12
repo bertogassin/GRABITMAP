@@ -41,6 +41,22 @@ form[aria-busy="true"] .is-submitting {
     pointer-events: none;
 }
 
+.rm-continue-card {
+    display: block !important;
+    width: 100%;
+}
+
+.rm-continue-card > .card-title,
+.rm-continue-card > .card-meta {
+    width: 100%;
+    min-width: 0;
+}
+
+.rm-continue-card > .rm-kind-chips {
+    width: 100%;
+    margin: 14px 0 0;
+}
+
 html {
     width: 100%;
     overflow-x: hidden;
