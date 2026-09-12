@@ -102,6 +102,10 @@ pub(super) fn routes() -> Router<AppState> {
             post(api_group_send_image),
         )
         .route(
+            "/api/group/{group_id}/send-media",
+            post(api_group_send_image),
+        )
+        .route(
             "/api/group/{group_id}/send-voice",
             post(api_group_send_voice),
         )
@@ -134,6 +138,10 @@ pub(super) fn routes() -> Router<AppState> {
         .route("/api/chat/{other_user_route}/send", post(api_chat_send))
         .route(
             "/api/chat/{other_user_route}/send-image",
+            post(api_chat_send_image),
+        )
+        .route(
+            "/api/chat/{other_user_route}/send-media",
             post(api_chat_send_image),
         )
         .route(

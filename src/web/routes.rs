@@ -17,7 +17,8 @@ pub fn routes(state: AppState) -> Router {
         .merge(admin::routes())
         .merge(system::routes())
         .nest_service("/static", tower_http::services::ServeDir::new("static"))
-        .layer(DefaultBodyLimit::max(15 * 1024 * 1024))
+        // Video uploads are still bounded again by type-specific handler limits.
+        .layer(DefaultBodyLimit::max(48 * 1024 * 1024))
         .layer(middleware::from_fn(crate::web::handlers::security_headers))
         .layer(middleware::from_fn(crate::i18n::locale_middleware))
         .with_state(state)

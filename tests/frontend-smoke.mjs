@@ -215,11 +215,38 @@ test("mobile chat composer keeps media, text, and send in one action row", async
   assert.match(template, /class="chat-action-label">Отправить<\/span>/);
   assert.match(css, /grid-template-columns:\s*44px 44px minmax\(0, 1fr\) 48px/);
   assert.match(chat, /labelAction\(send, "chat_send_action", "Отправить"\)/);
-  assert.match(chat, /labelAction\(imageBtn, "chat_photo", "Фото"\)/);
+  assert.match(chat, /labelAction\(imageBtn, "chat_attachment", "Вложение"\)/);
   assert.match(chat, /labelAction\(voiceBtn, "chat_voice", "Голосовое"\)/);
   assert.match(chat, /setMediaSending\(true\)/);
   assert.match(chat, /mediaErrorCopy\("image", code\)/);
   assert.match(chat, /mediaErrorCopy\("voice", code\)/);
+});
+
+test("android media v2 preserves photos and adds bounded video delivery", async () => {
+  const [chat, media, groups, routes, rootRoutes, css, common] = await Promise.all([
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("src/web/handlers/chat_media.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
+    readFile(new URL("src/web/routes/communication.rs", root), "utf8"),
+    readFile(new URL("src/web/routes.rs", root), "utf8"),
+    readFile(new URL("static/chat-mature.css", root), "utf8"),
+    readFile(new URL("src/web/templates/common.rs", root), "utf8"),
+  ]);
+
+  assert.match(chat, /videoInput\.accept = "video\/\*,\.mp4,\.webm"/);
+  assert.match(chat, /chat-media-sheet-panel/);
+  assert.match(chat, /chat-video-confirm-panel/);
+  assert.match(chat, /request\.upload\.onprogress/);
+  assert.match(chat, /request\.timeout = 120000/);
+  assert.match(chat, /chatApi\("\/send-media"\)/);
+  assert.match(media, /fn detect_video/);
+  assert.match(media, /MAX_VIDEO_BYTES: usize = 40 \* 1024 \* 1024/);
+  assert.match(groups, /not_a_member/);
+  assert.match(routes, /send-media/);
+  assert.match(rootRoutes, /DefaultBodyLimit::max\(48 \* 1024 \* 1024\)/);
+  assert.match(css, /\.chat-media-sheet/);
+  assert.match(common, /env!\("CARGO_PKG_VERSION"\)/);
+  assert.match(chat, /chatApi\(item\.kind === "voice" \? "\/send-voice" : \(item\.kind === "video" \? "\/send-media" : "\/send-image"\)\)/);
 });
 
 test("mature chat layout is loaded last and stays mobile safe", async () => {

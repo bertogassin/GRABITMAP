@@ -829,6 +829,22 @@
                     cap.textContent = String(message.message);
                     body.appendChild(cap);
                 }
+            } else if (message.attachment_kind === "video" && message.attachment_url) {
+                var video = document.createElement("video");
+                video.className = "chat-message-video";
+                video.src = String(message.attachment_url);
+                video.controls = true;
+                video.preload = "metadata";
+                video.playsInline = true;
+                body.textContent = "";
+                body.classList.add("chat-message-body--video");
+                body.appendChild(video);
+                if (message.message) {
+                    var videoCaption = document.createElement("div");
+                    videoCaption.className = "chat-message-caption";
+                    videoCaption.textContent = String(message.message);
+                    body.appendChild(videoCaption);
+                }
             }
             meta.className = "chat-message-meta";
             time.textContent = formatTime(
@@ -1946,15 +1962,17 @@
 
         function mediaRequest(item) {
             var formData = new FormData();
-            var field = item.kind === "image" ? "image" : "voice";
+            var field = item.kind === "image" ? "image" : (item.kind === "video" ? "video" : "voice");
             var extension = item.kind === "image"
                 ? "jpg"
+                : (item.kind === "video"
+                    ? (item.mimeType.indexOf("webm") !== -1 ? "webm" : "mp4")
                 : (item.mimeType.indexOf("ogg") !== -1
                     ? "ogg"
-                    : (item.mimeType.indexOf("mp4") !== -1 ? "m4a" : "webm"));
+                    : (item.mimeType.indexOf("mp4") !== -1 ? "m4a" : "webm")));
             formData.append(field, item.blob, field + "." + extension);
             formData.append("client_message_id", item.clientMessageId);
-            if (item.kind === "image") {
+            if (item.kind === "image" || item.kind === "video") {
                 formData.append("caption", item.caption || "");
             }
             if (item.replyToMessageId) {
@@ -1964,8 +1982,41 @@
                 );
             }
 
+            if (item.kind === "video") {
+                return new Promise(function (resolve, reject) {
+                    var request = new XMLHttpRequest();
+                    request.open("POST", chatApi("/send-media"));
+                    request.withCredentials = true;
+                    request.timeout = 120000;
+                    request.upload.onprogress = function (event) {
+                        if (!event.lengthComputable) return;
+                        showMediaNotice(
+                            t("chat_video_uploading", "Видео отправляется") + " · " +
+                            Math.round(event.loaded * 100 / event.total) + "%",
+                            false
+                        );
+                    };
+                    request.onload = function () {
+                        var data;
+                        try { data = JSON.parse(request.responseText); }
+                        catch (_) { data = { ok: false, error: "invalid_response" }; }
+                        if (request.status < 200 || request.status >= 300 || !data.ok) {
+                            var error = new Error(data.error || "send_failed");
+                            error.status = request.status;
+                            error.retryAfter = Number(data.retry_after || 0);
+                            reject(error);
+                            return;
+                        }
+                        resolve(data);
+                    };
+                    request.onerror = function () { reject(new Error("network_error")); };
+                    request.ontimeout = function () { reject(new Error("upload_timeout")); };
+                    request.send(formData);
+                });
+            }
+
             return fetch(
-                chatApi(item.kind === "image" ? "/send-image" : "/send-voice"),
+                chatApi(item.kind === "voice" ? "/send-voice" : (item.kind === "video" ? "/send-media" : "/send-image")),
                 {
                     method: "POST",
                     body: formData,
@@ -2017,7 +2068,9 @@
             setMediaSending(true);
             sendState.textContent = item.kind === "image"
                 ? t("chat_sending_photo", "Отправка фото…")
-                : t("chat_sending_voice", "Отправка голосового…");
+                : (item.kind === "video"
+                    ? t("chat_sending_video", "Отправка видео…")
+                    : t("chat_sending_voice", "Отправка голосового…"));
 
             mediaRequest(item).then(function (data) {
                 if (data.message) {
@@ -2056,13 +2109,18 @@
                 setConnection(
                     item.kind === "image"
                         ? t("chat_photo_error", "Ошибка фото")
-                        : t("chat_voice_error", "Ошибка голосового"),
+                        : (item.kind === "video"
+                            ? t("chat_video_error", "Видео не отправлено")
+                            : t("chat_voice_error", "Ошибка голосового")),
                     "is-error"
                 );
                 sendState.textContent = mediaErrorCopy(
                     item.kind,
                     error && error.message ? error.message : "send_failed"
                 );
+                if (item.kind === "video") {
+                    showMediaNotice(sendState.textContent, true);
+                }
                 if (typeof window.playChatError === "function") {
                     window.playChatError();
                 }
@@ -2097,6 +2155,9 @@
                 voiceBtn.disabled = mediaSending;
                 voiceBtn.setAttribute("aria-busy", mediaSending ? "true" : "false");
             }
+            if (videoInput) {
+                videoInput.disabled = mediaSending;
+            }
         }
 
         function mediaErrorCopy(kind, code) {
@@ -2118,9 +2179,17 @@
             if (code === "voice_too_large") {
                 return t("chat_voice_too_large", "Запись слишком длинная — максимум 2 минуты");
             }
+            if (code === "media_too_large" || code === "body_too_large") {
+                return t("chat_video_too_large", "Видео больше 40 МБ");
+            }
+            if (code === "unsupported_media") {
+                return t("chat_video_format", "Поддерживаются MP4 и WebM");
+            }
             return kind === "image"
                 ? t("chat_photo_failed", "Фото не отправлено")
-                : t("chat_voice_failed", "Голосовое не отправлено");
+                : (kind === "video"
+                    ? t("chat_video_failed", "Видео не отправлено")
+                    : t("chat_voice_failed", "Голосовое не отправлено"));
         }
 
         if (!imageInput) {
@@ -2143,14 +2212,132 @@
             }
         }
 
-        labelAction(imageBtn, "chat_photo", "Фото");
+        labelAction(imageBtn, "chat_attachment", "Вложение");
+        imageBtn.setAttribute("aria-haspopup", "dialog");
+        imageBtn.setAttribute("aria-expanded", "false");
+
+        var videoInput = document.createElement("input");
+        videoInput.type = "file";
+        videoInput.accept = "video/*,.mp4,.webm";
+        videoInput.id = "chat-video-input";
+        videoInput.className = "chat-file-input";
+        form.appendChild(videoInput);
+
+        var mediaSheet = document.createElement("div");
+        mediaSheet.className = "chat-media-sheet";
+        mediaSheet.hidden = true;
+        mediaSheet.innerHTML =
+            '<button type="button" class="chat-media-backdrop" aria-label="Закрыть"></button>' +
+            '<section class="chat-media-sheet-panel" role="dialog" aria-modal="true" aria-label="Добавить вложение">' +
+                '<span class="chat-media-sheet-handle" aria-hidden="true"></span>' +
+                '<div class="chat-media-sheet-title"><strong>Добавить вложение</strong><button type="button" data-media-close aria-label="Закрыть">×</button></div>' +
+                '<div class="chat-media-sheet-grid">' +
+                    '<button type="button" data-media-choice="photo"><span>📷</span><strong>Фото</strong><small>JPEG, PNG, WebP</small></button>' +
+                    '<button type="button" data-media-choice="video"><span>🎬</span><strong>Видео</strong><small>MP4 или WebM</small></button>' +
+                '</div>' +
+            '</section>';
+        document.body.appendChild(mediaSheet);
+
+        function closeMediaSheet() {
+            mediaSheet.hidden = true;
+            imageBtn.setAttribute("aria-expanded", "false");
+        }
+
+        function openMediaSheet() {
+            mediaSheet.hidden = false;
+            imageBtn.setAttribute("aria-expanded", "true");
+            var first = mediaSheet.querySelector("[data-media-choice]");
+            if (first) first.focus();
+        }
 
         imageBtn.addEventListener("click", function () {
             if (mediaSending) {
                 return;
             }
-            imageInput.click();
+            openMediaSheet();
         });
+
+        mediaSheet.addEventListener("click", function (event) {
+            if (event.target.closest("[data-media-close],.chat-media-backdrop")) {
+                closeMediaSheet();
+                imageBtn.focus();
+                return;
+            }
+            var choice = event.target.closest("[data-media-choice]");
+            if (!choice) return;
+            closeMediaSheet();
+            if (choice.dataset.mediaChoice === "video") videoInput.click();
+            else imageInput.click();
+        });
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape" && !mediaSheet.hidden) {
+                closeMediaSheet();
+                imageBtn.focus();
+            }
+        });
+
+        function showMediaNotice(message, isError) {
+            var notice = document.getElementById("chat-media-notice");
+            if (!notice) {
+                notice = document.createElement("div");
+                notice.id = "chat-media-notice";
+                notice.className = "chat-media-notice";
+                notice.setAttribute("role", "status");
+                notice.setAttribute("aria-live", "polite");
+                form.appendChild(notice);
+            }
+            notice.textContent = message;
+            notice.classList.toggle("is-error", Boolean(isError));
+            notice.hidden = false;
+            window.clearTimeout(notice._hideTimer);
+            notice._hideTimer = window.setTimeout(function () { notice.hidden = true; }, 5000);
+        }
+
+        function confirmVideo(file, duration) {
+            var previewUrl = URL.createObjectURL(file);
+            var confirm = document.createElement("div");
+            confirm.className = "chat-video-confirm";
+            confirm.innerHTML =
+                '<button type="button" class="chat-media-backdrop" aria-label="Отмена"></button>' +
+                '<section class="chat-video-confirm-panel" role="dialog" aria-modal="true" aria-label="Предпросмотр видео">' +
+                    '<video controls muted playsinline preload="metadata"></video>' +
+                    '<div class="chat-video-confirm-copy"><strong></strong><small></small></div>' +
+                    '<div class="chat-video-confirm-actions"><button type="button" data-video-cancel>Отмена</button><button type="button" data-video-send>Отправить</button></div>' +
+                '</section>';
+            confirm.querySelector("video").src = previewUrl;
+            confirm.querySelector("strong").textContent = file.name || "Видео";
+            confirm.querySelector("small").textContent = Math.ceil(file.size / 1024 / 1024) + " МБ · " + Math.ceil(duration) + " сек.";
+            function close() {
+                URL.revokeObjectURL(previewUrl);
+                confirm.remove();
+            }
+            confirm.addEventListener("click", function (event) {
+                if (event.target.closest("[data-video-cancel],.chat-media-backdrop")) {
+                    close();
+                    return;
+                }
+                if (!event.target.closest("[data-video-send]")) return;
+                var caption = input.value.trim();
+                var reply = window.ResursMapChatReply || null;
+                close();
+                queueMedia({
+                    clientMessageId: createClientMessageId(),
+                    kind: "video",
+                    blob: file,
+                    mimeType: file.type || "video/mp4",
+                    caption: caption,
+                    replyToMessageId: reply && reply.id ? Number(reply.id) : null,
+                    createdAt: Math.floor(Date.now() / 1000)
+                }).then(function () {
+                    input.value = "";
+                    updateComposer();
+                    showMediaNotice(t("chat_sending_video", "Видео отправляется…"), false);
+                });
+            });
+            document.body.appendChild(confirm);
+            confirm.querySelector("[data-video-send]").focus();
+        }
 
         if (emojiBtn && emojiPanel) {
             emojiBtn.addEventListener("click", function () {
@@ -2226,6 +2413,46 @@
             }).finally(function () {
                 setMediaSending(false);
             });
+        });
+
+        videoInput.addEventListener("change", function () {
+            var file = videoInput.files && videoInput.files[0];
+            videoInput.value = "";
+            if (!file) return;
+
+            var extensionOk = /\.(mp4|webm)$/i.test(file.name || "");
+            var mimeOk = /^(video\/mp4|video\/webm)$/i.test(file.type || "");
+            if (!extensionOk && !mimeOk) {
+                showMediaNotice(t("chat_video_format", "Выберите видео MP4 или WebM"), true);
+                return;
+            }
+            if (file.size > 40 * 1024 * 1024) {
+                showMediaNotice(t("chat_video_too_large", "Видео больше 40 МБ"), true);
+                return;
+            }
+
+            var probeUrl = URL.createObjectURL(file);
+            var probe = document.createElement("video");
+            probe.preload = "metadata";
+            probe.onloadedmetadata = function () {
+                var duration = Number(probe.duration || 0);
+                URL.revokeObjectURL(probeUrl);
+                probe.removeAttribute("src");
+                if (!Number.isFinite(duration) || duration <= 0) {
+                    showMediaNotice(t("chat_video_read_failed", "Не удалось прочитать видео"), true);
+                    return;
+                }
+                if (duration > 300) {
+                    showMediaNotice(t("chat_video_too_long", "Видео длиннее 5 минут"), true);
+                    return;
+                }
+                confirmVideo(file, duration);
+            };
+            probe.onerror = function () {
+                URL.revokeObjectURL(probeUrl);
+                showMediaNotice(t("chat_video_read_failed", "Не удалось прочитать видео"), true);
+            };
+            probe.src = probeUrl;
         });
 
         var voiceBtn = document.getElementById("chat-voice-btn");

@@ -494,6 +494,22 @@ fn chat_message_body_html(message: &crate::web::view_models::ChatMessageRow) -> 
         );
     }
 
+    if message.attachment_kind == "video" && !message.attachment_url.is_empty() {
+        let caption_html = if message.message.is_empty() {
+            String::new()
+        } else {
+            format!(
+                r#"<div class="chat-message-caption">{}</div>"#,
+                escape_html(&message.message)
+            )
+        };
+        return format!(
+            r#"<div class="chat-message-body chat-message-body--video"><video class="chat-message-video" src="{url}" controls preload="metadata" playsinline></video>{caption}</div>"#,
+            url = escape_html(&message.attachment_url),
+            caption = caption_html
+        );
+    }
+
     let listing_id = message.message.split_whitespace().find_map(|part| {
         let path = part
             .strip_prefix("https://grabitmap.com")

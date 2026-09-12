@@ -3,7 +3,8 @@ use super::chat::load_user_conversations;
 use super::chat_api::{message_content_can_be_edited, message_is_valid, reaction_emoji_is_allowed};
 use super::chat_identity::active_public_id_by_user_id;
 use super::chat_media::{
-    detect_audio, detect_image, extension_for_mime, media_path_is_safe, media_root, MAX_VOICE_BYTES,
+    detect_audio, detect_image, detect_video, extension_for_mime, media_path_is_safe, media_root,
+    MAX_VIDEO_BYTES, MAX_VOICE_BYTES,
 };
 use super::common::{input_text_is_valid, rate_limit_retry_after, request_is_cross_site, unix_now};
 use crate::state::app_state::AppState;
@@ -814,7 +815,7 @@ fn map_group_message_row(
         deleted_at,
         attachment_kind: attachment_kind.clone(),
         attachment_url: if deleted_at == 0
-            && (attachment_kind == "image" || attachment_kind == "voice")
+            && matches!(attachment_kind.as_str(), "image" | "voice" | "video")
             && !attachment_path.is_empty()
         {
             format!("/api/group/media/{message_id}")
@@ -1347,7 +1348,7 @@ pub async fn api_group_send_image(
                     reply_to_message_id = positive_message_id(&text).unwrap_or(0);
                 }
             }
-            "image" | "file" => {
+            "image" | "video" | "file" => {
                 if let Ok(bytes) = field.bytes().await {
                     file_bytes = Some(bytes.to_vec());
                 }
@@ -1390,12 +1391,16 @@ pub async fn api_group_send_image(
             .into_response();
         }
     }
-    if bytes.len() > 8 * 1024 * 1024 {
-        return json_error(StatusCode::PAYLOAD_TOO_LARGE, "image_too_large");
-    }
-    let Some((_, mime)) = detect_image(&bytes) else {
-        return json_error(StatusCode::BAD_REQUEST, "unsupported_image");
+    let (kind, mime, max_bytes) = match detect_image(&bytes) {
+        Some((kind, mime)) => (kind, mime, 8 * 1024 * 1024),
+        None => match detect_video(&bytes) {
+            Some((kind, mime)) => (kind, mime, MAX_VIDEO_BYTES),
+            None => return json_error(StatusCode::BAD_REQUEST, "unsupported_media"),
+        },
     };
+    if bytes.len() > max_bytes {
+        return json_error(StatusCode::PAYLOAD_TOO_LARGE, "media_too_large");
+    }
     let ext = extension_for_mime(mime);
     let unique = format!(
         "{}-{}",
@@ -1426,7 +1431,7 @@ pub async fn api_group_send_image(
                 group_id, sender_user_id, message, created_at, client_message_id,
                 reply_to_message_id, attachment_kind, attachment_path, attachment_mime,
                 attachment_size
-             ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, 'image', ?7, ?8, ?9)",
+             ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
             rusqlite::params![
                 group_id,
                 user_id,
@@ -1434,6 +1439,7 @@ pub async fn api_group_send_image(
                 now,
                 client_message_id,
                 reply_to_message_id,
+                kind,
                 relative,
                 mime,
                 bytes.len() as i64
@@ -1466,7 +1472,11 @@ pub async fn api_group_send_image(
         message_id,
         user_id,
         if caption.is_empty() {
-            "Фото"
+            if kind == "video" {
+                "Видео"
+            } else {
+                "Фото"
+            }
         } else {
             caption.as_str()
         },
@@ -1483,7 +1493,7 @@ pub async fn api_group_send_image(
                 "created_at": now,
                 "sender_name": profile_display_name(&db, user_id),
                 "reply_to_message_id": if reply_to_message_id > 0 { Some(reply_to_message_id) } else { None },
-                "attachment_kind": "image",
+                "attachment_kind": kind,
                 "attachment_url": format!("/api/group/media/{message_id}"),
             })
         });
@@ -1525,7 +1535,7 @@ pub async fn api_group_media(
     if deleted_at > 0 || !is_member(&db, group_id, user_id) {
         return json_error(StatusCode::FORBIDDEN, "not_a_member");
     }
-    if !media_path_is_safe(&path) || (kind != "image" && kind != "voice") {
+    if !media_path_is_safe(&path) || !matches!(kind.as_str(), "image" | "voice" | "video") {
         return json_error(StatusCode::NOT_FOUND, "not_found");
     }
     let absolute = media_root().join(&path);

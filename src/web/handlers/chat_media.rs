@@ -18,6 +18,7 @@ use std::path::{Path as FsPath, PathBuf};
 
 const MAX_IMAGE_BYTES: usize = 8 * 1024 * 1024;
 pub(crate) const MAX_VOICE_BYTES: usize = 8 * 1024 * 1024;
+pub(crate) const MAX_VIDEO_BYTES: usize = 40 * 1024 * 1024;
 
 #[derive(Debug, Serialize)]
 struct MediaChatMessage {
@@ -102,6 +103,16 @@ pub(crate) fn detect_audio(bytes: &[u8]) -> Option<(&'static str, &'static str)>
     None
 }
 
+pub(crate) fn detect_video(bytes: &[u8]) -> Option<(&'static str, &'static str)> {
+    if bytes.len() >= 12 && &bytes[4..8] == b"ftyp" {
+        return Some(("video", "video/mp4"));
+    }
+    if bytes.len() >= 4 && bytes.starts_with(&[0x1a, 0x45, 0xdf, 0xa3]) {
+        return Some(("video", "video/webm"));
+    }
+    None
+}
+
 pub(crate) fn extension_for_mime(mime: &str) -> &'static str {
     match mime {
         "image/jpeg" => "jpg",
@@ -110,6 +121,8 @@ pub(crate) fn extension_for_mime(mime: &str) -> &'static str {
         "audio/ogg" => "ogg",
         "audio/webm" => "webm",
         "audio/mp4" => "m4a",
+        "video/mp4" => "mp4",
+        "video/webm" => "webm",
         _ => "bin",
     }
 }
@@ -150,7 +163,7 @@ fn load_message(
             let kind: String = row.get(12)?;
             let path: String = row.get(15)?;
             let attachment_url = if deleted_at == 0
-                && (kind == "image" || kind == "voice")
+                && matches!(kind.as_str(), "image" | "voice" | "video")
                 && !path.is_empty()
             {
                 format!("/api/chat/media/{id}")
@@ -219,7 +232,7 @@ pub async fn api_chat_send_image(
                     }
                 }
             }
-            "image" | "file" => {
+            "image" | "video" | "file" => {
                 if let Ok(b) = field.bytes().await {
                     file_bytes = Some(b.to_vec());
                 }
@@ -232,13 +245,16 @@ pub async fn api_chat_send_image(
         Some(b) if !b.is_empty() => b,
         _ => return json_error(StatusCode::BAD_REQUEST, "image_required"),
     };
-    if file_bytes.len() > MAX_IMAGE_BYTES {
-        return json_error(StatusCode::PAYLOAD_TOO_LARGE, "image_too_large");
-    }
-    let (kind, mime) = match detect_image(&file_bytes) {
-        Some(p) => p,
-        None => return json_error(StatusCode::BAD_REQUEST, "unsupported_image"),
+    let (kind, mime, max_bytes) = match detect_image(&file_bytes) {
+        Some((kind, mime)) => (kind, mime, MAX_IMAGE_BYTES),
+        None => match detect_video(&file_bytes) {
+            Some((kind, mime)) => (kind, mime, MAX_VIDEO_BYTES),
+            None => return json_error(StatusCode::BAD_REQUEST, "unsupported_media"),
+        },
     };
+    if file_bytes.len() > max_bytes {
+        return json_error(StatusCode::PAYLOAD_TOO_LARGE, "media_too_large");
+    }
     if !client_message_id.is_empty() && !client_message_id_is_valid(&client_message_id) {
         return json_error(StatusCode::BAD_REQUEST, "invalid_client_message_id");
     }
@@ -819,5 +835,14 @@ mod tests {
         assert_eq!(first, 1);
         assert_eq!(retry, 0);
         assert_eq!(count, 1);
+    }
+
+    #[test]
+    fn video_detection_uses_file_signature() {
+        let mp4 = [0, 0, 0, 20, b'f', b't', b'y', b'p', b'i', b's', b'o', b'm'];
+        let webm = [0x1a, 0x45, 0xdf, 0xa3];
+        assert_eq!(detect_video(&mp4), Some(("video", "video/mp4")));
+        assert_eq!(detect_video(&webm), Some(("video", "video/webm")));
+        assert_eq!(detect_video(b"<video src=x>"), None);
     }
 }
