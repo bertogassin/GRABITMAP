@@ -60,7 +60,10 @@ pub(crate) fn chat_media_attachment_url(
     kind: &str,
     path: &str,
 ) -> String {
-    if deleted_at == 0 && !path.is_empty() && (kind == "image" || kind == "voice") {
+    if deleted_at == 0
+        && !path.is_empty()
+        && matches!(kind, "image" | "voice" | "video" | "document")
+    {
         format!("/api/chat/media/{id}")
     } else {
         String::new()
