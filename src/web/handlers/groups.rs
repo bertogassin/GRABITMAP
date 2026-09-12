@@ -2053,17 +2053,22 @@ pub async fn group_members_page(
     } else {
         vec![]
     };
-    let invite_token = parse_group_invite_token(&state.admin_key, &query.invite, unix_now())
-        .filter(|invite| invite.group_id == group_id)
-        .filter(|invite| {
-            db.query_row(
-                "SELECT invite_nonce FROM chat_groups WHERE id = ?1",
-                rusqlite::params![group_id],
-                |row| row.get::<_, String>(0),
-            )
-            .is_ok_and(|nonce| !nonce.is_empty() && nonce == invite.nonce)
+    let stored_invite_token = db
+        .query_row(
+            "SELECT invite_nonce FROM chat_groups WHERE id = ?1",
+            rusqlite::params![group_id],
+            |row| row.get::<_, String>(0),
+        )
+        .unwrap_or_default();
+    let invite_token = [&query.invite, &stored_invite_token]
+        .into_iter()
+        .find(|candidate| {
+            !candidate.is_empty()
+                && **candidate == stored_invite_token
+                && parse_group_invite_token(&state.admin_key, candidate, unix_now())
+                    .is_some_and(|invite| invite.group_id == group_id)
         })
-        .map(|_| query.invite)
+        .map(|candidate| candidate.to_string())
         .unwrap_or_default();
     Html(templates::render_group_members(
         templates::GroupMembersPage {
@@ -2144,7 +2149,7 @@ pub async fn delete_group(
         })
         .and_then(|_| {
             tx.execute(
-                "DELETE FROM chat_pins WHERE chat_kind = 'group' AND target_id = ?1",
+                "DELETE FROM chat_message_pins WHERE chat_kind = 'group' AND target_id = ?1",
                 rusqlite::params![group_id],
             )
         })
@@ -2211,7 +2216,7 @@ pub async fn create_group_invite(
     {
         return Redirect::to(&target).into_response();
     }
-    let Some((token, nonce)) = create_group_invite_token(&state.admin_key, group_id, unix_now())
+    let Some((token, _nonce)) = create_group_invite_token(&state.admin_key, group_id, unix_now())
     else {
         return Redirect::to(&target).into_response();
     };
@@ -2234,7 +2239,7 @@ pub async fn create_group_invite(
                       AND actor.role IN (?5, ?6)
                )",
             rusqlite::params![
-                nonce,
+                token,
                 unix_now(),
                 group_id,
                 user_id,
@@ -2535,10 +2540,7 @@ pub async fn group_invite_page(
     let Some((name, current_nonce, member_count)) = details else {
         return Html(templates::render_group_invite(false, &token, "", 0, false)).into_response();
     };
-    if current_nonce != invite.nonce
-        || current_nonce.is_empty()
-        || member_count >= MAX_GROUP_MEMBERS
-    {
+    if current_nonce != token || current_nonce.is_empty() || member_count >= MAX_GROUP_MEMBERS {
         return Html(templates::render_group_invite(false, &token, "", 0, false)).into_response();
     }
     let user_id = verify_user_session(&state, &headers).unwrap_or(0);
@@ -2605,10 +2607,7 @@ pub async fn join_group_invite(
             |row| row.get::<_, i64>(0),
         )
         .unwrap_or(MAX_GROUP_MEMBERS);
-    if current_nonce.is_empty()
-        || current_nonce != invite.nonce
-        || member_count >= MAX_GROUP_MEMBERS
-    {
+    if current_nonce.is_empty() || current_nonce != token || member_count >= MAX_GROUP_MEMBERS {
         return Redirect::to(&invite_path).into_response();
     }
     if tx
