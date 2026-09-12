@@ -98,7 +98,7 @@ test("critical mobile layouts remain readable and listing links always become ca
   assert.match(chat, /messageCache\.set\(id, message\);[\s\S]*enhanceListingBody\(body, message\)/);
 });
 
-test("mobile experience removes retired steps and uses the measured chat viewport", async () => {
+test("mobile experience removes retired invitations and uses the measured chat viewport", async () => {
   const [invite, memory, mobile, chat, communication] = await Promise.all([
     readFile(new URL("src/web/templates/invite.rs", root), "utf8"),
     readFile(new URL("static/place-memory.js", root), "utf8"),
@@ -106,7 +106,7 @@ test("mobile experience removes retired steps and uses the measured chat viewpor
     readFile(new URL("static/chat-v2.js", root), "utf8"),
     readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
   ]);
-  assert.doesNotMatch(invite, /data-share-title="GRABIT · шагомер"/);
+  assert.match(invite, /Отправьте личную ссылку для чата или поиска работы/);
   assert.match(invite, /Отправьте личную ссылку для чата или поиска работы/);
   assert.match(memory, /caregiver: "Уход и няня"/);
   assert.match(memory, /work: "Работа"/);
@@ -114,6 +114,22 @@ test("mobile experience removes retired steps and uses the measured chat viewpor
   assert.match(chat, /--chat-visible-bottom/);
   assert.match(communication, /chat-message-body--listing/);
   assert.match(communication, /Объявление GRABIT/);
+});
+
+test("retired activity is absent from invitations onboarding and public copy", async () => {
+  const [handler, invite, legal, splash, russian, french, english] = await Promise.all([
+    readFile(new URL("src/web/handlers/invite.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/invite.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/legal.rs", root), "utf8"),
+    readFile(new URL("static/splash.js", root), "utf8"),
+    readFile(new URL("messages/ru.json", root), "utf8"),
+    readFile(new URL("messages/fr.json", root), "utf8"),
+    readFile(new URL("messages/en.json", root), "utf8"),
+  ]);
+  const productCopy = [handler, invite, legal, splash, russian, french, english].join("\n");
+  assert.doesNotMatch(productCopy, /to=steps|"steps"|Шагомер|10 000 шаг|Chat, pas et travail/i);
+  assert.match(invite, /"chat" \| "work"/);
+  assert.match(handler, /"work" => "work"/);
 });
 
 test("locale switching validates and canonicalizes locale tags", async () => {

@@ -17,7 +17,6 @@ pub struct InviteQuery {
 
 fn invite_kind(raw: Option<&str>) -> &'static str {
     match raw.unwrap_or("").trim() {
-        "steps" => "steps",
         "work" => "work",
         "chat" => "chat",
         _ => "",
@@ -194,10 +193,10 @@ mod tests {
 
     #[test]
     fn invite_kind_is_narrow() {
-        assert_eq!(invite_kind(Some("steps")), "steps");
         assert_eq!(invite_kind(Some("work")), "work");
         assert_eq!(invite_kind(Some("chat")), "chat");
         assert_eq!(invite_kind(Some("admin")), "");
+        assert_eq!(invite_kind(Some("retired")), "");
         assert!(public_id_is_valid("ab12"));
         assert!(!public_id_is_valid("../x"));
         assert_eq!(
