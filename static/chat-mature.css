@@ -164,3 +164,104 @@ html[data-page="chat"] .chat-shell {
         gap: 10px !important;
     }
 }
+
+/* v7.16 communication core: one compact, keyboard-safe composer. */
+html[data-page="chat"] #chat-form.chat-composer {
+    grid-template-columns: minmax(0, 1fr) 48px !important;
+    grid-template-areas:
+        "reply reply"
+        "forward forward"
+        "main action" !important;
+    align-items: end !important;
+    gap: 6px !important;
+    width: 100% !important;
+    padding: 6px !important;
+    border-radius: 24px !important;
+    overflow: visible !important;
+}
+
+#chat-form .chat-reply-bar { grid-area: reply; }
+#chat-form .chat-forward-bar { grid-area: forward; }
+#chat-form .chat-composer-main {
+    grid-area: main;
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr) 40px;
+    align-items: end;
+    min-height: 48px;
+    border: 1px solid color-mix(in srgb, var(--text) 13%, transparent);
+    border-radius: 22px;
+    background: color-mix(in srgb, var(--bg) 74%, #202834);
+}
+
+#chat-form #chat-input {
+    grid-column: 2;
+    min-width: 0;
+    min-height: 46px !important;
+    height: 46px !important;
+    max-height: 132px !important;
+    padding: 12px 4px 10px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+#chat-form .chat-attach-btn,
+#chat-form .chat-image-btn {
+    width: 38px !important;
+    height: 46px !important;
+    min-height: 46px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: var(--muted) !important;
+    box-shadow: none !important;
+}
+
+#chat-form .chat-attach-btn {
+    grid-column: 1;
+    font-size: 28px;
+    line-height: 1;
+}
+
+#chat-form .chat-image-btn {
+    grid-column: 3;
+    font-size: 20px;
+}
+
+#chat-form .chat-voice-btn,
+#chat-form .chat-send-button {
+    grid-area: action;
+    align-self: end;
+    width: 48px !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+}
+
+#chat-form .chat-send-button {
+    display: none !important;
+}
+
+#chat-form.has-message .chat-voice-btn {
+    display: none !important;
+}
+
+#chat-form.has-message .chat-send-button {
+    display: grid !important;
+    place-items: center;
+}
+
+#chat-form .chat-action-label,
+#chat-form .chat-composer-footer {
+    display: none !important;
+}
+
+@media (max-width: 540px) {
+    html[data-page="chat"] #chat-form.chat-composer {
+        grid-template-columns: minmax(0, 1fr) 48px !important;
+        margin: 0 !important;
+        padding-bottom: max(6px, env(safe-area-inset-bottom)) !important;
+    }
+}

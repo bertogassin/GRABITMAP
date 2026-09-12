@@ -614,11 +614,16 @@
         }
 
         function autoResize() {
-            input.style.height = "48px";
+            input.style.height = "0px";
+            input.style.height = Math.min(
+                132,
+                Math.max(46, input.scrollHeight || 46)
+            ) + "px";
         }
 
         function updateComposer() {
             var length = Array.from(input.value).length;
+            var hasMessage = input.value.trim().length > 0;
 
             counter.textContent = length + " / 2000";
             counter.classList.toggle(
@@ -630,9 +635,9 @@
                 length >= 2000
             );
 
-            send.disabled =
-                input.value.trim().length === 0 ||
-                length > 2000;
+            send.disabled = !hasMessage || length > 2000;
+            form.classList.toggle("has-message", hasMessage);
+            send.setAttribute("aria-hidden", hasMessage ? "false" : "true");
 
             autoResize();
 
@@ -1212,7 +1217,15 @@
         }
 
         async function fetchJson(url, options) {
-            var response = await fetch(url, {
+            var controller = typeof AbortController === "function"
+                ? new AbortController()
+                : null;
+            var timeout = controller
+                ? window.setTimeout(function () { controller.abort(); }, 20000)
+                : null;
+            var response;
+            try {
+                response = await fetch(url, {
                 credentials: "same-origin",
                 cache: "no-store",
                 headers: Object.assign(
@@ -1230,8 +1243,12 @@
                 body:
                     options && options.body
                         ? options.body
-                        : undefined
-            });
+                        : undefined,
+                signal: controller ? controller.signal : undefined
+                });
+            } finally {
+                if (timeout) window.clearTimeout(timeout);
+            }
 
             var data = await response.json().catch(function () {
                 return {
@@ -1703,6 +1720,7 @@
 
         var imageInput = document.getElementById("chat-image-input");
         var imageBtn = document.getElementById("chat-image-btn");
+        var attachBtn = document.getElementById("chat-attach-btn");
 
         var MEDIA_DB_NAME = "grabit-chat-media-outbox";
         var MEDIA_DB_VERSION = 1;
@@ -2132,6 +2150,12 @@
             }
             imageInput.click();
         });
+
+        if (attachBtn) {
+            attachBtn.addEventListener("click", function () {
+                if (!mediaSending) imageInput.click();
+            });
+        }
 
         imageInput.addEventListener("change", function () {
             var file = imageInput.files && imageInput.files[0];
