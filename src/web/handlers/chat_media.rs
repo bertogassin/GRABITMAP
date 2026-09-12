@@ -18,17 +18,6 @@ use std::path::{Path as FsPath, PathBuf};
 
 const MAX_IMAGE_BYTES: usize = 8 * 1024 * 1024;
 pub(crate) const MAX_VOICE_BYTES: usize = 8 * 1024 * 1024;
-pub(crate) const MAX_VIDEO_BYTES: usize = 40 * 1024 * 1024;
-pub(crate) const MAX_DOCUMENT_BYTES: usize = 16 * 1024 * 1024;
-pub(crate) const MAX_VIDEO_DURATION_SECONDS: f64 = 180.0;
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub(crate) struct DetectedMedia {
-    pub kind: &'static str,
-    pub mime: &'static str,
-    pub extension: &'static str,
-    pub max_bytes: usize,
-}
 
 #[derive(Debug, Serialize)]
 struct MediaChatMessage {
@@ -74,33 +63,7 @@ pub(crate) fn media_root() -> PathBuf {
 }
 
 pub(crate) fn media_path_is_safe(relative: &str) -> bool {
-    let path = FsPath::new(relative);
-    !relative.trim().is_empty()
-        && !relative.contains("..")
-        && !path.is_absolute()
-        && path.components().all(|component| {
-            matches!(
-                component,
-                std::path::Component::Normal(_) | std::path::Component::CurDir
-            )
-        })
-}
-
-pub(crate) fn safe_attachment_name(value: &str, fallback_extension: &str) -> String {
-    let basename = FsPath::new(value)
-        .file_name()
-        .and_then(|part| part.to_str())
-        .unwrap_or("");
-    let mut safe = basename
-        .chars()
-        .filter(|ch| !ch.is_control() && *ch != '/' && *ch != '\\')
-        .take(120)
-        .collect::<String>();
-    safe = safe.trim().trim_matches('.').to_string();
-    if safe.is_empty() {
-        safe = format!("attachment.{fallback_extension}");
-    }
-    safe
+    !relative.trim().is_empty() && !relative.contains("..") && !FsPath::new(relative).is_absolute()
 }
 
 pub(crate) fn detect_image(bytes: &[u8]) -> Option<(&'static str, &'static str)> {
@@ -147,187 +110,8 @@ pub(crate) fn extension_for_mime(mime: &str) -> &'static str {
         "audio/ogg" => "ogg",
         "audio/webm" => "webm",
         "audio/mp4" => "m4a",
-        "video/mp4" => "mp4",
-        "video/webm" => "webm",
-        "application/pdf" => "pdf",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => "docx",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => "xlsx",
-        "text/plain" => "txt",
-        "text/csv" => "csv",
-        "application/rtf" => "rtf",
         _ => "bin",
     }
-}
-
-fn zip_contains(bytes: &[u8], marker: &[u8]) -> bool {
-    bytes.windows(marker.len()).any(|window| window == marker)
-}
-
-pub(crate) fn detect_attachment(bytes: &[u8], filename: &str) -> Option<DetectedMedia> {
-    if let Some((kind, mime)) = detect_image(bytes) {
-        return Some(DetectedMedia {
-            kind,
-            mime,
-            extension: extension_for_mime(mime),
-            max_bytes: MAX_IMAGE_BYTES,
-        });
-    }
-    if bytes.len() >= 12 && &bytes[4..8] == b"ftyp" {
-        return Some(DetectedMedia {
-            kind: "video",
-            mime: "video/mp4",
-            extension: "mp4",
-            max_bytes: MAX_VIDEO_BYTES,
-        });
-    }
-    if bytes.starts_with(&[0x1a, 0x45, 0xdf, 0xa3]) {
-        return Some(DetectedMedia {
-            kind: "video",
-            mime: "video/webm",
-            extension: "webm",
-            max_bytes: MAX_VIDEO_BYTES,
-        });
-    }
-    if bytes.starts_with(b"%PDF-") {
-        return Some(DetectedMedia {
-            kind: "document",
-            mime: "application/pdf",
-            extension: "pdf",
-            max_bytes: MAX_DOCUMENT_BYTES,
-        });
-    }
-    if bytes.starts_with(b"PK\x03\x04") && zip_contains(bytes, b"[Content_Types].xml") {
-        if zip_contains(bytes, b"word/") {
-            return Some(DetectedMedia {
-                kind: "document",
-                mime: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                extension: "docx",
-                max_bytes: MAX_DOCUMENT_BYTES,
-            });
-        }
-        if zip_contains(bytes, b"xl/") {
-            return Some(DetectedMedia {
-                kind: "document",
-                mime: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                extension: "xlsx",
-                max_bytes: MAX_DOCUMENT_BYTES,
-            });
-        }
-    }
-    if bytes.starts_with(b"{\\rtf") {
-        return Some(DetectedMedia {
-            kind: "document",
-            mime: "application/rtf",
-            extension: "rtf",
-            max_bytes: MAX_DOCUMENT_BYTES,
-        });
-    }
-    let extension = FsPath::new(filename)
-        .extension()
-        .and_then(|value| value.to_str())
-        .unwrap_or("")
-        .to_ascii_lowercase();
-    if matches!(extension.as_str(), "txt" | "csv")
-        && std::str::from_utf8(bytes).is_ok()
-        && !String::from_utf8_lossy(&bytes[..bytes.len().min(512)])
-            .trim_start()
-            .starts_with('<')
-    {
-        let (mime, ext) = if extension == "csv" {
-            ("text/csv", "csv")
-        } else {
-            ("text/plain", "txt")
-        };
-        return Some(DetectedMedia {
-            kind: "document",
-            mime,
-            extension: ext,
-            max_bytes: MAX_DOCUMENT_BYTES,
-        });
-    }
-    None
-}
-
-pub(crate) fn mp4_duration_seconds(bytes: &[u8]) -> Option<f64> {
-    let position = bytes.windows(4).position(|window| window == b"mvhd")?;
-    let data = bytes.get(position + 4..)?;
-    let version = *data.first()?;
-    let (timescale_offset, duration_offset, duration_size) = if version == 1 {
-        (20, 24, 8)
-    } else {
-        (12, 16, 4)
-    };
-    let timescale = u32::from_be_bytes(
-        data.get(timescale_offset..timescale_offset + 4)?
-            .try_into()
-            .ok()?,
-    );
-    if timescale == 0 {
-        return None;
-    }
-    let duration = if duration_size == 8 {
-        u64::from_be_bytes(
-            data.get(duration_offset..duration_offset + 8)?
-                .try_into()
-                .ok()?,
-        )
-    } else {
-        u32::from_be_bytes(
-            data.get(duration_offset..duration_offset + 4)?
-                .try_into()
-                .ok()?,
-        ) as u64
-    };
-    Some(duration as f64 / timescale as f64)
-}
-
-fn ebml_size(bytes: &[u8]) -> Option<(usize, usize)> {
-    let first = *bytes.first()?;
-    let width = (first.leading_zeros() as usize) + 1;
-    if width > 8 || bytes.len() < width {
-        return None;
-    }
-    let mut value = (first & (0xff >> width)) as usize;
-    for byte in &bytes[1..width] {
-        value = value.checked_mul(256)?.checked_add(*byte as usize)?;
-    }
-    Some((value, width))
-}
-
-pub(crate) fn webm_duration_seconds(bytes: &[u8]) -> Option<f64> {
-    let duration_at = bytes.windows(2).position(|window| window == [0x44, 0x89])? + 2;
-    let (duration_size, duration_width) = ebml_size(bytes.get(duration_at..)?)?;
-    let duration_data =
-        bytes.get(duration_at + duration_width..duration_at + duration_width + duration_size)?;
-    let duration = match duration_size {
-        4 => f32::from_be_bytes(duration_data.try_into().ok()?) as f64,
-        8 => f64::from_be_bytes(duration_data.try_into().ok()?),
-        _ => return None,
-    };
-    let scale = if let Some(scale_at) = bytes
-        .windows(3)
-        .position(|window| window == [0x2a, 0xd7, 0xb1])
-    {
-        let start = scale_at + 3;
-        let (size, width) = ebml_size(bytes.get(start..)?)?;
-        let data = bytes.get(start + width..start + width + size)?;
-        data.iter()
-            .fold(0u64, |value, byte| (value << 8) | u64::from(*byte))
-    } else {
-        1_000_000
-    };
-    Some(duration * scale as f64 / 1_000_000_000.0)
-}
-
-pub(crate) fn video_duration_is_allowed(bytes: &[u8], mime: &str) -> bool {
-    let duration = match mime {
-        "video/mp4" => mp4_duration_seconds(bytes),
-        "video/webm" => webm_duration_seconds(bytes),
-        _ => None,
-    };
-    duration.is_some_and(|seconds| {
-        seconds.is_finite() && seconds > 0.0 && seconds <= MAX_VIDEO_DURATION_SECONDS
-    })
 }
 
 fn random_file_stem() -> String {
@@ -366,7 +150,7 @@ fn load_message(
             let kind: String = row.get(12)?;
             let path: String = row.get(15)?;
             let attachment_url = if deleted_at == 0
-                && matches!(kind.as_str(), "image" | "voice" | "video" | "document")
+                && (kind == "image" || kind == "voice")
                 && !path.is_empty()
             {
                 format!("/api/chat/media/{id}")
@@ -412,7 +196,6 @@ pub async fn api_chat_send_image(
     let mut client_message_id = String::new();
     let mut reply_to_message_id: Option<i64> = None;
     let mut file_bytes: Option<Vec<u8>> = None;
-    let mut original_name = String::new();
 
     while let Ok(Some(field)) = multipart.next_field().await {
         let name = field.name().unwrap_or("").to_string();
@@ -437,7 +220,6 @@ pub async fn api_chat_send_image(
                 }
             }
             "image" | "file" => {
-                original_name = field.file_name().unwrap_or("").to_string();
                 if let Ok(b) = field.bytes().await {
                     file_bytes = Some(b.to_vec());
                 }
@@ -450,18 +232,13 @@ pub async fn api_chat_send_image(
         Some(b) if !b.is_empty() => b,
         _ => return json_error(StatusCode::BAD_REQUEST, "image_required"),
     };
-    let detected = match detect_attachment(&file_bytes, &original_name) {
-        Some(value) => value,
-        None => return json_error(StatusCode::BAD_REQUEST, "unsupported_attachment"),
+    if file_bytes.len() > MAX_IMAGE_BYTES {
+        return json_error(StatusCode::PAYLOAD_TOO_LARGE, "image_too_large");
+    }
+    let (kind, mime) = match detect_image(&file_bytes) {
+        Some(p) => p,
+        None => return json_error(StatusCode::BAD_REQUEST, "unsupported_image"),
     };
-    if file_bytes.len() > detected.max_bytes {
-        return json_error(StatusCode::PAYLOAD_TOO_LARGE, "attachment_too_large");
-    }
-    if detected.kind == "video" && !video_duration_is_allowed(&file_bytes, detected.mime) {
-        return json_error(StatusCode::BAD_REQUEST, "video_duration_invalid");
-    }
-    let kind = detected.kind;
-    let mime = detected.mime;
     if !client_message_id.is_empty() && !client_message_id_is_valid(&client_message_id) {
         return json_error(StatusCode::BAD_REQUEST, "invalid_client_message_id");
     }
@@ -524,7 +301,7 @@ pub async fn api_chat_send_image(
         "{}/{}.{}",
         conversation_id,
         random_file_stem(),
-        detected.extension
+        extension_for_mime(mime)
     );
     let absolute = media_root().join(&relative);
     if let Some(parent) = absolute.parent() {
@@ -948,23 +725,14 @@ pub async fn api_chat_media(
         Ok(c) => c,
         Err(_) => return json_error(StatusCode::SERVICE_UNAVAILABLE, "database_unavailable"),
     };
-    let row: Result<(i64, String, String, String, String), _> = connection.query_row(
-        "SELECT m.deleted_at, m.attachment_path, m.attachment_mime,
-                m.attachment_kind, m.message
+    let row: Result<(i64, String, String), _> = connection.query_row(
+        "SELECT m.deleted_at, m.attachment_path, m.attachment_mime
          FROM messages m JOIN conversations c ON c.id = m.conversation_id
          WHERE m.id = ?1 AND (c.user1_id = ?2 OR c.user2_id = ?2) LIMIT 1",
         rusqlite::params![message_id, user_id],
-        |row| {
-            Ok((
-                row.get(0)?,
-                row.get(1)?,
-                row.get(2)?,
-                row.get(3)?,
-                row.get(4)?,
-            ))
-        },
+        |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
     );
-    let (deleted_at, relative, mime, kind, message) = match row {
+    let (deleted_at, relative, mime) = match row {
         Ok(r) => r,
         Err(_) => return json_error(StatusCode::NOT_FOUND, "media_not_found"),
     };
@@ -995,22 +763,6 @@ pub async fn api_chat_media(
         header::X_CONTENT_TYPE_OPTIONS,
         HeaderValue::from_static("nosniff"),
     );
-    response.headers_mut().insert(
-        header::CONTENT_SECURITY_POLICY,
-        HeaderValue::from_static("default-src 'none'; sandbox"),
-    );
-    if kind == "document" {
-        let name = safe_attachment_name(&message, extension_for_mime(&mime));
-        let value = format!(
-            "attachment; filename*=UTF-8''{}",
-            urlencoding::encode(&name)
-        );
-        if let Ok(value) = HeaderValue::from_str(&value) {
-            response
-                .headers_mut()
-                .insert(header::CONTENT_DISPOSITION, value);
-        }
-    }
     response
 }
 
@@ -1067,40 +819,5 @@ mod tests {
         assert_eq!(first, 1);
         assert_eq!(retry, 0);
         assert_eq!(count, 1);
-    }
-
-    #[test]
-    fn attachment_detection_rejects_active_content() {
-        assert!(detect_attachment(b"<html><script>alert(1)</script>", "attack.html").is_none());
-        assert!(
-            detect_attachment(b"<svg xmlns='http://www.w3.org/2000/svg'>", "attack.svg").is_none()
-        );
-        assert_eq!(
-            detect_attachment(b"%PDF-1.7\n", "report.pdf").unwrap().kind,
-            "document"
-        );
-        assert_eq!(
-            detect_attachment(b"plain notes", "notes.txt").unwrap().mime,
-            "text/plain"
-        );
-    }
-
-    #[test]
-    fn attachment_names_cannot_escape_storage() {
-        assert_eq!(
-            safe_attachment_name("../../report.pdf", "pdf"),
-            "report.pdf"
-        );
-        assert_eq!(safe_attachment_name("../..", "txt"), "attachment.txt");
-    }
-
-    #[test]
-    fn webm_duration_is_server_validated() {
-        let mut webm = vec![
-            0x1a, 0x45, 0xdf, 0xa3, 0x2a, 0xd7, 0xb1, 0x83, 0x0f, 0x42, 0x40, 0x44, 0x89, 0x88,
-        ];
-        webm.extend_from_slice(&120_000.0f64.to_be_bytes());
-        assert_eq!(webm_duration_seconds(&webm), Some(120.0));
-        assert!(video_duration_is_allowed(&webm, "video/webm"));
     }
 }

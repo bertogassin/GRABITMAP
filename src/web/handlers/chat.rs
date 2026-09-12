@@ -90,10 +90,7 @@ fn load_recent_chat_messages(
                     deleted_at,
                     attachment_kind: attachment_kind.clone(),
                     attachment_url: if deleted_at == 0
-                        && matches!(
-                            attachment_kind.as_str(),
-                            "image" | "voice" | "video" | "document"
-                        )
+                        && (attachment_kind == "image" || attachment_kind == "voice")
                         && !attachment_path.is_empty()
                     {
                         format!("/api/chat/media/{message_id}")

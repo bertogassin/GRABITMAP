@@ -494,34 +494,6 @@ fn chat_message_body_html(message: &crate::web::view_models::ChatMessageRow) -> 
         );
     }
 
-    if message.attachment_kind == "video" && !message.attachment_url.is_empty() {
-        let caption = if message.message.is_empty() {
-            String::new()
-        } else {
-            format!(
-                r#"<div class="chat-message-caption">{}</div>"#,
-                escape_html(&message.message)
-            )
-        };
-        return format!(
-            r#"<div class="chat-message-body chat-message-body--video"><video class="chat-message-video" src="{url}" controls preload="metadata" playsinline></video>{caption}</div>"#,
-            url = escape_html(&message.attachment_url)
-        );
-    }
-
-    if message.attachment_kind == "document" && !message.attachment_url.is_empty() {
-        let name = if message.message.is_empty() {
-            crate::i18n::t("chat_document")
-        } else {
-            message.message.clone()
-        };
-        return format!(
-            r#"<div class="chat-message-body chat-message-body--document"><a class="chat-document-link" href="{url}" download>📄 {name}</a></div>"#,
-            url = escape_html(&message.attachment_url),
-            name = escape_html(&name)
-        );
-    }
-
     let listing_id = message.message.split_whitespace().find_map(|part| {
         let path = part
             .strip_prefix("https://grabitmap.com")
@@ -984,9 +956,9 @@ fn render_chat_thread(
     <div class="chat-composer-main">
         <button id="chat-emoji-btn" type="button" class="chat-emoji-btn" aria-label="Открыть эмодзи" aria-controls="chat-emoji-panel" aria-expanded="false">☺</button>
         <textarea id="chat-input" name="message" rows="1" maxlength="2000" required autocomplete="off" enterkeyhint="send" aria-label="Текст сообщения" placeholder="Сообщение…" class="ui-textarea chat-input"></textarea>
-        <button id="chat-image-btn" type="button" class="chat-image-btn" aria-label="Добавить вложение">
-            <span class="chat-action-icon" aria-hidden="true">＋</span>
-            <span class="chat-action-label">Вложение</span>
+        <button id="chat-image-btn" type="button" class="chat-image-btn" aria-label="Добавить фото">
+            <span class="chat-action-icon" aria-hidden="true">▣</span>
+            <span class="chat-action-label">Фото</span>
         </button>
     </div>
     <input type="file" id="chat-image-input" accept="image/jpeg,image/png,image/webp" class="chat-file-input">
