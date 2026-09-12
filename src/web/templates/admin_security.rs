@@ -67,6 +67,7 @@ body{{
  border-radius:14px;color:var(--text);text-decoration:none;font-weight:850
 }}
 .hero,.card{{
+ display:block;
  border:1px solid var(--line);border-radius:25px;
  background:linear-gradient(145deg,rgba(21,24,32,.97),rgba(10,12,17,.98));
  box-shadow:0 22px 65px rgba(0,0,0,.3)
@@ -122,7 +123,9 @@ input{{
  background:rgba(98,224,173,.06)
 }}
 .notice{{margin-top:15px;color:var(--muted);font-size:12px;line-height:1.55}}
-</style>"#;
+</style>"#
+        .replace("{{", "{")
+        .replace("}}", "}");
 
     let main = format!(
         r#"
@@ -176,10 +179,31 @@ input{{
 
     super::common::page_document(
         "Безопасность владельца · GRABIT",
-        head,
+        &head,
         &super::common::topbar("Безопасность владельца", "shield"),
         &main,
         &super::common::bottom_nav("menu"),
         "",
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{render_admin_security, AdminSecurityData};
+
+    #[test]
+    fn owner_security_emits_valid_mobile_card_css() {
+        let html = render_admin_security(AdminSecurityData {
+            masked_email: "a***@example.com".to_string(),
+            verified: false,
+            remaining_seconds: 0,
+            message: String::new(),
+        });
+
+        assert!(html.contains(":root {"));
+        assert!(html.contains(".hero,.card{"));
+        assert!(html.contains("display:block;"));
+        assert!(!html.contains(":root {{"));
+        assert!(!html.contains(".hero,.card{{"));
+    }
 }

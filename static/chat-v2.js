@@ -3961,6 +3961,16 @@
                 return;
             }
             body.dataset.listingPreviewId = String(id);
+            renderListingCard(body, {
+                url: "/app/listing/" + id,
+                title: t("common_listing", "Объявление GRABIT"),
+                listing_type: "",
+                rubric: "",
+                address: "",
+                description: "",
+                verified: false,
+                premium: false
+            }, originalText);
             listingPreview(id).then(function (listing) {
                 if (
                     listing &&
@@ -4384,6 +4394,9 @@
                 };
 
                 messageCache.set(id, message);
+                if (body) {
+                    enhanceListingBody(body, message);
+                }
             });
         }
 
