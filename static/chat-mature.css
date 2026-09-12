@@ -188,17 +188,22 @@ html[data-page="chat"] #chat-form.chat-composer {
     grid-area: main;
     display: grid;
     grid-template-columns: 38px minmax(0, 1fr) 40px;
+    grid-template-rows: auto;
     align-items: center;
     min-height: 48px;
+    isolation: isolate;
     border: 1px solid color-mix(in srgb, var(--text) 13%, transparent);
     border-radius: 22px;
     background: color-mix(in srgb, var(--bg) 74%, #202834);
 }
 
 #chat-form #chat-input {
-    grid-column: 2;
-    grid-row: 1;
+    grid-column: 2 !important;
+    grid-row: 1 !important;
     align-self: end;
+    position: relative;
+    z-index: 1;
+    pointer-events: auto !important;
     min-width: 0;
     min-height: 46px !important;
     height: 46px !important;
@@ -224,15 +229,28 @@ html[data-page="chat"] #chat-form.chat-composer {
     box-shadow: none !important;
 }
 
-#chat-form .chat-emoji-btn {
-    grid-column: 1;
+#chat-form #chat-emoji-btn {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    width: 38px !important;
     font-size: 23px;
     line-height: 1;
 }
 
-#chat-form .chat-image-btn {
-    grid-column: 3;
+#chat-form #chat-image-btn {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    position: relative;
+    z-index: 2;
     font-size: 20px;
+}
+
+#chat-form #chat-image-input.chat-file-input {
+    display: none !important;
+    pointer-events: none !important;
 }
 
 #chat-form .chat-emoji-panel {
