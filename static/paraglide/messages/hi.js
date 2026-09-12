@@ -56,6 +56,8 @@
 /** @typedef {{}} Chat_LeaveInputs */
 /** @typedef {{}} Chat_Link_OffInputs */
 /** @typedef {{}} Chat_Link_OkInputs */
+/** @typedef {{}} Chat_Listing_OpenInputs */
+/** @typedef {{}} Chat_Listing_VerifiedInputs */
 /** @typedef {{}} Chat_Load_OlderInputs */
 /** @typedef {{}} Chat_LoadingInputs */
 /** @typedef {{}} Chat_Long_AgoInputs */
@@ -88,6 +90,7 @@
 /** @typedef {{}} Chat_Retry_SoonInputs */
 /** @typedef {{}} Chat_SaveInputs */
 /** @typedef {{}} Chat_SavingInputs */
+/** @typedef {{}} Chat_Send_ActionInputs */
 /** @typedef {{}} Chat_Send_ErrorInputs */
 /** @typedef {{}} Chat_Send_Failed_RetryInputs */
 /** @typedef {{}} Chat_Send_UnavailableInputs */
@@ -97,6 +100,10 @@
 /** @typedef {{}} Chat_Sending_VoiceInputs */
 /** @typedef {{}} Chat_Sent_HintInputs */
 /** @typedef {{}} Chat_Session_ExpiredInputs */
+/** @typedef {{}} Chat_Share_CancelInputs */
+/** @typedef {{}} Chat_Share_Choose_BodyInputs */
+/** @typedef {{}} Chat_Share_Choose_TitleInputs */
+/** @typedef {{}} Chat_Share_ReadyInputs */
 /** @typedef {{}} Chat_Status_SendingInputs */
 /** @typedef {{}} Chat_TitleInputs */
 /** @typedef {{}} Chat_TypingInputs */
@@ -263,8 +270,6 @@
 /** @typedef {{}} Menu_Sound_OnInputs */
 /** @typedef {{}} Menu_Sound_TestInputs */
 /** @typedef {{}} Menu_Sound_Test_HintInputs */
-/** @typedef {{}} Menu_Steps_CardInputs */
-/** @typedef {{}} Menu_Steps_MetaInputs */
 /** @typedef {{}} Menu_ThemeInputs */
 /** @typedef {{}} Menu_Theme_DarkInputs */
 /** @typedef {{}} Menu_Theme_LightInputs */
@@ -277,9 +282,6 @@
 /** @typedef {{}} Notify_GenericInputs */
 /** @typedef {{}} Notify_New_MessageInputs */
 /** @typedef {{}} Notify_Open_ChatInputs */
-/** @typedef {{}} Notify_Steps_ActionInputs */
-/** @typedef {{}} Notify_Steps_BodyInputs */
-/** @typedef {{}} Notify_Steps_TitleInputs */
 /** @typedef {{}} Profile_Login_WriteInputs */
 /** @typedef {{}} Profile_SettingsInputs */
 /** @typedef {{}} Profile_Settings_SoundInputs */
@@ -288,39 +290,19 @@
 /** @typedef {{}} Profile_Write_HintInputs */
 /** @typedef {{}} Profile_Write_Login_HintInputs */
 /** @typedef {{}} Pwa_InstalledInputs */
-/** @typedef {{}} Pwa_Open_App_StepsInputs */
 /** @typedef {{ rating: NonNullable<unknown>, votes: NonNullable<unknown> }} Rating_VotesInputs */
 /** @typedef {{}} Search_TitleInputs */
 /** @typedef {{}} Search_WhatInputs */
+/** @typedef {{}} Share_Card_SentInputs */
+/** @typedef {{}} Share_Copy_AddressInputs */
+/** @typedef {{}} Share_ExternalInputs */
+/** @typedef {{}} Share_FailedInputs */
+/** @typedef {{}} Share_InternalInputs */
+/** @typedef {{}} Share_Link_CopiedInputs */
+/** @typedef {{}} Share_Open_DetailsInputs */
+/** @typedef {{}} Share_SentInputs */
+/** @typedef {{}} Share_TaglineInputs */
 /** @typedef {{}} SpecialistInputs */
-/** @typedef {{}} Steps_BestInputs */
-/** @typedef {{}} Steps_CountingInputs */
-/** @typedef {{}} Steps_DesktopInputs */
-/** @typedef {{}} Steps_EmptyInputs */
-/** @typedef {{}} Steps_Goal_DoneInputs */
-/** @typedef {{}} Steps_Goal_LabelInputs */
-/** @typedef {{}} Steps_Goal_UpdatedInputs */
-/** @typedef {{}} Steps_InstallInputs */
-/** @typedef {{}} Steps_Keep_PanelInputs */
-/** @typedef {{}} Steps_LeadInputs */
-/** @typedef {{}} Steps_LifeInputs */
-/** @typedef {{ pct: NonNullable<unknown>, km: NonNullable<unknown>, goal: NonNullable<unknown> }} Steps_Live_BodyInputs */
-/** @typedef {{}} Steps_LogInputs */
-/** @typedef {{}} Steps_Need_MotionInputs */
-/** @typedef {{}} Steps_Notify_DeniedInputs */
-/** @typedef {{ goal: NonNullable<unknown> }} Steps_Of_GoalInputs */
-/** @typedef {{}} Steps_OkInputs */
-/** @typedef {{}} Steps_PinInputs */
-/** @typedef {{}} Steps_Sensor_QuietInputs */
-/** @typedef {{}} Steps_StreakInputs */
-/** @typedef {{}} Steps_TitleInputs */
-/** @typedef {{ pct: NonNullable<unknown> }} Steps_Today_PctInputs */
-/** @typedef {{}} Steps_WeekInputs */
-/** @typedef {{}} Steps_Word_FewInputs */
-/** @typedef {{}} Steps_Word_ManyInputs */
-/** @typedef {{}} Steps_Word_OneInputs */
-/** @typedef {{}} Steps_YearInputs */
-/** @typedef {{}} Steps_Year_HintInputs */
 
 
 export const auth_email = /** @type {(inputs: Auth_EmailInputs) => LocalizedString} */ () => {
@@ -547,6 +529,14 @@ export const chat_link_ok = /** @type {(inputs: Chat_Link_OkInputs) => Localized
 	return /** @type {LocalizedString} */ (`लाइव`)
 };
 
+export const chat_listing_open = /** @type {(inputs: Chat_Listing_OpenInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`खोलें`)
+};
+
+export const chat_listing_verified = /** @type {(inputs: Chat_Listing_VerifiedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`सत्यापित`)
+};
+
 export const chat_load_older = /** @type {(inputs: Chat_Load_OlderInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`पिछले संदेश लोड करें`)
 };
@@ -675,6 +665,10 @@ export const chat_saving = /** @type {(inputs: Chat_SavingInputs) => LocalizedSt
 	return /** @type {LocalizedString} */ (`सहेजा जा रहा…`)
 };
 
+export const chat_send_action = /** @type {(inputs: Chat_Send_ActionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`भेजें`)
+};
+
 export const chat_send_error = /** @type {(inputs: Chat_Send_ErrorInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`भेजने में त्रुटि`)
 };
@@ -709,6 +703,22 @@ export const chat_sent_hint = /** @type {(inputs: Chat_Sent_HintInputs) => Local
 
 export const chat_session_expired = /** @type {(inputs: Chat_Session_ExpiredInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`सत्र समाप्त`)
+};
+
+export const chat_share_cancel = /** @type {(inputs: Chat_Share_CancelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`साझा करना रद्द करें`)
+};
+
+export const chat_share_choose_body = /** @type {(inputs: Chat_Share_Choose_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`चैट या समूह चुनें।`)
+};
+
+export const chat_share_choose_title = /** @type {(inputs: Chat_Share_Choose_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`यह विज्ञापन कहाँ भेजें?`)
+};
+
+export const chat_share_ready = /** @type {(inputs: Chat_Share_ReadyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`विज्ञापन कार्ड भेजने के लिए तैयार है`)
 };
 
 export const chat_status_sending = /** @type {(inputs: Chat_Status_SendingInputs) => LocalizedString} */ () => {
@@ -1252,7 +1262,7 @@ export const map_pick_country = /** @type {(inputs: Map_Pick_CountryInputs) => L
 };
 
 export const map_pick_country_cities = /** @type {(inputs: Map_Pick_Country_CitiesInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`शहर और संसाधन खोलने के लिए देश चुनें।`)
+	return /** @type {LocalizedString} */ (`शहर और विज्ञापन खोलने के लिए देश चुनें।`)
 };
 
 export const map_pick_profession = /** @type {(inputs: Map_Pick_ProfessionInputs) => LocalizedString} */ () => {
@@ -1375,14 +1385,6 @@ export const menu_sound_test_hint = /** @type {(inputs: Menu_Sound_Test_HintInpu
 	return /** @type {LocalizedString} */ (`Short signal`)
 };
 
-export const menu_steps_card = /** @type {(inputs: Menu_Steps_CardInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Pedometer`)
-};
-
-export const menu_steps_meta = /** @type {(inputs: Menu_Steps_MetaInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`10,000 steps a day`)
-};
-
 export const menu_theme = /** @type {(inputs: Menu_ThemeInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Day and night`)
 };
@@ -1431,18 +1433,6 @@ export const notify_open_chat = /** @type {(inputs: Notify_Open_ChatInputs) => L
 	return /** @type {LocalizedString} */ (`GRABIT में चैट खोलें।`)
 };
 
-export const notify_steps_action = /** @type {(inputs: Notify_Steps_ActionInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`पेडोमीटर खोलें`)
-};
-
-export const notify_steps_body = /** @type {(inputs: Notify_Steps_BodyInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`टैप करें — कदम गिनें।`)
-};
-
-export const notify_steps_title = /** @type {(inputs: Notify_Steps_TitleInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`GRABIT पेडोमीटर`)
-};
-
 export const profile_login_write = /** @type {(inputs: Profile_Login_WriteInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`साइन इन करके लिखें`)
 };
@@ -1456,7 +1446,7 @@ export const profile_settings_sound = /** @type {(inputs: Profile_Settings_Sound
 };
 
 export const profile_share_text = /** @type {(inputs: Profile_Share_TextInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`मेरे लिंक से GRABIT में आएँ। चैट, कदम और पास का काम।`)
+	return /** @type {LocalizedString} */ (`मेरे लिंक से GRABIT में आएँ। चैट करें और पास में काम खोजें।`)
 };
 
 export const profile_title = /** @type {(inputs: Profile_TitleInputs) => LocalizedString} */ () => {
@@ -1475,10 +1465,6 @@ export const pwa_installed = /** @type {(inputs: Pwa_InstalledInputs) => Localiz
 	return /** @type {LocalizedString} */ (`Already installed`)
 };
 
-export const pwa_open_app_steps = /** @type {(inputs: Pwa_Open_App_StepsInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`ऐप खोलें। पेडोमीटर पैनल पर है — कदम गिनें।`)
-};
-
 export const rating_votes = /** @type {(inputs: Rating_VotesInputs) => LocalizedString} */ (i) => {
 	return /** @type {LocalizedString} */ (`रेटिंग ${i?.rating} · ${i?.votes}`)
 };
@@ -1491,118 +1477,42 @@ export const search_what = /** @type {(inputs: Search_WhatInputs) => LocalizedSt
 	return /** @type {LocalizedString} */ (`क्या खोजें`)
 };
 
+export const share_card_sent = /** @type {(inputs: Share_Card_SentInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`कार्ड भेजा गया`)
+};
+
+export const share_copy_address = /** @type {(inputs: Share_Copy_AddressInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`पेज का पता कॉपी करें`)
+};
+
+export const share_external = /** @type {(inputs: Share_ExternalInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`साझा करें`)
+};
+
+export const share_failed = /** @type {(inputs: Share_FailedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`साझा नहीं हो सका`)
+};
+
+export const share_internal = /** @type {(inputs: Share_InternalInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`GRABIT में भेजें`)
+};
+
+export const share_link_copied = /** @type {(inputs: Share_Link_CopiedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`लिंक कॉपी हुआ`)
+};
+
+export const share_open_details = /** @type {(inputs: Share_Open_DetailsInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`पूरी जानकारी खोलें`)
+};
+
+export const share_sent = /** @type {(inputs: Share_SentInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`भेजा गया`)
+};
+
+export const share_tagline = /** @type {(inputs: Share_TaglineInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`लोग · काम · सेवाएँ · व्यवसाय`)
+};
+
 export const specialist = /** @type {(inputs: SpecialistInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`विशेषज्ञ`)
-};
-
-export const steps_best = /** @type {(inputs: Steps_BestInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`सर्वश्रेष्ठ`)
-};
-
-export const steps_counting = /** @type {(inputs: Steps_CountingInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`फ़ोन से कदम गिने जा रहे हैं`)
-};
-
-export const steps_desktop = /** @type {(inputs: Steps_DesktopInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`कंप्यूटर पर कदम नहीं गिने जाते। फ़ोन पर खोलें।`)
-};
-
-export const steps_empty = /** @type {(inputs: Steps_EmptyInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`अभी खाली`)
-};
-
-export const steps_goal_done = /** @type {(inputs: Steps_Goal_DoneInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`दिन का लक्ष्य पूरा`)
-};
-
-export const steps_goal_label = /** @type {(inputs: Steps_Goal_LabelInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`लक्ष्य`)
-};
-
-export const steps_goal_updated = /** @type {(inputs: Steps_Goal_UpdatedInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`लक्ष्य अपडेट`)
-};
-
-export const steps_install = /** @type {(inputs: Steps_InstallInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Add to home screen`)
-};
-
-export const steps_keep_panel = /** @type {(inputs: Steps_Keep_PanelInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`फोन पैनल खुद अपडेट होता है`)
-};
-
-export const steps_lead = /** @type {(inputs: Steps_LeadInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Daily goal — 10,000 steps.`)
-};
-
-export const steps_life = /** @type {(inputs: Steps_LifeInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`कुल`)
-};
-
-export const steps_live_body = /** @type {(inputs: Steps_Live_BodyInputs) => LocalizedString} */ (i) => {
-	return /** @type {LocalizedString} */ (`${i?.pct}% · ${i?.km} किमी · लक्ष्य ${i?.goal}`)
-};
-
-export const steps_log = /** @type {(inputs: Steps_LogInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`गतिविधि`)
-};
-
-export const steps_need_motion = /** @type {(inputs: Steps_Need_MotionInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`मोशन अनुमति चाहिए`)
-};
-
-export const steps_notify_denied = /** @type {(inputs: Steps_Notify_DeniedInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`सूचनाएँ बंद — फ़ोन पैनल उपलब्ध नहीं`)
-};
-
-export const steps_of_goal = /** @type {(inputs: Steps_Of_GoalInputs) => LocalizedString} */ (i) => {
-	return /** @type {LocalizedString} */ (`/ ${i?.goal}`)
-};
-
-export const steps_ok = /** @type {(inputs: Steps_OkInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`ठीक`)
-};
-
-export const steps_pin = /** @type {(inputs: Steps_PinInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`फ़ोन पैनल`)
-};
-
-export const steps_sensor_quiet = /** @type {(inputs: Steps_Sensor_QuietInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`सेंसर चुप है। स्क्रीन खुली रखें या शॉर्टकट लगाएँ।`)
-};
-
-export const steps_streak = /** @type {(inputs: Steps_StreakInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`लकीर`)
-};
-
-export const steps_title = /** @type {(inputs: Steps_TitleInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`पेडोमीटर`)
-};
-
-export const steps_today_pct = /** @type {(inputs: Steps_Today_PctInputs) => LocalizedString} */ (i) => {
-	return /** @type {LocalizedString} */ (`आज ${i?.pct}%`)
-};
-
-export const steps_week = /** @type {(inputs: Steps_WeekInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`सप्ताह`)
-};
-
-export const steps_word_few = /** @type {(inputs: Steps_Word_FewInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`कदम`)
-};
-
-export const steps_word_many = /** @type {(inputs: Steps_Word_ManyInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`कदम`)
-};
-
-export const steps_word_one = /** @type {(inputs: Steps_Word_OneInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`कदम`)
-};
-
-export const steps_year = /** @type {(inputs: Steps_YearInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`साल`)
-};
-
-export const steps_year_hint = /** @type {(inputs: Steps_Year_HintInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`रंग बताता है कितने कदम`)
 };

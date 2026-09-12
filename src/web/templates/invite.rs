@@ -3,7 +3,7 @@ use super::common::{back_link, bottom_nav, escape_html, page_document, simple_he
 pub fn invite_path(public_id: &str, to: &str) -> String {
     let id = urlencoding::encode(public_id.trim());
     match to {
-        "steps" | "chat" | "work" => format!("/app/join/{id}?to={to}"),
+        "chat" | "work" => format!("/app/join/{id}?to={to}"),
         _ => format!("/app/join/{id}"),
     }
 }
@@ -22,7 +22,7 @@ pub fn invite_share_block(public_id: &str) -> String {
         <button type="button" class="ui-button" data-share data-share-title="GRABIT · написать" data-share-text="Напиши мне в GRABIT. Чат сразу, без заявки." data-share-url="{chat}" data-share-status="rm-invite-status">Чат</button>
         <button type="button" class="ui-button" data-share data-share-title="GRABIT · работа" data-share-text="Ищем работу рядом в GRABIT. Заходи по ссылке." data-share-url="{work}" data-share-status="rm-invite-status">Работа</button>
     </div>
-    <p id="rm-invite-status" class="rm-step-hint" role="status"></p>
+    <p id="rm-invite-status" class="rm-invite-status-message" role="status"></p>
 </section>"#,
         chat = escape_html(&invite_path(public_id, "chat")),
         work = escape_html(&invite_path(public_id, "work")),
@@ -33,13 +33,11 @@ pub fn render_invite_landing(name: &str, public_id: &str, to: &str) -> String {
     let next = invite_path(public_id, to);
     let next_q = urlencoding::encode(&next);
     let title = match to {
-        "steps" => "Друг зовёт в шагомер",
         "chat" => "Друг зовёт в чат",
         "work" => "Друг зовёт к работе",
         _ => "Друг зовёт в GRABIT",
     };
     let lead = match to {
-        "steps" => "Цель дня — 10 000 шагов. Войдите и шагомер откроется, а чат с другом будет уже на месте.",
         "chat" => "Напишите сразу. Потом можно заблокировать или удалить.",
         "work" => "После входа откроется поиск работы, и вы сразу сможете написать другу.",
         _ => "Чат и поиск работы рядом. Войдите — и вы уже у друга.",
@@ -87,13 +85,12 @@ mod tests {
 
     #[test]
     fn invite_links_stay_inside_app() {
-        assert_eq!(invite_path("abc123", "steps"), "/app/join/abc123?to=steps");
+        assert_eq!(invite_path("abc123", "retired"), "/app/join/abc123");
         let html = render_invite_landing("Анна", "abc123", "chat");
         assert!(html.contains("/login?next="));
         assert!(html.contains("/register?next="));
         assert!(html.contains("Анна"));
         let share = invite_share_block("abc123");
-        assert!(!share.contains("/app/join/abc123?to=steps"));
         assert!(share.contains("/app/join/abc123?to=chat"));
         assert!(share.contains("/app/join/abc123?to=work"));
         assert!(share.contains("Пригласить друга"));
