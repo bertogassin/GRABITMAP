@@ -234,6 +234,19 @@
         );
     }
 
+    function userLabel(value) {
+        var label = String(value || "").trim();
+        var labels = {
+            work: "Работа",
+            workers: "Работники",
+            caregiver: "Уход и няня",
+            security: "Охрана",
+            services: "Услуги",
+            business: "Бизнес"
+        };
+        return labels[label.toLowerCase()] || label;
+    }
+
     function continueChips(includePlace) {
         var html = "";
         var place = loadPlace();
@@ -258,7 +271,7 @@
             if (!row.href || !row.label) {
                 return;
             }
-            html += chip(row.href, row.label);
+            html += chip(row.href, userLabel(row.label));
         });
 
         return html;
@@ -339,7 +352,7 @@
             '<section class="card rm-continue-card">' +
             '<div class="card-title">Продолжить</div>' +
             '<div class="card-meta">Последнее место, поиск и объявление</div>' +
-            (chips ? '<nav class="rm-kind-chips">' + chips + "</nav>" : "") +
+            (chips ? '<nav class="rm-kind-chips" aria-label="Недавние действия">' + chips + "</nav>" : "") +
             "</section>";
         host.hidden = false;
     }

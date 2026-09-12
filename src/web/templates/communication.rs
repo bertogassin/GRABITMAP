@@ -476,6 +476,26 @@ fn chat_message_body_html(message: &crate::web::view_models::ChatMessageRow) -> 
         );
     }
 
+    let listing_id = message.message.split_whitespace().find_map(|part| {
+        let path = part
+            .strip_prefix("https://grabitmap.com")
+            .or_else(|| part.strip_prefix("http://grabitmap.com"))
+            .or_else(|| part.strip_prefix("https://www.grabitmap.com"))
+            .unwrap_or(part);
+        ["/app/listing/", "/app/resource/"]
+            .iter()
+            .find_map(|prefix| path.strip_prefix(prefix))
+            .and_then(|tail| tail.split(['/', '?', '#']).next())
+            .and_then(|id| id.parse::<i64>().ok())
+            .filter(|id| *id > 0)
+    });
+
+    if let Some(id) = listing_id {
+        return format!(
+            r#"<div class="chat-message-body chat-message-body--listing" data-listing-preview-id="{id}"><a class="chat-listing-card" href="/app/listing/{id}"><div class="chat-listing-brand"><img src="/static/grabit-mascot-v2.png" alt="" width="88" height="53"><strong>GRABIT</strong></div><strong class="chat-listing-title">Объявление GRABIT</strong><span class="chat-listing-footer"><span></span><span>Открыть</span></span></a></div>"#
+        );
+    }
+
     format!(
         r#"<div class="chat-message-body">{}</div>"#,
         escape_html(&message.message)

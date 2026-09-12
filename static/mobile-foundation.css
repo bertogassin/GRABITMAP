@@ -343,3 +343,63 @@ textarea,
         transition-duration: .01ms !important;
     }
 }
+
+/* v7.13: one measured mobile viewport for browser chrome and system navigation. */
+html[data-page="chat"],
+html[data-page="chat"] body {
+    height: var(--chat-viewport-height, 100dvh) !important;
+    max-height: var(--chat-viewport-height, 100dvh) !important;
+}
+
+html[data-page="chat"] main.page {
+    padding-bottom: max(10px, env(safe-area-inset-bottom)) !important;
+}
+
+html[data-page="chat"] #chat-form.chat-composer {
+    margin-bottom: max(4px, env(safe-area-inset-bottom)) !important;
+}
+
+html[data-page="chat"] .chat-toolbar-status,
+html[data-page="chat"] .chat-connection-state {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+    .rm-invite-card {
+        padding: 15px !important;
+        gap: 8px !important;
+    }
+
+    .rm-invite-actions {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #rm-continue-menu .rm-kind-chips {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        max-width: 100%;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    #rm-continue-menu .rm-kind-chips::-webkit-scrollbar {
+        display: none;
+    }
+
+    html[data-page="chat"] .chat-header-menu {
+        width: min(218px, calc(100vw - 32px)) !important;
+        min-width: 0 !important;
+        padding: 5px !important;
+    }
+
+    html[data-page="chat"] .chat-header-menu button {
+        min-height: 42px !important;
+        padding-inline: 9px !important;
+        font-size: 13px !important;
+    }
+}

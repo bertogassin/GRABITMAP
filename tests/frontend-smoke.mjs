@@ -98,6 +98,24 @@ test("critical mobile layouts remain readable and listing links always become ca
   assert.match(chat, /messageCache\.set\(id, message\);[\s\S]*enhanceListingBody\(body, message\)/);
 });
 
+test("mobile experience removes retired steps and uses the measured chat viewport", async () => {
+  const [invite, memory, mobile, chat, communication] = await Promise.all([
+    readFile(new URL("src/web/templates/invite.rs", root), "utf8"),
+    readFile(new URL("static/place-memory.js", root), "utf8"),
+    readFile(new URL("static/mobile-foundation.css", root), "utf8"),
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+  ]);
+  assert.doesNotMatch(invite, /data-share-title="GRABIT · шагомер"/);
+  assert.match(invite, /Отправьте личную ссылку для чата или поиска работы/);
+  assert.match(memory, /caregiver: "Уход и няня"/);
+  assert.match(memory, /work: "Работа"/);
+  assert.match(mobile, /height: var\(--chat-viewport-height, 100dvh\) !important/);
+  assert.match(chat, /--chat-visible-bottom/);
+  assert.match(communication, /chat-message-body--listing/);
+  assert.match(communication, /Объявление GRABIT/);
+});
+
 test("locale switching validates and canonicalizes locale tags", async () => {
   const runtime = await readFile(new URL("static/i18n-runtime.js", root), "utf8");
   assert.match(runtime, /normalizeLocale/);
