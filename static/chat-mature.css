@@ -98,6 +98,22 @@ html[data-page="chat"] .chat-shell {
     width: min(230px, 59vw); padding: 4px 0; border: 0; background: transparent;
 }
 .chat-voice-play { width: 38px; height: 38px; }
+.chat-voice-play .chat-icon { width: 20px; height: 20px; }
+.chat-voice-player.is-loading .chat-voice-play {
+    position: relative;
+}
+.chat-voice-player.is-loading .chat-voice-play .chat-icon { opacity: .3; }
+.chat-voice-player.is-loading .chat-voice-play::after {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: chat-voice-spin .7s linear infinite;
+}
+.chat-voice-player.is-error .chat-voice-play { color: #ff8d84; }
+@keyframes chat-voice-spin { to { transform: rotate(1turn); } }
 .chat-voice-time { grid-column: 2; min-width: 0; text-align: left; }
 
 #chat-form.chat-composer {

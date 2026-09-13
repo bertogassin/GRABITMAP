@@ -2,6 +2,15 @@
     "use strict";
 
     var activeAudio = null;
+    var preloadObserver = null;
+
+    function voiceIcon(name) {
+        var path = name === "pause"
+            ? '<path d="M9 7v10M15 7v10"></path>'
+            : '<path d="m9 7 8 5-8 5Z"></path>';
+        return '<svg class="chat-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            path + '</svg>';
+    }
 
     function finiteDuration(audio) {
         return Number.isFinite(audio.duration) &&
@@ -45,7 +54,7 @@
             : "0";
         progress.disabled = duration <= 0;
 
-        button.textContent = audio.paused ? "▶" : "Ⅱ";
+        button.innerHTML = voiceIcon(audio.paused ? "play" : "pause");
         button.setAttribute(
             "aria-label",
             audio.paused
@@ -57,6 +66,40 @@
             formatTime(current) +
             " / " +
             formatTime(duration);
+    }
+
+    function primeVisibleAudio(player) {
+        var audio = player.querySelector("audio");
+        if (!audio || audio.dataset.voicePrimed === "1") {
+            return;
+        }
+
+        audio.dataset.voicePrimed = "1";
+        audio.preload = "auto";
+        try {
+            audio.load();
+        } catch (_) {}
+    }
+
+    function scheduleVisiblePreload(player) {
+        if (!("IntersectionObserver" in window)) {
+            primeVisibleAudio(player);
+            return;
+        }
+
+        if (!preloadObserver) {
+            preloadObserver = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (!entry.isIntersecting) {
+                        return;
+                    }
+                    preloadObserver.unobserve(entry.target);
+                    primeVisibleAudio(entry.target);
+                });
+            }, { rootMargin: "320px 0px" });
+        }
+
+        preloadObserver.observe(player);
     }
 
     function recoverWebmDuration(audio, player) {
@@ -121,6 +164,7 @@
         player.dataset.voiceEnhanced = "1";
         audio.controls = false;
         audio.preload = "metadata";
+        audio.playsInline = true;
 
         var button = document.createElement("button");
         var progress = document.createElement("input");
@@ -128,7 +172,7 @@
 
         button.type = "button";
         button.className = "chat-voice-play";
-        button.textContent = "▶";
+        button.innerHTML = voiceIcon("play");
         button.setAttribute(
             "aria-label",
             "Воспроизвести голосовое"
@@ -163,9 +207,17 @@
 
             if (audio.paused) {
                 activeAudio = audio;
-                audio.play().catch(function () {
-                    update(player);
-                });
+                player.classList.remove("is-error");
+                player.classList.add("is-loading");
+                var playback = audio.play();
+                if (playback && typeof playback.catch === "function") {
+                    playback.catch(function () {
+                        player.classList.remove("is-loading");
+                        player.classList.add("is-error");
+                        button.setAttribute("aria-label", "Повторить голосовое");
+                        update(player);
+                    });
+                }
             } else {
                 audio.pause();
             }
@@ -203,6 +255,8 @@
             "durationchange",
             "timeupdate",
             "play",
+            "playing",
+            "canplay",
             "pause",
             "ended",
             "seeked",
@@ -211,6 +265,9 @@
             audio.addEventListener(
                 eventName,
                 function () {
+                    if (eventName === "playing" || eventName === "canplay") {
+                        player.classList.remove("is-loading", "is-error");
+                    }
                     update(player);
                 }
             );
@@ -223,7 +280,18 @@
             }
         );
 
+        audio.addEventListener("waiting", function () {
+            player.classList.add("is-loading");
+        });
+
+        audio.addEventListener("error", function () {
+            player.classList.remove("is-loading");
+            player.classList.add("is-error");
+            button.setAttribute("aria-label", "Повторить голосовое");
+        });
+
         update(player);
+        scheduleVisiblePreload(player);
     }
 
     function enhanceAll(root) {

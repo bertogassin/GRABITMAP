@@ -937,6 +937,7 @@ fn render_chat_thread(
             r#"
 <form id="chat-form"
       class="ui-form chat-composer"
+      novalidate
       method="post"
       action="{composer_action}">
 
@@ -983,7 +984,7 @@ fn render_chat_thread(
 
     <div class="chat-composer-main">
         <button id="chat-emoji-btn" type="button" class="chat-emoji-btn" aria-label="Открыть эмодзи" aria-controls="chat-emoji-panel" aria-expanded="false"><svg class="chat-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 14.5c1 1.2 2.1 1.8 3.5 1.8s2.5-.6 3.5-1.8"></path><path d="M9 9.5h.01M15 9.5h.01"></path></svg></button>
-        <textarea id="chat-input" name="message" rows="1" maxlength="2000" required autocomplete="off" enterkeyhint="send" aria-label="Текст сообщения" placeholder="Сообщение…" class="ui-textarea chat-input"></textarea>
+        <textarea id="chat-input" name="message" rows="1" maxlength="2000" autocomplete="off" enterkeyhint="send" aria-label="Текст сообщения" placeholder="Сообщение…" class="ui-textarea chat-input"></textarea>
         <button id="chat-image-btn" type="button" class="chat-image-btn" aria-label="Добавить вложение">
             <span class="chat-action-icon" aria-hidden="true"><svg class="chat-icon" viewBox="0 0 24 24" focusable="false"><path d="M8.5 12.5 14.8 6.2a3 3 0 0 1 4.2 4.2l-7.8 7.8a5 5 0 0 1-7.1-7.1l7.7-7.7"></path></svg></span>
             <span class="chat-action-label">Вложение</span>
