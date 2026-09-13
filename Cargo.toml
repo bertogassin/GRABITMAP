@@ -4,6 +4,9 @@ version = "7.18.0"
 edition = "2021"
 
 [dependencies]
+# Bounded DOCX/XLSX structure and decompression validation. Only the
+# compression method needed by ordinary Office documents is enabled.
+zip = { version = "2.3", default-features = false, features = ["deflate"] }
 reqwest = { version = "0.12", features = ["json"] }
 axum = { version = "0.8", features = ["ws", "multipart"] }
 tokio = { version = "1", features = ["full"] }

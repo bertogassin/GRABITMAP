@@ -128,6 +128,16 @@ pub struct AppState {
     pub chat_typing_events: broadcast::Sender<ChatTypingEvent>,
     pub chat_typing_sequence: Arc<AtomicU64>,
     pub chat_typing_rate: Arc<StdMutex<HashMap<String, i64>>>,
+
+    // Bounds how many CPU-heavy Office ZIP validations
+    // (decompression, see chat_media::validate_office_zip) can run at
+    // once, independent of `spawn_blocking`'s own thread pool size.
+    // `tokio::time::timeout` on the caller side does NOT cancel an
+    // already-running blocking task — this semaphore is what actually
+    // keeps a burst of concurrent DOCX/XLSX uploads from saturating CPU
+    // on the small production host. Owned by AppState (constructed once,
+    // shared via Arc, never per-request) rather than created ad hoc.
+    pub office_zip_validation_slots: Arc<tokio::sync::Semaphore>,
 }
 
 impl AppState {
@@ -163,6 +173,11 @@ impl AppState {
             chat_typing_events,
             chat_typing_sequence: Arc::new(AtomicU64::new(initial_sequence)),
             chat_typing_rate: Arc::new(StdMutex::new(HashMap::new())),
+            // One heavy validation at a time on the current small host.
+            // `try_acquire_owned` rejects excess work instead of creating
+            // an unbounded queue, while ordinary photo/video traffic never
+            // uses this semaphore.
+            office_zip_validation_slots: Arc::new(tokio::sync::Semaphore::new(1)),
         }
     }
 

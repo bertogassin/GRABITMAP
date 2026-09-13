@@ -259,8 +259,297 @@ pub(crate) fn private_media_response(
     response
 }
 
-fn zip_contains(bytes: &[u8], marker: &[u8]) -> bool {
-    bytes.windows(marker.len()).any(|window| window == marker)
+// --- Real, streamed ZIP validation for DOCX/XLSX uploads ---------------
+//
+// Real, bounded, streamed decompression + structural validation via the
+// `zip` crate. We never call `ZipArchive::extract`: every entry is inspected
+// and streamed individually, and nothing is written to a path supplied by
+// the archive.
+//
+// Limits are a `ZipValidationLimits` struct rather than bare constants so
+// tests can exercise the same code path with small thresholds.
+#[derive(Clone, Copy)]
+struct ZipValidationLimits {
+    max_entries: usize,
+    max_entry_decompressed_bytes: u64,
+    max_total_decompressed_bytes: u64,
+    max_path_len: usize,
+    max_path_depth: usize,
+}
+
+impl ZipValidationLimits {
+    /// Conservative limits for the current small production host.
+    const fn production() -> Self {
+        Self {
+            max_entries: 512,
+            max_entry_decompressed_bytes: 32 * 1024 * 1024,
+            max_total_decompressed_bytes: 64 * 1024 * 1024,
+            max_path_len: 180,
+            max_path_depth: 10,
+        }
+    }
+}
+
+const ZIP_STREAM_BUFFER_BYTES: usize = 64 * 1024;
+// Cooperative deadline check inside the decompression loop. This does
+// NOT stop the underlying blocking task the instant it fires — nothing
+// short of a subprocess with its own kill switch can guarantee that. It
+// bounds how much *our own loop* keeps decompressing once a request is
+// already known to be too slow, checked between buffer-sized reads
+// rather than only once at the start. Combined with
+// `office_zip_validation_slots` (a bounded semaphore — see AppState) and
+// the byte-count caps above, this keeps worst-case cost bounded on
+// multiple independent axes rather than relying on any single one.
+const ZIP_VALIDATION_DEADLINE: std::time::Duration = std::time::Duration::from_secs(4);
+
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+enum OfficeDocumentKind {
+    Docx,
+    Xlsx,
+}
+
+/// Typed internal rejection reason. The public HTTP API still only ever
+/// returns the generic `unsupported_attachment` error code. Typed reasons
+/// let tests prove which defense rejected a hostile archive.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+enum OfficeZipRejection {
+    NotAZip,
+    TooManyEntries,
+    UnsafePath,
+    Encrypted,
+    UnsupportedFileType,
+    DuplicateEntry,
+    MacroEnabled,
+    NotAnOfficePackage,
+    AmbiguousOfficeKind,
+    EntryTooLarge,
+    TotalSizeTooLarge,
+    InvalidCrcOrStream,
+    UnsafeXml,
+    ExternalRelationship,
+    ContentTypeMismatch,
+    Timeout,
+}
+
+fn unix_mode_is_regular_file_or_directory(mode: u32) -> bool {
+    const S_IFMT: u32 = 0o170000;
+    const S_IFREG: u32 = 0o100000;
+    const S_IFDIR: u32 = 0o040000;
+    let file_type = mode & S_IFMT;
+    // Some writers leave the type bits unset for plain entries — treat
+    // "no type bits at all" as regular, everything else must be exactly
+    // a regular file or a directory. Symlinks (S_IFLNK), devices, FIFOs
+    // and sockets are all rejected by this being `false`.
+    file_type == 0 || file_type == S_IFREG || file_type == S_IFDIR
+}
+
+/// Normalizes a validated, enclosed path for critical-entry comparison:
+/// lowercased (OPC part names are case-insensitive per the spec) and
+/// with a leading "./" stripped. This is intentionally narrow — full
+/// Unicode confusable normalization is out of scope for this pass, but it closes
+/// the two concrete
+/// collision shapes ("Word/Document.xml" vs "word/document.xml", and
+/// "./word/document.xml" vs "word/document.xml") without attempting a
+/// general-purpose path-equivalence solver.
+fn normalize_for_critical_entry_comparison(path: &str) -> String {
+    path.trim_start_matches("./").to_ascii_lowercase()
+}
+
+/// Validates a DOCX/XLSX candidate using real, bounded, streamed
+/// decompression. Never more than one entry's compressed+decompressed
+/// data resident at once — each entry is streamed through a fixed 64 KiB
+/// buffer and discarded, never accumulated into a growing buffer.
+fn validate_office_zip(
+    bytes: &[u8],
+    limits: ZipValidationLimits,
+    deadline: std::time::Instant,
+) -> Result<OfficeDocumentKind, OfficeZipRejection> {
+    let mut archive = zip::ZipArchive::new(std::io::Cursor::new(bytes))
+        .map_err(|_| OfficeZipRejection::NotAZip)?;
+    let entry_count = archive.len();
+    if entry_count == 0 || entry_count > limits.max_entries {
+        return Err(OfficeZipRejection::TooManyEntries);
+    }
+
+    let mut has_content_types = false;
+    let mut has_rels = false;
+    let mut has_document_xml = false;
+    let mut has_workbook_xml = false;
+    let mut has_macro_project = false;
+    let mut seen_normalized_names: std::collections::HashSet<String> =
+        std::collections::HashSet::with_capacity(entry_count);
+
+    // Pass 1: metadata-only (by_index_raw never decompresses). Reject on
+    // any structural red flag before spending CPU decompressing anything.
+    for index in 0..entry_count {
+        let entry = archive
+            .by_index_raw(index)
+            .map_err(|_| OfficeZipRejection::InvalidCrcOrStream)?;
+
+        if entry.encrypted() {
+            return Err(OfficeZipRejection::Encrypted);
+        }
+        let name_raw = entry.name_raw();
+        if name_raw.contains(&0u8) || name_raw.contains(&b'\\') {
+            // NUL: ambiguous/truncatable names. Backslash: not a valid
+            // ZIP path separator per spec, and `enclosed_name` below is
+            // written for '/'-separated paths — a literal backslash is
+            // only ever present to smuggle a different path once opened
+            // by a decompressor with different platform semantics.
+            return Err(OfficeZipRejection::UnsafePath);
+        }
+        let Some(enclosed) = entry.enclosed_name() else {
+            // The crate's own path-safety check: rejects NUL bytes,
+            // absolute paths, and traversal outside the archive root.
+            return Err(OfficeZipRejection::UnsafePath);
+        };
+        let enclosed_str = enclosed.to_string_lossy();
+        if enclosed_str.is_empty()
+            || enclosed_str.len() > limits.max_path_len
+            || enclosed.components().count() > limits.max_path_depth
+        {
+            return Err(OfficeZipRejection::UnsafePath);
+        }
+        if let Some(mode) = entry.unix_mode() {
+            if !unix_mode_is_regular_file_or_directory(mode) {
+                return Err(OfficeZipRejection::UnsupportedFileType);
+            }
+        }
+
+        let normalized = normalize_for_critical_entry_comparison(&enclosed_str);
+        if !seen_normalized_names.insert(normalized.clone()) {
+            // Any repeated normalized path — not just the critical ones
+            // — is ambiguous: different tools may resolve which entry
+            // "wins" differently. Fail closed rather than special-case
+            // only the handful of names we happen to check below.
+            return Err(OfficeZipRejection::DuplicateEntry);
+        }
+
+        match normalized.as_str() {
+            "[content_types].xml" => has_content_types = true,
+            "_rels/.rels" => has_rels = true,
+            "word/document.xml" => has_document_xml = true,
+            "xl/workbook.xml" => has_workbook_xml = true,
+            "word/vbaproject.bin" | "xl/vbaproject.bin" => has_macro_project = true,
+            _ => {}
+        }
+    }
+
+    if has_macro_project {
+        return Err(OfficeZipRejection::MacroEnabled);
+    }
+    if !has_content_types || !has_rels {
+        return Err(OfficeZipRejection::NotAnOfficePackage);
+    }
+    let kind = match (has_document_xml, has_workbook_xml) {
+        (true, false) => OfficeDocumentKind::Docx,
+        (false, true) => OfficeDocumentKind::Xlsx,
+        // Neither marker (not Office at all) or both (ambiguous /
+        // malformed dual-purpose file) — reject either way. This is also
+        // what makes DOCX-content-mislabeled-as-.xlsx (or the reverse)
+        // safe: the *filename* is never consulted for kind detection,
+        // only the real internal structure is.
+        _ => return Err(OfficeZipRejection::AmbiguousOfficeKind),
+    };
+
+    // Pass 2: real, bounded, streamed decompression. This — not any
+    // declared metadata — is what actually proves the archive isn't a
+    // decompression bomb: nothing above ever rejects based on a
+    // compression *ratio*, only on bytes actually read out of the
+    // decompressor. Reading each entry to completion also makes the
+    // crate perform its own CRC32 validation at end-of-stream; a
+    // mismatch surfaces as a `Read` error, treated as rejection.
+    let mut total_decompressed: u64 = 0;
+    let mut buffer = [0u8; ZIP_STREAM_BUFFER_BYTES];
+    let mut content_types_xml = Vec::new();
+    let mut root_rels_xml = Vec::new();
+    for index in 0..entry_count {
+        if std::time::Instant::now() >= deadline {
+            return Err(OfficeZipRejection::Timeout);
+        }
+        let mut entry = archive
+            .by_index(index)
+            .map_err(|_| OfficeZipRejection::InvalidCrcOrStream)?;
+        if entry.is_dir() {
+            continue;
+        }
+        let normalized_name = normalize_for_critical_entry_comparison(entry.name());
+        let mut entry_decompressed: u64 = 0;
+        loop {
+            if std::time::Instant::now() >= deadline {
+                return Err(OfficeZipRejection::Timeout);
+            }
+            let read = match std::io::Read::read(&mut entry, &mut buffer) {
+                Ok(0) => break,
+                Ok(read) => read,
+                Err(_) => return Err(OfficeZipRejection::InvalidCrcOrStream),
+            };
+            entry_decompressed += read as u64;
+            total_decompressed += read as u64;
+            if entry_decompressed > limits.max_entry_decompressed_bytes {
+                return Err(OfficeZipRejection::EntryTooLarge);
+            }
+            if total_decompressed > limits.max_total_decompressed_bytes {
+                return Err(OfficeZipRejection::TotalSizeTooLarge);
+            }
+            if normalized_name == "[content_types].xml" {
+                if content_types_xml.len() + read > 256 * 1024 {
+                    return Err(OfficeZipRejection::InvalidCrcOrStream);
+                }
+                content_types_xml.extend_from_slice(&buffer[..read]);
+            } else if normalized_name == "_rels/.rels" {
+                if root_rels_xml.len() + read > 256 * 1024 {
+                    return Err(OfficeZipRejection::InvalidCrcOrStream);
+                }
+                root_rels_xml.extend_from_slice(&buffer[..read]);
+            }
+        }
+    }
+
+    let content_types = String::from_utf8(content_types_xml)
+        .map_err(|_| OfficeZipRejection::NotAnOfficePackage)?
+        .to_ascii_lowercase();
+    let root_rels = String::from_utf8(root_rels_xml)
+        .map_err(|_| OfficeZipRejection::NotAnOfficePackage)?
+        .to_ascii_lowercase();
+    if content_types.contains("<!doctype")
+        || content_types.contains("<!entity")
+        || root_rels.contains("<!doctype")
+        || root_rels.contains("<!entity")
+    {
+        return Err(OfficeZipRejection::UnsafeXml);
+    }
+    if root_rels.contains("targetmode=\"external\"") || root_rels.contains("targetmode='external'")
+    {
+        return Err(OfficeZipRejection::ExternalRelationship);
+    }
+    if content_types.contains("macroenabled") {
+        return Err(OfficeZipRejection::MacroEnabled);
+    }
+    let expected_content_type = match kind {
+        OfficeDocumentKind::Docx => {
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"
+        }
+        OfficeDocumentKind::Xlsx => {
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"
+        }
+    };
+    if !content_types.contains(expected_content_type)
+        || !root_rels.contains("relationships/officedocument")
+    {
+        return Err(OfficeZipRejection::ContentTypeMismatch);
+    }
+
+    Ok(kind)
+}
+
+/// Cheap, synchronous, non-blocking-pool-worthy check: is this candidate
+/// even shaped like a ZIP? Only PK\x03\x04-prefixed input goes anywhere
+/// near `validate_office_zip`'s real decompression work — photos,
+/// videos, PDFs, and plain text never touch the semaphore, the blocking
+/// pool, or the timeout machinery added for the ZIP path.
+pub(crate) fn looks_like_zip(bytes: &[u8]) -> bool {
+    bytes.starts_with(b"PK\x03\x04")
 }
 
 pub(crate) fn detect_attachment(bytes: &[u8], filename: &str) -> Option<DetectedMedia> {
@@ -296,22 +585,26 @@ pub(crate) fn detect_attachment(bytes: &[u8], filename: &str) -> Option<Detected
             max_bytes: MAX_DOCUMENT_BYTES,
         });
     }
-    if bytes.starts_with(b"PK\x03\x04") && zip_contains(bytes, b"[Content_Types].xml") {
-        if zip_contains(bytes, b"word/") {
-            return Some(DetectedMedia {
-                kind: "document",
-                mime: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                extension: "docx",
-                max_bytes: MAX_DOCUMENT_BYTES,
-            });
-        }
-        if zip_contains(bytes, b"xl/") {
-            return Some(DetectedMedia {
-                kind: "document",
-                mime: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                extension: "xlsx",
-                max_bytes: MAX_DOCUMENT_BYTES,
-            });
+    if looks_like_zip(bytes) {
+        let deadline = std::time::Instant::now() + ZIP_VALIDATION_DEADLINE;
+        match validate_office_zip(bytes, ZipValidationLimits::production(), deadline) {
+            Ok(OfficeDocumentKind::Docx) => {
+                return Some(DetectedMedia {
+                    kind: "document",
+                    mime: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    extension: "docx",
+                    max_bytes: MAX_DOCUMENT_BYTES,
+                });
+            }
+            Ok(OfficeDocumentKind::Xlsx) => {
+                return Some(DetectedMedia {
+                    kind: "document",
+                    mime: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    extension: "xlsx",
+                    max_bytes: MAX_DOCUMENT_BYTES,
+                });
+            }
+            Err(_rejection) => {}
         }
     }
     if bytes.starts_with(b"{\\rtf") {
@@ -550,9 +843,55 @@ pub async fn api_chat_send_image(
         Some(b) if !b.is_empty() => b,
         _ => return json_error(StatusCode::BAD_REQUEST, "image_required"),
     };
-    let detected = match detect_attachment(&file_bytes, &original_name) {
-        Some(value) => value,
-        None => return json_error(StatusCode::BAD_REQUEST, "unsupported_attachment"),
+    if looks_like_zip(&file_bytes) && file_bytes.len() > MAX_DOCUMENT_BYTES {
+        return json_error(StatusCode::PAYLOAD_TOO_LARGE, "attachment_too_large");
+    }
+    // Only ZIP-shaped candidates (DOCX/XLSX) pay for the blocking pool,
+    // the semaphore, and the timeout below — a real, bounded decompression
+    // pass (see validate_office_zip). Photos, videos, PDFs, and plain
+    // text are cheap and run inline, synchronously, as before.
+    let detected = if looks_like_zip(&file_bytes) {
+        let permit = match state
+            .office_zip_validation_slots
+            .clone()
+            .try_acquire_owned()
+        {
+            Ok(permit) => permit,
+            // Bounded queue, not unbounded backpressure: if every slot is
+            // busy, reject now rather than making the caller wait behind
+            // an unknown number of other heavy validations.
+            Err(_) => {
+                return json_error(StatusCode::TOO_MANY_REQUESTS, "attachment_validation_busy")
+            }
+        };
+        let validation_bytes = file_bytes.clone();
+        let validation_name = original_name.clone();
+        match tokio::time::timeout(
+            std::time::Duration::from_secs(5),
+            tokio::task::spawn_blocking(move || {
+                let _permit = permit; // held until this closure returns
+                detect_attachment(&validation_bytes, &validation_name)
+            }),
+        )
+        .await
+        {
+            Ok(Ok(Some(value))) => value,
+            Ok(Ok(None)) => return json_error(StatusCode::BAD_REQUEST, "unsupported_attachment"),
+            Ok(Err(_)) => {
+                return json_error(
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "attachment_validation_failed",
+                )
+            }
+            Err(_) => {
+                return json_error(StatusCode::REQUEST_TIMEOUT, "attachment_validation_timeout")
+            }
+        }
+    } else {
+        match detect_attachment(&file_bytes, &original_name) {
+            Some(value) => value,
+            None => return json_error(StatusCode::BAD_REQUEST, "unsupported_attachment"),
+        }
     };
     if file_bytes.len() > detected.max_bytes {
         return json_error(StatusCode::PAYLOAD_TOO_LARGE, "attachment_too_large");
@@ -1148,6 +1487,524 @@ mod tests {
         assert_eq!(
             detect_attachment(b"plain notes", "notes.txt").unwrap().mime,
             "text/plain"
+        );
+    }
+
+    /// Builds a real, valid ZIP archive with `zip::ZipWriter` — genuine
+    /// deflate-compressed entries, a real central directory, real CRC32s.
+    fn build_zip_with_entries(entries: &[(&str, &[u8])]) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        {
+            let mut writer = zip::ZipWriter::new(std::io::Cursor::new(&mut buffer));
+            let options = zip::write::SimpleFileOptions::default()
+                .compression_method(zip::CompressionMethod::Deflated);
+            for (name, data) in entries {
+                writer.start_file(*name, options).expect("start_file");
+                std::io::Write::write_all(&mut writer, data).expect("write entry data");
+            }
+            writer.finish().expect("finish zip");
+        }
+        buffer
+    }
+
+    /// Tiny limits so size/count tests don't allocate hundreds of
+    /// megabytes just to prove the same comparison logic. Production
+    /// traffic always uses `ZipValidationLimits::production()`; the
+    /// *algorithm* being tested is identical either way — only the
+    /// threshold changes.
+    fn tiny_test_limits() -> ZipValidationLimits {
+        ZipValidationLimits {
+            max_entries: 4,
+            max_entry_decompressed_bytes: 6144,
+            max_total_decompressed_bytes: 8192,
+            max_path_len: 180,
+            max_path_depth: 10,
+        }
+    }
+
+    fn far_future_deadline() -> std::time::Instant {
+        std::time::Instant::now() + std::time::Duration::from_secs(30)
+    }
+
+    fn already_passed_deadline() -> std::time::Instant {
+        std::time::Instant::now() - std::time::Duration::from_millis(1)
+    }
+
+    const DOCX_CONTENT_TYPES_XML: &[u8] = br#"<?xml version="1.0"?><Types><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>"#;
+    const XLSX_CONTENT_TYPES_XML: &[u8] = br#"<?xml version="1.0"?><Types><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/></Types>"#;
+    const RELS_XML: &[u8] = br#"<?xml version="1.0"?><Relationships><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>"#;
+
+    fn minimal_docx_entries() -> Vec<(&'static str, &'static [u8])> {
+        vec![
+            ("[Content_Types].xml", DOCX_CONTENT_TYPES_XML),
+            ("_rels/.rels", RELS_XML),
+            (
+                "word/document.xml",
+                br#"<?xml version="1.0"?><w:document xmlns:w="w"><w:body/></w:document>"#,
+            ),
+        ]
+    }
+
+    fn minimal_xlsx_entries() -> Vec<(&'static str, &'static [u8])> {
+        vec![
+            ("[Content_Types].xml", XLSX_CONTENT_TYPES_XML),
+            ("_rels/.rels", RELS_XML),
+            (
+                "xl/workbook.xml",
+                br#"<?xml version="1.0"?><workbook xmlns="s"><sheets/></workbook>"#,
+            ),
+        ]
+    }
+
+    #[test]
+    fn accepts_a_real_minimal_docx() {
+        let zip = build_zip_with_entries(&minimal_docx_entries());
+        assert_eq!(
+            validate_office_zip(
+                &zip,
+                ZipValidationLimits::production(),
+                far_future_deadline()
+            ),
+            Ok(OfficeDocumentKind::Docx)
+        );
+        assert_eq!(
+            detect_attachment(&zip, "report.docx").unwrap().mime,
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        );
+    }
+
+    #[test]
+    fn accepts_a_real_minimal_xlsx() {
+        let zip = build_zip_with_entries(&minimal_xlsx_entries());
+        assert_eq!(
+            validate_office_zip(
+                &zip,
+                ZipValidationLimits::production(),
+                far_future_deadline()
+            ),
+            Ok(OfficeDocumentKind::Xlsx)
+        );
+        assert_eq!(
+            detect_attachment(&zip, "sheet.xlsx").unwrap().mime,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+    }
+
+    #[test]
+    fn rejects_a_zip_with_no_office_structure() {
+        let zip = build_zip_with_entries(&[("readme.txt", b"just a plain zip")]);
+        assert_eq!(
+            validate_office_zip(
+                &zip,
+                ZipValidationLimits::production(),
+                far_future_deadline()
+            ),
+            Err(OfficeZipRejection::NotAnOfficePackage)
+        );
+        assert!(detect_attachment(&zip, "archive.zip").is_none());
+    }
+
+    #[test]
+    fn docx_content_is_identified_correctly_even_with_an_xlsx_filename() {
+        // The attack this defends against: naming real DOCX bytes
+        // "evil.xlsx" (or vice versa) to confuse extension-based logic
+        // downstream. Kind must come from the verified internal
+        // structure, never the filename.
+        let zip = build_zip_with_entries(&minimal_docx_entries());
+        let detected = detect_attachment(&zip, "not-really.xlsx").unwrap();
+        assert_eq!(
+            detected.mime,
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        );
+    }
+
+    #[test]
+    fn xlsx_content_is_identified_correctly_even_with_a_docx_filename() {
+        let zip = build_zip_with_entries(&minimal_xlsx_entries());
+        let detected = detect_attachment(&zip, "not-really.docx").unwrap();
+        assert_eq!(
+            detected.mime,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+    }
+
+    #[test]
+    fn office_content_type_must_match_the_detected_package_kind() {
+        let entries = vec![
+            ("[Content_Types].xml", XLSX_CONTENT_TYPES_XML),
+            ("_rels/.rels", RELS_XML),
+            ("word/document.xml", b"<w:document/>" as &[u8]),
+        ];
+        let zip = build_zip_with_entries(&entries);
+        assert_eq!(
+            validate_office_zip(
+                &zip,
+                ZipValidationLimits::production(),
+                far_future_deadline()
+            ),
+            Err(OfficeZipRejection::ContentTypeMismatch)
+        );
+    }
+
+    #[test]
+    fn office_metadata_rejects_doctype_and_external_relationships() {
+        let unsafe_content_types = br#"<!DOCTYPE Types><Types><Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>"#;
+        let entries = vec![
+            ("[Content_Types].xml", unsafe_content_types.as_slice()),
+            ("_rels/.rels", RELS_XML),
+            ("word/document.xml", b"<w:document/>" as &[u8]),
+        ];
+        let zip = build_zip_with_entries(&entries);
+        assert_eq!(
+            validate_office_zip(
+                &zip,
+                ZipValidationLimits::production(),
+                far_future_deadline()
+            ),
+            Err(OfficeZipRejection::UnsafeXml)
+        );
+
+        let external_rels = br#"<Relationships><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="https://attacker.invalid/file" TargetMode="External"/></Relationships>"#;
+        let entries = vec![
+            ("[Content_Types].xml", DOCX_CONTENT_TYPES_XML),
+            ("_rels/.rels", external_rels.as_slice()),
+            ("word/document.xml", b"<w:document/>" as &[u8]),
+        ];
+        let zip = build_zip_with_entries(&entries);
+        assert_eq!(
+            validate_office_zip(
+                &zip,
+                ZipValidationLimits::production(),
+                far_future_deadline()
+            ),
+            Err(OfficeZipRejection::ExternalRelationship)
+        );
+    }
+
+    #[test]
+    fn a_real_highly_compressible_entry_within_limits_is_accepted() {
+        // No ratio-based rejection is used: real decompressed byte counts
+        // are enforced.
+        // 3 KiB of zeros compresses via Deflate to a handful of bytes (a
+        // very high real ratio) but the actual decompressed size is
+        // trivially within tiny_test_limits' caps, so this must be
+        // accepted purely on that basis.
+        let mut entries = minimal_docx_entries();
+        let compressible = vec![0u8; 3 * 1024];
+        entries.push(("word/media/pattern.bin", &compressible));
+        let zip = build_zip_with_entries(&entries);
+        assert_eq!(
+            validate_office_zip(&zip, tiny_test_limits(), far_future_deadline()),
+            Ok(OfficeDocumentKind::Docx)
+        );
+    }
+
+    #[test]
+    fn a_real_decompression_bomb_is_caught_by_actual_streamed_output_not_metadata() {
+        // Passes every metadata prefilter (entry count fine, declared
+        // sizes aren't even inspected pre-decompression anymore) and is
+        // only caught once Pass 2 actually reads more real bytes out of
+        // the decompressor than tiny_test_limits allows for a single
+        // entry. This is the test that specifically proves the streamed
+        // limit — not a declared-size check — is what fires.
+        let mut entries = minimal_docx_entries();
+        let bomb_payload = vec![0u8; tiny_test_limits().max_entry_decompressed_bytes as usize + 1];
+        entries.push(("word/media/bomb.bin", &bomb_payload));
+        let zip = build_zip_with_entries(&entries);
+        assert_eq!(
+            validate_office_zip(&zip, tiny_test_limits(), far_future_deadline()),
+            Err(OfficeZipRejection::EntryTooLarge)
+        );
+    }
+
+    #[test]
+    fn total_decompressed_limit_is_enforced_across_entries() {
+        let mut limits = tiny_test_limits();
+        limits.max_entries = 8;
+        let mut entries = minimal_docx_entries();
+        // Two entries, each individually under the per-entry cap, whose
+        // sum exceeds the total cap.
+        let half = vec![0u8; (limits.max_total_decompressed_bytes / 2) as usize + 100];
+        entries.push(("word/media/a.bin", &half));
+        entries.push(("word/media/b.bin", &half));
+        let zip = build_zip_with_entries(&entries);
+        assert_eq!(
+            validate_office_zip(&zip, limits, far_future_deadline()),
+            Err(OfficeZipRejection::TotalSizeTooLarge)
+        );
+    }
+
+    #[test]
+    fn too_many_entries_is_rejected() {
+        let limits = tiny_test_limits(); // max_entries: 4
+        let entries = vec![
+            ("[Content_Types].xml", DOCX_CONTENT_TYPES_XML),
+            ("_rels/.rels", RELS_XML),
+            ("word/document.xml", b"<w:document/>" as &[u8]),
+            ("word/media/one.bin", b"a"),
+            ("word/media/two.bin", b"b"), // 5th entry, over the tiny limit
+        ];
+        let zip = build_zip_with_entries(&entries);
+        assert_eq!(
+            validate_office_zip(&zip, limits, far_future_deadline()),
+            Err(OfficeZipRejection::TooManyEntries)
+        );
+    }
+
+    #[test]
+    fn validation_stops_at_a_deadline_that_has_already_passed() {
+        let zip = build_zip_with_entries(&minimal_docx_entries());
+        // A deadline in the past must be caught on the very first
+        // cooperative check, before any decompression happens.
+        assert_eq!(
+            validate_office_zip(
+                &zip,
+                ZipValidationLimits::production(),
+                already_passed_deadline()
+            ),
+            Err(OfficeZipRejection::Timeout)
+        );
+    }
+
+    #[test]
+    fn path_traversal_entry_is_rejected() {
+        let mut entries = minimal_docx_entries();
+        entries.push(("../../etc/passwd", b"pwned"));
+        let zip = build_zip_with_entries(&entries);
+        assert_eq!(
+            validate_office_zip(
+                &zip,
+                ZipValidationLimits::production(),
+                far_future_deadline()
+            ),
+            Err(OfficeZipRejection::UnsafePath)
+        );
+    }
+
+    #[test]
+    fn backslash_traversal_entry_is_rejected() {
+        let mut entries = minimal_docx_entries();
+        entries.push(("word\\..\\..\\evil.dll", b"pwned"));
+        let zip = build_zip_with_entries(&entries);
+        assert_eq!(
+            validate_office_zip(
+                &zip,
+                ZipValidationLimits::production(),
+                far_future_deadline()
+            ),
+            Err(OfficeZipRejection::UnsafePath)
+        );
+    }
+
+    #[test]
+    fn absolute_path_entry_is_rejected() {
+        let mut entries = minimal_docx_entries();
+        entries.push(("/etc/passwd", b"pwned"));
+        let zip = build_zip_with_entries(&entries);
+        assert_eq!(
+            validate_office_zip(
+                &zip,
+                ZipValidationLimits::production(),
+                far_future_deadline()
+            ),
+            Err(OfficeZipRejection::UnsafePath)
+        );
+    }
+
+    #[test]
+    fn encrypted_entry_is_rejected() {
+        let mut buffer = build_zip_with_entries(&minimal_docx_entries());
+        // Set the ZIP encryption flag in the first local and central
+        // headers. The validator rejects on metadata before attempting
+        // decryption, so a real encrypted payload is unnecessary here.
+        let local = buffer
+            .windows(4)
+            .position(|window| window == b"PK\x03\x04")
+            .expect("local header");
+        buffer[local + 6] |= 1;
+        let central = buffer
+            .windows(4)
+            .position(|window| window == b"PK\x01\x02")
+            .expect("central header");
+        buffer[central + 8] |= 1;
+        assert_eq!(
+            validate_office_zip(
+                &buffer,
+                ZipValidationLimits::production(),
+                far_future_deadline()
+            ),
+            Err(OfficeZipRejection::Encrypted)
+        );
+    }
+
+    #[test]
+    fn symlink_entry_is_rejected() {
+        let mut buffer = Vec::new();
+        {
+            let mut writer = zip::ZipWriter::new(std::io::Cursor::new(&mut buffer));
+            let plain = zip::write::SimpleFileOptions::default()
+                .compression_method(zip::CompressionMethod::Deflated);
+            for (name, data) in minimal_docx_entries() {
+                writer.start_file(name, plain).expect("start_file");
+                std::io::Write::write_all(&mut writer, data).expect("write entry data");
+            }
+            writer
+                .add_symlink("word/media/link", "/etc/passwd", plain)
+                .expect("add_symlink");
+            writer.finish().expect("finish zip");
+        }
+        assert_eq!(
+            validate_office_zip(
+                &buffer,
+                ZipValidationLimits::production(),
+                far_future_deadline()
+            ),
+            Err(OfficeZipRejection::UnsupportedFileType)
+        );
+    }
+
+    #[test]
+    fn duplicate_critical_entry_is_rejected() {
+        let mut buffer = Vec::new();
+        {
+            let mut writer = zip::ZipWriter::new(std::io::Cursor::new(&mut buffer));
+            let options = zip::write::SimpleFileOptions::default()
+                .compression_method(zip::CompressionMethod::Deflated);
+            // "[Content_Types].xml" written twice — a genuine unzip tool
+            // must pick one, silently ignoring the other; that ambiguity
+            // itself is the attack surface.
+            for name in ["[Content_Types].xml", "[content_types].xml"] {
+                writer.start_file(name, options).expect("start_file");
+                std::io::Write::write_all(&mut writer, DOCX_CONTENT_TYPES_XML).expect("write");
+            }
+            writer
+                .start_file("_rels/.rels", options)
+                .expect("start_file");
+            std::io::Write::write_all(&mut writer, RELS_XML).expect("write");
+            writer
+                .start_file("word/document.xml", options)
+                .expect("start_file");
+            std::io::Write::write_all(&mut writer, b"<w:document/>").expect("write");
+            writer.finish().expect("finish zip");
+        }
+        assert_eq!(
+            validate_office_zip(
+                &buffer,
+                ZipValidationLimits::production(),
+                far_future_deadline()
+            ),
+            Err(OfficeZipRejection::DuplicateEntry)
+        );
+    }
+
+    #[test]
+    fn case_and_dot_slash_variant_duplicate_is_rejected() {
+        // "./word/document.xml" and "Word/Document.xml" both normalize to
+        // the same critical entry name — a second, differently-cased or
+        // dot-prefixed copy must still be caught as a duplicate.
+        let mut buffer = Vec::new();
+        {
+            let mut writer = zip::ZipWriter::new(std::io::Cursor::new(&mut buffer));
+            let options = zip::write::SimpleFileOptions::default()
+                .compression_method(zip::CompressionMethod::Deflated);
+            writer
+                .start_file("[Content_Types].xml", options)
+                .expect("start_file");
+            std::io::Write::write_all(&mut writer, DOCX_CONTENT_TYPES_XML).expect("write");
+            writer
+                .start_file("_rels/.rels", options)
+                .expect("start_file");
+            std::io::Write::write_all(&mut writer, RELS_XML).expect("write");
+            writer
+                .start_file("word/document.xml", options)
+                .expect("start_file");
+            std::io::Write::write_all(&mut writer, b"<w:document/>").expect("write");
+            writer
+                .start_file("Word/Document.xml", options)
+                .expect("start_file");
+            std::io::Write::write_all(&mut writer, b"<w:document/>").expect("write");
+            writer.finish().expect("finish zip");
+        }
+        assert_eq!(
+            validate_office_zip(
+                &buffer,
+                ZipValidationLimits::production(),
+                far_future_deadline()
+            ),
+            Err(OfficeZipRejection::DuplicateEntry)
+        );
+    }
+
+    #[test]
+    fn macro_enabled_docm_style_payload_is_rejected() {
+        let mut entries = minimal_docx_entries();
+        entries.push(("word/vbaProject.bin", b"fake macro payload"));
+        let zip = build_zip_with_entries(&entries);
+        assert_eq!(
+            validate_office_zip(
+                &zip,
+                ZipValidationLimits::production(),
+                far_future_deadline()
+            ),
+            Err(OfficeZipRejection::MacroEnabled)
+        );
+    }
+
+    #[test]
+    fn corrupted_crc_is_rejected_for_the_actual_payload_not_the_directory() {
+        // Use Stored (not Deflated) for the target entry so its bytes
+        // appear verbatim in the archive and can be located exactly —
+        // flipping a byte inside real entry *data*, not anywhere near the
+        // central directory, so this genuinely proves a CRC32 mismatch on
+        // read, not incidental structural corruption.
+        let marker = b"FIND-THIS-EXACT-PAYLOAD-1234567890";
+        let mut buffer = Vec::new();
+        {
+            let mut writer = zip::ZipWriter::new(std::io::Cursor::new(&mut buffer));
+            let deflated = zip::write::SimpleFileOptions::default()
+                .compression_method(zip::CompressionMethod::Deflated);
+            let stored = zip::write::SimpleFileOptions::default()
+                .compression_method(zip::CompressionMethod::Stored);
+            writer
+                .start_file("[Content_Types].xml", deflated)
+                .expect("start_file");
+            std::io::Write::write_all(&mut writer, DOCX_CONTENT_TYPES_XML).expect("write");
+            writer
+                .start_file("_rels/.rels", deflated)
+                .expect("start_file");
+            std::io::Write::write_all(&mut writer, RELS_XML).expect("write");
+            writer
+                .start_file("word/document.xml", stored)
+                .expect("start_file");
+            std::io::Write::write_all(&mut writer, marker).expect("write");
+            writer.finish().expect("finish zip");
+        }
+        let data_at = buffer
+            .windows(marker.len())
+            .position(|window| window == marker)
+            .expect("marker bytes must appear verbatim (Stored, no compression)");
+        buffer[data_at] ^= 0xFF;
+        assert_eq!(
+            validate_office_zip(
+                &buffer,
+                ZipValidationLimits::production(),
+                far_future_deadline()
+            ),
+            Err(OfficeZipRejection::InvalidCrcOrStream)
+        );
+    }
+
+    #[test]
+    fn truncated_zip_is_rejected() {
+        let zip = build_zip_with_entries(&minimal_docx_entries());
+        let truncated = &zip[..zip.len() / 2];
+        assert_eq!(
+            validate_office_zip(
+                truncated,
+                ZipValidationLimits::production(),
+                far_future_deadline()
+            ),
+            Err(OfficeZipRejection::NotAZip)
         );
     }
 
