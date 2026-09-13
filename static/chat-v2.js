@@ -159,6 +159,21 @@
             button.title = label;
         }
 
+        function chatIcon(name) {
+            var paths = {
+                smile: '<circle cx="12" cy="12" r="9"></circle><path d="M8.5 14.5c1 1.2 2.1 1.8 3.5 1.8s2.5-.6 3.5-1.8"></path><path d="M9 9.5h.01M15 9.5h.01"></path>',
+                attach: '<path d="M8.5 12.5 14.8 6.2a3 3 0 0 1 4.2 4.2l-7.8 7.8a5 5 0 0 1-7.1-7.1l7.7-7.7"></path>',
+                mic: '<rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M6.5 11.5a5.5 5.5 0 0 0 11 0M12 17v4M9 21h6"></path>',
+                send: '<path d="m4 4 17 8-17 8 3-8-3-8Z"></path><path d="M7 12h14"></path>',
+                photo: '<rect x="3" y="4" width="18" height="16" rx="3"></rect><circle cx="9" cy="10" r="2"></circle><path d="m21 15-4.5-4.5L7 20"></path>',
+                video: '<rect x="3" y="5" width="14" height="14" rx="3"></rect><path d="m17 10 4-2v8l-4-2"></path>',
+                document: '<path d="M6 2h8l4 4v16H6z"></path><path d="M14 2v5h5M9 12h6M9 16h6"></path>',
+                close: '<path d="m7 7 10 10M17 7 7 17"></path>'
+            };
+            return '<svg class="chat-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+                (paths[name] || paths.attach) + '</svg>';
+        }
+
         var messageLabel = t("chat_message", "Сообщение");
         input.placeholder = messageLabel + "…";
         input.setAttribute("aria-label", messageLabel);
@@ -463,7 +478,12 @@
             });
 
             if (mediaItem) {
-                removeMediaItem(mediaItem);
+                // Realtime can deliver the committed message before the POST
+                // response reaches the sender. Do not abort that successful
+                // request or the abort handler will incorrectly schedule it
+                // for another upload.
+                mediaItem.committed = true;
+                removeMediaItem(mediaItem, false);
             }
         }
 
@@ -527,24 +547,27 @@
             }
         }
 
+        var viewportFrame = 0;
+        var stableViewportHeight = Math.max(
+            window.innerHeight || 0,
+            window.visualViewport ? window.visualViewport.height : 0
+        );
+
         function updateViewportHeight() {
             var viewport = window.visualViewport;
-            var height = viewport
+            var height = Math.max(1, viewport
                 ? viewport.height
-                : window.innerHeight;
+                : (window.innerHeight || document.documentElement.clientHeight));
 
             var offsetTop = viewport
                 ? viewport.offsetTop
                 : 0;
 
-            var bottomInset = viewport
-                ? Math.max(
-                    0,
-                    window.innerHeight -
-                        viewport.height -
-                        viewport.offsetTop
-                )
-                : 0;
+            var inputFocused = document.activeElement === input;
+            if (!inputFocused) {
+                stableViewportHeight = height;
+            }
+            var keyboardInset = Math.max(0, stableViewportHeight - height);
 
             document.documentElement.style.setProperty(
                 "--chat-viewport-height",
@@ -563,12 +586,10 @@
 
             document.documentElement.style.setProperty(
                 "--chat-keyboard-inset",
-                Math.round(bottomInset) + "px"
+                Math.round(keyboardInset) + "px"
             );
 
-            var keyboardOpen =
-                bottomInset > 80 ||
-                height < window.innerHeight * 0.78;
+            var keyboardOpen = inputFocused && keyboardInset > 80;
 
             document.body.classList.toggle(
                 "chat-keyboard-open",
@@ -582,8 +603,10 @@
                 var visibleBottom =
                     offsetTop + height;
 
-                var shellTop =
-                    shell.getBoundingClientRect().top;
+                var shellTop = Math.max(
+                    offsetTop,
+                    shell.getBoundingClientRect().top
+                );
 
                 var shellVisibleHeight =
                     Math.max(
@@ -597,10 +620,6 @@
                 );
             }
 
-            window.scrollTo(0, 0);
-            document.documentElement.scrollTop = 0;
-            document.body.scrollTop = 0;
-
             if (
                 keyboardOpen &&
                 document.activeElement === input &&
@@ -611,6 +630,22 @@
                         history.scrollHeight;
                 });
             }
+        }
+
+        function scheduleViewportUpdate() {
+            if (viewportFrame) {
+                window.cancelAnimationFrame(viewportFrame);
+            }
+            viewportFrame = window.requestAnimationFrame(function () {
+                viewportFrame = 0;
+                updateViewportHeight();
+            });
+        }
+
+        function settleViewport() {
+            scheduleViewportUpdate();
+            window.setTimeout(scheduleViewportUpdate, 120);
+            window.setTimeout(scheduleViewportUpdate, 320);
         }
 
         function haptic(kind) {
@@ -855,10 +890,16 @@
                 var documentLink = document.createElement("a");
                 documentLink.className = "chat-document-link";
                 documentLink.href = String(message.attachment_url);
-                documentLink.textContent = "📄 " + String(message.message || t("chat_document", "Документ"));
+                var documentIcon = document.createElement("span");
+                documentIcon.className = "chat-document-icon";
+                documentIcon.innerHTML = chatIcon("document");
+                var documentName = document.createElement("span");
+                documentName.textContent = String(message.message || t("chat_document", "Документ"));
                 documentLink.setAttribute("download", "");
                 body.textContent = "";
                 body.classList.add("chat-message-body--document");
+                documentLink.appendChild(documentIcon);
+                documentLink.appendChild(documentName);
                 body.appendChild(documentLink);
             }
             meta.className = "chat-message-meta";
@@ -1464,6 +1505,18 @@
         }
 
         function isRecoverableError(error) {
+            var code = error && (error.code || error.message)
+                ? String(error.code || error.message)
+                : "";
+            if (
+                code === "network_error" ||
+                code === "upload_timeout" ||
+                code === "attachment_upload_interrupted" ||
+                code === "attachment_validation_busy" ||
+                code === "attachment_validation_timeout"
+            ) {
+                return true;
+            }
             if (!error || typeof error.status !== "number") {
                 return true;
             }
@@ -1672,6 +1725,13 @@
             var message = input.value.trim();
 
             if (attachmentDraft) {
+                if (mediaQueue.length >= MAX_MEDIA_QUEUE) {
+                    sendState.textContent = t(
+                        "chat_media_queue_full",
+                        "Дождитесь отправки текущих вложений"
+                    );
+                    return;
+                }
                 var mediaDraft = attachmentDraft;
                 attachmentDraft = null;
                 var preview = document.getElementById("chat-attachment-preview");
@@ -1827,6 +1887,7 @@
                         blob: item.blob,
                         mimeType: item.mimeType,
                         caption: item.caption,
+                        fileName: item.fileName,
                         replyToMessageId: item.replyToMessageId,
                         createdAt: item.createdAt
                     });
@@ -1891,9 +1952,13 @@
             }
         }
 
-        function removeMediaItem(item) {
+        function removeMediaItem(item, cancelUpload) {
             if (!item) {
                 return;
+            }
+            var shouldCancel = cancelUpload !== false;
+            if (shouldCancel) {
+                item.cancelled = true;
             }
             if (mediaRetryTimers[item.clientMessageId]) {
                 window.clearTimeout(
@@ -1902,7 +1967,7 @@
                 delete mediaRetryTimers[item.clientMessageId];
             }
             var activeRequest = activeMediaRequests[item.clientMessageId];
-            if (activeRequest) {
+            if (activeRequest && shouldCancel) {
                 delete activeMediaRequests[item.clientMessageId];
                 activeRequest.abort();
             }
@@ -1914,7 +1979,11 @@
             mediaQueue = mediaQueue.filter(function (candidate) {
                 return candidate.clientMessageId !== item.clientMessageId;
             });
-            mediaOutboxDelete(item.clientMessageId);
+            Promise.resolve(item.outboxWrite).catch(function () {
+                // Failed persistence does not affect a completed live upload.
+            }).then(function () {
+                return mediaOutboxDelete(item.clientMessageId);
+            });
         }
 
         function renderMediaItem(item) {
@@ -1943,10 +2012,18 @@
                 }
                 var meta = row.querySelector(".chat-message-meta");
                 if (meta) {
+                    var progress = document.createElement("span");
+                    progress.className = "chat-media-progress";
+                    progress.setAttribute("role", "progressbar");
+                    progress.setAttribute("aria-label", t("chat_upload_progress", "Загрузка"));
+                    progress.setAttribute("aria-valuemin", "0");
+                    progress.setAttribute("aria-valuemax", "100");
+                    progress.innerHTML = '<span></span>';
+                    meta.appendChild(progress);
                     var cancel = document.createElement("button");
                     cancel.type = "button";
                     cancel.className = "chat-media-cancel";
-                    cancel.textContent = "×";
+                    cancel.innerHTML = chatIcon("close");
                     cancel.title = t("chat_cancel", "Отмена");
                     cancel.setAttribute(
                         "aria-label",
@@ -1970,7 +2047,15 @@
             row.classList.toggle("is-sending", item.state === "sending");
             var cancel = row.querySelector(".chat-media-cancel");
             if (cancel) {
-                cancel.hidden = item.state === "sending";
+                cancel.hidden = false;
+            }
+            var progress = row.querySelector(".chat-media-progress");
+            if (progress) {
+                var progressValue = Math.max(0, Math.min(100, Number(item.progress) || 0));
+                progress.setAttribute("aria-valuenow", String(progressValue));
+                progress.classList.toggle("is-processing", item.phase === "processing");
+                var progressFill = progress.querySelector("span");
+                if (progressFill) progressFill.style.width = progressValue + "%";
             }
             status.classList.toggle("is-error", item.state === "failed");
             status.classList.toggle("is-pending", item.state !== "failed");
@@ -2017,7 +2102,6 @@
                 field = "file";
                 extension = String(item.fileName || "attachment.bin").split(".").pop();
             }
-            formData.append(field, item.blob, item.fileName || (field + "." + extension));
             formData.append("client_message_id", item.clientMessageId);
             if (item.kind !== "voice") {
                 formData.append("caption", item.caption || "");
@@ -2028,6 +2112,7 @@
                     String(item.replyToMessageId)
                 );
             }
+            formData.append(field, item.blob, item.fileName || (field + "." + extension));
 
             var endpoint = item.kind === "voice" ? "/send-voice" : "/send-attachment";
             return new Promise(function (resolve, reject) {
@@ -2035,13 +2120,18 @@
                 activeMediaRequests[item.clientMessageId] = request;
                 request.open("POST", chatApi(endpoint));
                 request.withCredentials = true;
-                request.timeout = 90000;
+                request.timeout = 300000;
                 request.upload.onprogress = function (event) {
                     if (!event.lengthComputable) return;
                     item.progress = Math.round(event.loaded * 100 / event.total);
-                    var row = mediaRow(item);
-                    var status = row && row.querySelector(".chat-message-status");
-                    if (status) status.textContent = item.progress + "%";
+                    item.phase = "uploading";
+                    renderMediaItem(item);
+                };
+                request.upload.onload = function () {
+                    item.progress = 100;
+                    item.phase = "processing";
+                    renderMediaItem(item);
+                    sendState.textContent = t("chat_attachment_processing", "Проверяем и сохраняем вложение…");
                 };
                 request.onload = function () {
                     delete activeMediaRequests[item.clientMessageId];
@@ -2051,6 +2141,7 @@
                     if (request.status < 200 || request.status >= 300 || !data.ok) {
                         var error = new Error(data.error || "send_failed");
                         error.status = request.status;
+                        error.code = data.error || "send_failed";
                         error.retryAfter = Number(data.retry_after || 0);
                         reject(error);
                         return;
@@ -2110,7 +2201,7 @@
                 if (data.message) {
                     appendMessages([data.message]);
                 }
-                removeMediaItem(item);
+                removeMediaItem(item, false);
                 window.ResursMapChatReply = null;
                 var replyBarEl = document.getElementById("chat-reply-bar");
                 if (replyBarEl) {
@@ -2128,6 +2219,15 @@
                     window.playChatSend();
                 }
             }).catch(function (error) {
+                if (item.committed) {
+                    setConnection(t("chat_conn_ok", "Связь есть"), "is-online");
+                    sendState.textContent = t("chat_sent_hint", "Отправлено · Enter — отправить");
+                    return;
+                }
+                if (item.cancelled || (error && error.message === "upload_cancelled")) {
+                    sendState.textContent = t("chat_upload_cancelled", "Отправка отменена");
+                    return;
+                }
                 var recoverable = isRecoverableError(error);
                 if (recoverable && item.attempts < MAX_AUTO_RETRIES) {
                     item.state = "waiting";
@@ -2164,17 +2264,20 @@
             if (mediaQueue.length >= MAX_MEDIA_QUEUE) {
                 return Promise.reject(new Error("media_queue_full"));
             }
-            return mediaOutboxWrite(item).catch(function () {
-                // Keep current-tab delivery available when private storage
-                // is disabled or full.
-            }).then(function () {
-                item.state = "queued";
-                item.attempts = 0;
-                mediaQueue.push(item);
-                renderMediaItem(item);
-                scrollToBottom("smooth");
-                window.setTimeout(flushMediaQueue, 0);
+            item.state = "queued";
+            item.attempts = 0;
+            item.progress = 0;
+            item.phase = "queued";
+            mediaQueue.push(item);
+            renderMediaItem(item);
+            scrollToBottom("smooth");
+            // IndexedDB persistence must not delay the live network upload,
+            // especially for large Android video blobs.
+            item.outboxWrite = mediaOutboxWrite(item).catch(function () {
+                item.outboxPersistenceFailed = true;
             });
+            window.setTimeout(flushMediaQueue, 0);
+            return Promise.resolve();
         }
 
         function setMediaSending(active) {
@@ -2211,6 +2314,15 @@
             if (code === "attachment_too_large") {
                 return t("chat_attachment_too_large", "Файл превышает допустимый размер");
             }
+            if (code === "attachment_validation_busy") {
+                return t("chat_attachment_busy", "Сервер проверяет другой файл · повторяем автоматически");
+            }
+            if (code === "attachment_validation_timeout" || code === "upload_timeout") {
+                return t("chat_attachment_timeout", "Сеть или проверка заняла слишком много времени · повторите");
+            }
+            if (code === "attachment_upload_interrupted" || code === "network_error") {
+                return t("chat_attachment_interrupted", "Загрузка прервалась · повторяем автоматически");
+            }
             if (code === "video_duration_invalid") {
                 return t("chat_video_duration", "Видео должно быть не длиннее 3 минут");
             }
@@ -2237,7 +2349,7 @@
             imageBtn = document.createElement("button");
             imageBtn.type = "button";
             imageBtn.id = "chat-image-btn";
-            imageBtn.textContent = "📷";
+            imageBtn.innerHTML = chatIcon("attach") + '<span class="chat-action-label">Вложение</span>';
             imageBtn.className = "chat-image-btn";
             if (send && send.parentNode) {
                 send.parentNode.insertBefore(imageBtn, send);
@@ -2270,11 +2382,11 @@
             '<button type="button" class="chat-attachment-backdrop" data-attachment-close aria-label="Закрыть меню вложений"></button>' +
             '<section class="chat-attachment-sheet" role="dialog" aria-modal="true" aria-label="Добавить вложение">' +
                 '<span class="chat-attachment-handle" aria-hidden="true"></span>' +
-                '<header><strong>Добавить вложение</strong><button type="button" data-attachment-close aria-label="Закрыть">×</button></header>' +
+                '<header><strong>Добавить вложение</strong><button type="button" data-attachment-close aria-label="Закрыть">' + chatIcon("close") + '</button></header>' +
                 '<div class="chat-attachment-actions">' +
-                    '<button type="button" data-attachment="photo"><span aria-hidden="true">📷</span><strong>Фото</strong><small>JPEG, PNG, WebP</small></button>' +
-                    '<button type="button" data-attachment="video"><span aria-hidden="true">🎬</span><strong>Видео</strong><small>MP4 или WebM</small></button>' +
-                    '<button type="button" data-attachment="document"><span aria-hidden="true">📄</span><strong>Документ</strong><small>PDF, Office, текст</small></button>' +
+                    '<button type="button" data-attachment="photo"><span class="chat-attachment-icon" aria-hidden="true">' + chatIcon("photo") + '</span><strong>Фото</strong><small>JPEG, PNG, WebP</small></button>' +
+                    '<button type="button" data-attachment="video"><span class="chat-attachment-icon" aria-hidden="true">' + chatIcon("video") + '</span><strong>Видео</strong><small>MP4 или WebM</small></button>' +
+                    '<button type="button" data-attachment="document"><span class="chat-attachment-icon" aria-hidden="true">' + chatIcon("document") + '</span><strong>Документ</strong><small>PDF, Office, текст</small></button>' +
                 '</div>' +
             '</section>';
         document.body.appendChild(attachmentMenu);
@@ -2331,8 +2443,8 @@
             preview.className = "chat-attachment-preview";
             var visual = kind === "image"
                 ? '<img alt="Предпросмотр">'
-                : (kind === "video" ? '<video muted playsinline preload="metadata"></video>' : '<span class="chat-document-icon">📄</span>');
-            preview.innerHTML = visual + '<span class="chat-attachment-name"></span><button type="button" aria-label="Удалить вложение">×</button>';
+                : (kind === "video" ? '<video muted playsinline preload="metadata"></video>' : '<span class="chat-document-icon">' + chatIcon("document") + '</span>');
+            preview.innerHTML = visual + '<span class="chat-attachment-name"></span><button type="button" aria-label="Удалить вложение">' + chatIcon("close") + '</button>';
             var media = preview.querySelector("img,video");
             if (media) media.src = attachmentDraft.previewUrl;
             preview.querySelector(".chat-attachment-name").textContent = file.name + " · " + Math.ceil(file.size / 1024) + " KB";
@@ -2344,7 +2456,9 @@
             });
             form.insertBefore(preview, form.firstChild);
             updateComposer();
-            input.focus();
+            // Selecting a file must not unexpectedly reopen the Android
+            // keyboard and cover the newly created preview/composer.
+            settleViewport();
         }
 
         if (emojiBtn && emojiPanel) {
@@ -2877,6 +2991,20 @@
         );
 
         document.addEventListener(
+            "resursmap:chat-realtime-state",
+            function (event) {
+                var online = Boolean(event.detail && event.detail.online);
+                if (online) {
+                    setConnection(t("chat_conn_ok", "Связь есть"), "is-online");
+                } else {
+                    // The REST poll is the live fallback, not a page-refresh
+                    // fallback. Trigger it immediately whenever WS drops.
+                    pollMessages(true);
+                }
+            }
+        );
+
+        document.addEventListener(
             "resursmap:chat-sync-messages",
             function (event) {
                 var detail = event.detail || {};
@@ -2889,26 +3017,25 @@
         if (window.visualViewport) {
             window.visualViewport.addEventListener(
                 "resize",
-                updateViewportHeight,
+                scheduleViewportUpdate,
                 { passive: true }
             );
             window.visualViewport.addEventListener(
                 "scroll",
-                function () {
-                    window.scrollTo(0, 0);
-                },
+                scheduleViewportUpdate,
                 { passive: true }
             );
         }
 
         window.addEventListener(
             "resize",
-            updateViewportHeight
+            scheduleViewportUpdate,
+            { passive: true }
         );
 
-        input.addEventListener("focus", function () {
-            window.scrollTo(0, 0);
-        });
+        window.addEventListener("orientationchange", settleViewport, { passive: true });
+        input.addEventListener("focus", settleViewport);
+        input.addEventListener("blur", settleViewport);
 
         ["chat-send", "chat-image-btn", "chat-emoji-btn"].forEach(function (id) {
             var button = document.getElementById(id);
@@ -2967,16 +3094,17 @@
         scrollToBottom("auto");
         setConnection(t("chat_conn_ok", "Связь есть"), "is-online");
 
-        pollTimer = window.setInterval(
-            pollMessages,
-            5000
-        );
+        pollTimer = window.setInterval(function () {
+            if (document.documentElement.dataset.chatRealtime !== "online") {
+                pollMessages(true);
+            }
+        }, 2000);
 
         var safetyPollTimer = window.setInterval(
             function () {
                 pollMessages(true);
             },
-            15000
+            10000
         );
 
         presenceTimer = window.setInterval(
@@ -3014,7 +3142,12 @@
                         item &&
                         item.scope === storageScope &&
                         typeof item.id === "string" &&
-                        (item.kind === "image" || item.kind === "voice") &&
+                        (
+                            item.kind === "image" ||
+                            item.kind === "voice" ||
+                            item.kind === "video" ||
+                            item.kind === "document"
+                        ) &&
                         item.blob instanceof Blob
                     );
                 })
@@ -3024,6 +3157,7 @@
                         kind: item.kind,
                         blob: item.blob,
                         mimeType: String(item.mimeType || item.blob.type || ""),
+                        fileName: String(item.fileName || "attachment"),
                         caption: String(item.caption || ""),
                         replyToMessageId: Number(item.replyToMessageId || 0) || null,
                         createdAt: Number(item.createdAt || 0) ||
@@ -3400,7 +3534,7 @@
                 message.attachment_kind === "voice" &&
                 message.attachment_url
             ) {
-                return "🎤 " + t("chat_voice", "Голосовое");
+                return t("chat_voice", "Голосовое");
             }
 
             if (
@@ -3408,8 +3542,8 @@
                 message.attachment_url
             ) {
                 return message.message
-                    ? "📷 " + shortText(message.message, limit || 90)
-                    : "📷 " + t("chat_photo_label", "Фото");
+                    ? shortText(message.message, limit || 90)
+                    : t("chat_photo_label", "Фото");
             }
 
             return shortText(messageText(message), limit || 110);
@@ -3464,7 +3598,7 @@
         function buildForwardCaption(payload, comment) {
             var core =
                 String(payload.text || "").trim() ||
-                ("📷 " + t("chat_photo_label", "Фото"));
+                t("chat_photo_label", "Фото");
             var block =
                 t("chat_forwarded_tag", "[Переслано]") + "\n" + core;
 
@@ -5525,6 +5659,14 @@
             );
         }
 
+        function announceRealtime(online) {
+            document.dispatchEvent(
+                new CustomEvent("resursmap:chat-realtime-state", {
+                    detail: { online: Boolean(online) }
+                })
+            );
+        }
+
         function scheduleReconnect() {
             if (
                 stopped ||
@@ -5594,6 +5736,8 @@
 
                     document.documentElement.dataset
                         .chatRealtime = "online";
+
+                    announceRealtime(true);
 
                     requestSync();
 
@@ -5761,6 +5905,7 @@
                         .chatRealtime;
 
                     socket = null;
+                    announceRealtime(false);
                     requestSync();
                     scheduleReconnect();
                 }
@@ -5812,6 +5957,7 @@
                     hiddenSocket.close();
                     delete document.documentElement.dataset
                         .chatRealtime;
+                    announceRealtime(false);
                 }
             }
         );
