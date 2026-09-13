@@ -277,9 +277,28 @@ test("office documents use bounded streamed validation", async () => {
   assert.match(media, /max_total_decompressed_bytes/);
   assert.match(media, /ContentTypeMismatch/);
   assert.match(media, /ExternalRelationship/);
-  assert.match(media, /looks_like_zip\(&file_bytes\)[\s\S]*MAX_DOCUMENT_BYTES/);
-  assert.match(groups, /looks_like_zip\(&bytes\)[\s\S]*MAX_DOCUMENT_BYTES/);
+  assert.match(media, /upload\.is_zip\(\)[\s\S]*MAX_DOCUMENT_BYTES/);
+  assert.match(groups, /validate_quarantined_attachment\(&state, &upload\)/);
   assert.match(state, /Semaphore::new\(1\)/);
+});
+
+test("attachment uploads stream through private quarantine without heap clones", async () => {
+  const [media, groups, manifest] = await Promise.all([
+    readFile(new URL("src/web/handlers/chat_media.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
+    readFile(new URL("Cargo.toml", root), "utf8"),
+  ]);
+
+  assert.match(manifest, /memmap2 = "0\.9"/);
+  assert.match(media, /quarantine_attachment_field/);
+  assert.match(media, /field\.chunk\(\)\.await/);
+  assert.match(media, /create_new\(true\)/);
+  assert.match(media, /mode\(0o600\)/);
+  assert.match(media, /memmap2::MmapOptions/);
+  assert.match(media, /fs::rename\(&source, destination\)/);
+  assert.match(media, /impl Drop for QuarantinedUpload/);
+  assert.doesNotMatch(media, /let validation_bytes = file_bytes\.clone\(\)/);
+  assert.doesNotMatch(groups, /let validation_bytes = bytes\.clone\(\)/);
 });
 
 test("mature chat layout is loaded last and stays mobile safe", async () => {
