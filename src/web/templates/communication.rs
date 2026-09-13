@@ -516,7 +516,7 @@ fn chat_message_body_html(message: &crate::web::view_models::ChatMessageRow) -> 
             message.message.clone()
         };
         return format!(
-            r#"<div class="chat-message-body chat-message-body--document"><a class="chat-document-link" href="{url}" download>📄 {name}</a></div>"#,
+            r#"<div class="chat-message-body chat-message-body--document"><a class="chat-document-link" href="{url}" download><span class="chat-document-icon" aria-hidden="true"><svg class="chat-icon" viewBox="0 0 24 24" focusable="false"><path d="M6 2h8l4 4v16H6z"></path><path d="M14 2v5h5M9 12h6M9 16h6"></path></svg></span><span>{name}</span></a></div>"#,
             url = escape_html(&message.attachment_url),
             name = escape_html(&name)
         );
@@ -982,20 +982,20 @@ fn render_chat_thread(
     </div>
 
     <div class="chat-composer-main">
-        <button id="chat-emoji-btn" type="button" class="chat-emoji-btn" aria-label="Открыть эмодзи" aria-controls="chat-emoji-panel" aria-expanded="false">☺</button>
+        <button id="chat-emoji-btn" type="button" class="chat-emoji-btn" aria-label="Открыть эмодзи" aria-controls="chat-emoji-panel" aria-expanded="false"><svg class="chat-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 14.5c1 1.2 2.1 1.8 3.5 1.8s2.5-.6 3.5-1.8"></path><path d="M9 9.5h.01M15 9.5h.01"></path></svg></button>
         <textarea id="chat-input" name="message" rows="1" maxlength="2000" required autocomplete="off" enterkeyhint="send" aria-label="Текст сообщения" placeholder="Сообщение…" class="ui-textarea chat-input"></textarea>
         <button id="chat-image-btn" type="button" class="chat-image-btn" aria-label="Добавить вложение">
-            <span class="chat-action-icon" aria-hidden="true">＋</span>
+            <span class="chat-action-icon" aria-hidden="true"><svg class="chat-icon" viewBox="0 0 24 24" focusable="false"><path d="M8.5 12.5 14.8 6.2a3 3 0 0 1 4.2 4.2l-7.8 7.8a5 5 0 0 1-7.1-7.1l7.7-7.7"></path></svg></span>
             <span class="chat-action-label">Вложение</span>
         </button>
     </div>
     <input type="file" id="chat-image-input" accept="image/jpeg,image/png,image/webp" class="chat-file-input">
-    <button id="chat-voice-btn" type="button" class="chat-voice-btn">
-        <span class="chat-action-icon" aria-hidden="true">●</span>
+    <button id="chat-voice-btn" type="button" class="chat-voice-btn" aria-label="Голосовое">
+        <span class="chat-action-icon" aria-hidden="true"><svg class="chat-icon" viewBox="0 0 24 24" focusable="false"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M6.5 11.5a5.5 5.5 0 0 0 11 0M12 17v4M9 21h6"></path></svg></span>
         <span class="chat-action-label">Голос</span>
     </button>
-    <button id="chat-send" type="submit" class="ui-button chat-send-button">
-        <span class="chat-action-icon" aria-hidden="true">➤</span>
+    <button id="chat-send" type="submit" class="ui-button chat-send-button" aria-label="Отправить">
+        <span class="chat-action-icon" aria-hidden="true"><svg class="chat-icon" viewBox="0 0 24 24" focusable="false"><path d="m4 4 17 8-17 8 3-8-3-8Z"></path><path d="M7 12h14"></path></svg></span>
         <span class="chat-action-label">Отправить</span>
     </button>
     <div class="chat-composer-footer"><span id="chat-send-state">Enter — отправить · Shift+Enter — новая строка</span><span id="chat-counter">0 / 2000</span></div>

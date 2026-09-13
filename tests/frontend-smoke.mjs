@@ -246,11 +246,19 @@ test("media core supports private image video and document delivery", async () =
   assert.match(groups, /not_a_member/);
   assert.match(chat, /MAX_MEDIA_QUEUE = 8/);
   assert.match(chat, /request\.upload\.onprogress/);
-  assert.match(chat, /request\.timeout = 90000/);
+  assert.match(chat, /request\.timeout = 300000/);
   assert.match(chat, /activeRequest\.abort\(\)/);
   assert.match(chat, /request\.onabort/);
+  assert.match(chat, /removeMediaItem\(mediaItem, false\)/);
+  assert.match(chat, /item\.cancelled.*upload_cancelled/s);
+  assert.match(chat, /item\.outboxWrite = mediaOutboxWrite\(item\)/);
+  assert.match(chat, /item\.kind === "video"[\s\S]*item\.kind === "document"/);
+  assert.match(chat, /request\.upload\.onload/);
+  assert.match(css, /chat-media-progress/);
   assert.match(chat, /chat-attachment-menu/);
   assert.match(chat, /chat-attachment-sheet/);
+  assert.match(chat, /chatIcon\("photo"\)/);
+  assert.doesNotMatch(chat, /data-attachment="photo"><span aria-hidden="true">📷/);
   assert.doesNotMatch(chat, /probe\.onloadedmetadata/);
   assert.match(chat, /looksLikeMachineKey/);
   assert.match(chat, /Never gate Android uploads on loadedmetadata/);
@@ -260,6 +268,22 @@ test("media core supports private image video and document delivery", async () =
   assert.match(css, /min-height: 44px/);
   assert.match(css, /position: fixed;[\s\S]*z-index: 1400/);
   assert.match(serviceWorker, /url\.pathname\.startsWith\("\/api\/"\)/);
+});
+
+test("Android chat viewport settles without forced page scrolling and realtime has a live fallback", async () => {
+  const [chat, css, template] = await Promise.all([
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("static/chat-mature.css", root), "utf8"),
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+  ]);
+
+  assert.match(chat, /function scheduleViewportUpdate\(\)/);
+  assert.match(chat, /window\.visualViewport\.addEventListener\([\s\S]*"scroll",[\s\S]*scheduleViewportUpdate/);
+  assert.doesNotMatch(chat, /window\.scrollTo\(0, 0\)/);
+  assert.match(chat, /resursmap:chat-realtime-state/);
+  assert.match(chat, /dataset\.chatRealtime !== "online"[\s\S]*pollMessages\(true\)/);
+  assert.match(css, /flex: 0 0 var\(--chat-shell-visible-height, 100%\) !important/);
+  assert.match(template, /class="chat-icon" viewBox="0 0 24 24"/);
 });
 
 test("office documents use bounded streamed validation", async () => {
