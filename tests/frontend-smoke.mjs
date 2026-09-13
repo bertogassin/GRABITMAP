@@ -271,10 +271,11 @@ test("media core supports private image video and document delivery", async () =
 });
 
 test("Android chat viewport settles without forced page scrolling and realtime has a live fallback", async () => {
-  const [chat, css, template] = await Promise.all([
+  const [chat, css, template, voice] = await Promise.all([
     readFile(new URL("static/chat-v2.js", root), "utf8"),
     readFile(new URL("static/chat-mature.css", root), "utf8"),
     readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+    readFile(new URL("static/chat-voice-player.js", root), "utf8"),
   ]);
 
   assert.match(chat, /function scheduleViewportUpdate\(\)/);
@@ -282,8 +283,16 @@ test("Android chat viewport settles without forced page scrolling and realtime h
   assert.doesNotMatch(chat, /window\.scrollTo\(0, 0\)/);
   assert.match(chat, /resursmap:chat-realtime-state/);
   assert.match(chat, /dataset\.chatRealtime !== "online"[\s\S]*pollMessages\(true\)/);
+  assert.match(chat, /__resursmapChatLastPollSucceededAt/);
   assert.match(css, /flex: 0 0 var\(--chat-shell-visible-height, 100%\) !important/);
   assert.match(template, /class="chat-icon" viewBox="0 0 24 24"/);
+  assert.match(template, /id="chat-form"[\s\S]*novalidate/);
+  assert.doesNotMatch(template, /id="chat-input"[^>]*\srequired(?:\s|>)/);
+  assert.match(chat, /input\.required = false/);
+  assert.match(voice, /IntersectionObserver/);
+  assert.match(voice, /audio\.preload = "auto"/);
+  assert.match(voice, /audio\.load\(\)/);
+  assert.match(voice, /voiceIcon\("play"\)/);
 });
 
 test("office documents use bounded streamed validation", async () => {

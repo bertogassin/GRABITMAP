@@ -666,6 +666,11 @@
             var length = Array.from(input.value).length;
             var hasMessage = input.value.trim().length > 0 || Boolean(attachmentDraft);
 
+            // Native constraint validation runs before the submit event.
+            // A required empty caption therefore made Android display a
+            // ready attachment while silently blocking its upload.
+            input.required = false;
+
             counter.textContent = length + " / 2000";
             counter.classList.toggle(
                 "is-near-limit",
@@ -1377,6 +1382,7 @@
 
                 appendMessages(data.messages || []);
                 applyReceiptCursors(data);
+                window.__resursmapChatLastPollSucceededAt = Date.now();
                 setConnection(t("chat_conn_ok", "Связь есть"), "is-online");
             } catch (error) {
                 if (error.status === 401) {
@@ -1384,7 +1390,10 @@
                         "/login?next=" +
                         encodeURIComponent(window.location.pathname + window.location.search);
                     return;
-                } else {
+                } else if (
+                    !window.__resursmapChatLastPollSucceededAt ||
+                    Date.now() - window.__resursmapChatLastPollSucceededAt > 5000
+                ) {
                     setConnection(
                         t("chat_connecting", "Связь восстанавливается…"),
                         "is-error"
@@ -2999,6 +3008,12 @@
                 } else {
                     // The REST poll is the live fallback, not a page-refresh
                     // fallback. Trigger it immediately whenever WS drops.
+                    if (
+                        window.__resursmapChatLastPollSucceededAt &&
+                        Date.now() - window.__resursmapChatLastPollSucceededAt <= 5000
+                    ) {
+                        setConnection(t("chat_conn_ok", "Связь есть"), "is-online");
+                    }
                     pollMessages(true);
                 }
             }
@@ -3592,7 +3607,9 @@
                 forwardText.textContent = "";
             }
 
-            input.setAttribute("required", "required");
+            // Empty text is rejected by the core itself. The textarea must
+            // remain optional so an attachment can be sent without a caption.
+            input.removeAttribute("required");
         }
 
         function buildForwardCaption(payload, comment) {
