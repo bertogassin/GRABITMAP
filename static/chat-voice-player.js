@@ -76,9 +76,6 @@
 
         audio.dataset.voicePrimed = "1";
         audio.preload = "auto";
-        try {
-            audio.load();
-        } catch (_) {}
     }
 
     function scheduleVisiblePreload(player) {
@@ -111,12 +108,16 @@
         var restoredTime = Number.isFinite(audio.currentTime)
             ? audio.currentTime
             : 0;
+        var done = false;
 
-        function recovered() {
-            audio.removeEventListener(
-                "timeupdate",
-                recovered
-            );
+        function finish() {
+            if (done) {
+                return;
+            }
+            done = true;
+            audio.removeEventListener("timeupdate", finish);
+            audio.removeEventListener("durationchange", finish);
+            audio.removeEventListener("loadeddata", finish);
 
             if (finiteDuration(audio) > 0) {
                 try {
@@ -130,20 +131,16 @@
             update(player);
         }
 
-        audio.addEventListener(
-            "timeupdate",
-            recovered,
-            { once: true }
-        );
+        audio.addEventListener("timeupdate", finish, { once: true });
+        audio.addEventListener("durationchange", finish, { once: true });
+        audio.addEventListener("loadeddata", finish, { once: true });
+
+        window.setTimeout(finish, 800);
 
         try {
             audio.currentTime = 1e10;
         } catch (_) {
-            audio.removeEventListener(
-                "timeupdate",
-                recovered
-            );
-            update(player);
+            finish();
         }
     }
 
@@ -288,6 +285,10 @@
             player.classList.remove("is-loading");
             player.classList.add("is-error");
             button.setAttribute("aria-label", "Повторить голосовое");
+            var time = player.querySelector(".chat-voice-time");
+            if (time) {
+                time.textContent = "Ошибка";
+            }
         });
 
         update(player);

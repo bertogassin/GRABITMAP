@@ -2229,6 +2229,7 @@
                 }
             }).catch(function (error) {
                 if (item.committed) {
+                    removeMediaItem(item, false);
                     setConnection(t("chat_conn_ok", "Связь есть"), "is-online");
                     sendState.textContent = t("chat_sent_hint", "Отправлено · Enter — отправить");
                     return;
