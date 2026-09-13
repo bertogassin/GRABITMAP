@@ -3,9 +3,9 @@ use super::chat::load_user_conversations;
 use super::chat_api::{message_content_can_be_edited, message_is_valid, reaction_emoji_is_allowed};
 use super::chat_identity::active_public_id_by_user_id;
 use super::chat_media::{
-    detect_attachment, detect_audio, detect_image, extension_for_mime, looks_like_zip,
-    media_path_is_safe, media_root, private_media_response, safe_attachment_name,
-    video_duration_is_allowed, MAX_VOICE_BYTES,
+    detect_audio, detect_image, extension_for_mime, media_path_is_safe, media_root,
+    private_media_response, quarantine_attachment_field, safe_attachment_name,
+    validate_quarantined_attachment, MAX_VOICE_BYTES,
 };
 use super::common::{input_text_is_valid, rate_limit_retry_after, request_is_cross_site, unix_now};
 use crate::state::app_state::AppState;
@@ -22,7 +22,6 @@ use serde::Deserialize;
 use serde_json::json;
 use sha2::Sha256;
 use std::fs;
-use std::io::Write;
 
 const MAX_GROUP_MEMBERS: i64 = 250;
 const GROUP_ROLE_OWNER: &str = "owner";
@@ -1333,8 +1332,7 @@ pub async fn api_group_send_image(
     let mut caption = String::new();
     let mut client_message_id = String::new();
     let mut reply_to_message_id = 0;
-    let mut file_bytes: Option<Vec<u8>> = None;
-    let mut original_name = String::new();
+    let mut upload = None;
     while let Ok(Some(field)) = multipart.next_field().await {
         let name = field.name().unwrap_or("").to_string();
         match name.as_str() {
@@ -1353,21 +1351,16 @@ pub async fn api_group_send_image(
                     reply_to_message_id = positive_message_id(&text).unwrap_or(0);
                 }
             }
-            "image" | "file" => {
-                original_name = field.file_name().unwrap_or("").to_string();
-                if let Ok(bytes) = field.bytes().await {
-                    file_bytes = Some(bytes.to_vec());
-                }
-            }
+            "image" | "file" => match quarantine_attachment_field(field).await {
+                Ok(value) => upload = Some(value),
+                Err(error) => return json_error(error.status, error.code),
+            },
             _ => {}
         }
     }
-    let Some(bytes) = file_bytes else {
+    let Some(upload) = upload else {
         return json_error(StatusCode::BAD_REQUEST, "image_required");
     };
-    if looks_like_zip(&bytes) && bytes.len() > super::chat_media::MAX_DOCUMENT_BYTES {
-        return json_error(StatusCode::PAYLOAD_TOO_LARGE, "attachment_too_large");
-    }
     if !client_message_id.is_empty() && !client_message_id_ok(&client_message_id) {
         return json_error(StatusCode::BAD_REQUEST, "invalid_client_message_id");
     }
@@ -1400,57 +1393,11 @@ pub async fn api_group_send_image(
             .into_response();
         }
     }
-    // Only ZIP-shaped candidates (DOCX/XLSX) pay for the blocking pool,
-    // the semaphore, and the timeout — see
-    // chat_media::api_chat_send_image (the unified /send-attachment
-    // handler) for the full reasoning. Photos, videos, PDFs, and plain
-    // text run inline, synchronously, as before.
-    let detected = if looks_like_zip(&bytes) {
-        let permit = match state
-            .office_zip_validation_slots
-            .clone()
-            .try_acquire_owned()
-        {
-            Ok(permit) => permit,
-            Err(_) => {
-                return json_error(StatusCode::TOO_MANY_REQUESTS, "attachment_validation_busy")
-            }
-        };
-        let validation_bytes = bytes.clone();
-        let validation_name = original_name.clone();
-        match tokio::time::timeout(
-            std::time::Duration::from_secs(5),
-            tokio::task::spawn_blocking(move || {
-                let _permit = permit;
-                detect_attachment(&validation_bytes, &validation_name)
-            }),
-        )
-        .await
-        {
-            Ok(Ok(Some(value))) => value,
-            Ok(Ok(None)) => return json_error(StatusCode::BAD_REQUEST, "unsupported_attachment"),
-            Ok(Err(_)) => {
-                return json_error(
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    "attachment_validation_failed",
-                )
-            }
-            Err(_) => {
-                return json_error(StatusCode::REQUEST_TIMEOUT, "attachment_validation_timeout")
-            }
-        }
-    } else {
-        match detect_attachment(&bytes, &original_name) {
-            Some(value) => value,
-            None => return json_error(StatusCode::BAD_REQUEST, "unsupported_attachment"),
-        }
+    let detected = match validate_quarantined_attachment(&state, &upload).await {
+        Ok(value) => value,
+        Err(error) => return json_error(error.status, error.code),
     };
-    if bytes.len() > detected.max_bytes {
-        return json_error(StatusCode::PAYLOAD_TOO_LARGE, "attachment_too_large");
-    }
-    if detected.kind == "video" && !video_duration_is_allowed(&bytes, detected.mime) {
-        return json_error(StatusCode::BAD_REQUEST, "video_duration_invalid");
-    }
+    let attachment_size = upload.size;
     let mime = detected.mime;
     let ext = detected.extension;
     let unique = format!(
@@ -1463,17 +1410,8 @@ pub async fn api_group_send_image(
     );
     let relative = format!("groups/{group_id}/{user_id}-{unique}.{ext}");
     let absolute = media_root().join(&relative);
-    if let Some(parent) = absolute.parent() {
-        let _ = fs::create_dir_all(parent);
-    }
-    match fs::File::create(&absolute) {
-        Ok(mut file) => {
-            if file.write_all(&bytes).is_err() {
-                let _ = fs::remove_file(&absolute);
-                return json_error(StatusCode::INTERNAL_SERVER_ERROR, "media_store_failed");
-            }
-        }
-        Err(_) => return json_error(StatusCode::INTERNAL_SERVER_ERROR, "media_store_failed"),
+    if upload.publish(&absolute).is_err() {
+        return json_error(StatusCode::INTERNAL_SERVER_ERROR, "media_store_failed");
     }
     let now = unix_now();
     let inserted = db
@@ -1493,7 +1431,7 @@ pub async fn api_group_send_image(
                 detected.kind,
                 relative,
                 mime,
-                bytes.len() as i64
+                attachment_size as i64
             ],
         )
         .unwrap_or(0);

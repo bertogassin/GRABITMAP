@@ -6,7 +6,7 @@ use super::user_blocks::users_are_blocked;
 use crate::state::app_state::AppState;
 use axum::{
     body::Body,
-    extract::{Multipart, Path, State},
+    extract::{multipart::Field, Multipart, Path, State},
     http::{header, HeaderMap, HeaderValue, StatusCode},
     response::{IntoResponse, Response},
     Json,
@@ -15,6 +15,7 @@ use serde::Serialize;
 use serde_json::json;
 use std::fs;
 use std::path::{Path as FsPath, PathBuf};
+use tokio::io::AsyncWriteExt;
 
 const MAX_IMAGE_BYTES: usize = 8 * 1024 * 1024;
 pub(crate) const MAX_VOICE_BYTES: usize = 8 * 1024 * 1024;
@@ -71,6 +72,239 @@ pub(crate) fn media_root() -> PathBuf {
         .map(PathBuf::from)
         .filter(|path| !path.as_os_str().is_empty())
         .unwrap_or_else(|| PathBuf::from("data/chat-media"))
+}
+
+#[derive(Debug)]
+pub(crate) struct QuarantinedUpload {
+    path: Option<PathBuf>,
+    pub original_name: String,
+    pub size: usize,
+    prefix: Vec<u8>,
+}
+
+impl QuarantinedUpload {
+    pub(crate) fn publish(mut self, destination: &FsPath) -> std::io::Result<()> {
+        if let Some(parent) = destination.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        let source = self.path.take().ok_or_else(|| {
+            std::io::Error::new(std::io::ErrorKind::NotFound, "quarantine file missing")
+        })?;
+        if let Err(error) = fs::rename(&source, destination) {
+            self.path = Some(source);
+            return Err(error);
+        }
+        Ok(())
+    }
+
+    fn is_zip(&self) -> bool {
+        looks_like_zip(&self.prefix)
+    }
+}
+
+impl Drop for QuarantinedUpload {
+    fn drop(&mut self) {
+        if let Some(path) = self.path.take() {
+            let _ = fs::remove_file(path);
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct AttachmentValidationError {
+    pub status: StatusCode,
+    pub code: &'static str,
+}
+
+fn quarantine_root() -> PathBuf {
+    media_root().join(".quarantine")
+}
+
+async fn cleanup_stale_quarantine(root: &FsPath) {
+    let Ok(mut entries) = tokio::fs::read_dir(root).await else {
+        return;
+    };
+    let stale_before = std::time::SystemTime::now()
+        .checked_sub(std::time::Duration::from_secs(60 * 60))
+        .unwrap_or(std::time::UNIX_EPOCH);
+    for _ in 0..32 {
+        let Ok(Some(entry)) = entries.next_entry().await else {
+            break;
+        };
+        let path = entry.path();
+        if path.extension().and_then(|value| value.to_str()) != Some("upload") {
+            continue;
+        }
+        let is_stale = entry
+            .metadata()
+            .await
+            .ok()
+            .and_then(|metadata| metadata.modified().ok())
+            .is_some_and(|modified| modified < stale_before);
+        if is_stale {
+            let _ = tokio::fs::remove_file(path).await;
+        }
+    }
+}
+
+pub(crate) async fn quarantine_attachment_field(
+    mut field: Field<'_>,
+) -> Result<QuarantinedUpload, AttachmentValidationError> {
+    let original_name = field.file_name().unwrap_or("").to_string();
+    let root = quarantine_root();
+    tokio::fs::create_dir_all(&root)
+        .await
+        .map_err(|_| AttachmentValidationError {
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            code: "media_store_failed",
+        })?;
+    cleanup_stale_quarantine(&root).await;
+    let path = root.join(format!("{}.upload", random_file_stem()));
+    let mut options = tokio::fs::OpenOptions::new();
+    options.write(true).create_new(true);
+    #[cfg(unix)]
+    {
+        options.mode(0o600);
+    }
+    let mut file = options
+        .open(&path)
+        .await
+        .map_err(|_| AttachmentValidationError {
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            code: "media_store_failed",
+        })?;
+    let mut size = 0usize;
+    let mut prefix = Vec::with_capacity(16);
+    loop {
+        let chunk = match field.chunk().await {
+            Ok(chunk) => chunk,
+            Err(_) => {
+                drop(file);
+                let _ = tokio::fs::remove_file(&path).await;
+                return Err(AttachmentValidationError {
+                    status: StatusCode::BAD_REQUEST,
+                    code: "attachment_upload_interrupted",
+                });
+            }
+        };
+        let Some(chunk) = chunk else { break };
+        size = match size.checked_add(chunk.len()) {
+            Some(size) => size,
+            None => {
+                drop(file);
+                let _ = tokio::fs::remove_file(&path).await;
+                return Err(AttachmentValidationError {
+                    status: StatusCode::PAYLOAD_TOO_LARGE,
+                    code: "attachment_too_large",
+                });
+            }
+        };
+        if size > MAX_VIDEO_BYTES {
+            drop(file);
+            let _ = tokio::fs::remove_file(&path).await;
+            return Err(AttachmentValidationError {
+                status: StatusCode::PAYLOAD_TOO_LARGE,
+                code: "attachment_too_large",
+            });
+        }
+        if prefix.len() < 16 {
+            let wanted = (16 - prefix.len()).min(chunk.len());
+            prefix.extend_from_slice(&chunk[..wanted]);
+        }
+        if file.write_all(&chunk).await.is_err() {
+            drop(file);
+            let _ = tokio::fs::remove_file(&path).await;
+            return Err(AttachmentValidationError {
+                status: StatusCode::INTERNAL_SERVER_ERROR,
+                code: "media_store_failed",
+            });
+        }
+    }
+    if size == 0 {
+        drop(file);
+        let _ = tokio::fs::remove_file(&path).await;
+        return Err(AttachmentValidationError {
+            status: StatusCode::BAD_REQUEST,
+            code: "image_required",
+        });
+    }
+    if file.flush().await.is_err() {
+        drop(file);
+        let _ = tokio::fs::remove_file(&path).await;
+        return Err(AttachmentValidationError {
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            code: "media_store_failed",
+        });
+    }
+    drop(file);
+    Ok(QuarantinedUpload {
+        path: Some(path),
+        original_name,
+        size,
+        prefix,
+    })
+}
+
+pub(crate) async fn validate_quarantined_attachment(
+    state: &AppState,
+    upload: &QuarantinedUpload,
+) -> Result<DetectedMedia, AttachmentValidationError> {
+    if upload.is_zip() && upload.size > MAX_DOCUMENT_BYTES {
+        return Err(AttachmentValidationError {
+            status: StatusCode::PAYLOAD_TOO_LARGE,
+            code: "attachment_too_large",
+        });
+    }
+    let permit = if upload.is_zip() {
+        Some(
+            state
+                .office_zip_validation_slots
+                .clone()
+                .try_acquire_owned()
+                .map_err(|_| AttachmentValidationError {
+                    status: StatusCode::TOO_MANY_REQUESTS,
+                    code: "attachment_validation_busy",
+                })?,
+        )
+    } else {
+        None
+    };
+    let path = upload.path.clone().ok_or(AttachmentValidationError {
+        status: StatusCode::INTERNAL_SERVER_ERROR,
+        code: "attachment_validation_failed",
+    })?;
+    let name = upload.original_name.clone();
+    let size = upload.size;
+    let task = tokio::task::spawn_blocking(move || {
+        let _permit = permit;
+        let file = fs::File::open(path).map_err(|_| ())?;
+        // The file is private, immutable and owned by this request until the
+        // blocking task finishes. Mapping avoids a second full-size heap copy.
+        let bytes = unsafe { memmap2::MmapOptions::new().map(&file) }.map_err(|_| ())?;
+        let detected = detect_attachment(&bytes, &name).ok_or(())?;
+        if size > detected.max_bytes {
+            return Err(());
+        }
+        if detected.kind == "video" && !video_duration_is_allowed(&bytes, detected.mime) {
+            return Err(());
+        }
+        Ok(detected)
+    });
+    match tokio::time::timeout(std::time::Duration::from_secs(6), task).await {
+        Ok(Ok(Ok(detected))) => Ok(detected),
+        Ok(Ok(Err(()))) => Err(AttachmentValidationError {
+            status: StatusCode::BAD_REQUEST,
+            code: "unsupported_attachment",
+        }),
+        Ok(Err(_)) => Err(AttachmentValidationError {
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            code: "attachment_validation_failed",
+        }),
+        Err(_) => Err(AttachmentValidationError {
+            status: StatusCode::REQUEST_TIMEOUT,
+            code: "attachment_validation_timeout",
+        }),
+    }
 }
 
 pub(crate) fn media_path_is_safe(relative: &str) -> bool {
@@ -804,8 +1038,7 @@ pub async fn api_chat_send_image(
     let mut caption = String::new();
     let mut client_message_id = String::new();
     let mut reply_to_message_id: Option<i64> = None;
-    let mut file_bytes: Option<Vec<u8>> = None;
-    let mut original_name = String::new();
+    let mut upload: Option<QuarantinedUpload> = None;
 
     while let Ok(Some(field)) = multipart.next_field().await {
         let name = field.name().unwrap_or("").to_string();
@@ -829,76 +1062,23 @@ pub async fn api_chat_send_image(
                     }
                 }
             }
-            "image" | "file" => {
-                original_name = field.file_name().unwrap_or("").to_string();
-                if let Ok(b) = field.bytes().await {
-                    file_bytes = Some(b.to_vec());
-                }
-            }
+            "image" | "file" => match quarantine_attachment_field(field).await {
+                Ok(value) => upload = Some(value),
+                Err(error) => return json_error(error.status, error.code),
+            },
             _ => {}
         }
     }
 
-    let file_bytes = match file_bytes {
-        Some(b) if !b.is_empty() => b,
+    let upload = match upload {
+        Some(upload) => upload,
         _ => return json_error(StatusCode::BAD_REQUEST, "image_required"),
     };
-    if looks_like_zip(&file_bytes) && file_bytes.len() > MAX_DOCUMENT_BYTES {
-        return json_error(StatusCode::PAYLOAD_TOO_LARGE, "attachment_too_large");
-    }
-    // Only ZIP-shaped candidates (DOCX/XLSX) pay for the blocking pool,
-    // the semaphore, and the timeout below — a real, bounded decompression
-    // pass (see validate_office_zip). Photos, videos, PDFs, and plain
-    // text are cheap and run inline, synchronously, as before.
-    let detected = if looks_like_zip(&file_bytes) {
-        let permit = match state
-            .office_zip_validation_slots
-            .clone()
-            .try_acquire_owned()
-        {
-            Ok(permit) => permit,
-            // Bounded queue, not unbounded backpressure: if every slot is
-            // busy, reject now rather than making the caller wait behind
-            // an unknown number of other heavy validations.
-            Err(_) => {
-                return json_error(StatusCode::TOO_MANY_REQUESTS, "attachment_validation_busy")
-            }
-        };
-        let validation_bytes = file_bytes.clone();
-        let validation_name = original_name.clone();
-        match tokio::time::timeout(
-            std::time::Duration::from_secs(5),
-            tokio::task::spawn_blocking(move || {
-                let _permit = permit; // held until this closure returns
-                detect_attachment(&validation_bytes, &validation_name)
-            }),
-        )
-        .await
-        {
-            Ok(Ok(Some(value))) => value,
-            Ok(Ok(None)) => return json_error(StatusCode::BAD_REQUEST, "unsupported_attachment"),
-            Ok(Err(_)) => {
-                return json_error(
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    "attachment_validation_failed",
-                )
-            }
-            Err(_) => {
-                return json_error(StatusCode::REQUEST_TIMEOUT, "attachment_validation_timeout")
-            }
-        }
-    } else {
-        match detect_attachment(&file_bytes, &original_name) {
-            Some(value) => value,
-            None => return json_error(StatusCode::BAD_REQUEST, "unsupported_attachment"),
-        }
+    let detected = match validate_quarantined_attachment(&state, &upload).await {
+        Ok(value) => value,
+        Err(error) => return json_error(error.status, error.code),
     };
-    if file_bytes.len() > detected.max_bytes {
-        return json_error(StatusCode::PAYLOAD_TOO_LARGE, "attachment_too_large");
-    }
-    if detected.kind == "video" && !video_duration_is_allowed(&file_bytes, detected.mime) {
-        return json_error(StatusCode::BAD_REQUEST, "video_duration_invalid");
-    }
+    let attachment_size = upload.size;
     let kind = detected.kind;
     let mime = detected.mime;
     if !client_message_id.is_empty() && !client_message_id_is_valid(&client_message_id) {
@@ -966,20 +1146,8 @@ pub async fn api_chat_send_image(
         detected.extension
     );
     let absolute = media_root().join(&relative);
-    if let Some(parent) = absolute.parent() {
-        if fs::create_dir_all(parent).is_err() {
-            return json_error(StatusCode::INTERNAL_SERVER_ERROR, "media_store_failed");
-        }
-    }
-    match fs::File::create(&absolute) {
-        Ok(mut file) => {
-            use std::io::Write;
-            if file.write_all(&file_bytes).is_err() {
-                let _ = fs::remove_file(&absolute);
-                return json_error(StatusCode::INTERNAL_SERVER_ERROR, "media_store_failed");
-            }
-        }
-        Err(_) => return json_error(StatusCode::INTERNAL_SERVER_ERROR, "media_store_failed"),
+    if upload.publish(&absolute).is_err() {
+        return json_error(StatusCode::INTERNAL_SERVER_ERROR, "media_store_failed");
     }
 
     let now = unix_now();
@@ -999,7 +1167,7 @@ pub async fn api_chat_send_image(
          ) VALUES (?1,?2,?3,0,0,0,?4,?5,?6,?7,?8,?9,?10)",
         rusqlite::params![
             conversation_id, user_id, caption, now, reply_to_message_id, client_message_id,
-            kind, mime, file_bytes.len() as i64, relative
+            kind, mime, attachment_size as i64, relative
         ],
     ).unwrap_or(0);
     if inserted == 0 {
@@ -1431,6 +1599,48 @@ mod tests {
         assert!(!media_path_is_safe("../votes.db"));
         assert!(!media_path_is_safe("groups/../../votes.db"));
         assert!(!media_path_is_safe("/etc/passwd"));
+    }
+
+    fn temporary_upload_path(label: &str) -> PathBuf {
+        std::env::temp_dir().join(format!(
+            "grabit-{label}-{}-{}",
+            std::process::id(),
+            random_file_stem()
+        ))
+    }
+
+    #[test]
+    fn quarantined_upload_removes_unpublished_files_on_drop() {
+        let path = temporary_upload_path("drop");
+        fs::write(&path, b"temporary").expect("write quarantine fixture");
+        let upload = QuarantinedUpload {
+            path: Some(path.clone()),
+            original_name: "fixture.txt".to_string(),
+            size: 9,
+            prefix: b"temporary".to_vec(),
+        };
+        drop(upload);
+        assert!(!path.exists());
+    }
+
+    #[test]
+    fn quarantine_publish_is_an_atomic_rename() {
+        let source = temporary_upload_path("source");
+        let destination = temporary_upload_path("destination");
+        fs::write(&source, b"published").expect("write quarantine fixture");
+        let upload = QuarantinedUpload {
+            path: Some(source.clone()),
+            original_name: "fixture.txt".to_string(),
+            size: 9,
+            prefix: b"published".to_vec(),
+        };
+        upload.publish(&destination).expect("publish upload");
+        assert!(!source.exists());
+        assert_eq!(
+            fs::read(&destination).expect("read published file"),
+            b"published"
+        );
+        fs::remove_file(destination).expect("remove published fixture");
     }
 
     #[test]
