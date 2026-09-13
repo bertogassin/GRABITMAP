@@ -3,9 +3,9 @@ use super::chat::load_user_conversations;
 use super::chat_api::{message_content_can_be_edited, message_is_valid, reaction_emoji_is_allowed};
 use super::chat_identity::active_public_id_by_user_id;
 use super::chat_media::{
-    detect_attachment, detect_audio, detect_image, extension_for_mime, media_path_is_safe,
-    media_root, private_media_response, safe_attachment_name, video_duration_is_allowed,
-    MAX_VOICE_BYTES,
+    detect_attachment, detect_audio, detect_image, extension_for_mime, looks_like_zip,
+    media_path_is_safe, media_root, private_media_response, safe_attachment_name,
+    video_duration_is_allowed, MAX_VOICE_BYTES,
 };
 use super::common::{input_text_is_valid, rate_limit_retry_after, request_is_cross_site, unix_now};
 use crate::state::app_state::AppState;
@@ -1365,6 +1365,9 @@ pub async fn api_group_send_image(
     let Some(bytes) = file_bytes else {
         return json_error(StatusCode::BAD_REQUEST, "image_required");
     };
+    if looks_like_zip(&bytes) && bytes.len() > super::chat_media::MAX_DOCUMENT_BYTES {
+        return json_error(StatusCode::PAYLOAD_TOO_LARGE, "attachment_too_large");
+    }
     if !client_message_id.is_empty() && !client_message_id_ok(&client_message_id) {
         return json_error(StatusCode::BAD_REQUEST, "invalid_client_message_id");
     }
@@ -1397,8 +1400,50 @@ pub async fn api_group_send_image(
             .into_response();
         }
     }
-    let Some(detected) = detect_attachment(&bytes, &original_name) else {
-        return json_error(StatusCode::BAD_REQUEST, "unsupported_attachment");
+    // Only ZIP-shaped candidates (DOCX/XLSX) pay for the blocking pool,
+    // the semaphore, and the timeout — see
+    // chat_media::api_chat_send_image (the unified /send-attachment
+    // handler) for the full reasoning. Photos, videos, PDFs, and plain
+    // text run inline, synchronously, as before.
+    let detected = if looks_like_zip(&bytes) {
+        let permit = match state
+            .office_zip_validation_slots
+            .clone()
+            .try_acquire_owned()
+        {
+            Ok(permit) => permit,
+            Err(_) => {
+                return json_error(StatusCode::TOO_MANY_REQUESTS, "attachment_validation_busy")
+            }
+        };
+        let validation_bytes = bytes.clone();
+        let validation_name = original_name.clone();
+        match tokio::time::timeout(
+            std::time::Duration::from_secs(5),
+            tokio::task::spawn_blocking(move || {
+                let _permit = permit;
+                detect_attachment(&validation_bytes, &validation_name)
+            }),
+        )
+        .await
+        {
+            Ok(Ok(Some(value))) => value,
+            Ok(Ok(None)) => return json_error(StatusCode::BAD_REQUEST, "unsupported_attachment"),
+            Ok(Err(_)) => {
+                return json_error(
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "attachment_validation_failed",
+                )
+            }
+            Err(_) => {
+                return json_error(StatusCode::REQUEST_TIMEOUT, "attachment_validation_timeout")
+            }
+        }
+    } else {
+        match detect_attachment(&bytes, &original_name) {
+            Some(value) => value,
+            None => return json_error(StatusCode::BAD_REQUEST, "unsupported_attachment"),
+        }
     };
     if bytes.len() > detected.max_bytes {
         return json_error(StatusCode::PAYLOAD_TOO_LARGE, "attachment_too_large");

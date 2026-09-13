@@ -251,17 +251,35 @@ test("media core supports private image video and document delivery", async () =
   assert.match(chat, /request\.onabort/);
   assert.match(chat, /chat-attachment-menu/);
   assert.match(chat, /chat-attachment-sheet/);
-  assert.match(chat, /chat_video_preview_unavailable/);
+  assert.doesNotMatch(chat, /probe\.onloadedmetadata/);
   assert.match(chat, /looksLikeMachineKey/);
-  assert.match(
-    chat,
-    /probe\.onerror = function \(\) \{[\s\S]*showAttachmentDraft\(file, "video"/,
-  );
+  assert.match(chat, /Never gate Android uploads on loadedmetadata/);
+  assert.match(chat, /showAttachmentDraft\([\s\S]*file,[\s\S]*"video"/);
   assert.match(chat, /video\/mp4,video\/webm/);
   assert.match(chat, /URL\.revokeObjectURL/);
   assert.match(css, /min-height: 44px/);
   assert.match(css, /position: fixed;[\s\S]*z-index: 1400/);
   assert.match(serviceWorker, /url\.pathname\.startsWith\("\/api\/"\)/);
+});
+
+test("office documents use bounded streamed validation", async () => {
+  const [media, groups, state, manifest] = await Promise.all([
+    readFile(new URL("src/web/handlers/chat_media.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/groups.rs", root), "utf8"),
+    readFile(new URL("src/state/app_state.rs", root), "utf8"),
+    readFile(new URL("Cargo.toml", root), "utf8"),
+  ]);
+
+  assert.match(manifest, /zip = \{ version = "2\.3"/);
+  assert.doesNotMatch(media, /fn zip_contains/);
+  assert.match(media, /validate_office_zip/);
+  assert.match(media, /OfficeZipRejection/);
+  assert.match(media, /max_total_decompressed_bytes/);
+  assert.match(media, /ContentTypeMismatch/);
+  assert.match(media, /ExternalRelationship/);
+  assert.match(media, /looks_like_zip\(&file_bytes\)[\s\S]*MAX_DOCUMENT_BYTES/);
+  assert.match(groups, /looks_like_zip\(&bytes\)[\s\S]*MAX_DOCUMENT_BYTES/);
+  assert.match(state, /Semaphore::new\(1\)/);
 });
 
 test("mature chat layout is loaded last and stays mobile safe", async () => {

@@ -2412,33 +2412,25 @@
             var file = videoInput.files && videoInput.files[0];
             videoInput.value = "";
             if (!file) return;
-            if (!/^(video\/mp4|video\/webm)$/.test(file.type) || file.size > 40 * 1024 * 1024) {
+            var videoNameAllowed = /\.(mp4|webm)$/i.test(file.name || "");
+            var videoMimeAllowed = /^(video\/mp4|video\/webm)$/.test(file.type || "");
+            if ((!videoNameAllowed && !videoMimeAllowed) || file.size > 40 * 1024 * 1024) {
                 sendState.textContent = t("chat_video_invalid", "Видео: MP4/WebM, максимум 40 МБ");
                 return;
             }
-            var probeUrl = URL.createObjectURL(file);
-            var probe = document.createElement("video");
-            probe.preload = "metadata";
-            probe.onloadedmetadata = function () {
-                URL.revokeObjectURL(probeUrl);
-                var duration = Number(probe.duration || 0);
-                probe.removeAttribute("src");
-                if (Number.isFinite(duration) && duration > 180) {
-                    sendState.textContent = t("chat_video_duration", "Видео должно быть не длиннее 3 минут");
-                    return;
-                }
-                showAttachmentDraft(file, "video", file.type);
-            };
-            probe.onerror = function () {
-                URL.revokeObjectURL(probeUrl);
-                probe.removeAttribute("src");
-                showAttachmentDraft(file, "video", file.type || "video/mp4");
-                sendState.textContent = t(
-                    "chat_video_preview_unavailable",
-                    "Предпросмотр недоступен · файл проверит сервер"
-                );
-            };
-            probe.src = probeUrl;
+            // Never gate Android uploads on loadedmetadata: some valid
+            // gallery videos do not emit it until network/decoder work
+            // finishes. The preview is immediate; the server remains the
+            // authority for signature, container, size and duration.
+            showAttachmentDraft(
+                file,
+                "video",
+                videoMimeAllowed ? file.type : "video/mp4"
+            );
+            sendState.textContent = t(
+                "chat_attachment_ready",
+                "Вложение готово · добавьте подпись"
+            );
         });
 
         documentInput.addEventListener("change", function () {
