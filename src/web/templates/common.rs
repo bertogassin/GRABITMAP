@@ -402,6 +402,7 @@ body.light-theme .theme-toggle-btn {
 html.light-theme .brand-logo-img,
 body.light-theme .brand-logo-img {
     box-shadow: 0 6px 16px rgba(26, 29, 33, .12);
+    filter: drop-shadow(0 5px 10px rgba(26, 29, 33, .16));
 }
 
 html.light-theme .hero,
@@ -4146,11 +4147,6 @@ body.light-theme .card:hover {
         inset 0 1px 0 rgba(255, 255, 255, .95);
 }
 
-html.light-theme .brand-logo-img,
-body.light-theme .brand-logo-img {
-    filter: drop-shadow(0 5px 10px rgba(26, 29, 33, .16));
-}
-
 html.light-theme .rm-menu-row-icon,
 body.light-theme .rm-menu-row-icon {
     background: rgba(165, 118, 31, .10);
@@ -6408,6 +6404,16 @@ mod public_entry_tests {
         assert!(style.contains("animation: fadeIn .4s ease both;"));
         assert!(style.contains("transition: transform .25s ease, opacity .25s ease;"));
         assert!(style.contains("border: 1px solid rgba(232, 204, 150, .32);"));
+    }
+
+    #[test]
+    fn light_theme_brand_image_has_one_canonical_rule() {
+        let style = base_style();
+        let selector = "html.light-theme .brand-logo-img,\nbody.light-theme .brand-logo-img {";
+
+        assert_eq!(style.matches(selector).count(), 1);
+        assert!(style.contains("box-shadow: 0 6px 16px rgba(26, 29, 33, .12);"));
+        assert!(style.contains("filter: drop-shadow(0 5px 10px rgba(26, 29, 33, .16));"));
     }
 
     #[test]
