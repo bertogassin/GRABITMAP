@@ -1911,17 +1911,6 @@ a.feature.rm-feature-add {
     background: rgba(0, 0, 0, .03);
 }
 
-.ui-button {
-    font-family: inherit;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    transition:
-        transform .14s ease,
-        opacity .14s ease,
-        border-color .14s ease,
-        background-color .14s ease;
-}
-
 .ui-button:active {
     transform: scale(.985);
 }
@@ -4077,6 +4066,9 @@ body {
 
 .ui-button {
     appearance: none;
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -4089,6 +4081,11 @@ body {
     font-size: 14px;
     font-weight: 800;
     cursor: pointer;
+    transition:
+        transform .14s ease,
+        opacity .14s ease,
+        border-color .14s ease,
+        background-color .14s ease;
 }
 
 .rm-auth-button,
@@ -6450,6 +6447,19 @@ mod public_entry_tests {
         );
         assert!(style.contains("border: 1px solid rgba(232, 204, 150, .24);"));
         assert!(style.contains(".rm-guest-hint a {\n    color: var(--gold-light);"));
+    }
+
+    #[test]
+    fn shared_button_styles_have_one_canonical_base_rule() {
+        let style = base_style();
+
+        assert_eq!(
+            style.lines().filter(|line| *line == ".ui-button {").count(),
+            1
+        );
+        assert!(style.contains("appearance: none;\n    font-family: inherit;"));
+        assert!(style.contains("touch-action: manipulation;"));
+        assert!(style.contains("background-color .14s ease;"));
     }
 
     #[test]
