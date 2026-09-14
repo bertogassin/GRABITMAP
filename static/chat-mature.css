@@ -496,6 +496,22 @@ html[data-page="chat"] #chat-form.chat-composer {
     outline: 2px solid var(--gold-light, #e6ca91);
     outline-offset: 2px;
 }
+.chat-sheet-actions > button,
+.chat-editor-footer button,
+.chat-forward-target,
+.chat-sheet-reactions button {
+    touch-action: manipulation;
+}
+.chat-forward-target {
+    min-height: 48px;
+}
+.chat-sheet-actions > button:focus-visible,
+.chat-editor-footer button:focus-visible,
+.chat-forward-target:focus-visible,
+.chat-sheet-reactions button:focus-visible {
+    outline: 2px solid var(--gold-light, #e6ca91);
+    outline-offset: 2px;
+}
 #chat-form .chat-emoji-panel { grid-area: emoji; }
 /* Without an explicit area, this auto-placed into whichever of the
    reply/forward/emoji rows was collapsed (hidden) at the time, so the
