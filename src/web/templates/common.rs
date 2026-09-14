@@ -1762,8 +1762,8 @@ a.feature.rm-feature-add {
     margin: 14px 0 0;
     padding: 12px 14px;
     border-radius: 12px;
-    border: 1px solid rgba(214, 183, 122, .24);
-    background: rgba(214, 183, 122, .08);
+    border: 1px solid rgba(232, 204, 150, .24);
+    background: rgba(232, 204, 150, .08);
     color: var(--muted);
     font-size: 14px;
     line-height: 1.5;
@@ -4098,11 +4098,6 @@ body {
     border: 0;
     background: linear-gradient(135deg, var(--gold-light), var(--gold));
     color: var(--on-gold);
-}
-
-.rm-guest-hint {
-    border-color: rgba(232, 204, 150, .24);
-    background: rgba(232, 204, 150, .08);
 }
 
 .rm-version-footer {
@@ -6440,6 +6435,21 @@ mod public_entry_tests {
             1
         );
         assert!(style.contains("background: rgba(232, 204, 150, .08);"));
+    }
+
+    #[test]
+    fn guest_hint_has_one_canonical_rule() {
+        let style = base_style();
+
+        assert_eq!(
+            style
+                .lines()
+                .filter(|line| *line == ".rm-guest-hint {")
+                .count(),
+            1
+        );
+        assert!(style.contains("border: 1px solid rgba(232, 204, 150, .24);"));
+        assert!(style.contains(".rm-guest-hint a {\n    color: var(--gold-light);"));
     }
 
     #[test]
