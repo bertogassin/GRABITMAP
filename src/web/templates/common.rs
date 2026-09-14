@@ -488,7 +488,7 @@ body::before { display: none; }
 .page {
     width: min(100% - 32px, 900px);
     margin: 0 auto;
-    padding: 28px 0 calc(140px + env(safe-area-inset-bottom, 0px));
+    padding: 22px 0 calc(140px + env(safe-area-inset-bottom, 0px));
 }
 
 .icon {
@@ -3995,7 +3995,6 @@ html[dir="rtl"] .rm-menu-row {
 @media (max-width: 620px) {
     .page {
         width: min(100% - 20px, 900px);
-        padding-top: 18px;
     }
 
     .hero {
@@ -4074,10 +4073,6 @@ body {
         radial-gradient(circle at 12% 0%, rgba(126, 212, 228, .07), transparent 40%),
         radial-gradient(circle at 88% 8%, rgba(232, 204, 150, .08), transparent 34%),
         linear-gradient(160deg, var(--bg) 0%, var(--bg-soft) 48%, var(--bg) 100%);
-}
-
-.page {
-    padding-top: 22px;
 }
 
 .ui-button {
@@ -6327,6 +6322,18 @@ mod public_entry_tests {
         assert!(!body.contains("<style>"));
         assert!(page.contains("margin: 18px auto 86px;"));
         assert!(page.contains("opacity: .82;"));
+    }
+
+    #[test]
+    fn shared_page_layout_has_one_canonical_base_rule() {
+        let style = base_style();
+
+        assert_eq!(style.lines().filter(|line| *line == ".page {").count(), 1);
+        assert!(style.contains("padding: 22px 0 calc(140px + env(safe-area-inset-bottom, 0px));"));
+        assert!(style.contains("width: min(100% - 20px, 900px);"));
+        assert!(!style.contains(
+            ".page {\n        width: min(100% - 20px, 900px);\n        padding-top: 18px;"
+        ));
     }
 
     #[test]
