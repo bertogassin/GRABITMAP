@@ -582,6 +582,18 @@ test("chat photo viewer actions follow LTR and RTL inline direction", async () =
   assert.doesNotMatch(css, /\.chat-lightbox-actions \{[^}]*\bright:/);
 });
 
+test("chat photo viewer keeps keyboard focus inside the modal", async () => {
+  const chat = await readFile(new URL("static/chat-v2.js", root), "utf8");
+
+  assert.match(chat, /chat-lightbox-backdrop" tabindex="-1"/);
+  assert.match(chat, /function trapLightboxFocus\(event, lightbox\)/);
+  assert.match(chat, /event\.key !== "Tab" \|\| !lightbox \|\| lightbox\.hidden/);
+  assert.match(chat, /\.chat-lightbox-download, \.chat-lightbox-close/);
+  assert.match(chat, /event\.shiftKey && \(active === first \|\| !lightbox\.contains\(active\)\)/);
+  assert.match(chat, /!event\.shiftKey && \(active === last \|\| !lightbox\.contains\(active\)\)/);
+  assert.match(chat, /trapLightboxFocus\(event, lightbox\)/);
+});
+
 test("chat preserves reading position and reveals quoted history", async () => {
   const [chat, styles, template] = await Promise.all([
     readFile(new URL("static/chat-v2.js", root), "utf8"),

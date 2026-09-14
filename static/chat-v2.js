@@ -6446,7 +6446,7 @@ ResursMapChat.icon = function (name) {
         lightbox.setAttribute("aria-modal", "true");
         lightbox.setAttribute("aria-label", lightboxText("chat_photo_label", "Фото"));
         lightbox.innerHTML =
-            '<button type="button" class="chat-lightbox-backdrop"></button>' +
+            '<button type="button" class="chat-lightbox-backdrop" tabindex="-1"></button>' +
             '<div class="chat-lightbox-actions">' +
                 '<a class="chat-lightbox-download" download aria-label="">' + ResursMapChat.icon("download") + '</a>' +
                 '<button type="button" class="chat-lightbox-close" aria-label="">' + ResursMapChat.icon("close") + '</button>' +
@@ -6468,6 +6468,31 @@ ResursMapChat.icon = function (name) {
 
         document.body.appendChild(lightbox);
         return lightbox;
+    }
+
+    function trapLightboxFocus(event, lightbox) {
+        if (event.key !== "Tab" || !lightbox || lightbox.hidden) {
+            return;
+        }
+
+        var focusable = lightbox.querySelectorAll(
+            ".chat-lightbox-download, .chat-lightbox-close"
+        );
+        if (!focusable.length) {
+            return;
+        }
+
+        var first = focusable[0];
+        var last = focusable[focusable.length - 1];
+        var active = document.activeElement;
+
+        if (event.shiftKey && (active === first || !lightbox.contains(active))) {
+            event.preventDefault();
+            last.focus({ preventScroll: true });
+        } else if (!event.shiftKey && (active === last || !lightbox.contains(active))) {
+            event.preventDefault();
+            first.focus({ preventScroll: true });
+        }
     }
 
     function closeLightbox() {
@@ -6529,6 +6554,13 @@ ResursMapChat.icon = function (name) {
     });
 
     document.addEventListener("keydown", function (event) {
+        var lightbox = document.getElementById("chat-image-lightbox");
+
+        if (event.key === "Tab" && lightbox && !lightbox.hidden) {
+            trapLightboxFocus(event, lightbox);
+            return;
+        }
+
         if (event.key === "Escape") {
             closeLightbox();
             return;
