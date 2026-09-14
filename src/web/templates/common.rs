@@ -480,7 +480,10 @@ body {
 
     color: var(--text);
 
-    background: var(--bg-soft);
+    background:
+        radial-gradient(circle at 12% 0%, rgba(126, 212, 228, .07), transparent 40%),
+        radial-gradient(circle at 88% 8%, rgba(232, 204, 150, .08), transparent 34%),
+        linear-gradient(160deg, var(--bg) 0%, var(--bg-soft) 48%, var(--bg) 100%);
 }
 
 body::before { display: none; }
@@ -4057,13 +4060,6 @@ html[dir="rtl"] .rm-menu-row {
 }
 
 /* GRABIT · единый слой */
-body {
-    background:
-        radial-gradient(circle at 12% 0%, rgba(126, 212, 228, .07), transparent 40%),
-        radial-gradient(circle at 88% 8%, rgba(232, 204, 150, .08), transparent 34%),
-        linear-gradient(160deg, var(--bg) 0%, var(--bg-soft) 48%, var(--bg) 100%);
-}
-
 .ui-button {
     appearance: none;
     font-family: inherit;
@@ -6416,6 +6412,19 @@ mod public_entry_tests {
         assert_eq!(style.matches(selector).count(), 1);
         assert!(style.contains("0 12px 28px rgba(26, 29, 33, .08),"));
         assert!(style.contains("inset 0 1px 0 rgba(255, 255, 255, .95);"));
+    }
+
+    #[test]
+    fn shared_body_styles_have_one_canonical_base_rule() {
+        let style = base_style();
+
+        assert_eq!(style.lines().filter(|line| *line == "body {").count(), 1);
+        assert!(style.contains(
+            "radial-gradient(circle at 12% 0%, rgba(126, 212, 228, .07), transparent 40%),"
+        ));
+        assert!(style.contains(
+            "linear-gradient(160deg, var(--bg) 0%, var(--bg-soft) 48%, var(--bg) 100%);"
+        ));
     }
 
     #[test]
