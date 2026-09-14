@@ -13,7 +13,7 @@ fn render_legal(title: &str, lead: &str, paragraphs: &[&str]) -> String {
         r#"{topbar}
 {back}
 {hero}
-<article class="card" style="padding:18px 16px;display:grid;gap:12px;line-height:1.5">
+<article class="card rm-document-card rm-document-card--prose">
 {article}
 </article>"#,
         topbar = topbar(title, "shield"),
@@ -74,5 +74,7 @@ mod tests {
         assert!(privacy.contains("Политика"));
         assert!(privacy.contains("почту"));
         assert!(privacy.contains("/privacy") || privacy.contains("GRABIT"));
+        assert!(privacy.contains("rm-document-card rm-document-card--prose"));
+        assert!(!privacy.contains("style="));
     }
 }

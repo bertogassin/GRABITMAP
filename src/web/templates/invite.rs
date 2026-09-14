@@ -52,7 +52,7 @@ pub fn render_invite_landing(name: &str, public_id: &str, to: &str) -> String {
         r#"{topbar}
 {back}
 {hero}
-<article class="card" style="padding:18px 16px;display:grid;gap:12px">
+<article class="card rm-document-card">
     <p>Вас зовёт <strong>{who}</strong>.</p>
     <div class="rm-invite-actions">
         <a class="ui-button" href="/login?next={next}">Войти</a>
@@ -92,6 +92,8 @@ mod tests {
         assert!(html.contains(".rm-invite-card {"));
         assert!(!html.contains(".rm-invite-actions{"));
         assert!(!html.contains(".rm-invite-card{"));
+        assert!(html.contains("class=\"card rm-document-card\""));
+        assert!(!html.contains("style="));
         let share = invite_share_block("abc123");
         assert!(share.contains("/app/join/abc123?to=chat"));
         assert!(share.contains("/app/join/abc123?to=work"));
