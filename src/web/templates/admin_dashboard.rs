@@ -69,7 +69,10 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     --owner-line:rgba(214,183,122,.18);
     max-width:1180px;
     margin:0 auto;
-    padding-bottom:50px;
+    padding:
+        max(10px,env(safe-area-inset-top))
+        0
+        calc(100px + env(safe-area-inset-bottom));
 }
 .admin-owner-hero {
     position:relative;
@@ -268,12 +271,6 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     }
 }
 
-.admin-v2 {
-    padding:
-        max(10px,env(safe-area-inset-top))
-        0
-        calc(100px + env(safe-area-inset-bottom));
-}
 .admin-command-nav {
     position:sticky;
     top:8px;
