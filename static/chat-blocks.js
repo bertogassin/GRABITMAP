@@ -15,6 +15,8 @@
 
     function confirmBlockUser() {
         return new Promise(function (resolve) {
+            var previousFocus = document.activeElement;
+            var finished = false;
             var overlay = document.createElement("div");
             overlay.className = "chat-confirm-overlay";
             overlay.innerHTML =
@@ -29,8 +31,19 @@
                 '</section>';
 
             function finish(accepted) {
+                if (finished) {
+                    return;
+                }
+                finished = true;
                 document.removeEventListener("keydown", onKeyDown);
                 overlay.remove();
+                if (
+                    previousFocus &&
+                    previousFocus.isConnected &&
+                    typeof previousFocus.focus === "function"
+                ) {
+                    previousFocus.focus();
+                }
                 resolve(accepted);
             }
 

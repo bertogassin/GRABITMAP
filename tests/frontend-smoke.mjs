@@ -947,6 +947,16 @@ test("chat attachment controls are touch-safe and keyboard-visible", async () =>
   assert.match(mature, /\.chat-attachment-sheet header button:focus-visible,[\s\S]*\.chat-attachment-actions > button:focus-visible \{[^}]*outline: 2px solid var\(--gold-light, #e6ca91\);[^}]*outline-offset: 2px;/);
 });
 
+test("chat block confirmation restores keyboard focus exactly once", async () => {
+  const blocks = await readFile(new URL("static/chat-blocks.js", root), "utf8");
+
+  assert.match(blocks, /var previousFocus = document\.activeElement;/);
+  assert.match(blocks, /var finished = false;/);
+  assert.match(blocks, /function finish\(accepted\) \{[\s\S]*if \(finished\) \{[\s\S]*finished = true;/);
+  assert.match(blocks, /previousFocus\.isConnected[\s\S]*typeof previousFocus\.focus === "function"[\s\S]*previousFocus\.focus\(\);/);
+  assert.match(blocks, /document\.removeEventListener\("keydown", onKeyDown\);/);
+});
+
 test("prelaunch UI removes debug hooks native popups duplicate ids and legacy symbols", async () => {
   const [common, navigation, pwa, communication, resources, chat, blocks, groupHelper, cityHelper, staticFiles] = await Promise.all([
     readFile(new URL("src/web/templates/common.rs", root), "utf8"),
