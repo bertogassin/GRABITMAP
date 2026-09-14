@@ -870,6 +870,8 @@ body::before { display: none; }
     box-shadow:
         0 8px 22px rgba(0, 0, 0, .22),
         inset 0 1px 0 rgba(255, 255, 255, .08);
+    filter: drop-shadow(0 0 10px rgba(224, 196, 138, .18));
+    transition: transform .25s ease, color .25s ease, filter .25s ease;
 }
 
 .card-content {
@@ -893,7 +895,8 @@ body::before { display: none; }
 }
 
 .card-arrow {
-    color: var(--muted);
+    color: rgba(214,183,122,.70);
+    transition: transform .25s ease, color .25s ease;
 }
 
 .rm-back-link {
@@ -1525,21 +1528,10 @@ html[data-page="chat"] .rm-version-footer {
     transform: translateX(100%);
 }
 
-.card-icon {
-    color: var(--gold-light);
-    filter: drop-shadow(0 0 10px rgba(224, 196, 138, .18));
-    transition: transform .25s ease, color .25s ease, filter .25s ease;
-}
-
 .card:hover .card-icon {
     transform: scale(1.08);
     color: #fff1d0;
     filter: drop-shadow(0 0 14px rgba(224, 196, 138, .32));
-}
-
-.card-arrow {
-    color: rgba(214,183,122,.70);
-    transition: transform .25s ease, color .25s ease;
 }
 
 .card:hover .card-arrow {
@@ -6506,6 +6498,22 @@ mod public_entry_tests {
         assert!(style.contains("position: relative;\n    z-index: 2;"));
         assert!(style.contains("background: rgba(0,0,0,.045);"));
         assert!(style.contains("0 12px 35px rgba(0,0,0,.18);"));
+    }
+
+    #[test]
+    fn shared_card_accessories_have_one_canonical_rule_each() {
+        let style = base_style();
+
+        for selector in [".card-icon {", ".card-arrow {"] {
+            assert_eq!(
+                style.lines().filter(|line| *line == selector).count(),
+                1,
+                "duplicate selector: {selector}"
+            );
+        }
+
+        assert!(style.contains("filter: drop-shadow(0 0 10px rgba(224, 196, 138, .18));"));
+        assert!(style.contains("transition: transform .25s ease, color .25s ease;"));
     }
 
     #[test]
