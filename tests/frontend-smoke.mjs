@@ -144,6 +144,28 @@ test("resource reports keep one canonical reason chip style", async () => {
   );
 });
 
+test("notification toolbar keeps one canonical read-all action style", async () => {
+  const template = await readFile(
+    new URL("src/web/templates/common.rs", root),
+    "utf8",
+  );
+  const readAllRules =
+    template.match(/^\.rm-notif-read-all \{[\s\S]*?^\}/gm) ?? [];
+
+  assert.equal(readAllRules.length, 1);
+  assert.match(readAllRules[0], /min-height: 40px;/);
+  assert.match(readAllRules[0], /border: 0;/);
+  assert.match(readAllRules[0], /color: var\(--on-gold\);/);
+  assert.match(
+    readAllRules[0],
+    /background: linear-gradient\(135deg, var\(--gold-light\), var\(--gold\)\);/,
+  );
+  assert.doesNotMatch(
+    readAllRules[0],
+    /color: var\(--gold-light\);|background: rgba\(232, 204, 150, \.12\);/,
+  );
+});
+
 test("mobile foundation hides assistive labels and clears Android system navigation", async () => {
   const css = await readFile(new URL("static/mobile-foundation.css", root), "utf8");
 

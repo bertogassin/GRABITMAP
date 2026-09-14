@@ -2003,14 +2003,15 @@ a.feature.rm-feature-add {
 .rm-notif-read-all {
     min-height: 40px;
     padding: 0 14px;
+    border: 0;
     border-radius: 12px;
     display: inline-flex;
     align-items: center;
     text-decoration: none;
-    color: var(--gold-light);
+    color: var(--on-gold);
     font-size: 13px;
     font-weight: 800;
-    background: rgba(232, 204, 150, .12);
+    background: linear-gradient(135deg, var(--gold-light), var(--gold));
 }
 
 .rm-notif-action {
@@ -4258,8 +4259,7 @@ body {
 .rm-profile-save-btn,
 .rm-promo-submit,
 .rm-empty-action,
-.rm-person-write,
-.rm-notif-read-all {
+.rm-person-write {
     border: 0;
     background: linear-gradient(135deg, var(--gold-light), var(--gold));
     color: var(--on-gold);
