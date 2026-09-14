@@ -966,6 +966,18 @@ test("chat attachment controls are touch-safe and keyboard-visible", async () =>
   assert.match(mature, /\.chat-attachment-sheet header button:focus-visible,[\s\S]*\.chat-attachment-actions > button:focus-visible \{[^}]*outline: 2px solid var\(--gold-light, #e6ca91\);[^}]*outline-offset: 2px;/);
 });
 
+test("chat attachment dialog keeps keyboard focus inside the modal", async () => {
+  const chat = await readFile(new URL("static/chat-v2.js", root), "utf8");
+
+  assert.match(chat, /chat-attachment-backdrop" data-attachment-close tabindex="-1"/);
+  assert.match(chat, /function trapAttachmentMenuFocus\(event\)/);
+  assert.match(chat, /event\.key !== "Tab" \|\| attachmentMenu\.hidden/);
+  assert.match(chat, /\.chat-attachment-sheet button:not\(\[disabled\]\)/);
+  assert.match(chat, /active === first \|\| !attachmentMenu\.contains\(active\)/);
+  assert.match(chat, /active === last \|\| !attachmentMenu\.contains\(active\)/);
+  assert.match(chat, /trapAttachmentMenuFocus\(event\)/);
+});
+
 test("chat block confirmation restores keyboard focus exactly once", async () => {
   const blocks = await readFile(new URL("static/chat-blocks.js", root), "utf8");
 
