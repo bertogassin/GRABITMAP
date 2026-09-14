@@ -2493,7 +2493,7 @@ ResursMapChat.icon = function (name) {
         attachmentMenu.className = "chat-attachment-menu";
         attachmentMenu.hidden = true;
         attachmentMenu.innerHTML =
-            '<button type="button" class="chat-attachment-backdrop" data-attachment-close aria-label="Закрыть меню вложений"></button>' +
+            '<button type="button" class="chat-attachment-backdrop" data-attachment-close tabindex="-1" aria-label="Закрыть меню вложений"></button>' +
             '<section class="chat-attachment-sheet" role="dialog" aria-modal="true" aria-label="Добавить вложение">' +
                 '<span class="chat-attachment-handle" aria-hidden="true"></span>' +
                 '<header><strong>Добавить вложение</strong><button type="button" data-attachment-close aria-label="Закрыть">' + ResursMapChat.icon("close") + '</button></header>' +
@@ -2508,6 +2508,31 @@ ResursMapChat.icon = function (name) {
         function closeAttachmentMenu() {
             attachmentMenu.hidden = true;
             imageBtn.setAttribute("aria-expanded", "false");
+        }
+
+        function trapAttachmentMenuFocus(event) {
+            if (event.key !== "Tab" || attachmentMenu.hidden) {
+                return;
+            }
+
+            var focusable = attachmentMenu.querySelectorAll(
+                ".chat-attachment-sheet button:not([disabled])"
+            );
+            if (!focusable.length) {
+                return;
+            }
+
+            var first = focusable[0];
+            var last = focusable[focusable.length - 1];
+            var active = document.activeElement;
+
+            if (event.shiftKey && (active === first || !attachmentMenu.contains(active))) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && (active === last || !attachmentMenu.contains(active))) {
+                event.preventDefault();
+                first.focus();
+            }
         }
 
         imageBtn.addEventListener("click", function () {
@@ -2541,6 +2566,10 @@ ResursMapChat.icon = function (name) {
             if (!attachmentMenu.hidden && !attachmentMenu.contains(event.target) && !imageBtn.contains(event.target)) closeAttachmentMenu();
         });
         document.addEventListener("keydown", function (event) {
+            if (event.key === "Tab" && !attachmentMenu.hidden) {
+                trapAttachmentMenuFocus(event);
+                return;
+            }
             if (event.key === "Escape" && !attachmentMenu.hidden) {
                 closeAttachmentMenu();
                 imageBtn.focus();
