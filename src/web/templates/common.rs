@@ -792,6 +792,7 @@ body::before { display: none; }
 
 .card {
     position: relative;
+    overflow: hidden;
 
     display: flex;
     align-items: center;
@@ -815,14 +816,14 @@ body::before { display: none; }
         var(--card);
 
     box-shadow:
-        0 16px 40px rgba(0,0,0,.18),
-        inset 0 1px 0 rgba(0,0,0,.035);
+        0 12px 35px rgba(0,0,0,.18),
+        inset 0 1px 0 rgba(0,0,0,.045);
 
     transition:
         transform .2s ease,
         border-color .2s ease,
-        background .2s ease,
-        box-shadow .2s ease;
+        box-shadow .2s ease,
+        background .2s ease;
 
     -webkit-tap-highlight-color: transparent;
 }
@@ -834,13 +835,19 @@ body::before { display: none; }
 .card:hover {
     transform: translateY(-2px);
 
-    border-color: rgba(214,183,122,.24);
+    border-color: rgba(232, 204, 150, .38);
 
-    background: var(--card-hover);
+    background:
+        linear-gradient(
+            145deg,
+            rgba(232, 204, 150, .11),
+            rgba(126, 212, 228, .06)
+        );
 
     box-shadow:
-        0 20px 48px rgba(0,0,0,.28),
-        0 0 0 1px rgba(214,183,122,.04);
+        0 22px 56px rgba(0,0,0,.32),
+        0 0 48px rgba(232, 204, 150, .10),
+        inset 0 1px 0 rgba(255,255,255,.08);
 }
 
 .card-icon {
@@ -1461,27 +1468,6 @@ html[data-page="chat"] .rm-version-footer {
     color: var(--gold-light);
 }
 
-.card {
-    position: relative;
-    overflow: hidden;
-    border: 1px solid var(--line);
-    background:
-        linear-gradient(
-            145deg,
-            rgba(0,0,0,.055),
-            rgba(0,0,0,.018)
-        ),
-        var(--card);
-    box-shadow:
-        0 12px 35px rgba(0,0,0,.18),
-        inset 0 1px 0 rgba(0,0,0,.045);
-    transition:
-        transform .2s ease,
-        border-color .2s ease,
-        box-shadow .2s ease,
-        background .2s ease;
-}
-
 .card::before {
     display: none;
     content: "";
@@ -1497,21 +1483,6 @@ html[data-page="chat"] .rm-version-footer {
     transform: translateX(-100%);
     transition: transform .55s ease;
     pointer-events: none;
-}
-
-.card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(232, 204, 150, .38);
-    background:
-        linear-gradient(
-            145deg,
-            rgba(232, 204, 150, .11),
-            rgba(126, 212, 228, .06)
-        );
-    box-shadow:
-        0 22px 56px rgba(0,0,0,.32),
-        0 0 48px rgba(232, 204, 150, .10),
-        inset 0 1px 0 rgba(255,255,255,.08);
 }
 
 .card:hover::before {
@@ -4158,10 +4129,6 @@ body {
     font-size: 15px;
 }
 
-.card:hover {
-    transform: translateY(-2px);
-}
-
 .ui-button {
     appearance: none;
     display: inline-flex;
@@ -6531,6 +6498,24 @@ mod public_entry_tests {
         );
         assert!(style.contains(".card::before {\n    display: none;"));
         assert!(style.contains(".card:hover::before {\n    transform: translateX(100%);"));
+    }
+
+    #[test]
+    fn shared_card_styles_have_one_canonical_base_and_hover_rule() {
+        let style = base_style();
+
+        for selector in [".card {", ".card:hover {"] {
+            assert_eq!(
+                style.lines().filter(|line| *line == selector).count(),
+                1,
+                "duplicate selector: {selector}"
+            );
+        }
+
+        assert!(style.contains("position: relative;\n    overflow: hidden;"));
+        assert!(style.contains("0 12px 35px rgba(0,0,0,.18),"));
+        assert!(style.contains("border-color: rgba(232, 204, 150, .38);"));
+        assert!(style.contains("0 22px 56px rgba(0,0,0,.32),"));
     }
 
     #[test]
