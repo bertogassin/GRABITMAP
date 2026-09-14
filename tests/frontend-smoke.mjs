@@ -64,6 +64,20 @@ test("shared page shell keeps version footer styles in the global UI layer", asy
   assert.doesNotMatch(template.slice(bodyStart, mainSlot), /<style>/);
 });
 
+test("owner dashboard keeps one canonical admin shell rule", async () => {
+  const dashboard = await readFile(
+    new URL("src/web/templates/admin_dashboard.rs", root),
+    "utf8",
+  );
+
+  assert.equal(dashboard.match(/^\.admin-v2 \{$/gm)?.length, 1);
+  assert.match(
+    dashboard,
+    /\.admin-v2 \{[\s\S]*?padding:\s*max\(10px,env\(safe-area-inset-top\)\)\s*0\s*calc\(100px \+ env\(safe-area-inset-bottom\)\);/,
+  );
+  assert.doesNotMatch(dashboard, /padding-bottom:50px;/);
+});
+
 test("mobile foundation hides assistive labels and clears Android system navigation", async () => {
   const css = await readFile(new URL("static/mobile-foundation.css", root), "utf8");
 
