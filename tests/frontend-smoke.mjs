@@ -187,6 +187,26 @@ test("person cards keep one canonical write action style", async () => {
   );
 });
 
+test("owner dashboard cards keep one canonical base rule each", async () => {
+  const dashboard = await readFile(
+    new URL("src/web/templates/admin_dashboard.rs", root),
+    "utf8",
+  );
+  const rulesFor = (selector) =>
+    dashboard.match(new RegExp(`^\\.${selector} \\{[\\s\\S]*?^\\}`, "gm")) ?? [];
+  const statRules = rulesFor("admin-stat");
+  const commandRules = rulesFor("admin-command-card");
+  const levelRules = rulesFor("admin-level-row");
+
+  assert.equal(statRules.length, 1);
+  assert.match(statRules[0], /display:block;[\s\S]*?position:relative;/);
+  assert.match(statRules[0], /overflow:hidden;[\s\S]*?transform \.22s ease/);
+  assert.equal(commandRules.length, 1);
+  assert.match(commandRules[0], /position:relative;[\s\S]*?overflow:hidden;/);
+  assert.equal(levelRules.length, 1);
+  assert.match(levelRules[0], /transform \.2s ease,[\s\S]*?border-color \.2s ease;/);
+});
+
 test("mobile foundation hides assistive labels and clears Android system navigation", async () => {
   const css = await readFile(new URL("static/mobile-foundation.css", root), "utf8");
 
