@@ -841,6 +841,22 @@ test("chat message actions keep one directional touch-safe geometry", async () =
   assert.match(chat, /bindMessageActionButton\(button, null\)/);
 });
 
+test("chat reply and forward bars share one touch-safe close control", async () => {
+  const [template, chat, mature] = await Promise.all([
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("static/chat-mature.css", root), "utf8"),
+  ]);
+
+  assert.match(template, /id="chat-reply-close"[\s\S]*aria-label="Отменить ответ"/);
+  assert.match(template, /id="chat-forward-close"[\s\S]*aria-label="Отменить пересылку"/);
+  assert.match(mature, /#chat-form \.chat-reply-bar,[\s\S]*#chat-form \.chat-forward-bar \{[\s\S]*grid-template-columns: 3px minmax\(0, 1fr\) 44px;/);
+  assert.match(mature, /#chat-form #chat-reply-close,[\s\S]*#chat-form #chat-forward-close \{[\s\S]*width: 44px;[\s\S]*height: 44px;[\s\S]*min-height: 44px !important;/);
+  assert.match(mature, /#chat-form #chat-reply-close:focus-visible,[\s\S]*#chat-form #chat-forward-close:focus-visible \{[\s\S]*outline: 2px solid var\(--gold-light, #e6ca91\);/);
+  assert.match(chat, /getElementById\(\s*"chat-reply-close"\s*\)\.addEventListener\("click", clearReply\)/);
+  assert.match(chat, /getElementById\(\s*"chat-forward-close"\s*\)\s*\.addEventListener\("click", clearForward\)/);
+});
+
 test("prelaunch UI removes debug hooks native popups duplicate ids and legacy symbols", async () => {
   const [common, navigation, pwa, communication, resources, chat, blocks, groupHelper, cityHelper, staticFiles] = await Promise.all([
     readFile(new URL("src/web/templates/common.rs", root), "utf8"),
