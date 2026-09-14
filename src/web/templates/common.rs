@@ -1005,10 +1005,22 @@ body::before { display: none; }
     min-height: 125px;
     padding: 18px;
 
-    border: 1px solid var(--line);
+    border: 1px solid rgba(0,0,0,.07);
     border-radius: 20px;
 
-    background: rgba(0,0,0,.025);
+    background:
+        linear-gradient(
+            145deg,
+            rgba(0,0,0,.045),
+            rgba(0,0,0,.015)
+        );
+    box-shadow:
+        0 12px 35px rgba(0,0,0,.16),
+        inset 0 1px 0 rgba(0,0,0,.04);
+    transition:
+        transform .25s ease,
+        border-color .25s ease,
+        box-shadow .25s ease;
 }
 
 .feature .icon {
@@ -1498,23 +1510,6 @@ html[data-page="chat"] .rm-version-footer {
 .card:hover .card-arrow {
     transform: translateX(4px);
     color: var(--gold-light);
-}
-
-.feature {
-    border: 1px solid rgba(0,0,0,.07);
-    background:
-        linear-gradient(
-            145deg,
-            rgba(0,0,0,.045),
-            rgba(0,0,0,.015)
-        );
-    box-shadow:
-        0 12px 35px rgba(0,0,0,.16),
-        inset 0 1px 0 rgba(0,0,0,.04);
-    transition:
-        transform .25s ease,
-        border-color .25s ease,
-        box-shadow .25s ease;
 }
 
 .feature:hover {
@@ -6417,13 +6412,21 @@ mod public_entry_tests {
     fn shared_section_and_feature_styles_have_one_canonical_rule_each() {
         let style = base_style();
 
-        for selector in [".feature .icon {", ".section-head {", ".section-caption {"] {
+        for selector in [
+            ".feature {",
+            ".feature .icon {",
+            ".section-head {",
+            ".section-caption {",
+        ] {
             assert_eq!(
                 style.lines().filter(|line| *line == selector).count(),
                 1,
                 "duplicate selector: {selector}"
             );
         }
+
+        assert!(style.contains("border: 1px solid rgba(0,0,0,.07);"));
+        assert!(style.contains("0 12px 35px rgba(0,0,0,.16),"));
     }
 
     #[test]
