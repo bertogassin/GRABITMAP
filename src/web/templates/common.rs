@@ -3730,11 +3730,16 @@ html[dir="rtl"] .rm-menu-row {
 }
 
 .rm-resource-star-btn {
-    font-size: 28px;
-    background: none;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
     border: 0;
+    background: transparent;
+    color: var(--gold);
+    font-size: 22px;
+    line-height: 1;
+    box-shadow: none;
     cursor: pointer;
-    padding: 2px;
 }
 
 .rm-resource-vote-status {
@@ -4258,18 +4263,6 @@ body {
     border: 0;
     background: linear-gradient(135deg, var(--gold-light), var(--gold));
     color: var(--on-gold);
-}
-
-.rm-resource-star-btn {
-    min-width: 44px;
-    min-height: 44px;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: var(--gold);
-    font-size: 22px;
-    line-height: 1;
-    box-shadow: none;
 }
 
 .rm-guest-hint,

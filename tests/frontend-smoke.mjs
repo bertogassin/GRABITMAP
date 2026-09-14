@@ -110,6 +110,22 @@ test("authentication shell keeps canonical card and title rules", async () => {
   assert.match(titleRules[0], /letter-spacing: -\.03em;/);
 });
 
+test("resource rating keeps one canonical star button rule", async () => {
+  const template = await readFile(
+    new URL("src/web/templates/common.rs", root),
+    "utf8",
+  );
+  const starRules =
+    template.match(/^\.rm-resource-star-btn \{[\s\S]*?^\}/gm) ?? [];
+
+  assert.equal(starRules.length, 1);
+  assert.match(starRules[0], /min-width: 44px;[\s\S]*?min-height: 44px;/);
+  assert.match(starRules[0], /background: transparent;/);
+  assert.match(starRules[0], /color: var\(--gold\);/);
+  assert.match(starRules[0], /font-size: 22px;/);
+  assert.doesNotMatch(starRules[0], /font-size: 28px;|padding: 2px;/);
+});
+
 test("mobile foundation hides assistive labels and clears Android system navigation", async () => {
   const css = await readFile(new URL("static/mobile-foundation.css", root), "utf8");
 
