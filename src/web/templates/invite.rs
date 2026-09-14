@@ -68,10 +68,7 @@ pub fn render_invite_landing(name: &str, public_id: &str, to: &str) -> String {
 
     page_document(
         &format!("{title} · GRABIT"),
-        r#"<style>
-.rm-invite-actions{display:flex;flex-wrap:wrap;gap:8px}
-.rm-invite-card{padding:16px;display:grid;gap:10px}
-</style>"#,
+        "",
         "",
         &body,
         &bottom_nav("menu"),
@@ -90,6 +87,11 @@ mod tests {
         assert!(html.contains("/login?next="));
         assert!(html.contains("/register?next="));
         assert!(html.contains("Анна"));
+        assert_eq!(html.matches("<style").count(), 1);
+        assert!(html.contains(".rm-invite-actions {"));
+        assert!(html.contains(".rm-invite-card {"));
+        assert!(!html.contains(".rm-invite-actions{"));
+        assert!(!html.contains(".rm-invite-card{"));
         let share = invite_share_block("abc123");
         assert!(share.contains("/app/join/abc123?to=chat"));
         assert!(share.contains("/app/join/abc123?to=work"));
