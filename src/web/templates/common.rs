@@ -1085,9 +1085,6 @@ body::before { display: none; }
 
 .nav-item .icon {
     pointer-events: none;
-}
-
-.nav-item .icon {
     width: 22px;
     height: 22px;
 }
@@ -1617,14 +1614,6 @@ html[data-page="chat"] .rm-version-footer {
 
 .nav-item:hover {
     transform: none;
-}
-
-.nav-item.active {
-    color: var(--gold);
-}
-
-.nav-item.active .icon {
-    filter: none;
 }
 
 .section-head {
@@ -6522,6 +6511,27 @@ mod public_entry_tests {
         assert!(!body.contains("<style>"));
         assert!(page.contains("margin: 18px auto 86px;"));
         assert!(page.contains("opacity: .82;"));
+    }
+
+    #[test]
+    fn bottom_navigation_styles_have_one_canonical_rule_per_state() {
+        let style = base_style();
+
+        for selector in [".nav-item .icon {", ".nav-item.active .icon {"] {
+            assert_eq!(
+                style.lines().filter(|line| *line == selector).count(),
+                1,
+                "duplicate selector: {selector}"
+            );
+        }
+
+        assert_eq!(
+            style
+                .matches(".nav-item.active {\n    color: var(--gold);\n}")
+                .count(),
+            1
+        );
+        assert!(style.contains("pointer-events: none;\n    width: 22px;\n    height: 22px;"));
     }
 
     #[test]
