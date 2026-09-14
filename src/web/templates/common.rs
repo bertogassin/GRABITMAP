@@ -597,10 +597,10 @@ body::before { display: none; }
     position: relative;
     overflow: hidden;
 
-    padding: 30px;
+    padding: 26px 22px;
 
     border: 1px solid var(--line);
-    border-radius: 30px;
+    border-radius: 24px;
 
     background:
         radial-gradient(
@@ -616,8 +616,8 @@ body::before { display: none; }
         var(--card);
 
     box-shadow:
-        0 30px 80px rgba(0,0,0,.32),
-        inset 0 1px 0 rgba(0,0,0,.06);
+        0 18px 48px rgba(0, 0, 0, .22),
+        inset 0 1px 0 rgba(255, 255, 255, .04);
 }
 
 .hero::after {
@@ -659,22 +659,23 @@ body::before { display: none; }
 }
 
 .hero h1 {
-    margin: 14px 0 10px;
+    margin: 0 0 10px 0;
 
-    font-size: clamp(32px, 7vw, 56px);
-    line-height: 1.02;
-    letter-spacing: -.045em;
-    text-shadow: 0 0 48px rgba(232, 204, 150, .14);
+    font-size: clamp(26px, 6vw, 38px);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -.03em;
+    text-shadow: none;
 }
 
 .hero p {
-    max-width: 620px;
+    max-width: 560px;
 
     margin: 0;
 
     color: var(--muted);
     font-size: 15px;
-    line-height: 1.7;
+    line-height: 1.6;
 }
 
 /* -----------------------------------------------------------
@@ -1374,33 +1375,6 @@ html[data-page="chat"] .rm-version-footer {
 .brand:hover {
     transform: translateY(-1px);
     opacity: .92;
-}
-
-.hero {
-    position: relative;
-    overflow: hidden;
-    border: 1px solid var(--line);
-    border-radius: 28px;
-    padding: 36px 28px;
-    box-shadow:
-        0 24px 70px rgba(0,0,0,.28),
-        inset 0 1px 0 rgba(0,0,0,.05);
-}
-
-.hero h1 {
-    font-size: clamp(28px, 6.4vw, 40px);
-    font-weight: 800;
-    letter-spacing: -.03em;
-    line-height: 1.08;
-    margin: 0 0 10px 0;
-}
-
-.hero p {
-    font-size: 16px;
-    line-height: 1.6;
-    color: var(--muted);
-    margin: 0 0 24px 0;
-    max-width: 560px;
 }
 
 .hero .eyebrow {
@@ -4106,24 +4080,6 @@ body {
     padding-top: 22px;
 }
 
-.hero {
-    padding: 26px 22px;
-    border-radius: 24px;
-    box-shadow:
-        0 18px 48px rgba(0, 0, 0, .22),
-        inset 0 1px 0 rgba(255, 255, 255, .04);
-}
-
-.hero h1 {
-    font-size: clamp(26px, 6vw, 38px);
-    text-shadow: none;
-}
-
-.hero p {
-    margin-bottom: 0;
-    font-size: 15px;
-}
-
 .ui-button {
     appearance: none;
     display: inline-flex;
@@ -6486,6 +6442,24 @@ mod public_entry_tests {
         assert!(style.contains("right: -100px;\n    bottom: -160px;\n    left: -100px;"));
         assert!(style.contains("background: rgba(232, 204, 150, .18);"));
         assert!(style.contains("filter: blur(52px);\n    pointer-events: none;"));
+    }
+
+    #[test]
+    fn shared_hero_styles_have_one_canonical_base_rule_each() {
+        let style = base_style();
+
+        for selector in [".hero {", ".hero h1 {", ".hero p {"] {
+            assert_eq!(
+                style.lines().filter(|line| *line == selector).count(),
+                1,
+                "duplicate selector: {selector}"
+            );
+        }
+
+        assert!(style.contains("padding: 26px 22px;"));
+        assert!(style.contains("font-size: clamp(26px, 6vw, 38px);"));
+        assert!(style.contains("max-width: 560px;"));
+        assert!(style.contains("line-height: 1.6;"));
     }
 
     #[test]
