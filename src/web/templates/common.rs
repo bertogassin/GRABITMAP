@@ -1644,8 +1644,9 @@ html[data-page="chat"] .rm-version-footer {
     font-size: 14px;
 }
 
-.rm-auth-status.is-error {
-    color: #ef6b72;
+.rm-auth-status.is-error,
+.ui-status.is-error {
+    color: var(--danger);
 }
 
 .rm-auth-footer {
@@ -6452,6 +6453,16 @@ mod public_entry_tests {
         assert!(style.contains(".rm-empty-action {\n    border: 0;"));
         assert!(style.contains("text-decoration: none;"));
         assert!(action.contains("class=\"rm-empty-action ui-button\""));
+    }
+
+    #[test]
+    fn shared_error_status_uses_theme_danger_token() {
+        let style = base_style();
+
+        assert!(style.contains(
+            ".rm-auth-status.is-error,\n.ui-status.is-error {\n    color: var(--danger);"
+        ));
+        assert!(!style.contains("color: #ef6b72;"));
     }
 
     #[test]
