@@ -1598,20 +1598,8 @@ html[data-page="chat"] .rm-version-footer {
         0 0 30px rgba(101,184,201,.045);
 }
 
-.feature .icon {
-    color: var(--gold-light);
-}
-
 .nav-item:hover {
     transform: none;
-}
-
-.section-head {
-    border-bottom: 1px solid var(--line);
-}
-
-.section-caption {
-    color: var(--muted);
 }
 
 
@@ -6504,6 +6492,19 @@ mod public_entry_tests {
             .expect("nav item rule end");
         assert!(nav_item.contains("position: relative;"));
         assert!(nav_item.contains("min-height: 56px;"));
+    }
+
+    #[test]
+    fn shared_section_and_feature_styles_have_one_canonical_rule_each() {
+        let style = base_style();
+
+        for selector in [".feature .icon {", ".section-head {", ".section-caption {"] {
+            assert_eq!(
+                style.lines().filter(|line| *line == selector).count(),
+                1,
+                "duplicate selector: {selector}"
+            );
+        }
     }
 
     #[test]
