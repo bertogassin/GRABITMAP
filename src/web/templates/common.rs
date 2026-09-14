@@ -1749,18 +1749,6 @@ a.feature.rm-feature-add {
     width: 100%;
 }
 
-.rm-empty-action {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 44px;
-    padding: 0 16px;
-    border-radius: 14px;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 850;
-}
-
 .rm-guest-hint {
     margin: 14px 0 0;
     padding: 12px 14px;
@@ -4086,11 +4074,17 @@ html[dir="rtl"] .rm-menu-row {
 
 .rm-auth-button,
 .rm-profile-save-btn,
-.rm-promo-submit,
+.rm-promo-submit {
+    border: 0;
+    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    color: var(--on-gold);
+}
+
 .rm-empty-action {
     border: 0;
     background: linear-gradient(135deg, var(--gold-light), var(--gold));
     color: var(--on-gold);
+    text-decoration: none;
 }
 
 .rm-version-footer {
@@ -6441,6 +6435,23 @@ mod public_entry_tests {
         assert!(
             style.contains(".rm-settings-sound-btn {\n    border-bottom: 0;\n    margin-top: 0;")
         );
+    }
+
+    #[test]
+    fn empty_action_uses_shared_button_and_one_canonical_override() {
+        let style = base_style();
+        let action = empty_state_action("/app/search", "Найти");
+
+        assert_eq!(
+            style
+                .lines()
+                .filter(|line| *line == ".rm-empty-action {")
+                .count(),
+            1
+        );
+        assert!(style.contains(".rm-empty-action {\n    border: 0;"));
+        assert!(style.contains("text-decoration: none;"));
+        assert!(action.contains("class=\"rm-empty-action ui-button\""));
     }
 
     #[test]
