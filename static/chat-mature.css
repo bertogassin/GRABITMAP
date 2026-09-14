@@ -90,10 +90,10 @@ html[data-page="chat"] .chat-message-row .chat-message-more {
     top: 7px; right: auto; left: auto; inset-inline-end: 7px;
     width: 36px; height: 36px;
     display: grid; place-items: center;
-    background: rgba(8, 11, 16, .46); opacity: .84;
-    border: 1px solid rgba(255, 255, 255, .12);
-    color: #fff;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, .26);
+    background: color-mix(in srgb, var(--surface) 82%, transparent); opacity: .84;
+    border: 1px solid color-mix(in srgb, var(--text) 16%, transparent);
+    color: var(--text);
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--bg) 32%, transparent);
     -webkit-appearance: none;
     touch-action: manipulation;
     pointer-events: auto;
@@ -123,6 +123,7 @@ html[data-page="chat"] .chat-message-row[data-attachment-kind="video"] .chat-mes
     opacity: 1;
     background: rgba(8, 11, 16, .72);
     border-color: rgba(255, 255, 255, .18);
+    color: #fff;
 }
 
 .chat-message-row[data-attachment-kind="video"] .chat-message-meta {

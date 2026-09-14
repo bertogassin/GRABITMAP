@@ -920,6 +920,14 @@ test("chat thread follows the shared light and dark background token", async () 
   assert.doesNotMatch(mature, /#chat-messages\.chat-messages-panel \{[^}]*#101722/);
 });
 
+test("chat message action follows theme tokens and stays legible on video", async () => {
+  const mature = await readFile(new URL("static/chat-mature.css", root), "utf8");
+
+  assert.match(mature, /\.chat-message-row \.chat-message-more \{[^}]*background: color-mix\(in srgb, var\(--surface\) 82%, transparent\);[^}]*border: 1px solid color-mix\(in srgb, var\(--text\) 16%, transparent\);[^}]*color: var\(--text\);/);
+  assert.match(mature, /\.chat-message-row\[data-attachment-kind="video"\] \.chat-message-more \{[^}]*background: rgba\(8, 11, 16, \.72\);[^}]*color: #fff;/);
+  assert.doesNotMatch(mature, /\.chat-message-row \.chat-message-more \{[^}]*background: rgba\(8, 11, 16, \.46\)/);
+});
+
 test("prelaunch UI removes debug hooks native popups duplicate ids and legacy symbols", async () => {
   const [common, navigation, pwa, communication, resources, chat, blocks, groupHelper, cityHelper, staticFiles] = await Promise.all([
     readFile(new URL("src/web/templates/common.rs", root), "utf8"),
