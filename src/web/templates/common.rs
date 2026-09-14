@@ -4175,9 +4175,10 @@ html[dir="rtl"] .rm-menu-row {
     justify-content: center;
     margin: 0 14px 14px;
     min-height: 40px;
+    border: 0;
     border-radius: 12px;
-    background: rgba(232, 204, 150, .14);
-    color: var(--gold-light);
+    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    color: var(--on-gold);
     font-size: 13px;
     font-weight: 800;
     text-decoration: none;
@@ -4258,8 +4259,7 @@ body {
 .rm-auth-button,
 .rm-profile-save-btn,
 .rm-promo-submit,
-.rm-empty-action,
-.rm-person-write {
+.rm-empty-action {
     border: 0;
     background: linear-gradient(135deg, var(--gold-light), var(--gold));
     color: var(--on-gold);

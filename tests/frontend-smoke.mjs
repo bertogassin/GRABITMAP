@@ -166,6 +166,27 @@ test("notification toolbar keeps one canonical read-all action style", async () 
   );
 });
 
+test("person cards keep one canonical write action style", async () => {
+  const template = await readFile(
+    new URL("src/web/templates/common.rs", root),
+    "utf8",
+  );
+  const writeRules = template.match(/^\.rm-person-write \{[\s\S]*?^\}/gm) ?? [];
+
+  assert.equal(writeRules.length, 1);
+  assert.match(writeRules[0], /min-height: 40px;/);
+  assert.match(writeRules[0], /border: 0;/);
+  assert.match(writeRules[0], /color: var\(--on-gold\);/);
+  assert.match(
+    writeRules[0],
+    /background: linear-gradient\(135deg, var\(--gold-light\), var\(--gold\)\);/,
+  );
+  assert.match(
+    template,
+    /\.rm-person-write:hover \{\s*background: rgba\(232, 204, 150, \.22\);\s*\}/,
+  );
+});
+
 test("mobile foundation hides assistive labels and clears Android system navigation", async () => {
   const css = await readFile(new URL("static/mobile-foundation.css", root), "utf8");
 
