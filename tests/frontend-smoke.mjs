@@ -872,6 +872,23 @@ test("chat action dialogs share touch and keyboard interaction states", async ()
   assert.match(mature, /\.chat-sheet-actions > button:focus-visible,[\s\S]*\.chat-sheet-reactions button:focus-visible \{[\s\S]*outline: 2px solid var\(--gold-light, #e6ca91\);/);
 });
 
+test("chat overlays share explicit dark and light theme tokens", async () => {
+  const [css, mature] = await Promise.all([
+    readFile(new URL("static/chat-v2.css", root), "utf8"),
+    readFile(new URL("static/chat-mature.css", root), "utf8"),
+  ]);
+
+  assert.match(css, /html\[data-page="chat"\] \{[\s\S]*--chat-overlay-backdrop:[\s\S]*--chat-overlay-panel:[\s\S]*--chat-overlay-control-border:/);
+  assert.match(css, /html\.light-theme\[data-page="chat"\],[\s\S]*html\[data-page="chat"\] body\.light-theme \{[\s\S]*--chat-overlay-backdrop:[\s\S]*--chat-overlay-panel:[\s\S]*--chat-overlay-shadow:/);
+  assert.match(css, /\.chat-sheet-backdrop \{[\s\S]*background:var\(--chat-overlay-backdrop\);/);
+  assert.match(css, /\.chat-sheet-panel,[\s\S]*\.chat-editor-panel \{[\s\S]*border:1px solid var\(--chat-overlay-border\);[\s\S]*var\(--chat-overlay-panel\);[\s\S]*box-shadow:var\(--chat-overlay-shadow\);/);
+  assert.match(css, /\.chat-sheet-preview \{[\s\S]*border:1px solid var\(--chat-overlay-control-border\);[\s\S]*background:var\(--chat-overlay-control\);/);
+  assert.match(css, /\.chat-forward-target \{[\s\S]*border:1px solid var\(--chat-overlay-control-border\);[\s\S]*background:var\(--chat-overlay-control\);/);
+  assert.match(css, /\.chat-sheet-reactions button \{[\s\S]*border: 1px solid var\(--chat-overlay-control-border\);[\s\S]*background: var\(--chat-overlay-control\);/);
+  assert.match(mature, /\.chat-attachment-backdrop \{[\s\S]*background: var\(--chat-overlay-backdrop\);/);
+  assert.match(mature, /\.chat-attachment-sheet \{[\s\S]*border: 1px solid var\(--chat-overlay-border\);[\s\S]*var\(--chat-overlay-panel\);[\s\S]*box-shadow: var\(--chat-overlay-shadow\);/);
+});
+
 test("prelaunch UI removes debug hooks native popups duplicate ids and legacy symbols", async () => {
   const [common, navigation, pwa, communication, resources, chat, blocks, groupHelper, cityHelper, staticFiles] = await Promise.all([
     readFile(new URL("src/web/templates/common.rs", root), "utf8"),
