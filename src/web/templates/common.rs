@@ -5024,6 +5024,13 @@ pub(crate) fn empty_state_action(href: &str, label: &str) -> String {
     )
 }
 
+pub(crate) fn error_status_html(message: &str) -> String {
+    format!(
+        r#"<p class="ui-status is-error" role="alert">{}</p>"#,
+        escape_html(message)
+    )
+}
+
 pub(crate) fn empty_state_card(title: &str, description_html: &str) -> String {
     empty_state_card_with_actions(title, description_html, "")
 }
@@ -6463,6 +6470,16 @@ mod public_entry_tests {
             ".rm-auth-status.is-error,\n.ui-status.is-error {\n    color: var(--danger);"
         ));
         assert!(!style.contains("color: #ef6b72;"));
+    }
+
+    #[test]
+    fn error_status_html_is_accessible_and_escapes_text() {
+        let html = error_status_html("<Ошибка>");
+
+        assert_eq!(
+            html,
+            r#"<p class="ui-status is-error" role="alert">&lt;Ошибка&gt;</p>"#
+        );
     }
 
     #[test]
