@@ -1,8 +1,8 @@
 use super::common::{
     back_hero, back_link, bottom_nav, empty_state_action, empty_state_card_with_actions,
-    escape_html, guest_locked_section, icon, is_generic_profession_key, kind_chip,
-    my_resource_moderation_badge, navigation_card, page_document, page_shell, premium_badge_html,
-    profession_label, resource_card_link_class, resource_detail_section_class,
+    error_status_html, escape_html, guest_locked_section, icon, is_generic_profession_key,
+    kind_chip, my_resource_moderation_badge, navigation_card, page_document, page_shell,
+    premium_badge_html, profession_label, resource_card_link_class, resource_detail_section_class,
     resource_listing_label, ru_count, search_people_cards, section_head, share_button, topbar,
     verified_badge_html,
 };
@@ -2092,12 +2092,7 @@ pub fn render_add_resource(
 
     let error_html = error
         .filter(|value| !value.trim().is_empty())
-        .map(|value| {
-            format!(
-                r#"<p class="ui-status is-error" role="alert">{}</p>"#,
-                escape_html(value)
-            )
-        })
+        .map(error_status_html)
         .unwrap_or_default();
     let title_value = draft.as_ref().map(|value| value.title).unwrap_or("");
     let description_value = draft.as_ref().map(|value| value.description).unwrap_or("");

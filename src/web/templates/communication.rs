@@ -1,7 +1,7 @@
 use super::common::{
     back_hero, back_link, bottom_nav, bottom_nav_with_badge, empty_state_action, empty_state_card,
-    empty_state_card_with_actions, escape_html, guest_locked_section, icon, page_document,
-    page_shell, ru_count, section_head, simple_hero, static_asset, topbar,
+    empty_state_card_with_actions, error_status_html, escape_html, guest_locked_section, icon,
+    page_document, page_shell, ru_count, section_head, simple_hero, static_asset, topbar,
 };
 
 // ============================================================
@@ -1297,10 +1297,7 @@ pub fn render_official_groups(params: OfficialGroupsPage<'_>) -> String {
     let error_html = if params.error.is_empty() {
         String::new()
     } else {
-        format!(
-            r#"<p class="ui-status is-error">{}</p>"#,
-            escape_html(params.error)
-        )
+        error_status_html(params.error)
     };
     let group_card = if params.group_id > 0 && params.is_member {
         format!(
@@ -1468,10 +1465,7 @@ pub fn render_new_group(authenticated: bool, partners: Vec<(i64, String)>, error
         let error_html = if error.is_empty() {
             String::new()
         } else {
-            format!(
-                r#"<p class="ui-status is-error">{}</p>"#,
-                escape_html(error)
-            )
+            error_status_html(error)
         };
         format!(
             r#"<form method="post" action="/app/groups" class="card rm-group-create" id="rm-group-create">
