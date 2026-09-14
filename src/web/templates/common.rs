@@ -1047,13 +1047,14 @@ body::before { display: none; }
 
 .nav-item {
     display: flex;
+    position: relative;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 
     gap: 4px;
 
-    min-height: 52px;
+    min-height: 56px;
 
     color: var(--muted);
     text-decoration: none;
@@ -1105,10 +1106,6 @@ body::before { display: none; }
     font-size: 10px;
     font-weight: 800;
     box-sizing: border-box;
-}
-
-.nav-item {
-    position: relative;
 }
 
 .nav-item.active .icon {
@@ -4181,10 +4178,6 @@ html[dir="rtl"] .rm-menu-row {
     background: rgba(232, 204, 150, .22);
 }
 
-.nav-item {
-    min-height: 56px;
-}
-
 .chat-dialog-card {
     border-radius: 18px;
     content-visibility: auto;
@@ -6484,6 +6477,7 @@ mod public_entry_tests {
 
         for selector in [
             ".bottom-nav {",
+            ".nav-item {",
             ".nav-item .icon {",
             ".nav-item.active .icon {",
         ] {
@@ -6503,6 +6497,13 @@ mod public_entry_tests {
         assert!(style.contains("pointer-events: none;\n    width: 22px;\n    height: 22px;"));
         let safe_area_padding = "padding: 6px 8px max(8px, env(safe-area-inset-bottom));";
         assert!(style.contains(safe_area_padding));
+
+        let (_, nav_item_and_rest) = style.split_once(".nav-item {").expect("nav item rule");
+        let (nav_item, _) = nav_item_and_rest
+            .split_once('}')
+            .expect("nav item rule end");
+        assert!(nav_item.contains("position: relative;"));
+        assert!(nav_item.contains("min-height: 56px;"));
     }
 
     #[test]
