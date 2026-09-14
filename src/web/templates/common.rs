@@ -1031,7 +1031,7 @@ body::before { display: none; }
     display: grid;
     grid-template-columns: repeat(4, 1fr);
 
-    padding: 6px 8px calc(8px + env(safe-area-inset-bottom, 0px));
+    padding: 6px 8px max(8px, env(safe-area-inset-bottom));
 
     border: 0;
     border-top: 1px solid var(--line);
@@ -1603,13 +1603,6 @@ html[data-page="chat"] .rm-version-footer {
 
 .feature .icon {
     color: var(--gold-light);
-}
-
-.bottom-nav {
-    border-top: 1px solid var(--line);
-    background: color-mix(in srgb, var(--bg) 88%, transparent);
-    box-shadow: 0 -8px 24px rgba(0,0,0,.12);
-    backdrop-filter: blur(20px);
 }
 
 .nav-item:hover {
@@ -4188,10 +4181,6 @@ html[dir="rtl"] .rm-menu-row {
     background: rgba(232, 204, 150, .22);
 }
 
-.bottom-nav {
-    padding-bottom: max(8px, env(safe-area-inset-bottom));
-}
-
 .nav-item {
     min-height: 56px;
 }
@@ -6493,7 +6482,11 @@ mod public_entry_tests {
     fn bottom_navigation_styles_have_one_canonical_rule_per_state() {
         let style = base_style();
 
-        for selector in [".nav-item .icon {", ".nav-item.active .icon {"] {
+        for selector in [
+            ".bottom-nav {",
+            ".nav-item .icon {",
+            ".nav-item.active .icon {",
+        ] {
             assert_eq!(
                 style.lines().filter(|line| *line == selector).count(),
                 1,
@@ -6508,6 +6501,8 @@ mod public_entry_tests {
             1
         );
         assert!(style.contains("pointer-events: none;\n    width: 22px;\n    height: 22px;"));
+        let safe_area_padding = "padding: 6px 8px max(8px, env(safe-area-inset-bottom));";
+        assert!(style.contains(safe_area_padding));
     }
 
     #[test]
