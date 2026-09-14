@@ -355,8 +355,7 @@ body.light-theme .card {
 html.light-theme .card:hover,
 body.light-theme .card:hover {
     box-shadow:
-        0 16px 36px rgba(26, 29, 33, .10),
-        0 0 28px rgba(165, 118, 31, .08),
+        0 12px 28px rgba(26, 29, 33, .08),
         inset 0 1px 0 rgba(255, 255, 255, .95);
 }
 
@@ -4140,13 +4139,6 @@ body {
     text-underline-offset: 2px;
 }
 
-html.light-theme .card:hover,
-body.light-theme .card:hover {
-    box-shadow:
-        0 12px 28px rgba(26, 29, 33, .08),
-        inset 0 1px 0 rgba(255, 255, 255, .95);
-}
-
 html.light-theme .rm-menu-row-icon,
 body.light-theme .rm-menu-row-icon {
     background: rgba(165, 118, 31, .10);
@@ -6414,6 +6406,16 @@ mod public_entry_tests {
         assert_eq!(style.matches(selector).count(), 1);
         assert!(style.contains("box-shadow: 0 6px 16px rgba(26, 29, 33, .12);"));
         assert!(style.contains("filter: drop-shadow(0 5px 10px rgba(26, 29, 33, .16));"));
+    }
+
+    #[test]
+    fn light_theme_card_hover_has_one_canonical_rule() {
+        let style = base_style();
+        let selector = "html.light-theme .card:hover,\nbody.light-theme .card:hover {";
+
+        assert_eq!(style.matches(selector).count(), 1);
+        assert!(style.contains("0 12px 28px rgba(26, 29, 33, .08),"));
+        assert!(style.contains("inset 0 1px 0 rgba(255, 255, 255, .95);"));
     }
 
     #[test]
