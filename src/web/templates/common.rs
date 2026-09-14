@@ -1663,14 +1663,15 @@ html[data-page="chat"] .rm-version-footer {
 
 .rm-auth-card {
     display: block;
-    padding: 26px 22px;
-    border-color: rgba(214, 183, 122, .24);
+    padding: 28px 22px;
+    border-color: rgba(232, 204, 150, .22);
 }
 
 .rm-auth-title {
     margin: 0 0 10px;
     color: var(--text);
-    font-size: clamp(30px, 8vw, 42px);
+    font-size: clamp(26px, 7vw, 36px);
+    letter-spacing: -.03em;
 }
 
 .rm-auth-subtitle {
@@ -4269,16 +4270,6 @@ body {
     font-size: 22px;
     line-height: 1;
     box-shadow: none;
-}
-
-.rm-auth-card {
-    padding: 28px 22px;
-    border-color: rgba(232, 204, 150, .22);
-}
-
-.rm-auth-title {
-    font-size: clamp(26px, 7vw, 36px);
-    letter-spacing: -.03em;
 }
 
 .rm-guest-hint,

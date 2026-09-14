@@ -94,6 +94,22 @@ test("empty states keep one canonical action layout", async () => {
   assert.doesNotMatch(actionRules[0], /gap: 10px;|margin-top: 18px;/);
 });
 
+test("authentication shell keeps canonical card and title rules", async () => {
+  const template = await readFile(
+    new URL("src/web/templates/common.rs", root),
+    "utf8",
+  );
+  const cardRules = template.match(/^\.rm-auth-card \{[\s\S]*?^\}/gm) ?? [];
+  const titleRules = template.match(/^\.rm-auth-title \{[\s\S]*?^\}/gm) ?? [];
+
+  assert.equal(cardRules.length, 1);
+  assert.match(cardRules[0], /padding: 28px 22px;/);
+  assert.match(cardRules[0], /border-color: rgba\(232, 204, 150, \.22\);/);
+  assert.equal(titleRules.length, 1);
+  assert.match(titleRules[0], /font-size: clamp\(26px, 7vw, 36px\);/);
+  assert.match(titleRules[0], /letter-spacing: -\.03em;/);
+});
+
 test("mobile foundation hides assistive labels and clears Android system navigation", async () => {
   const css = await readFile(new URL("static/mobile-foundation.css", root), "utf8");
 
