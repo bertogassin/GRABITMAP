@@ -258,7 +258,7 @@ pub fn render_geo_root(
     <div class="eyebrow">{logo} GRABIT</div>
     <h1>{map_global_title}</h1>
     <p>{map_global_lead}</p>
-    <button id="resursmap-install-pwa"
+    <button data-resursmap-install-pwa
             type="button"
             class="ui-button rm-pwa-home-btn">
         {map_download_app}
@@ -329,8 +329,9 @@ pub fn render_geo_continent(
         .collect::<Vec<_>>()
         .join("");
     let country_search = format!(
-        r#"<div class="search rm-catalog-search"><span aria-hidden="true">{icon}</span><input id="rm-map-country-search" type="search" autocomplete="off" placeholder="{placeholder}"><button id="rm-map-country-clear" type="button" aria-label="{clear}">×</button></div>"#,
+        r#"<div class="search rm-catalog-search"><span aria-hidden="true">{icon}</span><input id="rm-map-country-search" type="search" autocomplete="off" placeholder="{placeholder}"><button id="rm-map-country-clear" type="button" aria-label="{clear}">{clear_icon}</button></div>"#,
         icon = icon("search"),
+        clear_icon = icon("x"),
         placeholder = crate::i18n::t("map_find_country"),
         clear = crate::i18n::t("map_clear_search"),
     );
@@ -391,8 +392,9 @@ pub fn render_geo_country(
         String::new()
     };
     let city_search = format!(
-        r#"<div class="search rm-catalog-search"><span aria-hidden="true">{icon}</span><input id="rm-map-city-search" type="search" autocomplete="off" placeholder="{placeholder}" data-country-id="{country_id}"><button id="rm-map-city-clear" type="button" aria-label="{clear}">×</button></div>"#,
+        r#"<div class="search rm-catalog-search"><span aria-hidden="true">{icon}</span><input id="rm-map-city-search" type="search" autocomplete="off" placeholder="{placeholder}" data-country-id="{country_id}"><button id="rm-map-city-clear" type="button" aria-label="{clear}">{clear_icon}</button></div>"#,
         icon = icon("search"),
+        clear_icon = icon("x"),
         placeholder = crate::i18n::t("map_find_city"),
         clear = crate::i18n::t("map_clear_search"),
     );
@@ -462,8 +464,9 @@ pub fn render_geo_city(
         .collect::<Vec<_>>()
         .join("");
     let catalog_search = format!(
-        r#"<div class="search rm-catalog-search"><span aria-hidden="true">{icon}</span><input id="rm-city-catalog-search" type="search" autocomplete="off" placeholder="{placeholder}" data-city-id="{city_id}"><button id="rm-city-catalog-clear" type="button" aria-label="{clear}">×</button></div>"#,
+        r#"<div class="search rm-catalog-search"><span aria-hidden="true">{icon}</span><input id="rm-city-catalog-search" type="search" autocomplete="off" placeholder="{placeholder}" data-city-id="{city_id}"><button id="rm-city-catalog-clear" type="button" aria-label="{clear}">{clear_icon}</button></div>"#,
         icon = icon("search"),
+        clear_icon = icon("x"),
         placeholder = crate::i18n::t("map_find_in_city"),
         clear = crate::i18n::t("map_clear_search"),
     );
@@ -921,7 +924,7 @@ pub fn render_continents(
 
     <p>{map_home_lead}</p>
 
-    <button id="resursmap-install-pwa"
+    <button data-resursmap-install-pwa
             type="button"
             class="ui-button rm-pwa-home-btn">
         {map_download_app}
@@ -940,7 +943,7 @@ pub fn render_continents(
         </div>
 
         <div class="rm-home-explorer-field">
-            <span class="rm-home-explorer-icon" aria-hidden="true">⌕</span>
+            <span class="rm-home-explorer-icon" aria-hidden="true">{search_icon}</span>
             <input id="rm-home-explorer-input"
                    class="rm-home-explorer-input"
                    type="search"
@@ -954,7 +957,7 @@ pub fn render_continents(
                     class="rm-home-explorer-clear"
                     type="button"
                     hidden
-                    aria-label="{common_clear}">×</button>
+                    aria-label="{common_clear}">{clear_icon}</button>
         </div>
 
         <div id="rm-home-explorer-results"
@@ -984,6 +987,8 @@ pub fn render_continents(
         map_cities_professions = crate::i18n::t("map_cities_professions"),
         map_home_lead = crate::i18n::t("map_home_lead"),
         map_download_app = crate::i18n::t("map_download_app"),
+        search_icon = icon("search"),
+        clear_icon = icon("x"),
         search_title = crate::i18n::t("search_title"),
         map_explorer_copy = crate::i18n::t("map_explorer_copy"),
         map_explorer_placeholder = crate::i18n::t("map_explorer_placeholder"),
@@ -1699,7 +1704,7 @@ pub fn render_menu(invite_public_id: &str, admin_level: i64) -> String {
                 </div>
             </div>
 
-            <button id="resursmap-install-pwa"
+            <button data-resursmap-install-pwa
                     type="button"
                     class="ui-button rm-pwa-install-btn">
                 {menu_download}

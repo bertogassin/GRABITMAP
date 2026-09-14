@@ -28,17 +28,30 @@
     }
 
     function showManualInstallHint() {
+        var message = isIOSDevice()
+            ? "Safari → Поделиться → На экран Домой"
+            : "Откройте меню браузера ⋮ и выберите «Установить приложение»";
         var hint = document.getElementById("resursmap-install-hint");
         if (hint) {
-            hint.textContent = isIOSDevice()
-                ? "Safari → Поделиться → На экран Домой"
-                : "Откройте меню браузера ⋮ и выберите «Установить приложение»";
+            hint.textContent = message;
             hint.setAttribute("role", "status");
         }
 
-        document.querySelectorAll("#resursmap-install-pwa").forEach(function (button) {
-            button.textContent = "Открыть меню браузера";
-            button.disabled = true;
+        document.querySelectorAll("[data-resursmap-install-pwa]").forEach(function (button) {
+            button.textContent = "Как установить";
+            button.disabled = false;
+            var localHint = button.parentElement &&
+                button.parentElement.querySelector("[data-resursmap-install-help]");
+            if (!hint && !localHint && button.parentElement) {
+                localHint = document.createElement("p");
+                localHint.dataset.resursmapInstallHelp = "1";
+                localHint.className = "card-meta rm-pwa-hint";
+                localHint.setAttribute("role", "status");
+                button.insertAdjacentElement("afterend", localHint);
+            }
+            if (localHint) {
+                localHint.textContent = message;
+            }
         });
     }
 
@@ -90,7 +103,7 @@
 
     window.addEventListener("appinstalled", function () {
         deferredPrompt = null;
-        document.querySelectorAll("#resursmap-install-pwa").forEach(function (button) {
+        document.querySelectorAll("[data-resursmap-install-pwa]").forEach(function (button) {
             button.textContent = "Уже скачано";
             button.disabled = true;
         });
@@ -101,7 +114,7 @@
     });
 
     ready(function () {
-        var buttons = document.querySelectorAll("#resursmap-install-pwa");
+        var buttons = document.querySelectorAll("[data-resursmap-install-pwa]");
         var panel = document.getElementById("resursmap-install-panel");
 
         if (isStandaloneMode()) {

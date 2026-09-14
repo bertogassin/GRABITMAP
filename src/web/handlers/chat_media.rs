@@ -1402,15 +1402,15 @@ pub async fn api_chat_send_voice(
             return json_error(StatusCode::INTERNAL_SERVER_ERROR, "media_store_failed");
         }
     }
-    match fs::File::create(&absolute) {
-        Ok(mut file) => {
-            use std::io::Write;
-            if file.write_all(&file_bytes).is_err() {
-                let _ = fs::remove_file(&absolute);
-                return json_error(StatusCode::INTERNAL_SERVER_ERROR, "media_store_failed");
-            }
-        }
-        Err(_) => return json_error(StatusCode::INTERNAL_SERVER_ERROR, "media_store_failed"),
+    // Voice notes previously used a blocking std::fs write directly on the
+    // async handler task, unlike the quarantine-based image/video/document
+    // path (see quarantine_attachment_field), which stalls the Tokio worker
+    // thread for the duration of the disk write and can delay WebSocket
+    // pumping (realtime delivery, ping/pong) for unrelated connections on
+    // the same runtime. Use a genuinely async write instead.
+    if tokio::fs::write(&absolute, &file_bytes).await.is_err() {
+        let _ = fs::remove_file(&absolute);
+        return json_error(StatusCode::INTERNAL_SERVER_ERROR, "media_store_failed");
     }
 
     let now = unix_now();

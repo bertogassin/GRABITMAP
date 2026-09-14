@@ -1742,7 +1742,7 @@ pub fn render_my_resources(
 
                                     <a href="/app/resource/{id}/edit"
                                        class="rm-my-resource-action rm-my-resource-action--edit">
-                                        ✎ Редактировать
+                                        {edit_icon} Редактировать
                                     </a>
 
                                     {promotion_button}
@@ -1760,6 +1760,7 @@ pub fn render_my_resources(
                     "#,
                     id = id,
                     icon = icon("map-pin"),
+                    edit_icon = icon("edit"),
                     title = safe_title,
                     category = category_line,
                     description = safe_description,

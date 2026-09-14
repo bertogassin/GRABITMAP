@@ -76,6 +76,9 @@
 
         audio.dataset.voicePrimed = "1";
         audio.preload = "auto";
+        try {
+            audio.load();
+        } catch (_) {}
     }
 
     function scheduleVisiblePreload(player) {
@@ -110,6 +113,10 @@
             : 0;
         var done = false;
 
+        // A tap on play while this probe seek is still in flight must wait;
+        // otherwise playback can start from the synthetic near-end position.
+        audio.dataset.voiceDurationProbing = "1";
+
         function finish() {
             if (done) {
                 return;
@@ -118,6 +125,7 @@
             audio.removeEventListener("timeupdate", finish);
             audio.removeEventListener("durationchange", finish);
             audio.removeEventListener("loadeddata", finish);
+            delete audio.dataset.voiceDurationProbing;
 
             if (finiteDuration(audio) > 0) {
                 try {
@@ -135,7 +143,28 @@
         audio.addEventListener("durationchange", finish, { once: true });
         audio.addEventListener("loadeddata", finish, { once: true });
 
-        window.setTimeout(finish, 800);
+        window.setTimeout(function () {
+            if (finiteDuration(audio) > 0) {
+                finish();
+                return;
+            }
+            // MediaRecorder WebM without duration header: estimate by size.
+            // Opus ~48 kbps => ~6 KB/sec.
+            var bytes = Number(audio.dataset.size || 0);
+            if (bytes > 0) {
+                var est = Math.max(1, Math.round(bytes / 6000));
+                var timeEl = player.querySelector(".chat-voice-time");
+                if (timeEl) {
+                    timeEl.textContent = "0:00 / " + formatTime(est);
+                }
+                var progress = player.querySelector(".chat-voice-progress");
+                if (progress) {
+                    progress.disabled = false;
+                    progress.max = String(est);
+                }
+            }
+            finish();
+        }, 800);
 
         try {
             audio.currentTime = 1e10;
@@ -206,14 +235,45 @@
                 activeAudio = audio;
                 player.classList.remove("is-error");
                 player.classList.add("is-loading");
-                var playback = audio.play();
-                if (playback && typeof playback.catch === "function") {
-                    playback.catch(function () {
-                        player.classList.remove("is-loading");
-                        player.classList.add("is-error");
-                        button.setAttribute("aria-label", "Повторить голосовое");
-                        update(player);
+
+                var playbackStarted = false;
+                var startPlayback = function () {
+                    if (playbackStarted) {
+                        return;
+                    }
+                    playbackStarted = true;
+
+                    var playback = audio.play();
+                    if (playback && typeof playback.catch === "function") {
+                        playback.catch(function () {
+                            player.classList.remove("is-loading");
+                            player.classList.add("is-error");
+                            button.setAttribute("aria-label", "Повторить голосовое");
+                            update(player);
+                        });
+                    }
+                };
+
+                if (audio.dataset.voiceDurationProbing === "1") {
+                    var waitForProbe = function () {
+                        audio.removeEventListener("timeupdate", waitForProbe);
+                        audio.removeEventListener("durationchange", waitForProbe);
+                        audio.removeEventListener("loadeddata", waitForProbe);
+                        startPlayback();
+                    };
+
+                    audio.addEventListener("timeupdate", waitForProbe, {
+                        once: true
                     });
+                    audio.addEventListener("durationchange", waitForProbe, {
+                        once: true
+                    });
+                    audio.addEventListener("loadeddata", waitForProbe, {
+                        once: true
+                    });
+                    window.setTimeout(waitForProbe, 900);
+                } else {
+                    startPlayback();
                 }
             } else {
                 audio.pause();

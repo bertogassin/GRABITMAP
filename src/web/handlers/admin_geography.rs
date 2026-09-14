@@ -237,14 +237,16 @@ fn render_page(
     notice: Option<&str>,
 ) -> String {
     let cards = if cities.is_empty() {
-        r#"
+        format!(
+            r#"
 <div class="empty-state">
-    <div class="empty-icon">⌕</div>
+    <div class="empty-icon">{search_icon}</div>
     <h2>Города не найдены</h2>
     <p>Попробуйте название города, страны или стабильный ключ.</p>
 </div>
-"#
-        .to_string()
+"#,
+            search_icon = crate::web::templates::icon("search"),
+        )
     } else {
         cities
             .iter()

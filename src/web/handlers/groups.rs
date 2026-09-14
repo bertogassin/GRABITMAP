@@ -1645,9 +1645,12 @@ pub async fn api_group_send_voice(
     let relative = format!("groups/{group_id}/{user_id}-voice-{unique}.{ext}");
     let absolute = media_root().join(&relative);
     if let Some(parent) = absolute.parent() {
-        let _ = fs::create_dir_all(parent);
+        let _ = tokio::fs::create_dir_all(parent).await;
     }
-    if fs::write(&absolute, &bytes).is_err() {
+    // Same blocking-write issue as api_chat_send_voice (see chat_media.rs):
+    // std::fs::write here would run synchronously on the async handler's
+    // Tokio task, blocking the worker thread for the write's duration.
+    if tokio::fs::write(&absolute, &bytes).await.is_err() {
         return json_error(StatusCode::INTERNAL_SERVER_ERROR, "media_store_failed");
     }
     let now = unix_now();

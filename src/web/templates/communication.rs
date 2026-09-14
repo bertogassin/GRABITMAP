@@ -402,12 +402,13 @@ pub fn render_messages(
         <strong>{title}</strong>
         <span>{body}</span>
     </div>
-    <a href="/app/messages" aria-label="{cancel}">×</a>
+    <a href="/app/messages" aria-label="{cancel}">{close_icon}</a>
 </aside>"#,
             mascot = static_asset("grabit-mascot-v2.png"),
             title = crate::i18n::t("chat_share_choose_title"),
             body = crate::i18n::t("chat_share_choose_body"),
             cancel = crate::i18n::t("chat_share_cancel"),
+            close_icon = icon("x"),
         ),
         _ => String::new(),
     };
@@ -504,7 +505,7 @@ fn chat_message_body_html(message: &crate::web::view_models::ChatMessageRow) -> 
             )
         };
         return format!(
-            r#"<div class="chat-message-body chat-message-body--video"><video class="chat-message-video" src="{url}" controls preload="metadata" playsinline></video>{caption}</div>"#,
+            r#"<div class="chat-message-body chat-message-body--video"><div class="chat-video-frame"><video class="chat-message-video" src="{url}" controls preload="metadata" playsinline></video></div>{caption}</div>"#,
             url = escape_html(&message.attachment_url)
         );
     }
@@ -736,7 +737,7 @@ fn render_chat_message_row(
      data-attachment-url="{attachment_url}">
 
     <div class="{bubble_class}">
-        <button type="button" class="chat-message-more" aria-label="{actions_aria}">⋮</button>
+        <button type="button" class="chat-message-more" aria-label="{actions_aria}"><svg class="chat-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="5" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="12" cy="19" r="1.5" fill="currentColor" stroke="none"></circle></svg></button>
         {author_html}
         {reply_html}
         {display_body}
@@ -1019,7 +1020,7 @@ fn render_chat_thread(
              aria-label="{search_label}"
              hidden>
         <form id="chat-search-form" class="chat-search-form" role="search">
-            <span class="chat-search-icon" aria-hidden="true">⌕</span>
+            <span class="chat-search-icon" aria-hidden="true">{search_icon}</span>
             <input id="chat-search-input"
                    type="search"
                    minlength="2"
@@ -1030,7 +1031,7 @@ fn render_chat_thread(
                    aria-label="{search_label}">
             <button id="chat-search-close"
                     type="button"
-                    aria-label="{close_label}">×</button>
+                    aria-label="{close_label}">{close_icon}</button>
         </form>
         <div id="chat-search-status"
              class="chat-search-status"
@@ -1044,13 +1045,13 @@ fn render_chat_thread(
                 type="button"
                 class="chat-secondary-button"
                 hidden>
-            Загрузить предыдущие сообщения
+            {load_older_label}
         </button>
 
         <div class="chat-toolbar-status">
             <span id="chat-connection-state"
                   class="chat-connection-state">
-                Подключение…
+                {connecting_label}
             </span>
 
             <span id="chat-peer-state"
@@ -1078,7 +1079,7 @@ fn render_chat_thread(
             class="chat-scroll-bottom"
             hidden
             aria-label="К новым сообщениям">
-        <span aria-hidden="true">↓</span>
+        <span aria-hidden="true">{arrow_down_icon}</span>
         <span id="chat-scroll-unread"
               class="chat-scroll-unread"
               hidden></span>
@@ -1104,6 +1105,11 @@ fn render_chat_thread(
             search_label = escape_html(&crate::i18n::t("nav_search")),
             search_placeholder = escape_html(&crate::i18n::t("search_what")),
             close_label = escape_html(&crate::i18n::t("chat_close")),
+            search_icon = icon("search"),
+            close_icon = icon("x"),
+            arrow_down_icon = icon("arrow-down"),
+            load_older_label = escape_html(&crate::i18n::t("chat_load_older")),
+            connecting_label = escape_html(&crate::i18n::t("chat_connecting")),
             other_public_id = escape_html(other_public_id),
             viewer_public_id = escape_html(viewer_public_id),
             group_id_attr = if group_id > 0 {
@@ -1898,9 +1904,39 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
             }});
         }});
     }}
+    function confirmAction(message) {{
+        return new Promise(function (resolve) {{
+            var dialog = document.createElement("dialog");
+            dialog.className = "rm-confirm-dialog";
+            dialog.innerHTML =
+                '<form method="dialog">' +
+                    '<h2>Подтвердите действие</h2>' +
+                    '<p></p>' +
+                    '<div class="rm-confirm-actions">' +
+                        '<button value="cancel" type="submit">Отмена</button>' +
+                        '<button value="confirm" type="submit" class="is-danger">Продолжить</button>' +
+                    '</div>' +
+                '</form>';
+            dialog.querySelector("p").textContent = message;
+            dialog.addEventListener("close", function () {{
+                var accepted = dialog.returnValue === "confirm";
+                dialog.remove();
+                resolve(accepted);
+            }}, {{ once: true }});
+            document.body.appendChild(dialog);
+            dialog.showModal();
+            dialog.querySelector('[value="cancel"]').focus();
+        }});
+    }}
     document.querySelectorAll("form[data-confirm]").forEach(function (form) {{
-        form.addEventListener("submit", function (event) {{
-            if (!window.confirm(form.getAttribute("data-confirm") || "Продолжить?")) event.preventDefault();
+        form.addEventListener("submit", async function (event) {{
+            if (form.dataset.confirmed === "1") return;
+            event.preventDefault();
+            var accepted = await confirmAction(form.getAttribute("data-confirm") || "Продолжить?");
+            if (accepted) {{
+                form.dataset.confirmed = "1";
+                form.requestSubmit();
+            }}
         }});
     }});
 }})();

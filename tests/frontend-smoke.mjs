@@ -22,7 +22,7 @@ test("RTL runtime and mobile PWA metadata are present", async () => {
   assert.ok(manifest.icons?.length > 0);
 });
 
-test("mobile product foundation locks accidental zoom and contains narrow layouts", async () => {
+test("mobile product foundation preserves accessible zoom and contains narrow layouts", async () => {
   const [template, i18n, css, runtime] = await Promise.all([
     readFile(new URL("src/web/templates/common.rs", root), "utf8"),
     readFile(new URL("src/i18n.rs", root), "utf8"),
@@ -30,18 +30,19 @@ test("mobile product foundation locks accidental zoom and contains narrow layout
     readFile(new URL("static/mobile-foundation.js", root), "utf8"),
   ]);
 
-  assert.match(template, /maximum-scale=1, user-scalable=no/);
+  assert.match(template, /width=device-width, initial-scale=1, viewport-fit=cover/);
+  assert.doesNotMatch(template, /maximum-scale=1|user-scalable=no/);
   assert.match(template, /static_asset\("mobile-foundation\.css"\)/);
   assert.match(template, /static_asset\("mobile-foundation\.js"\)/);
-  assert.match(css, /touch-action: pan-x pan-y/);
+  assert.match(css, /touch-action: pan-x pan-y pinch-zoom/);
   assert.match(css, /input,[\s\S]*font-size: 16px !important/);
   assert.match(css, /\.rm-map-grid \.card[\s\S]*min-height: 72px !important/);
   assert.match(css, /\.rm-lang-grid[\s\S]*max-height: 274px !important/);
   assert.match(css, /\.chat-dialog-preview[\s\S]*text-overflow: ellipsis/);
   assert.match(css, /prefers-reduced-motion: reduce/);
-  assert.match(runtime, /gesturestart/);
-  assert.match(runtime, /dblclick/);
-  assert.match(runtime, /passive: false/);
+  assert.doesNotMatch(runtime, /gesturestart|gesturechange|gestureend/);
+  assert.doesNotMatch(runtime, /dblclick/);
+  assert.doesNotMatch(runtime, /preventGestureZoom/);
   assert.match(i18n, /data-language-filter/);
   assert.match(i18n, /data-empty-label/);
   assert.match(runtime, /bindLanguageFilter/);
@@ -140,10 +141,15 @@ test("locale switching validates and canonicalizes locale tags", async () => {
 });
 
 test("service worker keeps partial shell caches and caches static responses", async () => {
-  const serviceWorker = await readFile(new URL("static/resursmap-sw.js", root), "utf8");
+  const [serviceWorker, common] = await Promise.all([
+    readFile(new URL("static/resursmap-sw.js", root), "utf8"),
+    readFile(new URL("src/web/templates/common.rs", root), "utf8"),
+  ]);
   assert.match(serviceWorker, /Promise\.all\(STATIC_ASSETS\.map/);
   assert.match(serviceWorker, /cache\.put\(cacheKey\.toString\(\), response\.clone\(\)\)/);
   assert.match(serviceWorker, /const CACHE_PREFIX = "grabit-shell-"/);
+  assert.match(serviceWorker, /CACHE_PREFIX \+ "v7\.21\.0-r5"/);
+  assert.match(common, /env!\("CARGO_PKG_VERSION"\), "-r5"/);
   assert.match(serviceWorker, /key\.startsWith\(CACHE_PREFIX\)/);
   assert.match(serviceWorker, /internalNavigationTarget\(event\.notification\.data\.url, target\)/);
   assert.match(serviceWorker, /internalNavigationTarget\(nudge\.href, "\/app"\)/);
@@ -257,7 +263,7 @@ test("media core supports private image video and document delivery", async () =
   assert.match(css, /chat-media-progress/);
   assert.match(chat, /chat-attachment-menu/);
   assert.match(chat, /chat-attachment-sheet/);
-  assert.match(chat, /chatIcon\("photo"\)/);
+  assert.match(chat, /ResursMapChat\.icon\("photo"\)/);
   assert.doesNotMatch(chat, /data-attachment="photo"><span aria-hidden="true">📷/);
   assert.doesNotMatch(chat, /probe\.onloadedmetadata/);
   assert.match(chat, /looksLikeMachineKey/);
@@ -518,7 +524,7 @@ test("successful direct chat send clears the account-scoped draft", async () => 
   const chat = await readFile(new URL("static/chat-v2.js", root), "utf8");
   assert.match(chat, /localStorage\.removeItem\("grabit-chat-draft:" \+ scope\)/);
   assert.match(chat, /clearStoredDraft\(\)/);
-  assert.match(chat, /voiceBtn\.textContent = t\("chat_voice_send", "Отправить"\)/);
+  assert.match(chat, /setComposerActionMode\("stop"\)/);
 });
 
 test("chat has one active submit owner and accepts practical voice sizes", async () => {
@@ -549,7 +555,68 @@ test("group text chat keeps a native fallback and the composer has one adaptive 
   assert.match(chat, /controller\.abort\(\)/);
   assert.match(chat, /Math\.max\(46, input\.scrollHeight \|\| 46\)/);
   assert.match(mature, /grid-template-areas:[\s\S]*"main action"/);
-  assert.match(mature, /#chat-form\.has-message \.chat-send-button/);
+  assert.match(chat, /setComposerActionMode\(hasMessage \? "send" : "mic"\)/);
+  assert.match(mature, /#chat-form #chat-voice-btn\[data-mode="send"\]/);
+});
+
+test("confirmed media replaces its optimistic row without deleting the video", async () => {
+  const chat = await readFile(new URL("static/chat-v2.js", root), "utf8");
+  assert.match(
+    chat,
+    /mediaRequest\(item\)\.then\(function \(data\) \{[\s\S]*?removeMediaItem\(item, false\);[\s\S]*?if \(data\.message\) \{[\s\S]*?appendMessages\(\[data\.message\]\);/
+  );
+});
+
+test("chat uses one visible adaptive mic send stop action", async () => {
+  const [chat, mature] = await Promise.all([
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("static/chat-mature.css", root), "utf8"),
+  ]);
+  assert.match(chat, /voiceBtn\.dataset\.mode = normalized/);
+  assert.match(chat, /form\.requestSubmit\(send\)/);
+  assert.match(chat, /composerMain\.appendChild\(voiceOverlay\)/);
+  assert.match(mature, /#chat-form \.chat-voice-recording \{[\s\S]*inset: 3px !important/);
+  assert.match(mature, /html\[data-page="chat"\] #chat-form #chat-send\.chat-send-button/);
+});
+
+test("video actions are consistent for sender recipient Android and iPhone", async () => {
+  const [template, chat, mature] = await Promise.all([
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("static/chat-mature.css", root), "utf8"),
+  ]);
+  assert.match(template, /class="chat-video-frame"/);
+  assert.match(template, /class="chat-message-more"[\s\S]*<svg class="chat-icon"/);
+  assert.match(chat, /data-chat-action="video-fullscreen"/);
+  assert.match(chat, /data-chat-action="video-speed"/);
+  assert.match(chat, /data-chat-action="video-pip"/);
+  assert.match(chat, /data-chat-action="attachment-open"/);
+  assert.match(chat, /typeof video\.webkitEnterFullscreen === "function"/);
+  assert.match(chat, /typeof video\.webkitSetPresentationMode === "function"/);
+  assert.match(chat, /function applyMessageBody[\s\S]*message\.attachment_kind === "video"[\s\S]*chat-video-frame/);
+  assert.match(chat, /messagePreviewLabel\(message, 180\)/);
+  assert.match(mature, /\.chat-message-row\[data-attachment-kind="video"\] \.chat-bubble/);
+  assert.match(mature, /\.chat-message-row\.is-theirs \.chat-message-more \{ right: 7px; left: auto; \}/);
+});
+
+test("chat modules share icons and action binding without closure leaks", async () => {
+  const chat = await readFile(new URL("static/chat-v2.js", root), "utf8");
+  const sharedEnd = chat.indexOf("(function ()");
+  const context = { window: {} };
+
+  assert.ok(sharedEnd > 0);
+  vm.runInNewContext(chat.slice(0, sharedEnd), context);
+  assert.equal(typeof context.window.ResursMapChat.icon, "function");
+  assert.match(context.window.ResursMapChat.icon("more"), /<svg[\s\S]*<circle/);
+  assert.doesNotMatch(chat, /\bchatIcon\(/);
+  assert.match(chat, /function bindMessageActionButton\(button, row\)/);
+  assert.match(chat, /button\.dataset\.chatActionsBound = "1"/);
+  assert.match(chat, /typeof ResursMapChat\.bindMessageActionButton ===[\s\S]*"function"[\s\S]*ResursMapChat\.bindMessageActionButton\(more, row\)/);
+  assert.match(chat, /ResursMapChat\.bindMessageActionButton =[\s\S]*bindMessageActionButton/);
+  assert.doesNotMatch(chat, /\n\s*bindMessageActionButton\(more, row\);/);
+  assert.match(chat, /history\.querySelectorAll\("\.chat-message-more"\)[\s\S]*bindMessageActionButton\(button, null\)/);
+  assert.match(chat, /event\.stopPropagation\(\);[\s\S]*messageFromRow\(messageRow\)[\s\S]*openSheet\(message\)/);
+  assert.match(chat, /form\.dataset\.chatActionsReady = "1"/);
 });
 
 test("mobile composer keeps every control aligned and offers working quick emoji", async () => {
@@ -579,13 +646,44 @@ test("chat text hitbox cannot be covered by the photo picker", async () => {
   assert.doesNotMatch(chat, /input\.addEventListener\("click"[\s\S]*imageInput\.click\(\)/);
 });
 
-test("mobile diagnostics probes session chat microphone and motion", async () => {
-  const diagnostics = await readFile(new URL("static/mobile-diagnostics.js", root), "utf8");
-  assert.match(diagnostics, /grabit-mobile-diagnostic/);
-  assert.match(diagnostics, /chatCoreReady/);
-  assert.match(diagnostics, /getUserMedia/);
-  assert.match(diagnostics, /DeviceMotionEvent\.requestPermission/);
-  assert.match(diagnostics, /\/api\/account\/attention-count/);
+test("prelaunch UI removes debug hooks native popups duplicate ids and legacy symbols", async () => {
+  const [common, navigation, pwa, communication, resources, chat, blocks, groupHelper, cityHelper, staticFiles] = await Promise.all([
+    readFile(new URL("src/web/templates/common.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/navigation.rs", root), "utf8"),
+    readFile(new URL("static/pwa-install.js", root), "utf8"),
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/resources.rs", root), "utf8"),
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("static/chat-blocks.js", root), "utf8"),
+    readFile(new URL("src/web/handlers/group_helper.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/city_helper_actions.rs", root), "utf8"),
+    readdir(new URL("static/", root)),
+  ]);
+
+  assert.doesNotMatch(common, /mobile-diagnostics\.js/);
+  assert.doesNotMatch(navigation, /id="resursmap-install-pwa"/);
+  assert.match(navigation, /data-resursmap-install-pwa/);
+  assert.match(pwa, /\[data-resursmap-install-pwa\]/);
+  assert.match(pwa, /data-resursmap-install-help/);
+  assert.doesNotMatch(communication, /window\.confirm/);
+  assert.match(communication, /rm-confirm-dialog/);
+  assert.doesNotMatch(blocks, /window\.(?:alert|confirm)/);
+  assert.match(blocks, /confirmBlockUser/);
+  assert.doesNotMatch(resources, /✎ Редактировать/);
+  assert.equal(chat.includes("📌"), false);
+  assert.doesNotMatch(chat, /✎|⌫/);
+  assert.match(chat, /data-close-sheet aria-label=/);
+  assert.match(chat, /data-close-editor aria-label=/);
+  assert.match(chat, /data-close-delete aria-label=/);
+  assert.match(chat, /data-close-forward aria-label=/);
+  assert.doesNotMatch(groupHelper, /<button\b(?:(?!\btype\s*=)[^>])*>/gs);
+  assert.doesNotMatch(cityHelper, /<button\b(?:(?!\btype\s*=)[^>])*>/gs);
+  for (const retiredAsset of ["app-icon.svg", "brand-logo.png", "brand-logo.svg"]) {
+    assert.equal(staticFiles.includes(retiredAsset), false);
+  }
+  for (const activeAsset of ["app-icon-192.png", "app-icon-512.png", "apple-touch-icon.png", "favicon-32.png"]) {
+    assert.equal(staticFiles.includes(activeAsset), true);
+  }
 });
 
 test("browser i18n fallback cannot recurse and generated bare imports are not loaded", async () => {

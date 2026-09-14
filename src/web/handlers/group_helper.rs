@@ -183,17 +183,20 @@ fn render_page(
                                        required
                                        placeholder="Причина решения">
                                 <div class="action-buttons">
-                                    <button name="action"
+                                    <button type="submit"
+                                            name="action"
                                             value="close"
                                             class="close">
                                         Закрыть
                                     </button>
-                                    <button name="action"
+                                    <button type="submit"
+                                            name="action"
                                             value="escalate"
                                             class="escalate">
                                         Передать выше
                                     </button>
-                                    <button name="action"
+                                    <button type="submit"
+                                            name="action"
                                             value="reject"
                                             class="reject">
                                         Отклонить материал

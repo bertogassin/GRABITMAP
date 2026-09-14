@@ -13,6 +13,48 @@
         }
     }
 
+    function confirmBlockUser() {
+        return new Promise(function (resolve) {
+            var overlay = document.createElement("div");
+            overlay.className = "chat-confirm-overlay";
+            overlay.innerHTML =
+                '<button type="button" class="chat-confirm-backdrop" aria-label="Отмена"></button>' +
+                '<section class="chat-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="chat-confirm-title">' +
+                    '<h2 id="chat-confirm-title">Заблокировать пользователя?</h2>' +
+                    '<p>Он больше не сможет отправлять вам сообщения. Старый диалог сохранится.</p>' +
+                    '<div class="chat-confirm-actions">' +
+                        '<button type="button" data-confirm-cancel>Отмена</button>' +
+                        '<button type="button" class="is-danger" data-confirm-accept>Заблокировать</button>' +
+                    '</div>' +
+                '</section>';
+
+            function finish(accepted) {
+                document.removeEventListener("keydown", onKeyDown);
+                overlay.remove();
+                resolve(accepted);
+            }
+
+            function onKeyDown(event) {
+                if (event.key === "Escape") {
+                    finish(false);
+                }
+            }
+
+            overlay.querySelector(".chat-confirm-backdrop").addEventListener("click", function () {
+                finish(false);
+            });
+            overlay.querySelector("[data-confirm-cancel]").addEventListener("click", function () {
+                finish(false);
+            });
+            overlay.querySelector("[data-confirm-accept]").addEventListener("click", function () {
+                finish(true);
+            });
+            document.addEventListener("keydown", onKeyDown);
+            document.body.appendChild(overlay);
+            overlay.querySelector("[data-confirm-cancel]").focus();
+        });
+    }
+
     ready(function () {
         var history =
             document.getElementById("chat-messages");
@@ -46,7 +88,8 @@
         var state = {
             blocked: false,
             blockedByMe: false,
-            busy: false
+            busy: false,
+            error: ""
         };
 
         function applyState() {
@@ -85,9 +128,10 @@
             }
 
             if (sendState) {
-                sendState.textContent = state.blocked
+                sendState.textContent = state.error || (state.blocked
                     ? "Обмен сообщениями недоступен"
-                    : "Enter — отправить · Shift+Enter — новая строка";
+                    : "Enter — отправить · Shift+Enter — новая строка");
+                sendState.classList.toggle("is-error", Boolean(state.error));
             }
         }
 
@@ -140,11 +184,7 @@
             }
 
             if (!state.blockedByMe) {
-                var confirmed = window.confirm(
-                    "Заблокировать пользователя?\n\n" +
-                    "Он больше не сможет отправлять вам сообщения. " +
-                    "Старый диалог сохранится."
-                );
+                var confirmed = await confirmBlockUser();
 
                 if (!confirmed) {
                     return;
@@ -155,6 +195,7 @@
             applyState();
 
             try {
+                state.error = "";
                 var endpoint = state.blockedByMe
                     ? "/api/chat/" +
                         encodeURIComponent(otherUserRoute) +
@@ -172,10 +213,13 @@
                 state.blockedByMe =
                     Boolean(data.blocked_by_me);
             } catch (_) {
-                window.alert(
-                    "Не удалось изменить блокировку. " +
-                    "Попробуйте ещё раз."
-                );
+                state.error = "Не удалось изменить блокировку. Попробуйте ещё раз.";
+                window.setTimeout(function () {
+                    if (state.error) {
+                        state.error = "";
+                        applyState();
+                    }
+                }, 4000);
             }
 
             state.busy = false;
