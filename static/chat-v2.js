@@ -3430,6 +3430,7 @@ ResursMapChat.icon = function (name) {
         var messageCache = new Map();
         var listingPreviewCache = new Map();
         var selectedMessage = null;
+        var sheetTrigger = null;
         var refreshDebounceTimer = null;
         var refreshFallbackTimer = null;
         var lastTapAt = 0;
@@ -3482,7 +3483,7 @@ ResursMapChat.icon = function (name) {
         sheet.hidden = true;
         sheet.innerHTML =
             '<button class="chat-sheet-backdrop" ' +
-                'type="button" data-close-sheet aria-label="' +
+                'type="button" tabindex="-1" data-close-sheet aria-label="' +
                 escapeHtml(t("chat_close", "Закрыть")) + '"></button>' +
             '<section class="chat-sheet-panel" ' +
                 'role="dialog" aria-modal="true" aria-label="' +
@@ -5099,7 +5100,42 @@ ResursMapChat.icon = function (name) {
                 });
         }
 
+        function sheetActionControls() {
+            return Array.prototype.filter.call(
+                sheet.querySelectorAll(
+                    '[data-chat-action]:not([hidden]):not([disabled])'
+                ),
+                function (control) {
+                    return !control.closest("[hidden]");
+                }
+            );
+        }
+
+        function trapSheetFocus(event) {
+            if (event.key !== "Tab" || sheet.hidden) {
+                return;
+            }
+
+            var controls = sheetActionControls();
+            if (!controls.length) {
+                return;
+            }
+
+            var first = controls[0];
+            var last = controls[controls.length - 1];
+            var active = document.activeElement;
+
+            if (event.shiftKey && (active === first || !sheet.contains(active))) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && (active === last || !sheet.contains(active))) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
+
         function closeSheet() {
+            var wasOpen = !sheet.hidden;
             sheet.hidden = true;
             if (
                 (!editor || editor.hidden) &&
@@ -5108,6 +5144,17 @@ ResursMapChat.icon = function (name) {
                 document.body.classList.remove(
                     "chat-overlay-open"
                 );
+            }
+            if (
+                wasOpen &&
+                sheetTrigger &&
+                sheetTrigger.isConnected &&
+                typeof sheetTrigger.focus === "function"
+            ) {
+                sheetTrigger.focus();
+            }
+            if (wasOpen) {
+                sheetTrigger = null;
             }
         }
 
@@ -5209,6 +5256,10 @@ ResursMapChat.icon = function (name) {
         }
 
         function openSheet(message) {
+            var wasHidden = sheet.hidden;
+            if (wasHidden && !sheetTrigger) {
+                sheetTrigger = document.activeElement;
+            }
             selectedMessage = message;
             sheetPreview.textContent =
                 messagePreviewLabel(message, 180);
@@ -5293,6 +5344,12 @@ ResursMapChat.icon = function (name) {
             document.body.classList.add(
                 "chat-overlay-open"
             );
+            if (wasHidden) {
+                var controls = sheetActionControls();
+                if (controls.length) {
+                    controls[0].focus();
+                }
+            }
         }
 
         function bindMessageActionButton(button, row) {
@@ -5316,6 +5373,7 @@ ResursMapChat.icon = function (name) {
                     ? messageFromRow(messageRow)
                     : null;
                 if (message) {
+                    sheetTrigger = button;
                     openSheet(message);
                 }
             });
@@ -5471,6 +5529,7 @@ ResursMapChat.icon = function (name) {
                         ? messageFromRow(moreRow)
                         : null;
                     if (moreMessage) {
+                        sheetTrigger = more;
                         openSheet(moreMessage);
                     }
                     return;
@@ -5517,6 +5576,10 @@ ResursMapChat.icon = function (name) {
         );
 
         document.addEventListener("keydown", function (event) {
+            if (event.key === "Tab" && sheet && !sheet.hidden) {
+                trapSheetFocus(event);
+                return;
+            }
             if (event.key !== "Escape") {
                 return;
             }

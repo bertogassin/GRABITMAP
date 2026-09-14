@@ -891,6 +891,21 @@ test("chat action dialogs share touch and keyboard interaction states", async ()
   assert.match(mature, /\.chat-sheet-actions > button:focus-visible,[\s\S]*\.chat-sheet-reactions button:focus-visible \{[\s\S]*outline: 2px solid var\(--gold-light, #e6ca91\);/);
 });
 
+test("chat message action sheet owns and restores keyboard focus", async () => {
+  const chat = await readFile(new URL("static/chat-v2.js", root), "utf8");
+
+  assert.match(chat, /var sheetTrigger = null;/);
+  assert.match(chat, /tabindex="-1" data-close-sheet aria-label=/);
+  assert.match(chat, /function sheetActionControls\(\)/);
+  assert.match(chat, /\[data-chat-action\]:not\(\[hidden\]\):not\(\[disabled\]\)/);
+  assert.match(chat, /function trapSheetFocus\(event\)/);
+  assert.match(chat, /function openSheet\(message\)/);
+  assert.match(chat, /sheetTrigger = button;[\s\S]*openSheet\(message\)/);
+  assert.match(chat, /sheetTrigger = more;[\s\S]*openSheet\(moreMessage\)/);
+  assert.match(chat, /sheetTrigger\.isConnected[\s\S]*sheetTrigger\.focus\(\)/);
+  assert.match(chat, /trapSheetFocus\(event\)/);
+});
+
 test("chat overlays share explicit dark and light theme tokens", async () => {
   const [css, mature] = await Promise.all([
     readFile(new URL("static/chat-v2.css", root), "utf8"),
