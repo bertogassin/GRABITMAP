@@ -1441,7 +1441,7 @@ html[data-page="chat"] .rm-version-footer {
     padding: 0 13px;
     border-radius: 999px;
     border: 1px solid rgba(232, 204, 150, .24);
-    background: rgba(232, 204, 150, .07);
+    background: rgba(232, 204, 150, .08);
     color: var(--text);
     text-decoration: none;
     font-size: 13px;
@@ -4100,8 +4100,7 @@ body {
     color: var(--on-gold);
 }
 
-.rm-guest-hint,
-.rm-kind-chip {
+.rm-guest-hint {
     border-color: rgba(232, 204, 150, .24);
     background: rgba(232, 204, 150, .08);
 }
@@ -6427,6 +6426,20 @@ mod public_entry_tests {
         assert!(style.contains("position: relative;\n    z-index: 2;"));
         assert!(style.contains("background: rgba(0,0,0,.045);"));
         assert!(style.contains("0 12px 35px rgba(0,0,0,.18);"));
+    }
+
+    #[test]
+    fn search_kind_chip_has_one_canonical_rule() {
+        let style = base_style();
+
+        assert_eq!(
+            style
+                .lines()
+                .filter(|line| *line == ".rm-kind-chip {")
+                .count(),
+            1
+        );
+        assert!(style.contains("background: rgba(232, 204, 150, .08);"));
     }
 
     #[test]
