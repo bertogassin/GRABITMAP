@@ -3134,9 +3134,9 @@ a.feature.rm-feature-add {
 }
 
 .rm-menu-row,
+.rm-settings-sound-btn,
 .rm-settings-theme-btn,
-.rm-settings-toggle-btn,
-.rm-settings-sound-btn {
+.rm-settings-toggle-btn {
     width: 100%;
     min-height: 56px;
     display: flex;
@@ -3155,9 +3155,13 @@ a.feature.rm-feature-add {
     cursor: pointer;
 }
 
-.rm-menu-row:last-child,
+.rm-menu-row:last-child {
+    border-bottom: 0;
+}
+
 .rm-settings-sound-btn {
     border-bottom: 0;
+    margin-top: 0;
 }
 
 .rm-menu-row-icon {
@@ -3320,10 +3324,6 @@ html[dir="rtl"] .rm-menu-row {
 
 .hero.chat-header-premium {
     overflow: visible;
-}
-
-.rm-settings-sound-btn {
-    margin-top: 0;
 }
 
 .nav-item.has-attention .nav-badge {
@@ -6425,6 +6425,22 @@ mod public_entry_tests {
         assert!(style.contains(
             "linear-gradient(160deg, var(--bg) 0%, var(--bg-soft) 48%, var(--bg) 100%);"
         ));
+    }
+
+    #[test]
+    fn settings_sound_button_has_one_canonical_override_rule() {
+        let style = base_style();
+
+        assert_eq!(
+            style
+                .lines()
+                .filter(|line| *line == ".rm-settings-sound-btn {")
+                .count(),
+            1
+        );
+        assert!(
+            style.contains(".rm-settings-sound-btn {\n    border-bottom: 0;\n    margin-top: 0;")
+        );
     }
 
     #[test]
