@@ -908,6 +908,18 @@ test("chat composer follows shared light and dark theme tokens", async () => {
   assert.doesNotMatch(mature, /#chat-form \.chat-composer-main \{[^}]*#202834/);
 });
 
+test("chat thread follows the shared light and dark background token", async () => {
+  const [css, mature] = await Promise.all([
+    readFile(new URL("static/chat-v2.css", root), "utf8"),
+    readFile(new URL("static/chat-mature.css", root), "utf8"),
+  ]);
+
+  assert.match(css, /#chat-messages\.chat-messages-panel \{[^}]*background: var\(--bg-soft\) !important;/);
+  assert.match(mature, /#chat-messages\.chat-messages-panel \{[^}]*background: var\(--bg-soft\) !important;/);
+  assert.doesNotMatch(css, /#chat-messages\.chat-messages-panel \{[^}]*#11161e/);
+  assert.doesNotMatch(mature, /#chat-messages\.chat-messages-panel \{[^}]*#101722/);
+});
+
 test("prelaunch UI removes debug hooks native popups duplicate ids and legacy symbols", async () => {
   const [common, navigation, pwa, communication, resources, chat, blocks, groupHelper, cityHelper, staticFiles] = await Promise.all([
     readFile(new URL("src/web/templates/common.rs", root), "utf8"),
