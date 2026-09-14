@@ -2653,7 +2653,7 @@ body.chat-overlay-open #chat-form.chat-composer {
 
 /* ResursMap 4.9.58: readable compact mobile chat */
 #chat-messages.chat-messages-panel {
-    background: #11161e !important;
+    background: var(--bg-soft) !important;
 }
 
 .chat-message-row {
