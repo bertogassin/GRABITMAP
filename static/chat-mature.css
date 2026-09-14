@@ -25,9 +25,9 @@ html[data-page="chat"] .chat-header-status { margin-top: 3px; font-size: 12px; }
 
 .chat-header-menu {
     min-width: 194px; gap: 2px; padding: 6px; border-radius: 14px;
-    background: #191e26 !important;
-    border-color: rgba(255,255,255,.13) !important;
-    box-shadow: 0 22px 56px rgba(0,0,0,.58) !important;
+    background: var(--surface) !important;
+    border-color: var(--line) !important;
+    box-shadow: 0 22px 56px color-mix(in srgb, var(--bg) 58%, transparent) !important;
     opacity: 1 !important;
     backdrop-filter: none !important;
 }
@@ -35,7 +35,7 @@ html[data-page="chat"] .chat-header-status { margin-top: 3px; font-size: 12px; }
 .chat-header-menu button {
     width: 100%; min-height: 44px; padding: 0 10px; border: 0 !important;
     border-radius: 9px !important; background: transparent !important;
-    color: #f4f6f8 !important; box-shadow: none !important;
+    color: var(--text) !important; box-shadow: none !important;
     display: flex; align-items: center; gap: 10px;
     font-size: 13px !important; font-weight: 650 !important; text-align: left;
 }
@@ -46,9 +46,9 @@ html[data-page="chat"] .chat-header-status { margin-top: 3px; font-size: 12px; }
 }
 .chat-header-menu-label { min-width: 0; white-space: nowrap; }
 .chat-header-menu button:hover,.chat-header-menu button:focus-visible {
-    background: rgba(255,255,255,.07) !important;
+    background: color-mix(in srgb, var(--text) 7%, transparent) !important;
 }
-.chat-header-menu .chat-block-toggle { color: #ff8e98 !important; }
+.chat-header-menu .chat-block-toggle { color: var(--danger) !important; }
 
 html[data-page="chat"] .chat-shell {
     gap: 6px !important; padding: 0 !important; border: 0 !important;

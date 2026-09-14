@@ -506,7 +506,7 @@ test("mature chat layout is loaded last and stays mobile safe", async () => {
 
   assert.match(template, /static_asset\("chat-mature\.css"\)/);
   assert.match(css, /html\[data-page="chat"\] \.topbar \{ display: none/);
-  assert.match(css, /\.chat-header-menu[\s\S]*background: #191e26 !important/);
+  assert.match(css, /\.chat-header-menu[\s\S]*background: var\(--surface\) !important/);
   assert.match(css, /\.chat-message-row \.chat-bubble[\s\S]*min-width: 84px/);
   assert.match(css, /\.chat-composer-footer \{ display: none !important/);
   assert.match(css, /\.official-group-place \.card-content/);
@@ -887,6 +887,16 @@ test("chat overlays share explicit dark and light theme tokens", async () => {
   assert.match(css, /\.chat-sheet-reactions button \{[\s\S]*border: 1px solid var\(--chat-overlay-control-border\);[\s\S]*background: var\(--chat-overlay-control\);/);
   assert.match(mature, /\.chat-attachment-backdrop \{[\s\S]*background: var\(--chat-overlay-backdrop\);/);
   assert.match(mature, /\.chat-attachment-sheet \{[\s\S]*border: 1px solid var\(--chat-overlay-border\);[\s\S]*var\(--chat-overlay-panel\);[\s\S]*box-shadow: var\(--chat-overlay-shadow\);/);
+});
+
+test("chat header menu follows shared light and dark theme tokens", async () => {
+  const mature = await readFile(new URL("static/chat-mature.css", root), "utf8");
+
+  assert.match(mature, /\.chat-header-menu \{[\s\S]*background: var\(--surface\) !important;[\s\S]*border-color: var\(--line\) !important;[\s\S]*color-mix\(in srgb, var\(--bg\) 58%, transparent\)/);
+  assert.match(mature, /\.chat-header-menu button \{[\s\S]*color: var\(--text\) !important/);
+  assert.match(mature, /\.chat-header-menu button:hover,\.chat-header-menu button:focus-visible \{[\s\S]*color-mix\(in srgb, var\(--text\) 7%, transparent\)/);
+  assert.match(mature, /\.chat-header-menu \.chat-block-toggle \{ color: var\(--danger\) !important; \}/);
+  assert.doesNotMatch(mature, /\.chat-header-menu[\s\S]*background: #191e26 !important/);
 });
 
 test("prelaunch UI removes debug hooks native popups duplicate ids and legacy symbols", async () => {
