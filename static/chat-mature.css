@@ -216,7 +216,7 @@ html[data-page="chat"] .chat-message-row[data-attachment-kind="video"] .chat-mes
 
 #chat-form.chat-composer {
     padding: 7px !important; border-radius: 15px !important;
-    background: #171d25 !important; box-shadow: none !important;
+    background: var(--surface) !important; box-shadow: none !important;
 }
 #chat-input {
     min-height: 44px !important; height: 44px !important; max-height: 120px !important;
@@ -529,7 +529,7 @@ html[data-page="chat"] #chat-form.chat-composer {
     position: relative;
     border: 1px solid color-mix(in srgb, var(--text) 13%, transparent);
     border-radius: 22px;
-    background: color-mix(in srgb, var(--bg) 74%, #202834);
+    background: var(--bg-soft);
 }
 
 #chat-form #chat-input {

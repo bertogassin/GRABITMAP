@@ -899,6 +899,15 @@ test("chat header menu follows shared light and dark theme tokens", async () => 
   assert.doesNotMatch(mature, /\.chat-header-menu[\s\S]*background: #191e26 !important/);
 });
 
+test("chat composer follows shared light and dark theme tokens", async () => {
+  const mature = await readFile(new URL("static/chat-mature.css", root), "utf8");
+
+  assert.match(mature, /#chat-form\.chat-composer \{[^}]*background: var\(--surface\) !important;/);
+  assert.match(mature, /#chat-form \.chat-composer-main \{[^}]*background: var\(--bg-soft\);/);
+  assert.doesNotMatch(mature, /#chat-form\.chat-composer \{[^}]*background: #171d25/);
+  assert.doesNotMatch(mature, /#chat-form \.chat-composer-main \{[^}]*#202834/);
+});
+
 test("prelaunch UI removes debug hooks native popups duplicate ids and legacy symbols", async () => {
   const [common, navigation, pwa, communication, resources, chat, blocks, groupHelper, cityHelper, staticFiles] = await Promise.all([
     readFile(new URL("src/web/templates/common.rs", root), "utf8"),
