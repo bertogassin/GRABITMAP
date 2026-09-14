@@ -154,6 +154,8 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
 }
 .admin-stat {
     display:block;
+    position:relative;
+    overflow:hidden;
     min-height:132px;
     color:inherit;
     text-decoration:none;
@@ -165,6 +167,10 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
             rgba(255,255,255,.045),
             rgba(255,255,255,.018));
     box-shadow:0 14px 34px rgba(0,0,0,.14);
+    transition:
+        transform .22s ease,
+        border-color .22s ease,
+        background .22s ease;
 }
 .admin-stat-icon {
     font-size:20px;
@@ -186,6 +192,8 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     gap:12px;
 }
 .admin-command-card {
+    position:relative;
+    overflow:hidden;
     padding:20px;
     border:1px solid var(--owner-line);
     border-radius:22px;
@@ -226,6 +234,9 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     border:1px solid rgba(255,255,255,.08);
     border-radius:16px;
     background:rgba(255,255,255,.025);
+    transition:
+        transform .2s ease,
+        border-color .2s ease;
 }
 .admin-level-number {
     width:36px;
@@ -450,14 +461,6 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     font-size:10px;
     font-weight:900;
 }
-.admin-stat {
-    position:relative;
-    overflow:hidden;
-    transition:
-        transform .22s ease,
-        border-color .22s ease,
-        background .22s ease;
-}
 .admin-stat::after {
     content:"";
     position:absolute;
@@ -481,10 +484,6 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     transform:translateY(-2px);
     border-color:rgba(214,183,122,.32);
 }
-.admin-command-card {
-    position:relative;
-    overflow:hidden;
-}
 .admin-command-card::before {
     content:"";
     position:absolute;
@@ -499,11 +498,6 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
         rgba(214,183,122,.75),
         transparent
     );
-}
-.admin-level-row {
-    transition:
-        transform .2s ease,
-        border-color .2s ease;
 }
 .admin-level-row:hover {
     transform:translateX(3px);
