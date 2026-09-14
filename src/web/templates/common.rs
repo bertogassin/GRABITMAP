@@ -4307,8 +4307,16 @@ body {
 }
 
 .rm-version-footer {
-    margin-bottom: 78px;
-    opacity: .55;
+    width: 100%;
+    margin: 18px auto 86px;
+    padding: 8px 16px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.3;
+    text-align: center;
+    letter-spacing: .04em;
+    opacity: .82;
 }
 
 .rm-invite-card {
@@ -4412,27 +4420,6 @@ pub(crate) fn page_document(
 </head>
 
 <body>
-
-<style>
-.rm-version-footer {{
-    width: 100%;
-    margin: 18px auto 86px;
-    padding: 8px 16px;
-    color: var(--muted);
-    font-size: 11px;
-    font-weight: 700;
-    line-height: 1.3;
-    text-align: center;
-    letter-spacing: .04em;
-    opacity: .82;
-}}
-
-.rm-version-footer a {{
-    color: inherit;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-}}
-</style>
 
 {body_before_main}
 
@@ -6519,6 +6506,22 @@ mod public_entry_tests {
         assert!(page.contains("href=\"/privacy\""));
         assert!(page.contains("Правила"));
         assert!(page.contains("Политика"));
+    }
+
+    #[test]
+    fn page_document_keeps_shared_footer_styles_in_the_head() {
+        let page = page_document("Тест", "", "", "<p>ok</p>", "", "");
+        let (_, body) = page.split_once("<body>").expect("page body");
+
+        assert_eq!(
+            page.lines()
+                .filter(|line| *line == ".rm-version-footer {")
+                .count(),
+            1
+        );
+        assert!(!body.contains("<style>"));
+        assert!(page.contains("margin: 18px auto 86px;"));
+        assert!(page.contains("opacity: .82;"));
     }
 
     #[test]
