@@ -643,6 +643,8 @@ html[data-page="chat"] #chat-form.chat-composer {
     background: var(--chat-overlay-control);
     color: var(--text);
     font-size: 28px;
+    cursor: pointer;
+    touch-action: manipulation;
 }
 .chat-attachment-actions {
     display: grid;
@@ -661,6 +663,8 @@ html[data-page="chat"] #chat-form.chat-composer {
     background: var(--chat-overlay-control);
     color: var(--text);
     font: inherit;
+    cursor: pointer;
+    touch-action: manipulation;
 }
 .chat-attachment-actions > button > span { font-size: 30px; }
 .chat-attachment-actions > button > strong { font-size: 15px; }
@@ -672,6 +676,11 @@ html[data-page="chat"] #chat-form.chat-composer {
 .chat-attachment-actions > button:hover,
 .chat-attachment-actions > button:focus-visible {
     background: color-mix(in srgb, var(--accent) 16%, var(--surface));
+}
+.chat-attachment-sheet header button:focus-visible,
+.chat-attachment-actions > button:focus-visible {
+    outline: 2px solid var(--gold-light, #e6ca91);
+    outline-offset: 2px;
 }
 @media (max-width: 390px) {
     .chat-attachment-actions { grid-template-columns: 1fr; }

@@ -939,6 +939,14 @@ test("chat block confirmation has touch-safe keyboard-visible actions", async ()
   assert.match(mature, /\.chat-confirm-actions button:focus-visible \{[^}]*outline: 2px solid var\(--gold-light, #e6ca91\);[^}]*outline-offset: 2px;/);
 });
 
+test("chat attachment controls are touch-safe and keyboard-visible", async () => {
+  const mature = await readFile(new URL("static/chat-mature.css", root), "utf8");
+
+  assert.match(mature, /\.chat-attachment-sheet header button \{[^}]*width: 44px;[^}]*height: 44px;[^}]*cursor: pointer;[^}]*touch-action: manipulation;/);
+  assert.match(mature, /\.chat-attachment-actions > button \{[^}]*min-height: 44px;[^}]*cursor: pointer;[^}]*touch-action: manipulation;/);
+  assert.match(mature, /\.chat-attachment-sheet header button:focus-visible,[\s\S]*\.chat-attachment-actions > button:focus-visible \{[^}]*outline: 2px solid var\(--gold-light, #e6ca91\);[^}]*outline-offset: 2px;/);
+});
+
 test("prelaunch UI removes debug hooks native popups duplicate ids and legacy symbols", async () => {
   const [common, navigation, pwa, communication, resources, chat, blocks, groupHelper, cityHelper, staticFiles] = await Promise.all([
     readFile(new URL("src/web/templates/common.rs", root), "utf8"),
