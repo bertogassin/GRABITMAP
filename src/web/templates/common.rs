@@ -623,16 +623,18 @@ body::before { display: none; }
 .hero::after {
     content: "";
     position: absolute;
-    width: 220px;
-    height: 220px;
+    width: 260px;
+    height: 260px;
 
     right: -100px;
-    bottom: -120px;
+    bottom: -160px;
+    left: -100px;
 
     border-radius: 50%;
 
-    background: rgba(214,183,122,.08);
-    filter: blur(10px);
+    background: rgba(232, 204, 150, .18);
+    filter: blur(52px);
+    pointer-events: none;
 }
 
 .eyebrow {
@@ -1403,19 +1405,6 @@ html[data-page="chat"] .rm-version-footer {
     right: -120px;
     border-radius: 50%;
     background: rgba(126, 212, 228, .20);
-    filter: blur(52px);
-    pointer-events: none;
-}
-
-.hero::after {
-    content: "";
-    position: absolute;
-    width: 260px;
-    height: 260px;
-    bottom: -160px;
-    left: -100px;
-    border-radius: 50%;
-    background: rgba(232, 204, 150, .18);
     filter: blur(52px);
     pointer-events: none;
 }
@@ -6514,6 +6503,22 @@ mod public_entry_tests {
 
         assert!(style.contains("filter: drop-shadow(0 0 10px rgba(224, 196, 138, .18));"));
         assert!(style.contains("transition: transform .25s ease, color .25s ease;"));
+    }
+
+    #[test]
+    fn shared_hero_decoration_has_one_canonical_rule() {
+        let style = base_style();
+
+        assert_eq!(
+            style
+                .lines()
+                .filter(|line| *line == ".hero::after {")
+                .count(),
+            1
+        );
+        assert!(style.contains("right: -100px;\n    bottom: -160px;\n    left: -100px;"));
+        assert!(style.contains("background: rgba(232, 204, 150, .18);"));
+        assert!(style.contains("filter: blur(52px);\n    pointer-events: none;"));
     }
 
     #[test]
