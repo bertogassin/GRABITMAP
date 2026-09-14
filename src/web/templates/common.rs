@@ -4119,6 +4119,16 @@ body {
     opacity: .82;
 }
 
+.card.rm-document-card {
+    display: grid;
+    gap: 12px;
+    padding: 18px 16px;
+}
+
+.rm-document-card--prose {
+    line-height: 1.5;
+}
+
 .rm-invite-card {
     padding: 16px;
     display: grid;
@@ -6500,6 +6510,21 @@ mod public_entry_tests {
         assert!(style.contains("0 12px 35px rgba(0,0,0,.18),"));
         assert!(style.contains("border-color: rgba(232, 204, 150, .38);"));
         assert!(style.contains("0 22px 56px rgba(0,0,0,.32),"));
+    }
+
+    #[test]
+    fn document_cards_keep_shared_layout_without_inline_styles() {
+        let style = base_style();
+
+        assert_eq!(
+            style
+                .lines()
+                .filter(|line| *line == ".card.rm-document-card {")
+                .count(),
+            1
+        );
+        assert!(style.contains("gap: 12px;\n    padding: 18px 16px;"));
+        assert!(style.contains(".rm-document-card--prose {\n    line-height: 1.5;"));
     }
 
     #[test]
