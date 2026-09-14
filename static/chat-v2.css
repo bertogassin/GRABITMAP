@@ -1665,7 +1665,7 @@ html[data-page="chat"] body.light-theme {
     position:fixed;
     z-index:2;
     top:calc(14px + env(safe-area-inset-top));
-    right:14px;
+    inset-inline-end:14px;
     display:flex;
     gap:10px;
 }
