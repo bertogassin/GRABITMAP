@@ -869,6 +869,27 @@
 .chat-overlay-open {
     overflow:hidden;
 }
+html[data-page="chat"] {
+    --chat-overlay-backdrop:rgba(4,6,12,.62);
+    --chat-overlay-panel:rgba(18,20,27,.97);
+    --chat-overlay-border:rgba(214,183,122,.20);
+    --chat-overlay-accent:rgba(214,183,122,.13);
+    --chat-overlay-control:rgba(255,255,255,.04);
+    --chat-overlay-control-border:rgba(255,255,255,.09);
+    --chat-overlay-handle:rgba(255,255,255,.18);
+    --chat-overlay-shadow:0 -24px 70px rgba(0,0,0,.42);
+}
+html.light-theme[data-page="chat"],
+html[data-page="chat"] body.light-theme {
+    --chat-overlay-backdrop:rgba(17,19,24,.38);
+    --chat-overlay-panel:rgba(255,255,255,.98);
+    --chat-overlay-border:rgba(26,29,33,.12);
+    --chat-overlay-accent:rgba(165,118,31,.08);
+    --chat-overlay-control:rgba(26,29,33,.04);
+    --chat-overlay-control-border:rgba(26,29,33,.10);
+    --chat-overlay-handle:rgba(26,29,33,.20);
+    --chat-overlay-shadow:0 -24px 70px rgba(26,29,33,.18);
+}
 .chat-action-sheet,
 .chat-editor,
 .chat-delete-confirm {
@@ -889,7 +910,7 @@
     width:100%;
     height:100%;
     border:0;
-    background:rgba(4,6,12,.62);
+    background:var(--chat-overlay-backdrop);
     backdrop-filter:blur(9px);
     cursor:default;
     animation:chat-backdrop-in .2s ease;
@@ -907,17 +928,17 @@
     padding:
         10px 16px
         calc(18px + env(safe-area-inset-bottom));
-    border:1px solid rgba(214,183,122,.20);
+    border:1px solid var(--chat-overlay-border);
     border-bottom:0;
     border-radius:26px 26px 0 0;
     background:
         radial-gradient(
             circle at 85% 0,
-            rgba(214,183,122,.13),
+            var(--chat-overlay-accent),
             transparent 40%
         ),
-        rgba(18,20,27,.97);
-    box-shadow:0 -24px 70px rgba(0,0,0,.42);
+        var(--chat-overlay-panel);
+    box-shadow:var(--chat-overlay-shadow);
     box-sizing:border-box;
     animation:chat-sheet-in .26s cubic-bezier(.2,.8,.2,1);
 }
@@ -936,16 +957,16 @@
     height:4px;
     margin:0 auto 13px;
     border-radius:999px;
-    background:rgba(255,255,255,.18);
+    background:var(--chat-overlay-handle);
 }
 .chat-sheet-preview {
     overflow:hidden;
     margin-bottom:12px;
     padding:12px 14px;
-    border:1px solid rgba(255,255,255,.075);
+    border:1px solid var(--chat-overlay-control-border);
     border-radius:14px;
     color:var(--muted);
-    background:rgba(255,255,255,.035);
+    background:var(--chat-overlay-control);
     font-size:12px;
     line-height:1.45;
     white-space:nowrap;
@@ -961,10 +982,10 @@
     align-items:center;
     gap:13px;
     padding:0 15px;
-    border:1px solid rgba(255,255,255,.08);
+    border:1px solid var(--chat-overlay-control-border);
     border-radius:15px;
     color:var(--text);
-    background:rgba(255,255,255,.04);
+    background:var(--chat-overlay-control);
     font:inherit;
     font-size:14px;
     font-weight:800;
@@ -1001,11 +1022,11 @@
     padding:14px;
     resize:vertical;
     box-sizing:border-box;
-    border:1px solid rgba(214,183,122,.24);
+    border:1px solid var(--chat-overlay-border);
     border-radius:15px;
     outline:none;
     color:var(--text);
-    background:rgba(255,255,255,.04);
+    background:var(--chat-overlay-control);
     font:inherit;
     font-size:14px;
     line-height:1.5;
@@ -1025,10 +1046,10 @@
 }
 .chat-editor-footer button {
     min-height:48px;
-    border:1px solid rgba(255,255,255,.10);
+    border:1px solid var(--chat-overlay-control-border);
     border-radius:14px;
     color:var(--text);
-    background:rgba(255,255,255,.045);
+    background:var(--chat-overlay-control);
     font:inherit;
     font-weight:900;
     cursor:pointer;
@@ -1080,7 +1101,7 @@
     .chat-sheet-panel,
     .chat-editor-panel {
         margin-bottom:24px;
-        border-bottom:1px solid rgba(214,183,122,.20);
+        border-bottom:1px solid var(--chat-overlay-border);
         border-radius:26px;
     }
 }
@@ -1566,10 +1587,10 @@
 .chat-forward-preview {
     margin-bottom:10px;
     padding:12px 14px;
-    border:1px solid rgba(255,255,255,.075);
+    border:1px solid var(--chat-overlay-control-border);
     border-radius:14px;
     color:var(--muted);
-    background:rgba(255,255,255,.035);
+    background:var(--chat-overlay-control);
     font-size:12px;
     line-height:1.45;
 }
@@ -1584,10 +1605,10 @@
     gap:3px;
     width:100%;
     padding:12px 14px;
-    border:1px solid rgba(255,255,255,.08);
+    border:1px solid var(--chat-overlay-control-border);
     border-radius:14px;
     color:var(--text);
-    background:rgba(255,255,255,.04);
+    background:var(--chat-overlay-control);
     text-align:left;
     font:inherit;
     cursor:pointer;
@@ -1817,10 +1838,10 @@ body.chat-lightbox-open {
     display: grid;
     place-items: center;
     padding: 0;
-    border: 1px solid rgba(255,255,255,.08);
+    border: 1px solid var(--chat-overlay-control-border);
     border-radius: 14px;
     color: var(--text);
-    background: rgba(255,255,255,.04);
+    background: var(--chat-overlay-control);
     font-size: 22px;
     cursor: pointer;
 }
