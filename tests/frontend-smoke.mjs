@@ -126,6 +126,24 @@ test("resource rating keeps one canonical star button rule", async () => {
   assert.doesNotMatch(starRules[0], /font-size: 28px;|padding: 2px;/);
 });
 
+test("resource reports keep one canonical reason chip style", async () => {
+  const template = await readFile(
+    new URL("src/web/templates/common.rs", root),
+    "utf8",
+  );
+  const chipRules = template.match(/^\.rm-report-chip \{[\s\S]*?^\}/gm) ?? [];
+
+  assert.equal(chipRules.length, 1);
+  assert.match(chipRules[0], /min-height: 36px;/);
+  assert.match(chipRules[0], /border-radius: 999px;/);
+  assert.match(chipRules[0], /border: 1px solid rgba\(232, 204, 150, \.24\);/);
+  assert.match(chipRules[0], /background: rgba\(232, 204, 150, \.08\);/);
+  assert.doesNotMatch(
+    template,
+    /\.rm-guest-hint,\s*\.rm-kind-chip,\s*\.rm-report-chip\s*\{/,
+  );
+});
+
 test("mobile foundation hides assistive labels and clears Android system navigation", async () => {
   const css = await readFile(new URL("static/mobile-foundation.css", root), "utf8");
 

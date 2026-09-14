@@ -3671,7 +3671,7 @@ html[dir="rtl"] .rm-menu-row {
     min-height: 36px;
     padding: 0 12px;
     border-radius: 999px;
-    border: 1px solid rgba(232, 204, 150, .26);
+    border: 1px solid rgba(232, 204, 150, .24);
     background: rgba(232, 204, 150, .08);
     color: var(--gold-light);
     font-size: 13px;
@@ -4266,8 +4266,7 @@ body {
 }
 
 .rm-guest-hint,
-.rm-kind-chip,
-.rm-report-chip {
+.rm-kind-chip {
     border-color: rgba(232, 204, 150, .24);
     background: rgba(232, 204, 150, .08);
 }
