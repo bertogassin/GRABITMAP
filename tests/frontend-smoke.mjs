@@ -857,6 +857,21 @@ test("chat reply and forward bars share one touch-safe close control", async () 
   assert.match(chat, /getElementById\(\s*"chat-forward-close"\s*\)\s*\.addEventListener\("click", clearForward\)/);
 });
 
+test("chat action dialogs share touch and keyboard interaction states", async () => {
+  const [chat, mature] = await Promise.all([
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("static/chat-mature.css", root), "utf8"),
+  ]);
+
+  assert.match(chat, /class="chat-sheet-panel"[\s\S]*role="dialog" aria-modal="true"/);
+  assert.match(chat, /class="chat-editor-panel"[\s\S]*role="dialog" aria-modal="true"/);
+  assert.match(chat, /class="chat-editor-panel chat-delete-panel"[\s\S]*role="dialog" aria-modal="true"/);
+  assert.match(chat, /class="chat-editor-panel chat-forward-panel"[\s\S]*role="dialog" aria-modal="true"/);
+  assert.match(mature, /\.chat-sheet-actions > button,[\s\S]*\.chat-sheet-reactions button \{[\s\S]*touch-action: manipulation;/);
+  assert.match(mature, /\.chat-forward-target \{[\s\S]*min-height: 48px;/);
+  assert.match(mature, /\.chat-sheet-actions > button:focus-visible,[\s\S]*\.chat-sheet-reactions button:focus-visible \{[\s\S]*outline: 2px solid var\(--gold-light, #e6ca91\);/);
+});
+
 test("prelaunch UI removes debug hooks native popups duplicate ids and legacy symbols", async () => {
   const [common, navigation, pwa, communication, resources, chat, blocks, groupHelper, cityHelper, staticFiles] = await Promise.all([
     readFile(new URL("src/web/templates/common.rs", root), "utf8"),
