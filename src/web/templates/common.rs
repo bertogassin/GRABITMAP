@@ -1859,8 +1859,8 @@ a.feature.rm-feature-add {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 18px;
+    gap: 8px;
+    margin-top: 14px;
 }
 
 .rm-city-add {
@@ -4192,13 +4192,6 @@ html[dir="rtl"] .rm-menu-row {
     border-radius: 18px;
     content-visibility: auto;
     contain-intrinsic-size: 1px 88px;
-}
-
-.rm-empty-state-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 14px;
 }
 
 /* GRABIT · единый слой */

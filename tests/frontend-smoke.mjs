@@ -78,6 +78,22 @@ test("owner dashboard keeps one canonical admin shell rule", async () => {
   assert.doesNotMatch(dashboard, /padding-bottom:50px;/);
 });
 
+test("empty states keep one canonical action layout", async () => {
+  const template = await readFile(
+    new URL("src/web/templates/common.rs", root),
+    "utf8",
+  );
+  const actionRules =
+    template.match(/^\.rm-empty-state-actions \{[\s\S]*?^\}/gm) ?? [];
+
+  assert.equal(actionRules.length, 1);
+  assert.match(
+    actionRules[0],
+    /justify-content: center;[\s\S]*?gap: 8px;[\s\S]*?margin-top: 14px;/,
+  );
+  assert.doesNotMatch(actionRules[0], /gap: 10px;|margin-top: 18px;/);
+});
+
 test("mobile foundation hides assistive labels and clears Android system navigation", async () => {
   const css = await readFile(new URL("static/mobile-foundation.css", root), "utf8");
 
