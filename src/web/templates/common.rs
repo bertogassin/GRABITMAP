@@ -680,6 +680,8 @@ body::before { display: none; }
 ----------------------------------------------------------- */
 
 .search {
+    position: relative;
+    z-index: 2;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -693,7 +695,14 @@ body::before { display: none; }
     border: 1px solid var(--line);
     border-radius: 16px;
 
-    background: rgba(214,183,122,.06);
+    background: rgba(0,0,0,.045);
+    box-shadow:
+        inset 0 1px 0 rgba(0,0,0,.05),
+        0 12px 35px rgba(0,0,0,.18);
+    transition:
+        border-color .25s ease,
+        box-shadow .25s ease,
+        background .25s ease;
 }
 
 .search input {
@@ -1406,20 +1415,6 @@ html[data-page="chat"] .rm-version-footer {
     background: rgba(232, 204, 150, .18);
     filter: blur(52px);
     pointer-events: none;
-}
-
-.search {
-    position: relative;
-    z-index: 2;
-    border: 1px solid var(--line);
-    background: rgba(0,0,0,.045);
-    box-shadow:
-        inset 0 1px 0 rgba(0,0,0,.05),
-        0 12px 35px rgba(0,0,0,.18);
-    transition:
-        border-color .25s ease,
-        box-shadow .25s ease,
-        background .25s ease;
 }
 
 .search:focus-within {
@@ -6501,6 +6496,16 @@ mod public_entry_tests {
         assert!(style.contains("animation: fadeIn .4s ease both;"));
         assert!(style.contains("transition: transform .25s ease, opacity .25s ease;"));
         assert!(style.contains("border: 1px solid rgba(232, 204, 150, .32);"));
+    }
+
+    #[test]
+    fn shared_search_styles_have_one_canonical_rule() {
+        let style = base_style();
+
+        assert_eq!(style.lines().filter(|line| *line == ".search {").count(), 1);
+        assert!(style.contains("position: relative;\n    z-index: 2;"));
+        assert!(style.contains("background: rgba(0,0,0,.045);"));
+        assert!(style.contains("0 12px 35px rgba(0,0,0,.18);"));
     }
 
     #[test]
