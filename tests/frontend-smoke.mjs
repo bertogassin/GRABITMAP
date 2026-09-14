@@ -49,6 +49,21 @@ test("mobile product foundation preserves accessible zoom and contains narrow la
   assert.match(runtime, /button\.hidden = !matches/);
 });
 
+test("shared page shell keeps version footer styles in the global UI layer", async () => {
+  const template = await readFile(
+    new URL("src/web/templates/common.rs", root),
+    "utf8",
+  );
+  const bodyStart = template.indexOf("<body>");
+  const mainSlot = template.indexOf("{body_before_main}", bodyStart);
+
+  assert.ok(bodyStart >= 0);
+  assert.ok(mainSlot > bodyStart);
+  assert.match(template, /\.rm-version-footer \{[\s\S]*width: 100%;/);
+  assert.match(template, /\.rm-version-footer \{[\s\S]*margin: 18px auto 86px;/);
+  assert.doesNotMatch(template.slice(bodyStart, mainSlot), /<style>/);
+});
+
 test("mobile foundation hides assistive labels and clears Android system navigation", async () => {
   const css = await readFile(new URL("static/mobile-foundation.css", root), "utf8");
 
