@@ -148,7 +148,7 @@ test("service worker keeps partial shell caches and caches static responses", as
   assert.match(serviceWorker, /Promise\.all\(STATIC_ASSETS\.map/);
   assert.match(serviceWorker, /cache\.put\(cacheKey\.toString\(\), response\.clone\(\)\)/);
   assert.match(serviceWorker, /const CACHE_PREFIX = "grabit-shell-"/);
-  assert.match(serviceWorker, /CACHE_PREFIX \+ "v7\.21\.0-r5"/);
+  assert.match(serviceWorker, /CACHE_PREFIX \+ "v7\.21\.1-r5"/);
   assert.match(common, /env!\("CARGO_PKG_VERSION"\), "-r5"/);
   assert.match(serviceWorker, /key\.startsWith\(CACHE_PREFIX\)/);
   assert.match(serviceWorker, /internalNavigationTarget\(event\.notification\.data\.url, target\)/);
