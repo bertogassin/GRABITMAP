@@ -754,7 +754,8 @@ test("video actions are consistent for sender recipient Android and iPhone", asy
   assert.match(chat, /function applyMessageBody[\s\S]*message\.attachment_kind === "video"[\s\S]*chat-video-frame/);
   assert.match(chat, /messagePreviewLabel\(message, 180\)/);
   assert.match(mature, /\.chat-message-row\[data-attachment-kind="video"\] \.chat-bubble/);
-  assert.match(mature, /\.chat-message-row\.is-theirs \.chat-message-more \{ right: 7px; left: auto; \}/);
+  assert.match(mature, /html\[data-page="chat"\] \.chat-message-row \.chat-message-more \{[\s\S]*inset-inline-end: 7px;/);
+  assert.doesNotMatch(mature, /\.chat-message-row\.is-theirs \.chat-message-more \{/);
 });
 
 test("chat modules share icons and action binding without closure leaks", async () => {
@@ -821,6 +822,23 @@ test("chat controls share one accessible mobile UI baseline", async () => {
   assert.match(mature, /#chat-form \.chat-composer-main \{[\s\S]*grid-template-columns: 40px minmax\(0, 1fr\) 40px;/);
   assert.match(mature, /#chat-form \.chat-emoji-btn,[\s\S]*width: 40px !important;[\s\S]*height: 46px !important;/);
   assert.match(mature, /\.chat-header-more:focus-visible,[\s\S]*\.chat-message-more:focus-visible,[\s\S]*#chat-form #chat-voice-btn:focus-visible[\s\S]*outline: 2px solid var\(--gold-light, #e6ca91\) !important;/);
+});
+
+test("chat message actions keep one directional touch-safe geometry", async () => {
+  const [template, chat, mature] = await Promise.all([
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("static/chat-mature.css", root), "utf8"),
+  ]);
+
+  assert.equal((mature.match(/^html\[data-page="chat"\] \.chat-message-row \.chat-message-more \{/gm) || []).length, 1);
+  assert.match(mature, /\.chat-message-row \.chat-bubble \{[\s\S]*padding-inline-end: 46px !important;/);
+  assert.match(mature, /html\[data-page="chat"\] \.chat-message-row \.chat-message-more \{[\s\S]*right: auto; left: auto; inset-inline-end: 7px;[\s\S]*width: 36px; height: 36px;/);
+  assert.match(mature, /html\[data-page="chat"\] \.chat-message-row \.chat-message-more::before \{[\s\S]*content: ""; position: absolute; inset: -4px;/);
+  assert.match(mature, /html\[data-page="chat"\] \.chat-message-row\[data-attachment-kind="video"\] \.chat-message-more \{[\s\S]*inset-inline-end: 12px;/);
+  assert.doesNotMatch(mature, /\.chat-message-row\.is-theirs \.chat-message-more \{/);
+  assert.match(template, /class="chat-message-more" aria-label="\{actions_aria\}"/);
+  assert.match(chat, /bindMessageActionButton\(button, null\)/);
 });
 
 test("prelaunch UI removes debug hooks native popups duplicate ids and legacy symbols", async () => {
