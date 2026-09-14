@@ -68,7 +68,7 @@
                     var link = document.createElement("a");
                     link.className = "card";
                     link.href = "/app/search?city_id=" + encodeURIComponent(cityId) + "&q=" + encodeURIComponent(item.name);
-                    link.innerHTML = '<div class="card-icon">⌕</div><div class="card-content"><div class="card-title">' + escapeHtml(item.name) + '</div><div class="card-meta">' + escapeHtml(item.sector || t("map_profession_label", "Профессия")) + '</div></div><div class="card-arrow">›</div>';
+                    link.innerHTML = '<div class="card-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></div><div class="card-content"><div class="card-title">' + escapeHtml(item.name) + '</div><div class="card-meta">' + escapeHtml(item.sector || t("map_profession_label", "Профессия")) + '</div></div><div class="card-arrow">›</div>';
                     results.appendChild(link);
                 });
                 var total = localCount + data.items.length;

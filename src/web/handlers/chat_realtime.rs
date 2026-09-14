@@ -452,11 +452,6 @@ mod tests {
     }
 
     #[test]
-    fn realtime_protocol_name_is_stable() {
-        assert_eq!("resursmap.chat.v5", "resursmap.chat.v5");
-    }
-
-    #[test]
     fn outgoing_chat_event_hides_internal_routing_ids() {
         let event = crate::state::app_state::ChatRealtimeEvent {
             event_id: 11,

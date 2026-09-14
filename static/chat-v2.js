@@ -1,3 +1,38 @@
+"use strict";
+
+// Shared chat primitives live outside the feature IIFEs below. Keeping them
+// here makes dependencies explicit and prevents one isolated module from
+// calling a function that only exists inside another module's closure.
+var ResursMapChat = window.ResursMapChat || (window.ResursMapChat = {});
+
+ResursMapChat.icon = function (name) {
+    var paths = {
+        smile: '<circle cx="12" cy="12" r="9"></circle><path d="M8.5 14.5c1 1.2 2.1 1.8 3.5 1.8s2.5-.6 3.5-1.8"></path><path d="M9 9.5h.01M15 9.5h.01"></path>',
+        attach: '<path d="M8.5 12.5 14.8 6.2a3 3 0 0 1 4.2 4.2l-7.8 7.8a5 5 0 0 1-7.1-7.1l7.7-7.7"></path>',
+        mic: '<rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M6.5 11.5a5.5 5.5 0 0 0 11 0M12 17v4M9 21h6"></path>',
+        send: '<path d="m4 4 17 8-17 8 3-8-3-8Z"></path><path d="M7 12h14"></path>',
+        stop: '<rect x="7" y="7" width="10" height="10" rx="2"></rect>',
+        photo: '<rect x="3" y="4" width="18" height="16" rx="3"></rect><circle cx="9" cy="10" r="2"></circle><path d="m21 15-4.5-4.5L7 20"></path>',
+        video: '<rect x="3" y="5" width="14" height="14" rx="3"></rect><path d="m17 10 4-2v8l-4-2"></path>',
+        document: '<path d="M6 2h8l4 4v16H6z"></path><path d="M14 2v5h5M9 12h6M9 16h6"></path>',
+        close: '<path d="m7 7 10 10M17 7 7 17"></path>',
+        pin: '<path d="m14 4 6 6-3 1-4 4-1 5-2-2 1-5 4-4z"></path><path d="m5 19 5-5"></path>',
+        reply: '<path d="m9 17-5-5 5-5"></path><path d="M4 12h9a6 6 0 0 1 6 6"></path>',
+        copy: '<rect x="8" y="8" width="11" height="11" rx="2"></rect><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path>',
+        forward: '<path d="m15 7 5 5-5 5"></path><path d="M20 12h-9a6 6 0 0 0-6 6"></path>',
+        edit: '<path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path>',
+        remove: '<path d="M4 7h16M9 7V4h6v3M8 10v8M12 10v8M16 10v8M6 7l1 14h10l1-14"></path>',
+        download: '<path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path>',
+        more: '<circle cx="12" cy="5" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="12" cy="19" r="1.5" fill="currentColor" stroke="none"></circle>',
+        fullscreen: '<path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"></path>',
+        pip: '<rect x="3" y="5" width="18" height="14" rx="2"></rect><rect x="11" y="11" width="8" height="6" rx="1"></rect>',
+        speed: '<path d="M5 15a8 8 0 1 1 14 0"></path><path d="m12 13 4-4"></path><circle cx="12" cy="13" r="1"></circle>',
+        next: '<path d="m9 18 6-6-6-6"></path>'
+    };
+    return '<svg class="chat-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+        (paths[name] || paths.attach) + '</svg>';
+};
+
 (function () {
     "use strict";
 
@@ -71,6 +106,7 @@
         var form = document.getElementById("chat-form");
         var input = document.getElementById("chat-input");
         var send = document.getElementById("chat-send");
+        var voiceBtn = document.getElementById("chat-voice-btn");
         var counter = document.getElementById(
             "chat-counter"
         );
@@ -159,19 +195,30 @@
             button.title = label;
         }
 
-        function chatIcon(name) {
-            var paths = {
-                smile: '<circle cx="12" cy="12" r="9"></circle><path d="M8.5 14.5c1 1.2 2.1 1.8 3.5 1.8s2.5-.6 3.5-1.8"></path><path d="M9 9.5h.01M15 9.5h.01"></path>',
-                attach: '<path d="M8.5 12.5 14.8 6.2a3 3 0 0 1 4.2 4.2l-7.8 7.8a5 5 0 0 1-7.1-7.1l7.7-7.7"></path>',
-                mic: '<rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M6.5 11.5a5.5 5.5 0 0 0 11 0M12 17v4M9 21h6"></path>',
-                send: '<path d="m4 4 17 8-17 8 3-8-3-8Z"></path><path d="M7 12h14"></path>',
-                photo: '<rect x="3" y="4" width="18" height="16" rx="3"></rect><circle cx="9" cy="10" r="2"></circle><path d="m21 15-4.5-4.5L7 20"></path>',
-                video: '<rect x="3" y="5" width="14" height="14" rx="3"></rect><path d="m17 10 4-2v8l-4-2"></path>',
-                document: '<path d="M6 2h8l4 4v16H6z"></path><path d="M14 2v5h5M9 12h6M9 16h6"></path>',
-                close: '<path d="m7 7 10 10M17 7 7 17"></path>'
-            };
-            return '<svg class="chat-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
-                (paths[name] || paths.attach) + '</svg>';
+        function setComposerActionMode(mode) {
+            if (!voiceBtn) {
+                return;
+            }
+            var normalized = mode === "stop"
+                ? "stop"
+                : (mode === "send" ? "send" : "mic");
+            var icon = voiceBtn.querySelector(".chat-action-icon");
+            if (icon) {
+                icon.innerHTML = ResursMapChat.icon(normalized);
+            }
+            voiceBtn.dataset.mode = normalized;
+            voiceBtn.classList.toggle("is-recording", normalized === "stop");
+            if (normalized === "stop") {
+                labelAction(
+                    voiceBtn,
+                    "chat_voice_stop_send",
+                    "Остановить и отправить"
+                );
+            } else if (normalized === "send") {
+                labelAction(voiceBtn, "chat_send_action", "Отправить");
+            } else {
+                labelAction(voiceBtn, "chat_voice", "Голосовое");
+            }
         }
 
         var messageLabel = t("chat_message", "Сообщение");
@@ -183,8 +230,8 @@
             "Загрузить предыдущие сообщения"
         );
         connectionState.textContent = t(
-            "chat_connecting",
-            "Связь восстанавливается…"
+            "chat_connecting_initial",
+            "Соединение…"
         );
 
         function localizeDeletedText(value) {
@@ -683,7 +730,15 @@
 
             send.disabled = !hasMessage || length > 2000;
             form.classList.toggle("has-message", hasMessage);
-            send.setAttribute("aria-hidden", hasMessage ? "false" : "true");
+            send.setAttribute("aria-hidden", "true");
+            if (voiceRecording) {
+                setComposerActionMode("stop");
+            } else {
+                setComposerActionMode(hasMessage ? "send" : "mic");
+            }
+            if (voiceBtn) {
+                voiceBtn.disabled = Boolean(mediaSending) || length > 2000;
+            }
 
             autoResize();
 
@@ -837,6 +892,8 @@
             row.dataset.clientMessageId = String(
                 message.client_message_id || ""
             );
+            row.dataset.attachmentKind = String(message.attachment_kind || "");
+            row.dataset.attachmentUrl = String(message.attachment_url || "");
 
             if (animate) {
                 row.classList.add("is-new");
@@ -854,6 +911,8 @@
                 voiceAudio.className = "chat-voice-audio";
                 voiceAudio.controls = true;
                 voiceAudio.preload = "metadata";
+                voiceAudio.dataset.size = String(message.attachment_size || 0);
+                voiceAudio.dataset.mime = String(message.attachment_mime || "");
                 voiceAudio.src = String(message.attachment_url);
                 voicePlayer.appendChild(voiceAudio);
                 body.appendChild(voicePlayer);
@@ -877,14 +936,41 @@
                 }
             } else if (message.attachment_kind === "video" && message.attachment_url) {
                 var video = document.createElement("video");
+                var videoUrl = String(message.attachment_url);
                 video.className = "chat-message-video";
-                video.src = String(message.attachment_url);
+                video.src = videoUrl;
                 video.controls = true;
                 video.preload = "metadata";
                 video.playsInline = true;
+                // A format the viewer's browser cannot decode (for
+                // example WebM opened on Safari/iOS) otherwise sits in
+                // HAVE_NOTHING forever: native controls show a spinner
+                // and "0:00" with no feedback. Fail visibly instead.
+                video.addEventListener("error", function () {
+                    video.hidden = true;
+                    var fallback = document.createElement("a");
+                    fallback.className = "chat-document-link";
+                    fallback.href = videoUrl;
+                    fallback.target = "_blank";
+                    fallback.rel = "noopener";
+                    var fallbackIcon = document.createElement("span");
+                    fallbackIcon.className = "chat-document-icon";
+                    fallbackIcon.innerHTML = ResursMapChat.icon("document");
+                    fallback.appendChild(fallbackIcon);
+                    var fallbackLabel = document.createElement("span");
+                    fallbackLabel.textContent = t(
+                        "chat_video_playback_error",
+                        "Не удалось воспроизвести видео · Открыть файл"
+                    );
+                    fallback.appendChild(fallbackLabel);
+                    video.insertAdjacentElement("afterend", fallback);
+                });
                 body.textContent = "";
                 body.classList.add("chat-message-body--video");
-                body.appendChild(video);
+                var videoFrame = document.createElement("div");
+                videoFrame.className = "chat-video-frame";
+                videoFrame.appendChild(video);
+                body.appendChild(videoFrame);
                 if (message.message) {
                     var videoCap = document.createElement("div");
                     videoCap.className = "chat-message-caption";
@@ -897,7 +983,7 @@
                 documentLink.href = String(message.attachment_url);
                 var documentIcon = document.createElement("span");
                 documentIcon.className = "chat-document-icon";
-                documentIcon.innerHTML = chatIcon("document");
+                documentIcon.innerHTML = ResursMapChat.icon("document");
                 var documentName = document.createElement("span");
                 documentName.textContent = String(message.message || t("chat_document", "Документ"));
                 documentLink.setAttribute("download", "");
@@ -936,7 +1022,13 @@
             more.type = "button";
             more.className = "chat-message-more";
             more.setAttribute("aria-label", t("chat_actions_aria", "Действия с сообщением"));
-            more.textContent = "⋮";
+            more.innerHTML = ResursMapChat.icon("more");
+            if (
+                typeof ResursMapChat.bindMessageActionButton ===
+                "function"
+            ) {
+                ResursMapChat.bindMessageActionButton(more, row);
+            }
             bubble.appendChild(more);
             if (isGroup && !mine) {
                 var authorName = String(message.sender_name || "").trim();
@@ -1394,10 +1486,18 @@
                     !window.__resursmapChatLastPollSucceededAt ||
                     Date.now() - window.__resursmapChatLastPollSucceededAt > 5000
                 ) {
-                    setConnection(
-                        t("chat_connecting", "Связь восстанавливается…"),
-                        "is-error"
-                    );
+                    var wsEver = document.documentElement.dataset.chatRealtime;
+                    if (wsEver === "online") {
+                        setConnection(
+                            t("chat_conn_ok", "Связь есть"),
+                            "is-online"
+                        );
+                    } else {
+                        setConnection(
+                            t("chat_connecting", "Связь восстанавливается…"),
+                            "is-error"
+                        );
+                    }
                 }
             } finally {
                 polling = false;
@@ -2032,7 +2132,7 @@
                     var cancel = document.createElement("button");
                     cancel.type = "button";
                     cancel.className = "chat-media-cancel";
-                    cancel.innerHTML = chatIcon("close");
+                    cancel.innerHTML = ResursMapChat.icon("close");
                     cancel.title = t("chat_cancel", "Отмена");
                     cancel.setAttribute(
                         "aria-label",
@@ -2207,10 +2307,13 @@
                 : t("chat_sending_attachment", "Отправка вложения…");
 
             mediaRequest(item).then(function (data) {
+                // Remove the optimistic row first. Appending the confirmed
+                // message before this cleanup made removeMediaItem() find and
+                // delete the newly rendered video with the same client id.
+                removeMediaItem(item, false);
                 if (data.message) {
                     appendMessages([data.message]);
                 }
-                removeMediaItem(item, false);
                 window.ResursMapChatReply = null;
                 var replyBarEl = document.getElementById("chat-reply-bar");
                 if (replyBarEl) {
@@ -2229,6 +2332,7 @@
                 }
             }).catch(function (error) {
                 if (item.committed) {
+                    removeMediaItem(item, false);
                     setConnection(t("chat_conn_ok", "Связь есть"), "is-online");
                     sendState.textContent = t("chat_sent_hint", "Отправлено · Enter — отправить");
                     return;
@@ -2299,6 +2403,7 @@
                 voiceBtn.disabled = mediaSending;
                 voiceBtn.setAttribute("aria-busy", mediaSending ? "true" : "false");
             }
+            updateComposer();
         }
 
         function mediaErrorCopy(kind, code) {
@@ -2358,7 +2463,7 @@
             imageBtn = document.createElement("button");
             imageBtn.type = "button";
             imageBtn.id = "chat-image-btn";
-            imageBtn.innerHTML = chatIcon("attach") + '<span class="chat-action-label">Вложение</span>';
+            imageBtn.innerHTML = ResursMapChat.icon("attach") + '<span class="chat-action-label">Вложение</span>';
             imageBtn.className = "chat-image-btn";
             if (send && send.parentNode) {
                 send.parentNode.insertBefore(imageBtn, send);
@@ -2391,11 +2496,11 @@
             '<button type="button" class="chat-attachment-backdrop" data-attachment-close aria-label="Закрыть меню вложений"></button>' +
             '<section class="chat-attachment-sheet" role="dialog" aria-modal="true" aria-label="Добавить вложение">' +
                 '<span class="chat-attachment-handle" aria-hidden="true"></span>' +
-                '<header><strong>Добавить вложение</strong><button type="button" data-attachment-close aria-label="Закрыть">' + chatIcon("close") + '</button></header>' +
+                '<header><strong>Добавить вложение</strong><button type="button" data-attachment-close aria-label="Закрыть">' + ResursMapChat.icon("close") + '</button></header>' +
                 '<div class="chat-attachment-actions">' +
-                    '<button type="button" data-attachment="photo"><span class="chat-attachment-icon" aria-hidden="true">' + chatIcon("photo") + '</span><strong>Фото</strong><small>JPEG, PNG, WebP</small></button>' +
-                    '<button type="button" data-attachment="video"><span class="chat-attachment-icon" aria-hidden="true">' + chatIcon("video") + '</span><strong>Видео</strong><small>MP4 или WebM</small></button>' +
-                    '<button type="button" data-attachment="document"><span class="chat-attachment-icon" aria-hidden="true">' + chatIcon("document") + '</span><strong>Документ</strong><small>PDF, Office, текст</small></button>' +
+                    '<button type="button" data-attachment="photo"><span class="chat-attachment-icon" aria-hidden="true">' + ResursMapChat.icon("photo") + '</span><strong>Фото</strong><small>JPEG, PNG, WebP</small></button>' +
+                    '<button type="button" data-attachment="video"><span class="chat-attachment-icon" aria-hidden="true">' + ResursMapChat.icon("video") + '</span><strong>Видео</strong><small>MP4 или WebM</small></button>' +
+                    '<button type="button" data-attachment="document"><span class="chat-attachment-icon" aria-hidden="true">' + ResursMapChat.icon("document") + '</span><strong>Документ</strong><small>PDF, Office, текст</small></button>' +
                 '</div>' +
             '</section>';
         document.body.appendChild(attachmentMenu);
@@ -2452,8 +2557,8 @@
             preview.className = "chat-attachment-preview";
             var visual = kind === "image"
                 ? '<img alt="Предпросмотр">'
-                : (kind === "video" ? '<video muted playsinline preload="metadata"></video>' : '<span class="chat-document-icon">' + chatIcon("document") + '</span>');
-            preview.innerHTML = visual + '<span class="chat-attachment-name"></span><button type="button" aria-label="Удалить вложение">' + chatIcon("close") + '</button>';
+                : (kind === "video" ? '<video muted playsinline preload="metadata"></video>' : '<span class="chat-document-icon">' + ResursMapChat.icon("document") + '</span>');
+            preview.innerHTML = visual + '<span class="chat-attachment-name"></span><button type="button" aria-label="Удалить вложение">' + ResursMapChat.icon("close") + '</button>';
             var media = preview.querySelector("img,video");
             if (media) media.src = attachmentDraft.previewUrl;
             preview.querySelector(".chat-attachment-name").textContent = file.name + " · " + Math.ceil(file.size / 1024) + " KB";
@@ -2568,8 +2673,6 @@
             showAttachmentDraft(file, "document", file.type || "application/octet-stream");
         });
 
-        var voiceBtn = document.getElementById("chat-voice-btn");
-        labelAction(voiceBtn, "chat_voice", "Голосовое");
         var voiceRecording = false;
         var voiceStarting = false;
         var voiceRecorder = null;
@@ -2587,8 +2690,9 @@
                 '<span class="chat-voice-recording-label">' + t("chat_recording", "Запись…") + '</span>' +
                 '<span class="chat-voice-recording-timer">0:00</span>' +
             '</div>';
-        if (form) {
-            form.appendChild(voiceOverlay);
+        var composerMain = form.querySelector(".chat-composer-main");
+        if (composerMain) {
+            composerMain.appendChild(voiceOverlay);
         }
 
         function formatVoiceDuration(ms) {
@@ -2613,9 +2717,8 @@
             voiceRecording = false;
             voiceStarting = false;
             voiceOverlay.hidden = true;
+            form.classList.remove("is-recording");
             if (voiceBtn) {
-                voiceBtn.classList.remove("is-recording");
-                labelAction(voiceBtn, "chat_voice", "Голосовое");
                 voiceBtn.disabled = false;
             }
             if (voiceTimerId) {
@@ -2626,6 +2729,7 @@
                 window.clearTimeout(voiceStopTimerId);
                 voiceStopTimerId = null;
             }
+            updateComposer();
         }
 
         function sendVoiceBlob(blob, mimeType) {
@@ -2750,18 +2854,8 @@
                     voiceRecorder.start(250);
                     voiceRecording = true;
                     voiceStartedAt = Date.now();
-                    voiceBtn.classList.add("is-recording");
-                    var voiceLabel = voiceBtn.querySelector(".chat-action-label");
-                    if (voiceLabel) {
-                        voiceLabel.textContent = t("chat_voice_send", "Отправить");
-                    } else {
-                        voiceBtn.textContent = t("chat_voice_send", "Отправить");
-                    }
-                    voiceBtn.setAttribute(
-                        "aria-label",
-                        t("chat_voice_send", "Отправить")
-                    );
-                    voiceBtn.title = t("chat_voice_send", "Отправить");
+                    form.classList.add("is-recording");
+                    setComposerActionMode("stop");
                     voiceOverlay.hidden = false;
                     updateVoiceTimer();
                     voiceTimerId = window.setInterval(
@@ -2776,6 +2870,7 @@
                 .catch(function () {
                     voiceStarting = false;
                     voiceBtn.disabled = false;
+                    updateComposer();
                     sendState.textContent =
                         t("chat_mic_denied", "Нет доступа к микрофону");
                     if (typeof window.playChatError === "function") {
@@ -2792,6 +2887,16 @@
                     if (voiceRecording) {
                         stopVoiceRecording(true);
                         haptic("voice-send");
+                    } else if (
+                        input.value.trim().length > 0 ||
+                        Boolean(attachmentDraft)
+                    ) {
+                        if (typeof form.requestSubmit === "function") {
+                            form.requestSubmit(send);
+                        } else {
+                            send.click();
+                        }
+                        haptic("send");
                     } else {
                         startVoiceRecording();
                         haptic("voice");
@@ -3309,12 +3414,12 @@
         pinnedBanner.type = "button";
         pinnedBanner.hidden = true;
         pinnedBanner.innerHTML =
-            '<span class="chat-pinned-icon" aria-hidden="true">📌</span>' +
+            '<span class="chat-pinned-icon" aria-hidden="true">' + ResursMapChat.icon("pin") + '</span>' +
             '<span class="chat-pinned-copy">' +
                 '<strong>' + t("chat_pinned_message", "Закреплённое сообщение") + '</strong>' +
                 '<small id="chat-pinned-preview"></small>' +
             '</span>' +
-            '<span class="chat-pinned-open" aria-hidden="true">›</span>';
+            '<span class="chat-pinned-open" aria-hidden="true">' + ResursMapChat.icon("next") + '</span>';
         history.parentNode.insertBefore(pinnedBanner, history);
 
         var replyBar = document.getElementById("chat-reply-bar");
@@ -3334,7 +3439,7 @@
                 '</div>' +
                 '<button id="chat-reply-close" ' +
                     'type="button" aria-label="' + t("chat_cancel_reply", "Отменить ответ") + '">' +
-                    '×' +
+                    ResursMapChat.icon("close") +
                 '</button>';
 
             form.insertBefore(replyBar, form.firstChild);
@@ -3348,9 +3453,11 @@
         sheet.hidden = true;
         sheet.innerHTML =
             '<button class="chat-sheet-backdrop" ' +
-                'type="button" data-close-sheet></button>' +
+                'type="button" data-close-sheet aria-label="' +
+                escapeHtml(t("chat_close", "Закрыть")) + '"></button>' +
             '<section class="chat-sheet-panel" ' +
-                'role="dialog" aria-modal="true">' +
+                'role="dialog" aria-modal="true" aria-label="' +
+                escapeHtml(t("chat_actions_aria", "Действия с сообщением")) + '">' +
                 '<div class="chat-sheet-handle"></div>' +
                 '<div class="chat-sheet-preview" ' +
                     'id="chat-sheet-preview"></div>' +
@@ -3365,30 +3472,46 @@
                     '</div>' +
                     '<button type="button" ' +
                         'data-chat-action="reply">' +
-                        '<span>↩</span>' + t("chat_reply", "Ответить") +
+                        '<span aria-hidden="true">' + ResursMapChat.icon("reply") + '</span>' + t("chat_reply", "Ответить") +
                     '</button>' +
                     '<button type="button" ' +
                         'data-chat-action="copy">' +
-                        '<span>⧉</span>' + t("chat_copy", "Копировать") +
+                        '<span aria-hidden="true">' + ResursMapChat.icon("copy") + '</span>' + t("chat_copy", "Копировать") +
                     '</button>' +
                     '<button type="button" ' +
                         'data-chat-action="forward">' +
-                        '<span>↪</span>' + t("chat_forward", "Переслать") +
+                        '<span aria-hidden="true">' + ResursMapChat.icon("forward") + '</span>' + t("chat_forward", "Переслать") +
+                    '</button>' +
+                    '<button type="button" data-chat-action="video-fullscreen" hidden>' +
+                        '<span aria-hidden="true">' + ResursMapChat.icon("fullscreen") + '</span>' +
+                        t("chat_video_fullscreen", "На весь экран") +
+                    '</button>' +
+                    '<button type="button" data-chat-action="video-speed" hidden>' +
+                        '<span aria-hidden="true">' + ResursMapChat.icon("speed") + '</span>' +
+                        '<span data-chat-video-speed-label>' + t("chat_video_speed", "Скорость") + ' · 1×</span>' +
+                    '</button>' +
+                    '<button type="button" data-chat-action="video-pip" hidden>' +
+                        '<span aria-hidden="true">' + ResursMapChat.icon("pip") + '</span>' +
+                        t("chat_video_pip", "Маленькое окно") +
+                    '</button>' +
+                    '<button type="button" data-chat-action="attachment-open" hidden>' +
+                        '<span aria-hidden="true">' + ResursMapChat.icon("download") + '</span>' +
+                        t("chat_attachment_open", "Открыть / скачать") +
                     '</button>' +
                     '<button type="button" ' +
                         'data-chat-action="pin">' +
-                        '<span>📌</span><span data-chat-pin-label>' +
+                        '<span aria-hidden="true">' + ResursMapChat.icon("pin") + '</span><span data-chat-pin-label>' +
                             t("chat_pin", "Закрепить") +
                         '</span>' +
                     '</button>' +
                     '<button type="button" ' +
                         'data-chat-action="edit">' +
-                        '<span>✎</span>' + t("chat_edit", "Изменить") +
+                        '<span aria-hidden="true">' + ResursMapChat.icon("edit") + '</span>' + t("chat_edit", "Изменить") +
                     '</button>' +
                     '<button type="button" ' +
                         'class="is-danger" ' +
                         'data-chat-action="delete">' +
-                        '<span>⌫</span>' + t("chat_delete", "Удалить") +
+                        '<span aria-hidden="true">' + ResursMapChat.icon("remove") + '</span>' + t("chat_delete", "Удалить") +
                     '</button>' +
                 '</div>' +
             '</section>';
@@ -3401,9 +3524,11 @@
         editor.hidden = true;
         editor.innerHTML =
             '<button class="chat-sheet-backdrop" ' +
-                'type="button" data-close-editor></button>' +
+                'type="button" data-close-editor aria-label="' +
+                escapeHtml(t("chat_close", "Закрыть")) + '"></button>' +
             '<section class="chat-editor-panel" ' +
-                'role="dialog" aria-modal="true">' +
+                'role="dialog" aria-modal="true" aria-label="' +
+                escapeHtml(t("chat_edit_title", "Редактировать сообщение")) + '">' +
                 '<div class="chat-sheet-handle"></div>' +
                 '<div class="chat-editor-title">' +
                     t("chat_edit_title", "Редактировать сообщение") +
@@ -3431,11 +3556,15 @@
         confirmBox.hidden = true;
         confirmBox.innerHTML =
             '<button class="chat-sheet-backdrop" ' +
-                'type="button" data-close-delete></button>' +
+                'type="button" data-close-delete aria-label="' +
+                escapeHtml(t("chat_close", "Закрыть")) + '"></button>' +
             '<section class="chat-editor-panel chat-delete-panel" ' +
-                'role="dialog" aria-modal="true">' +
+                'role="dialog" aria-modal="true" aria-label="' +
+                escapeHtml(t("chat_delete_title", "Удалить сообщение?")) + '">' +
                 '<div class="chat-sheet-handle"></div>' +
-                '<div class="chat-delete-icon">⌫</div>' +
+                '<div class="chat-delete-icon">' +
+                    ResursMapChat.icon("remove") +
+                '</div>' +
                 '<div class="chat-editor-title">' +
                     t("chat_delete_title", "Удалить сообщение?") +
                 '</div>' +
@@ -3466,9 +3595,11 @@
         forwardPicker.hidden = true;
         forwardPicker.innerHTML =
             '<button class="chat-sheet-backdrop" ' +
-                'type="button" data-close-forward></button>' +
+                'type="button" data-close-forward aria-label="' +
+                escapeHtml(t("chat_close", "Закрыть")) + '"></button>' +
             '<section class="chat-editor-panel chat-forward-panel" ' +
-                'role="dialog" aria-modal="true">' +
+                'role="dialog" aria-modal="true" aria-label="' +
+                escapeHtml(t("chat_forward_title", "Переслать сообщение")) + '">' +
                 '<div class="chat-sheet-handle"></div>' +
                 '<div class="chat-editor-title">' + t("chat_forward_title", "Переслать сообщение") + '</div>' +
                 '<div class="chat-forward-preview" ' +
@@ -3559,6 +3690,24 @@
                 return message.message
                     ? shortText(message.message, limit || 90)
                     : t("chat_photo_label", "Фото");
+            }
+
+            if (
+                message.attachment_kind === "video" &&
+                message.attachment_url
+            ) {
+                return message.message
+                    ? shortText(message.message, limit || 90)
+                    : t("chat_video", "Видео");
+            }
+
+            if (
+                message.attachment_kind === "document" &&
+                message.attachment_url
+            ) {
+                return message.message
+                    ? shortText(message.message, limit || 90)
+                    : t("chat_document", "Документ");
             }
 
             return shortText(messageText(message), limit || 110);
@@ -4412,6 +4561,8 @@
             body.classList.remove("is-deleted");
             body.classList.remove("chat-message-body--voice");
             body.classList.remove("chat-message-body--image");
+            body.classList.remove("chat-message-body--video");
+            body.classList.remove("chat-message-body--document");
             body.classList.remove("chat-message-body--listing");
             delete body.dataset.listingPreviewId;
             body.innerHTML = "";
@@ -4461,6 +4612,66 @@
                     body.appendChild(caption);
                 }
 
+                return;
+            }
+
+            if (
+                message.attachment_kind === "video" &&
+                message.attachment_url
+            ) {
+                var videoUrl = String(message.attachment_url);
+                var videoFrame = document.createElement("div");
+                var video = document.createElement("video");
+                videoFrame.className = "chat-video-frame";
+                video.className = "chat-message-video";
+                video.src = videoUrl;
+                video.controls = true;
+                video.preload = "metadata";
+                video.playsInline = true;
+                video.addEventListener("error", function () {
+                    video.hidden = true;
+                    var fallback = document.createElement("a");
+                    fallback.className = "chat-document-link";
+                    fallback.href = videoUrl;
+                    fallback.target = "_blank";
+                    fallback.rel = "noopener";
+                    fallback.textContent = t(
+                        "chat_video_playback_error",
+                        "Не удалось воспроизвести видео · Открыть файл"
+                    );
+                    video.insertAdjacentElement("afterend", fallback);
+                });
+                videoFrame.appendChild(video);
+                body.classList.add("chat-message-body--video");
+                body.appendChild(videoFrame);
+                if (message.message) {
+                    var videoCaption = document.createElement("div");
+                    videoCaption.className = "chat-message-caption";
+                    videoCaption.textContent = String(message.message);
+                    body.appendChild(videoCaption);
+                }
+                return;
+            }
+
+            if (
+                message.attachment_kind === "document" &&
+                message.attachment_url
+            ) {
+                var documentLink = document.createElement("a");
+                documentLink.className = "chat-document-link";
+                documentLink.href = String(message.attachment_url);
+                documentLink.setAttribute("download", "");
+                var documentIcon = document.createElement("span");
+                documentIcon.className = "chat-document-icon";
+                documentIcon.innerHTML = ResursMapChat.icon("document");
+                var documentName = document.createElement("span");
+                documentName.textContent = String(
+                    message.message || t("chat_document", "Документ")
+                );
+                documentLink.appendChild(documentIcon);
+                documentLink.appendChild(documentName);
+                body.classList.add("chat-message-body--document");
+                body.appendChild(documentLink);
                 return;
             }
 
@@ -4871,10 +5082,107 @@
             }
         }
 
+        function messageRowFor(message) {
+            var id = Number(message && message.id || 0);
+            if (!Number.isSafeInteger(id) || id <= 0) {
+                return null;
+            }
+            return history.querySelector(
+                '.chat-message-row[data-message-id="' + String(id) + '"]'
+            );
+        }
+
+        function videoForMessage(message) {
+            var row = messageRowFor(message);
+            return row ? row.querySelector("video.chat-message-video") : null;
+        }
+
+        function videoSupportsPip(video) {
+            return Boolean(
+                video &&
+                (
+                    typeof video.requestPictureInPicture === "function" ||
+                    (
+                        typeof video.webkitSetPresentationMode === "function" &&
+                        typeof video.webkitSupportsPresentationMode === "function" &&
+                        video.webkitSupportsPresentationMode("picture-in-picture")
+                    )
+                )
+            );
+        }
+
+        function openVideoFullscreen(message) {
+            var video = videoForMessage(message);
+            if (!video) {
+                return;
+            }
+            closeSheet();
+            if (typeof video.requestFullscreen === "function") {
+                Promise.resolve(video.requestFullscreen()).catch(function () {});
+            } else if (typeof video.webkitEnterFullscreen === "function") {
+                try {
+                    video.webkitEnterFullscreen();
+                } catch (_) {}
+            } else {
+                var playback = video.play();
+                if (playback && typeof playback.catch === "function") {
+                    playback.catch(function () {});
+                }
+            }
+        }
+
+        function cycleVideoSpeed(message) {
+            var video = videoForMessage(message);
+            if (!video) {
+                return;
+            }
+            var speeds = [1, 1.25, 1.5, 1.75, 2];
+            var current = Number(video.playbackRate || 1);
+            var index = speeds.findIndex(function (speed) {
+                return Math.abs(speed - current) < 0.01;
+            });
+            video.playbackRate = speeds[(index + 1) % speeds.length];
+            openSheet(message);
+        }
+
+        function toggleVideoPip(message) {
+            var video = videoForMessage(message);
+            if (!videoSupportsPip(video)) {
+                return;
+            }
+            closeSheet();
+            if (typeof video.requestPictureInPicture === "function") {
+                Promise.resolve(video.requestPictureInPicture()).catch(function () {});
+            } else {
+                try {
+                    video.webkitSetPresentationMode("picture-in-picture");
+                } catch (_) {}
+            }
+        }
+
+        function openAttachment(message) {
+            var raw = String(message && message.attachment_url || "");
+            try {
+                var url = new URL(raw, window.location.origin);
+                if (url.origin !== window.location.origin) {
+                    return;
+                }
+                var link = document.createElement("a");
+                link.href = url.href;
+                link.target = "_blank";
+                link.rel = "noopener";
+                link.download = "";
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                closeSheet();
+            } catch (_) {}
+        }
+
         function openSheet(message) {
             selectedMessage = message;
             sheetPreview.textContent =
-                shortText(messageText(message), 180);
+                messagePreviewLabel(message, 180);
 
             var editButton = sheet.querySelector(
                 '[data-chat-action="edit"]'
@@ -4888,10 +5196,24 @@
             var pinButton = sheet.querySelector(
                 '[data-chat-action="pin"]'
             );
+            var videoFullscreenButton = sheet.querySelector(
+                '[data-chat-action="video-fullscreen"]'
+            );
+            var videoSpeedButton = sheet.querySelector(
+                '[data-chat-action="video-speed"]'
+            );
+            var videoPipButton = sheet.querySelector(
+                '[data-chat-action="video-pip"]'
+            );
+            var attachmentOpenButton = sheet.querySelector(
+                '[data-chat-action="attachment-open"]'
+            );
 
             var mine = Boolean(message.is_mine);
             var deleted =
                 Number(message.deleted_at) > 0;
+            var isVideo = !deleted && message.attachment_kind === "video";
+            var selectedVideo = isVideo ? videoForMessage(message) : null;
 
             editButton.hidden = !messageCanBeEdited(message);
             deleteButton.hidden =
@@ -4911,6 +5233,26 @@
                 }
             }
 
+            if (videoFullscreenButton) {
+                videoFullscreenButton.hidden = !selectedVideo;
+            }
+            if (videoSpeedButton) {
+                videoSpeedButton.hidden = !selectedVideo;
+                var speedLabel = videoSpeedButton.querySelector(
+                    "[data-chat-video-speed-label]"
+                );
+                if (speedLabel && selectedVideo) {
+                    speedLabel.textContent = t("chat_video_speed", "Скорость") +
+                        " · " + String(Number(selectedVideo.playbackRate || 1)) + "×";
+                }
+            }
+            if (videoPipButton) {
+                videoPipButton.hidden = !videoSupportsPip(selectedVideo);
+            }
+            if (attachmentOpenButton) {
+                attachmentOpenButton.hidden = deleted || !message.attachment_url;
+            }
+
             var reactionsRow =
                 document.getElementById("chat-sheet-reactions");
 
@@ -4923,6 +5265,38 @@
                 "chat-overlay-open"
             );
         }
+
+        function bindMessageActionButton(button, row) {
+            if (!button || button.dataset.chatActionsBound === "1") {
+                return;
+            }
+            button.dataset.chatActionsBound = "1";
+            button.addEventListener("click", function (event) {
+                // Use currentTarget instead of event.target: older Safari can
+                // report the tapped SVG/circle without Element.closest().
+                event.preventDefault();
+                event.stopPropagation();
+                var messageRow = row || button.parentElement;
+                while (
+                    messageRow &&
+                    !messageRow.classList.contains("chat-message-row")
+                ) {
+                    messageRow = messageRow.parentElement;
+                }
+                var message = messageRow
+                    ? messageFromRow(messageRow)
+                    : null;
+                if (message) {
+                    openSheet(message);
+                }
+            });
+        }
+
+        // The transport module creates new rows, while this isolated module
+        // owns message actions. Publish the narrow binding contract instead
+        // of reaching across closures with an undeclared function call.
+        ResursMapChat.bindMessageActionButton =
+            bindMessageActionButton;
 
         function selectReply(message) {
             if (Number(message.deleted_at) > 0) {
@@ -4985,6 +5359,12 @@
                 "chat-overlay-open"
             );
         }
+
+        history.querySelectorAll(".chat-message-more")
+            .forEach(function (button) {
+                bindMessageActionButton(button, null);
+            });
+        form.dataset.chatActionsReady = "1";
 
         history.addEventListener(
             "click",
@@ -5180,6 +5560,14 @@
                         });
                 } else if (action.dataset.chatAction === "forward") {
                     openForwardPicker(selectedMessage);
+                } else if (action.dataset.chatAction === "video-fullscreen") {
+                    openVideoFullscreen(selectedMessage);
+                } else if (action.dataset.chatAction === "video-speed") {
+                    cycleVideoSpeed(selectedMessage);
+                } else if (action.dataset.chatAction === "video-pip") {
+                    toggleVideoPip(selectedMessage);
+                } else if (action.dataset.chatAction === "attachment-open") {
+                    openAttachment(selectedMessage);
                 } else if (action.dataset.chatAction === "pin") {
                     togglePin(selectedMessage)
                         .then(closeSheet)
@@ -6060,8 +6448,8 @@
         lightbox.innerHTML =
             '<button type="button" class="chat-lightbox-backdrop"></button>' +
             '<div class="chat-lightbox-actions">' +
-                '<a class="chat-lightbox-download" download aria-label="">↓</a>' +
-                '<button type="button" class="chat-lightbox-close" aria-label="">×</button>' +
+                '<a class="chat-lightbox-download" download aria-label="">' + ResursMapChat.icon("download") + '</a>' +
+                '<button type="button" class="chat-lightbox-close" aria-label="">' + ResursMapChat.icon("close") + '</button>' +
             '</div>' +
             '<img class="chat-lightbox-image" alt="">';
 

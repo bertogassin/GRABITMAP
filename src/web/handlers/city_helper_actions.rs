@@ -398,7 +398,7 @@ pub async fn city_helpers_page(State(state): State<AppState>, headers: HeaderMap
                                        maxlength="500"
                                        placeholder="Причина приостановки"
                                        required>
-                                <button class="warning">Приостановить</button>
+                                <button type="submit" class="warning">Приостановить</button>
                             </form>
                             <form method="post"
                                   action="/app/center/city/helpers/{id}/revoke">
@@ -407,7 +407,7 @@ pub async fn city_helpers_page(State(state): State<AppState>, headers: HeaderMap
                                        maxlength="500"
                                        placeholder="Причина отзыва"
                                        required>
-                                <button class="danger">Отозвать</button>
+                                <button type="submit" class="danger">Отозвать</button>
                             </form>"#,
                             id = assignment_id,
                         ),
@@ -420,7 +420,7 @@ pub async fn city_helpers_page(State(state): State<AppState>, headers: HeaderMap
                                        maxlength="500"
                                        placeholder="Причина восстановления"
                                        required>
-                                <button>Восстановить</button>
+                                <button type="submit">Восстановить</button>
                             </form>
                             <form method="post"
                                   action="/app/center/city/helpers/{id}/revoke">
@@ -429,7 +429,7 @@ pub async fn city_helpers_page(State(state): State<AppState>, headers: HeaderMap
                                        maxlength="500"
                                        placeholder="Причина отзыва"
                                        required>
-                                <button class="danger">Отозвать</button>
+                                <button type="submit" class="danger">Отозвать</button>
                             </form>"#,
                             id = assignment_id,
                         ),

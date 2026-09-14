@@ -29,7 +29,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = env!("CARGO_PKG_VERSION");
+pub const STATIC_ASSET_VERSION: &str = concat!(env!("CARGO_PKG_VERSION"), "-r5");
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -151,6 +151,10 @@ pub(crate) fn icon(name: &str) -> &'static str {
 
         "arrow-left" => {
             r#"<svg class="icon" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>"#
+        }
+
+        "arrow-down" => {
+            r#"<svg class="icon" viewBox="0 0 24 24"><path d="M12 4v16"/><path d="m5 13 7 7 7-7"/></svg>"#
         }
 
         "chevron-left" => {
@@ -4392,7 +4396,7 @@ pub(crate) fn page_document(
 <html lang="{html_lang}" dir="{html_dir}">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="resursmap-asset-version" content="{asset_version}">
 <script>try{{if(localStorage.getItem('resursmap-theme')==='light'){{document.documentElement.classList.add('light-theme');document.documentElement.style.colorScheme='light';}}}}catch(e){{}}</script>
 <script>window.resursmapI18n={i18n_boot};</script>
@@ -4449,7 +4453,6 @@ pub(crate) fn page_document(
 
 {bottom_nav}
 
-<script src="{mobile_diagnostics_js}" defer></script>
 <script src="{mobile_foundation_js}" defer></script>
 <script src="{app_reliability_js}" defer></script>
 
@@ -4489,7 +4492,6 @@ pub(crate) fn page_document(
         place_memory_js = static_asset("place-memory.js"),
         share_js = static_asset("share.js"),
         pwa_install_js = static_asset("pwa-install.js"),
-        mobile_diagnostics_js = static_asset("mobile-diagnostics.js"),
         mobile_foundation_css = static_asset("mobile-foundation.css"),
         mobile_foundation_js = static_asset("mobile-foundation.js"),
         app_reliability_js = static_asset("app-reliability.js"),
@@ -6469,6 +6471,7 @@ mod public_entry_tests {
             "play",
             "logo",
             "arrow-left",
+            "arrow-down",
             "chevron-left",
             "shield",
             "users",

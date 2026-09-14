@@ -1,4 +1,28 @@
 /* GRABITMAP 7.10 — final communications polish */
+.rm-confirm-dialog {
+    width: min(calc(100% - 32px), 420px);
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    color: var(--text);
+    background: var(--surface);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .52);
+}
+.rm-confirm-dialog::backdrop { background: rgba(0, 0, 0, .68); backdrop-filter: blur(5px); }
+.rm-confirm-dialog form { display: grid; gap: 12px; padding: 20px; }
+.rm-confirm-dialog h2 { margin: 0; font-size: 20px; }
+.rm-confirm-dialog p { margin: 0; color: var(--muted); line-height: 1.45; }
+.rm-confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+.rm-confirm-actions button {
+    min-height: 44px;
+    border: 1px solid var(--line);
+    border-radius: 13px;
+    background: var(--bg-soft);
+    color: var(--text);
+    font: inherit;
+    font-weight: 750;
+}
+.rm-confirm-actions .is-danger { border-color: rgba(255, 143, 152, .42); color: var(--danger); }
 
 /* Communication pages use a compact title block instead of a landing-page hero. */
 .hero {

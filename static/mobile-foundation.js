@@ -1,23 +1,6 @@
 (function () {
     "use strict";
 
-    function preventGestureZoom(event) {
-        event.preventDefault();
-    }
-
-    document.addEventListener("gesturestart", preventGestureZoom, {
-        passive: false,
-    });
-    document.addEventListener("gesturechange", preventGestureZoom, {
-        passive: false,
-    });
-    document.addEventListener("gestureend", preventGestureZoom, {
-        passive: false,
-    });
-    document.addEventListener("dblclick", preventGestureZoom, {
-        passive: false,
-    });
-
     window.addEventListener("pageshow", function () {
         document.documentElement.style.setProperty(
             "--rm-viewport-width",
