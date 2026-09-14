@@ -1483,6 +1483,7 @@ html[data-page="chat"] .rm-version-footer {
 }
 
 .card::before {
+    display: none;
     content: "";
     position: absolute;
     inset: 0;
@@ -4161,10 +4162,6 @@ body {
     transform: translateY(-2px);
 }
 
-.card::before {
-    display: none;
-}
-
 .ui-button {
     appearance: none;
     display: inline-flex;
@@ -6519,6 +6516,21 @@ mod public_entry_tests {
         assert!(style.contains("right: -100px;\n    bottom: -160px;\n    left: -100px;"));
         assert!(style.contains("background: rgba(232, 204, 150, .18);"));
         assert!(style.contains("filter: blur(52px);\n    pointer-events: none;"));
+    }
+
+    #[test]
+    fn shared_card_decoration_has_one_canonical_rule() {
+        let style = base_style();
+
+        assert_eq!(
+            style
+                .lines()
+                .filter(|line| *line == ".card::before {")
+                .count(),
+            1
+        );
+        assert!(style.contains(".card::before {\n    display: none;"));
+        assert!(style.contains(".card:hover::before {\n    transform: translateX(100%);"));
     }
 
     #[test]
