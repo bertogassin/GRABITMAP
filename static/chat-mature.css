@@ -211,6 +211,12 @@ html[data-page="chat"] .chat-message-row[data-attachment-kind="video"] .chat-mes
     color: var(--text);
     font: inherit;
     font-weight: 750;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+.chat-confirm-actions button:focus-visible {
+    outline: 2px solid var(--gold-light, #e6ca91);
+    outline-offset: 2px;
 }
 .chat-confirm-actions .is-danger { border-color: rgba(255, 143, 152, .42); color: var(--danger); }
 .chat-send-state.is-error { color: var(--danger) !important; }
