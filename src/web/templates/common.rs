@@ -514,11 +514,14 @@ body::before { display: none; }
 ----------------------------------------------------------- */
 
 .topbar {
+    position: relative;
+    z-index: 5;
     display: flex;
     align-items: center;
     justify-content: space-between;
 
     margin-bottom: 32px;
+    animation: fadeIn .4s ease both;
 }
 
 .brand {
@@ -528,6 +531,7 @@ body::before { display: none; }
 
     text-decoration: none;
     color: var(--text);
+    transition: transform .25s ease, opacity .25s ease;
 }
 
 .brand-mark {
@@ -537,22 +541,16 @@ body::before { display: none; }
     display: grid;
     place-items: center;
 
-    border: 1px solid rgba(232, 204, 150, .38);
+    border: 1px solid rgba(232, 204, 150, .32);
     border-radius: 14px;
 
     color: var(--gold);
 
-    background:
-        radial-gradient(
-            circle at 30% 25%,
-            rgba(232, 204, 150, .22),
-            transparent 52%
-        ),
-        var(--surface);
+    background: var(--surface);
 
     box-shadow:
-        0 10px 28px rgba(0, 0, 0, .28),
-        inset 0 1px 0 rgba(255, 255, 255, .06);
+        0 8px 24px rgba(0,0,0,.28),
+        inset 0 1px 0 rgba(255,255,255,.06);
 }
 
 .brand-mark .brand-logo-icon {
@@ -1306,13 +1304,6 @@ html[data-page="chat"] .rm-version-footer {
     text-transform: uppercase;
 }
 
-.topbar {
-    position: relative;
-    z-index: 5;
-
-    animation: fadeIn .4s ease both;
-}
-
 .theme-toggle-btn {
     display: inline-flex;
     align-items: center;
@@ -1347,21 +1338,9 @@ html[data-page="chat"] .rm-version-footer {
     background: rgba(214,183,122,.06);
 }
 
-.brand {
-    transition: transform .25s ease, opacity .25s ease;
-}
-
 .brand:hover {
     transform: translateY(-1px);
     opacity: .92;
-}
-
-.brand-mark {
-    background: var(--surface);
-    border: 1px solid rgba(232, 204, 150, .32);
-    box-shadow:
-        0 8px 24px rgba(0,0,0,.28),
-        inset 0 1px 0 rgba(255,255,255,.06);
 }
 
 .hero {
@@ -6505,6 +6484,23 @@ mod public_entry_tests {
                 "duplicate selector: {selector}"
             );
         }
+    }
+
+    #[test]
+    fn shared_header_styles_have_one_canonical_rule_each() {
+        let style = base_style();
+
+        for selector in [".topbar {", ".brand {", ".brand-mark {"] {
+            assert_eq!(
+                style.lines().filter(|line| *line == selector).count(),
+                1,
+                "duplicate selector: {selector}"
+            );
+        }
+
+        assert!(style.contains("animation: fadeIn .4s ease both;"));
+        assert!(style.contains("transition: transform .25s ease, opacity .25s ease;"));
+        assert!(style.contains("border: 1px solid rgba(232, 204, 150, .32);"));
     }
 
     #[test]
