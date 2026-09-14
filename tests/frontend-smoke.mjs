@@ -804,6 +804,25 @@ test("chat text hitbox cannot be covered by the photo picker", async () => {
   assert.doesNotMatch(chat, /input\.addEventListener\("click"[\s\S]*imageInput\.click\(\)/);
 });
 
+test("chat controls share one accessible mobile UI baseline", async () => {
+  const [template, chat, mature] = await Promise.all([
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+    readFile(new URL("static/chat-v2.js", root), "utf8"),
+    readFile(new URL("static/chat-mature.css", root), "utf8"),
+  ]);
+
+  assert.match(template, /id="chat-header-more"[\s\S]*aria-expanded="false"[\s\S]*aria-controls="chat-header-menu"/);
+  assert.match(template, /class="chat-message-more" aria-label="\{actions_aria\}"/);
+  assert.match(template, /id="chat-emoji-btn"[\s\S]*aria-expanded="false"/);
+  assert.match(chat, /role="dialog" aria-modal="true" aria-label="Добавить вложение"/);
+  assert.match(chat, /more\.setAttribute\("aria-label", t\("chat_actions_aria"/);
+  assert.match(mature, /\.chat-header-more \{[\s\S]*width: 44px; height: 44px;/);
+  assert.match(mature, /\.chat-header-menu button \{[\s\S]*min-height: 44px;/);
+  assert.match(mature, /#chat-form \.chat-composer-main \{[\s\S]*grid-template-columns: 40px minmax\(0, 1fr\) 40px;/);
+  assert.match(mature, /#chat-form \.chat-emoji-btn,[\s\S]*width: 40px !important;[\s\S]*height: 46px !important;/);
+  assert.match(mature, /\.chat-header-more:focus-visible,[\s\S]*\.chat-message-more:focus-visible,[\s\S]*#chat-form #chat-voice-btn:focus-visible[\s\S]*outline: 2px solid var\(--gold-light, #e6ca91\) !important;/);
+});
+
 test("prelaunch UI removes debug hooks native popups duplicate ids and legacy symbols", async () => {
   const [common, navigation, pwa, communication, resources, chat, blocks, groupHelper, cityHelper, staticFiles] = await Promise.all([
     readFile(new URL("src/web/templates/common.rs", root), "utf8"),
