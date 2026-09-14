@@ -575,6 +575,13 @@ test("chat photo viewer is isolated, keyboard accessible, and downloadable", asy
   assert.match(css, /\.chat-lightbox-actions/);
 });
 
+test("chat photo viewer actions follow LTR and RTL inline direction", async () => {
+  const css = await readFile(new URL("static/chat-v2.css", root), "utf8");
+
+  assert.match(css, /\.chat-lightbox-actions \{[^}]*inset-inline-end:14px;/);
+  assert.doesNotMatch(css, /\.chat-lightbox-actions \{[^}]*\bright:/);
+});
+
 test("chat preserves reading position and reveals quoted history", async () => {
   const [chat, styles, template] = await Promise.all([
     readFile(new URL("static/chat-v2.js", root), "utf8"),
