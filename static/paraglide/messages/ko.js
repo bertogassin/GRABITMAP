@@ -13,6 +13,10 @@
 /** @typedef {{}} Chat_Actions_AriaInputs */
 /** @typedef {{}} Chat_All_ReadInputs */
 /** @typedef {{}} Chat_AttachmentInputs */
+/** @typedef {{}} Chat_Attachment_BusyInputs */
+/** @typedef {{}} Chat_Attachment_OpenInputs */
+/** @typedef {{}} Chat_Attachment_ProcessingInputs */
+/** @typedef {{}} Chat_Attachment_ReadyInputs */
 /** @typedef {{}} Chat_CancelInputs */
 /** @typedef {{}} Chat_Cancel_ReplyInputs */
 /** @typedef {{}} Chat_CloseInputs */
@@ -356,6 +360,22 @@ export const chat_all_read = /** @type {(inputs: Chat_All_ReadInputs) => Localiz
 
 export const chat_attachment = /** @type {(inputs: Chat_AttachmentInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`첨부 파일`)
+};
+
+export const chat_attachment_busy = /** @type {(inputs: Chat_Attachment_BusyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`서버가 다른 파일을 확인 중 · 자동으로 다시 시도합니다`)
+};
+
+export const chat_attachment_open = /** @type {(inputs: Chat_Attachment_OpenInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`열기 / 다운로드`)
+};
+
+export const chat_attachment_processing = /** @type {(inputs: Chat_Attachment_ProcessingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`첨부 파일을 확인하고 저장하는 중…`)
+};
+
+export const chat_attachment_ready = /** @type {(inputs: Chat_Attachment_ReadyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`첨부 파일 준비 완료 · 설명 추가`)
 };
 
 export const chat_cancel = /** @type {(inputs: Chat_CancelInputs) => LocalizedString} */ () => {

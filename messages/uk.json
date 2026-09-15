@@ -302,5 +302,9 @@
   "chat_share_ready": "Картка оголошення готова",
   "chat_listing_verified": "Перевірено",
   "chat_listing_open": "Відкрити",
-  "chat_attachment": "Вкладення"
+  "chat_attachment": "Вкладення",
+  "chat_attachment_busy": "Сервер перевіряє інший файл · повторюємо автоматично",
+  "chat_attachment_open": "Відкрити / завантажити",
+  "chat_attachment_processing": "Перевіряємо та зберігаємо вкладення…",
+  "chat_attachment_ready": "Вкладення готове · додайте підпис"
 }

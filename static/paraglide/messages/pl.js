@@ -13,6 +13,10 @@
 /** @typedef {{}} Chat_Actions_AriaInputs */
 /** @typedef {{}} Chat_All_ReadInputs */
 /** @typedef {{}} Chat_AttachmentInputs */
+/** @typedef {{}} Chat_Attachment_BusyInputs */
+/** @typedef {{}} Chat_Attachment_OpenInputs */
+/** @typedef {{}} Chat_Attachment_ProcessingInputs */
+/** @typedef {{}} Chat_Attachment_ReadyInputs */
 /** @typedef {{}} Chat_CancelInputs */
 /** @typedef {{}} Chat_Cancel_ReplyInputs */
 /** @typedef {{}} Chat_CloseInputs */
@@ -356,6 +360,22 @@ export const chat_all_read = /** @type {(inputs: Chat_All_ReadInputs) => Localiz
 
 export const chat_attachment = /** @type {(inputs: Chat_AttachmentInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Załącznik`)
+};
+
+export const chat_attachment_busy = /** @type {(inputs: Chat_Attachment_BusyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Serwer sprawdza inny plik · automatyczna ponowna próba`)
+};
+
+export const chat_attachment_open = /** @type {(inputs: Chat_Attachment_OpenInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Otwórz / pobierz`)
+};
+
+export const chat_attachment_processing = /** @type {(inputs: Chat_Attachment_ProcessingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Sprawdzanie i zapisywanie załącznika…`)
+};
+
+export const chat_attachment_ready = /** @type {(inputs: Chat_Attachment_ReadyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Załącznik gotowy · dodaj podpis`)
 };
 
 export const chat_cancel = /** @type {(inputs: Chat_CancelInputs) => LocalizedString} */ () => {

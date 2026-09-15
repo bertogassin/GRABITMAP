@@ -302,5 +302,9 @@
   "chat_share_ready": "การ์ดประกาศพร้อมส่งแล้ว",
   "chat_listing_verified": "ยืนยันแล้ว",
   "chat_listing_open": "เปิด",
-  "chat_attachment": "ไฟล์แนบ"
+  "chat_attachment": "ไฟล์แนบ",
+  "chat_attachment_busy": "เซิร์ฟเวอร์กำลังตรวจสอบไฟล์อื่น · จะลองอีกครั้งโดยอัตโนมัติ",
+  "chat_attachment_open": "เปิด / ดาวน์โหลด",
+  "chat_attachment_processing": "กำลังตรวจสอบและบันทึกไฟล์แนบ…",
+  "chat_attachment_ready": "ไฟล์แนบพร้อมแล้ว · เพิ่มคำบรรยาย"
 }

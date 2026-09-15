@@ -302,5 +302,9 @@
   "chat_share_ready": "O cartão do anúncio está pronto",
   "chat_listing_verified": "Verificado",
   "chat_listing_open": "Abrir",
-  "chat_attachment": "Anexo"
+  "chat_attachment": "Anexo",
+  "chat_attachment_busy": "O servidor está verificando outro arquivo · nova tentativa automática",
+  "chat_attachment_open": "Abrir / baixar",
+  "chat_attachment_processing": "Verificando e salvando o anexo…",
+  "chat_attachment_ready": "Anexo pronto · adicione uma legenda"
 }

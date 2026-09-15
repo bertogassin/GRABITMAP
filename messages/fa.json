@@ -302,5 +302,9 @@
   "chat_share_ready": "کارت آگهی آماده ارسال است",
   "chat_listing_verified": "تأییدشده",
   "chat_listing_open": "باز کردن",
-  "chat_attachment": "پیوست"
+  "chat_attachment": "پیوست",
+  "chat_attachment_busy": "سرور در حال بررسی فایل دیگری است · تلاش مجدد به‌صورت خودکار",
+  "chat_attachment_open": "باز کردن / دانلود",
+  "chat_attachment_processing": "در حال بررسی و ذخیره پیوست…",
+  "chat_attachment_ready": "پیوست آماده است · توضیح اضافه کنید"
 }

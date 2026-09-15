@@ -302,5 +302,9 @@
   "chat_share_ready": "La carte de l’annonce est prête à envoyer",
   "chat_listing_verified": "Vérifié",
   "chat_listing_open": "Ouvrir",
-  "chat_attachment": "Pièce jointe"
+  "chat_attachment": "Pièce jointe",
+  "chat_attachment_busy": "Le serveur vérifie un autre fichier · nouvelle tentative automatique",
+  "chat_attachment_open": "Ouvrir / télécharger",
+  "chat_attachment_processing": "Vérification et enregistrement de la pièce jointe…",
+  "chat_attachment_ready": "Pièce jointe prête · ajoutez une légende"
 }

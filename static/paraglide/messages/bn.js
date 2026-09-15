@@ -13,6 +13,10 @@
 /** @typedef {{}} Chat_Actions_AriaInputs */
 /** @typedef {{}} Chat_All_ReadInputs */
 /** @typedef {{}} Chat_AttachmentInputs */
+/** @typedef {{}} Chat_Attachment_BusyInputs */
+/** @typedef {{}} Chat_Attachment_OpenInputs */
+/** @typedef {{}} Chat_Attachment_ProcessingInputs */
+/** @typedef {{}} Chat_Attachment_ReadyInputs */
 /** @typedef {{}} Chat_CancelInputs */
 /** @typedef {{}} Chat_Cancel_ReplyInputs */
 /** @typedef {{}} Chat_CloseInputs */
@@ -356,6 +360,22 @@ export const chat_all_read = /** @type {(inputs: Chat_All_ReadInputs) => Localiz
 
 export const chat_attachment = /** @type {(inputs: Chat_AttachmentInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`সংযুক্তি`)
+};
+
+export const chat_attachment_busy = /** @type {(inputs: Chat_Attachment_BusyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`সার্ভার অন্য একটি ফাইল যাচাই করছে · স্বয়ংক্রিয়ভাবে আবার চেষ্টা করা হবে`)
+};
+
+export const chat_attachment_open = /** @type {(inputs: Chat_Attachment_OpenInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`খুলুন / ডাউনলোড করুন`)
+};
+
+export const chat_attachment_processing = /** @type {(inputs: Chat_Attachment_ProcessingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`সংযুক্তি যাচাই করে সংরক্ষণ করা হচ্ছে…`)
+};
+
+export const chat_attachment_ready = /** @type {(inputs: Chat_Attachment_ReadyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`সংযুক্তি প্রস্তুত · ক্যাপশন যোগ করুন`)
 };
 
 export const chat_cancel = /** @type {(inputs: Chat_CancelInputs) => LocalizedString} */ () => {

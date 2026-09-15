@@ -302,5 +302,9 @@
   "chat_share_ready": "বিজ্ঞাপনের কার্ড পাঠানোর জন্য প্রস্তুত",
   "chat_listing_verified": "যাচাইকৃত",
   "chat_listing_open": "খুলুন",
-  "chat_attachment": "সংযুক্তি"
+  "chat_attachment": "সংযুক্তি",
+  "chat_attachment_busy": "সার্ভার অন্য একটি ফাইল যাচাই করছে · স্বয়ংক্রিয়ভাবে আবার চেষ্টা করা হবে",
+  "chat_attachment_open": "খুলুন / ডাউনলোড করুন",
+  "chat_attachment_processing": "সংযুক্তি যাচাই করে সংরক্ষণ করা হচ্ছে…",
+  "chat_attachment_ready": "সংযুক্তি প্রস্তুত · ক্যাপশন যোগ করুন"
 }

@@ -302,5 +302,9 @@
   "chat_share_ready": "Anzeigenkarte ist versandbereit",
   "chat_listing_verified": "Geprüft",
   "chat_listing_open": "Öffnen",
-  "chat_attachment": "Anhang"
+  "chat_attachment": "Anhang",
+  "chat_attachment_busy": "Server prüft eine andere Datei · automatischer neuer Versuch",
+  "chat_attachment_open": "Öffnen / herunterladen",
+  "chat_attachment_processing": "Anhang wird geprüft und gespeichert…",
+  "chat_attachment_ready": "Anhang bereit · Beschriftung hinzufügen"
 }

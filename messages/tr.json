@@ -302,5 +302,9 @@
   "chat_share_ready": "İlan kartı gönderilmeye hazır",
   "chat_listing_verified": "Doğrulandı",
   "chat_listing_open": "Aç",
-  "chat_attachment": "Ek"
+  "chat_attachment": "Ek",
+  "chat_attachment_busy": "Sunucu başka bir dosyayı kontrol ediyor · otomatik olarak yeniden deneniyor",
+  "chat_attachment_open": "Aç / indir",
+  "chat_attachment_processing": "Ek kontrol ediliyor ve kaydediliyor…",
+  "chat_attachment_ready": "Ek hazır · açıklama ekleyin"
 }

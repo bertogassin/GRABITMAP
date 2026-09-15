@@ -302,5 +302,9 @@
   "chat_share_ready": "게시물 카드가 전송 준비되었습니다",
   "chat_listing_verified": "인증됨",
   "chat_listing_open": "열기",
-  "chat_attachment": "첨부 파일"
+  "chat_attachment": "첨부 파일",
+  "chat_attachment_busy": "서버가 다른 파일을 확인 중 · 자동으로 다시 시도합니다",
+  "chat_attachment_open": "열기 / 다운로드",
+  "chat_attachment_processing": "첨부 파일을 확인하고 저장하는 중…",
+  "chat_attachment_ready": "첨부 파일 준비 완료 · 설명 추가"
 }

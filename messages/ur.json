@@ -302,5 +302,9 @@
   "chat_share_ready": "اشتہار کا کارڈ بھیجنے کے لیے تیار ہے",
   "chat_listing_verified": "تصدیق شدہ",
   "chat_listing_open": "کھولیں",
-  "chat_attachment": "منسلکہ"
+  "chat_attachment": "منسلکہ",
+  "chat_attachment_busy": "سرور دوسری فائل چیک کر رہا ہے · خودکار طور پر دوبارہ کوشش ہوگی",
+  "chat_attachment_open": "کھولیں / ڈاؤن لوڈ کریں",
+  "chat_attachment_processing": "منسلکہ چیک اور محفوظ کیا جا رہا ہے…",
+  "chat_attachment_ready": "منسلکہ تیار ہے · کیپشن شامل کریں"
 }

@@ -49,18 +49,62 @@ test("chat attachment label is registered in every locale", async () => {
   assert.equal(translations.ar, "مرفق");
 });
 
+test("chat attachment availability states are registered in every locale", async () => {
+  const keys = [
+    "chat_attachment_busy",
+    "chat_attachment_open",
+    "chat_attachment_processing",
+    "chat_attachment_ready",
+  ];
+  const translations = {};
+
+  for (const locale of locales) {
+    const messages = JSON.parse(
+      await readFile(new URL("messages/" + locale + ".json", root), "utf8"),
+    );
+    translations[locale] = {};
+
+    for (const key of keys) {
+      assert.equal(typeof messages[key], "string");
+      assert.notEqual(messages[key].trim(), "");
+      translations[locale][key] = messages[key];
+    }
+  }
+
+  assert.deepEqual(translations.ru, {
+    chat_attachment_busy: "Сервер проверяет другой файл · повторяем автоматически",
+    chat_attachment_open: "Открыть / скачать",
+    chat_attachment_processing: "Проверяем и сохраняем вложение…",
+    chat_attachment_ready: "Вложение готово · добавьте подпись",
+  });
+  assert.deepEqual(translations.en, {
+    chat_attachment_busy: "Server is checking another file · retrying automatically",
+    chat_attachment_open: "Open / download",
+    chat_attachment_processing: "Checking and saving attachment…",
+    chat_attachment_ready: "Attachment ready · add a caption",
+  });
+  assert.deepEqual(translations.fr, {
+    chat_attachment_busy: "Le serveur vérifie un autre fichier · nouvelle tentative automatique",
+    chat_attachment_open: "Ouvrir / télécharger",
+    chat_attachment_processing: "Vérification et enregistrement de la pièce jointe…",
+    chat_attachment_ready: "Pièce jointe prête · ajoutez une légende",
+  });
+  assert.deepEqual(translations.ar, {
+    chat_attachment_busy: "الخادم يتحقق من ملف آخر · ستتم إعادة المحاولة تلقائيًا",
+    chat_attachment_open: "فتح / تنزيل",
+    chat_attachment_processing: "جارٍ التحقق من المرفق وحفظه…",
+    chat_attachment_ready: "المرفق جاهز · أضف تعليقًا",
+  });
+});
+
 test("browser translation calls cannot add unregistered locale keys", async () => {
   const base = JSON.parse(
     await readFile(new URL("messages/ru.json", root), "utf8"),
   );
   const knownLegacyDebt = [
-    "chat_attachment_busy",
     "chat_attachment_error",
     "chat_attachment_failed",
     "chat_attachment_interrupted",
-    "chat_attachment_open",
-    "chat_attachment_processing",
-    "chat_attachment_ready",
     "chat_attachment_timeout",
     "chat_attachment_too_large",
     "chat_attachment_type",

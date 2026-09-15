@@ -302,5 +302,9 @@
   "chat_share_ready": "Karta inzerátu je připravena",
   "chat_listing_verified": "Ověřeno",
   "chat_listing_open": "Otevřít",
-  "chat_attachment": "Příloha"
+  "chat_attachment": "Příloha",
+  "chat_attachment_busy": "Server kontroluje jiný soubor · automatický nový pokus",
+  "chat_attachment_open": "Otevřít / stáhnout",
+  "chat_attachment_processing": "Kontrola a ukládání přílohy…",
+  "chat_attachment_ready": "Příloha je připravena · přidejte popisek"
 }

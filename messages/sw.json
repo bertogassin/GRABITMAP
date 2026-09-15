@@ -302,5 +302,9 @@
   "chat_share_ready": "Kadi ya tangazo iko tayari kutumwa",
   "chat_listing_verified": "Imethibitishwa",
   "chat_listing_open": "Fungua",
-  "chat_attachment": "Kiambatisho"
+  "chat_attachment": "Kiambatisho",
+  "chat_attachment_busy": "Seva inakagua faili nyingine · inajaribu tena kiotomatiki",
+  "chat_attachment_open": "Fungua / pakua",
+  "chat_attachment_processing": "Inakagua na kuhifadhi kiambatisho…",
+  "chat_attachment_ready": "Kiambatisho kiko tayari · ongeza maelezo"
 }
