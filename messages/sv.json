@@ -302,5 +302,9 @@
   "chat_share_ready": "Annonskortet är klart att skicka",
   "chat_listing_verified": "Verifierad",
   "chat_listing_open": "Öppna",
-  "chat_attachment": "Bilaga"
+  "chat_attachment": "Bilaga",
+  "chat_attachment_busy": "Servern kontrollerar en annan fil · försöker igen automatiskt",
+  "chat_attachment_open": "Öppna / ladda ner",
+  "chat_attachment_processing": "Kontrollerar och sparar bilagan…",
+  "chat_attachment_ready": "Bilagan är klar · lägg till en bildtext"
 }

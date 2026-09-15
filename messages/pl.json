@@ -302,5 +302,9 @@
   "chat_share_ready": "Karta ogłoszenia jest gotowa",
   "chat_listing_verified": "Zweryfikowano",
   "chat_listing_open": "Otwórz",
-  "chat_attachment": "Załącznik"
+  "chat_attachment": "Załącznik",
+  "chat_attachment_busy": "Serwer sprawdza inny plik · automatyczna ponowna próba",
+  "chat_attachment_open": "Otwórz / pobierz",
+  "chat_attachment_processing": "Sprawdzanie i zapisywanie załącznika…",
+  "chat_attachment_ready": "Załącznik gotowy · dodaj podpis"
 }

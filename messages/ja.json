@@ -302,5 +302,9 @@
   "chat_share_ready": "掲載カードを送信できます",
   "chat_listing_verified": "確認済み",
   "chat_listing_open": "開く",
-  "chat_attachment": "添付ファイル"
+  "chat_attachment": "添付ファイル",
+  "chat_attachment_busy": "サーバーが別のファイルを確認中 · 自動的に再試行します",
+  "chat_attachment_open": "開く / ダウンロード",
+  "chat_attachment_processing": "添付ファイルを確認して保存しています…",
+  "chat_attachment_ready": "添付ファイルの準備完了 · キャプションを追加"
 }

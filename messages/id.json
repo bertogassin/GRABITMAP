@@ -302,5 +302,9 @@
   "chat_share_ready": "Kartu iklan siap dikirim",
   "chat_listing_verified": "Terverifikasi",
   "chat_listing_open": "Buka",
-  "chat_attachment": "Lampiran"
+  "chat_attachment": "Lampiran",
+  "chat_attachment_busy": "Server sedang memeriksa file lain · mencoba lagi secara otomatis",
+  "chat_attachment_open": "Buka / unduh",
+  "chat_attachment_processing": "Memeriksa dan menyimpan lampiran…",
+  "chat_attachment_ready": "Lampiran siap · tambahkan keterangan"
 }

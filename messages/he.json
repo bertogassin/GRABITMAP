@@ -302,5 +302,9 @@
   "chat_share_ready": "כרטיס המודעה מוכן לשליחה",
   "chat_listing_verified": "מאומת",
   "chat_listing_open": "פתיחה",
-  "chat_attachment": "קובץ מצורף"
+  "chat_attachment": "קובץ מצורף",
+  "chat_attachment_busy": "השרת בודק קובץ אחר · ניסיון חוזר אוטומטי",
+  "chat_attachment_open": "פתיחה / הורדה",
+  "chat_attachment_processing": "הקובץ המצורף נבדק ונשמר…",
+  "chat_attachment_ready": "הקובץ המצורף מוכן · הוסיפו כיתוב"
 }

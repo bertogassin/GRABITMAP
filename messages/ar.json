@@ -302,5 +302,9 @@
   "chat_share_ready": "بطاقة الإعلان جاهزة للإرسال",
   "chat_listing_verified": "موثّق",
   "chat_listing_open": "فتح",
-  "chat_attachment": "مرفق"
+  "chat_attachment": "مرفق",
+  "chat_attachment_busy": "الخادم يتحقق من ملف آخر · ستتم إعادة المحاولة تلقائيًا",
+  "chat_attachment_open": "فتح / تنزيل",
+  "chat_attachment_processing": "جارٍ التحقق من المرفق وحفظه…",
+  "chat_attachment_ready": "المرفق جاهز · أضف تعليقًا"
 }

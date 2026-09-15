@@ -302,5 +302,9 @@
   "chat_share_ready": "Kad iklan sedia dihantar",
   "chat_listing_verified": "Disahkan",
   "chat_listing_open": "Buka",
-  "chat_attachment": "Lampiran"
+  "chat_attachment": "Lampiran",
+  "chat_attachment_busy": "Pelayan sedang memeriksa fail lain · mencuba semula secara automatik",
+  "chat_attachment_open": "Buka / muat turun",
+  "chat_attachment_processing": "Memeriksa dan menyimpan lampiran…",
+  "chat_attachment_ready": "Lampiran sedia · tambah kapsyen"
 }

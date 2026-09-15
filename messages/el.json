@@ -302,5 +302,9 @@
   "chat_share_ready": "Η κάρτα αγγελίας είναι έτοιμη",
   "chat_listing_verified": "Επαληθευμένο",
   "chat_listing_open": "Άνοιγμα",
-  "chat_attachment": "Συνημμένο"
+  "chat_attachment": "Συνημμένο",
+  "chat_attachment_busy": "Ο διακομιστής ελέγχει άλλο αρχείο · αυτόματη επανάληψη",
+  "chat_attachment_open": "Άνοιγμα / λήψη",
+  "chat_attachment_processing": "Έλεγχος και αποθήκευση συνημμένου…",
+  "chat_attachment_ready": "Το συνημμένο είναι έτοιμο · προσθέστε λεζάντα"
 }

@@ -13,6 +13,10 @@
 /** @typedef {{}} Chat_Actions_AriaInputs */
 /** @typedef {{}} Chat_All_ReadInputs */
 /** @typedef {{}} Chat_AttachmentInputs */
+/** @typedef {{}} Chat_Attachment_BusyInputs */
+/** @typedef {{}} Chat_Attachment_OpenInputs */
+/** @typedef {{}} Chat_Attachment_ProcessingInputs */
+/** @typedef {{}} Chat_Attachment_ReadyInputs */
 /** @typedef {{}} Chat_CancelInputs */
 /** @typedef {{}} Chat_Cancel_ReplyInputs */
 /** @typedef {{}} Chat_CloseInputs */
@@ -356,6 +360,22 @@ export const chat_all_read = /** @type {(inputs: Chat_All_ReadInputs) => Localiz
 
 export const chat_attachment = /** @type {(inputs: Chat_AttachmentInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`添付ファイル`)
+};
+
+export const chat_attachment_busy = /** @type {(inputs: Chat_Attachment_BusyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`サーバーが別のファイルを確認中 · 自動的に再試行します`)
+};
+
+export const chat_attachment_open = /** @type {(inputs: Chat_Attachment_OpenInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`開く / ダウンロード`)
+};
+
+export const chat_attachment_processing = /** @type {(inputs: Chat_Attachment_ProcessingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`添付ファイルを確認して保存しています…`)
+};
+
+export const chat_attachment_ready = /** @type {(inputs: Chat_Attachment_ReadyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`添付ファイルの準備完了 · キャプションを追加`)
 };
 
 export const chat_cancel = /** @type {(inputs: Chat_CancelInputs) => LocalizedString} */ () => {

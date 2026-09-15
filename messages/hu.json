@@ -302,5 +302,9 @@
   "chat_share_ready": "A hirdetéskártya küldésre kész",
   "chat_listing_verified": "Ellenőrzött",
   "chat_listing_open": "Megnyitás",
-  "chat_attachment": "Melléklet"
+  "chat_attachment": "Melléklet",
+  "chat_attachment_busy": "A szerver egy másik fájlt ellenőriz · automatikus újrapróbálkozás",
+  "chat_attachment_open": "Megnyitás / letöltés",
+  "chat_attachment_processing": "A melléklet ellenőrzése és mentése…",
+  "chat_attachment_ready": "A melléklet kész · adjon hozzá feliratot"
 }

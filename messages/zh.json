@@ -302,5 +302,9 @@
   "chat_share_ready": "信息卡片已可发送",
   "chat_listing_verified": "已认证",
   "chat_listing_open": "打开",
-  "chat_attachment": "附件"
+  "chat_attachment": "附件",
+  "chat_attachment_busy": "服务器正在检查另一个文件 · 将自动重试",
+  "chat_attachment_open": "打开 / 下载",
+  "chat_attachment_processing": "正在检查并保存附件…",
+  "chat_attachment_ready": "附件已准备好 · 添加说明"
 }

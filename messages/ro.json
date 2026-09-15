@@ -302,5 +302,9 @@
   "chat_share_ready": "Cardul anunțului este gata",
   "chat_listing_verified": "Verificat",
   "chat_listing_open": "Deschide",
-  "chat_attachment": "Atașament"
+  "chat_attachment": "Atașament",
+  "chat_attachment_busy": "Serverul verifică alt fișier · reîncercare automată",
+  "chat_attachment_open": "Deschide / descarcă",
+  "chat_attachment_processing": "Se verifică și se salvează atașamentul…",
+  "chat_attachment_ready": "Atașamentul este gata · adăugați o legendă"
 }
