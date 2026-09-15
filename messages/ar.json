@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "يتجاوز الملف الحجم المسموح",
   "chat_attachment_type": "نوع الملف هذا غير مدعوم",
   "chat_attachment_error": "خطأ في المرفق",
-  "chat_attachment_failed": "لم يُرسل المرفق"
+  "chat_attachment_failed": "لم يُرسل المرفق",
+  "chat_document": "مستند",
+  "chat_document_invalid": "مستند غير صالح أو حجمه أكبر من 16 ميغابايت"
 }

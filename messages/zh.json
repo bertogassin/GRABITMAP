@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "文件超过允许的大小",
   "chat_attachment_type": "不支持此文件类型",
   "chat_attachment_error": "附件错误",
-  "chat_attachment_failed": "附件未发送"
+  "chat_attachment_failed": "附件未发送",
+  "chat_document": "文档",
+  "chat_document_invalid": "文档无效或大小超过 16 MB"
 }

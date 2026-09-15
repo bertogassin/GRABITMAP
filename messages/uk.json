@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "Файл перевищує допустимий розмір",
   "chat_attachment_type": "Цей тип файлу не підтримується",
   "chat_attachment_error": "Помилка вкладення",
-  "chat_attachment_failed": "Вкладення не надіслано"
+  "chat_attachment_failed": "Вкладення не надіслано",
+  "chat_document": "Документ",
+  "chat_document_invalid": "Недопустимий документ або розмір перевищує 16 МБ"
 }

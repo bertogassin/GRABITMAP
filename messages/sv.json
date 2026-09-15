@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "Filen överskrider den tillåtna storleken",
   "chat_attachment_type": "Den här filtypen stöds inte",
   "chat_attachment_error": "Bilagefel",
-  "chat_attachment_failed": "Bilagan skickades inte"
+  "chat_attachment_failed": "Bilagan skickades inte",
+  "chat_document": "Dokument",
+  "chat_document_invalid": "Ogiltigt dokument eller storleken överstiger 16 MB"
 }

@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "فائل کا سائز اجازت شدہ حد سے زیادہ ہے",
   "chat_attachment_type": "اس فائل کی قسم معاونت یافتہ نہیں ہے",
   "chat_attachment_error": "منسلکہ کی خرابی",
-  "chat_attachment_failed": "منسلکہ نہیں بھیجا گیا"
+  "chat_attachment_failed": "منسلکہ نہیں بھیجا گیا",
+  "chat_document": "دستاویز",
+  "chat_document_invalid": "دستاویز درست نہیں یا سائز 16 MB سے زیادہ ہے"
 }

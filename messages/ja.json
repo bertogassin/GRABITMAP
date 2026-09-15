@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "ファイルが許容サイズを超えています",
   "chat_attachment_type": "このファイル形式はサポートされていません",
   "chat_attachment_error": "添付ファイルエラー",
-  "chat_attachment_failed": "添付ファイルは送信されませんでした"
+  "chat_attachment_failed": "添付ファイルは送信されませんでした",
+  "chat_document": "ドキュメント",
+  "chat_document_invalid": "無効なドキュメント、またはサイズが16 MBを超えています"
 }

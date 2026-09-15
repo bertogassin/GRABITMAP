@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "File exceeds the allowed size",
   "chat_attachment_type": "This file type is not supported",
   "chat_attachment_error": "Attachment error",
-  "chat_attachment_failed": "Attachment not sent"
+  "chat_attachment_failed": "Attachment not sent",
+  "chat_document": "Document",
+  "chat_document_invalid": "Invalid document or file exceeds 16 MB"
 }

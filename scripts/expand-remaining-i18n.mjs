@@ -96,6 +96,20 @@ const NEW = {
     id:"Lampiran tidak terkirim",ms:"Lampiran tidak dihantar",th:"ไม่ได้ส่งไฟล์แนบ",fa:"پیوست ارسال نشد",ur:"منسلکہ نہیں بھیجا گیا",bn:"সংযুক্তি পাঠানো হয়নি",
     pa:"ਅਟੈਚਮੈਂਟ ਨਹੀਂ ਭੇਜਿਆ ਗਿਆ",sw:"Kiambatisho hakijatumwa",el:"Το συνημμένο δεν στάλθηκε",cs:"Příloha nebyla odeslána",ro:"Atașamentul nu a fost trimis",hu:"A melléklet nem lett elküldve",sv:"Bilagan skickades inte",he:"הקובץ המצורף לא נשלח",
   }),
+  chat_document: L({
+    ru:"Документ",en:"Document",fr:"Document",es:"Documento",zh:"文档","zh-TW":"文件",
+    hi:"दस्तावेज़",ar:"مستند",pt:"Documento",de:"Dokument",ja:"ドキュメント",ko:"문서",
+    it:"Documento",tr:"Belge",pl:"Dokument",uk:"Документ",nl:"Document",vi:"Tài liệu",
+    id:"Dokumen",ms:"Dokumen",th:"เอกสาร",fa:"سند",ur:"دستاویز",bn:"নথি",
+    pa:"ਦਸਤਾਵੇਜ਼",sw:"Hati",el:"Έγγραφο",cs:"Dokument",ro:"Document",hu:"Dokumentum",sv:"Dokument",he:"מסמך",
+  }),
+  chat_document_invalid: L({
+    ru:"Недопустимый документ или размер больше 16 МБ",en:"Invalid document or file exceeds 16 MB",fr:"Document non valide ou taille supérieure à 16 Mo",es:"Documento no válido o tamaño superior a 16 MB",zh:"文档无效或大小超过 16 MB","zh-TW":"文件無效或大小超過 16 MB",
+    hi:"अमान्य दस्तावेज़ या आकार 16 MB से अधिक है",ar:"مستند غير صالح أو حجمه أكبر من 16 ميغابايت",pt:"Documento inválido ou tamanho superior a 16 MB",de:"Ungültiges Dokument oder größer als 16 MB",ja:"無効なドキュメント、またはサイズが16 MBを超えています",ko:"유효하지 않은 문서이거나 크기가 16MB를 초과합니다",
+    it:"Documento non valido o dimensione superiore a 16 MB",tr:"Geçersiz belge veya boyut 16 MB’den büyük",pl:"Nieprawidłowy dokument lub rozmiar przekracza 16 MB",uk:"Недопустимий документ або розмір перевищує 16 МБ",nl:"Ongeldig document of groter dan 16 MB",vi:"Tài liệu không hợp lệ hoặc dung lượng vượt quá 16 MB",
+    id:"Dokumen tidak valid atau ukurannya melebihi 16 MB",ms:"Dokumen tidak sah atau saiz melebihi 16 MB",th:"เอกสารไม่ถูกต้องหรือมีขนาดเกิน 16 MB",fa:"سند نامعتبر است یا حجم آن بیشتر از ۱۶ مگابایت است",ur:"دستاویز درست نہیں یا سائز 16 MB سے زیادہ ہے",bn:"নথিটি বৈধ নয় অথবা আকার ১৬ MB-এর বেশি",
+    pa:"ਦਸਤਾਵੇਜ਼ ਅਵੈਧ ਹੈ ਜਾਂ ਆਕਾਰ 16 MB ਤੋਂ ਵੱਧ ਹੈ",sw:"Hati si sahihi au ukubwa unazidi MB 16",el:"Μη έγκυρο έγγραφο ή μέγεθος άνω των 16 MB",cs:"Neplatný dokument nebo velikost přesahuje 16 MB",ro:"Document nevalid sau dimensiune mai mare de 16 MB",hu:"Érvénytelen dokumentum, vagy a mérete meghaladja a 16 MB-ot",sv:"Ogiltigt dokument eller storleken överstiger 16 MB",he:"מסמך לא תקין או שגודלו עולה על 16 MB",
+  }),
   chat_offline: L({
     ru:"не в сети",en:"offline",fr:"hors ligne",es:"desconectado",zh:"离线","zh-TW":"離線",
     hi:"ऑफ़लाइन",ar:"غير متصل",pt:"offline",de:"offline",ja:"オフライン",ko:"오프라인",

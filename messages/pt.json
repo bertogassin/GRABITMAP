@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "O arquivo excede o tamanho permitido",
   "chat_attachment_type": "Este tipo de arquivo não é compatível",
   "chat_attachment_error": "Erro no anexo",
-  "chat_attachment_failed": "Anexo não enviado"
+  "chat_attachment_failed": "Anexo não enviado",
+  "chat_document": "Documento",
+  "chat_document_invalid": "Documento inválido ou tamanho superior a 16 MB"
 }

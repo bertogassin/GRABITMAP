@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "حجم فایل از حد مجاز بیشتر است",
   "chat_attachment_type": "این نوع فایل پشتیبانی نمی‌شود",
   "chat_attachment_error": "خطای پیوست",
-  "chat_attachment_failed": "پیوست ارسال نشد"
+  "chat_attachment_failed": "پیوست ارسال نشد",
+  "chat_document": "سند",
+  "chat_document_invalid": "سند نامعتبر است یا حجم آن بیشتر از ۱۶ مگابایت است"
 }

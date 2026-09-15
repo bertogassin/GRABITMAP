@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "Fișierul depășește dimensiunea permisă",
   "chat_attachment_type": "Acest tip de fișier nu este acceptat",
   "chat_attachment_error": "Eroare la atașament",
-  "chat_attachment_failed": "Atașamentul nu a fost trimis"
+  "chat_attachment_failed": "Atașamentul nu a fost trimis",
+  "chat_document": "Document",
+  "chat_document_invalid": "Document nevalid sau dimensiune mai mare de 16 MB"
 }
