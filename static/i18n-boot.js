@@ -22,11 +22,15 @@
     if (!window.m) {
         window.m = new Proxy({}, {
             get: function (_, key) {
+                var name = String(key);
+                if (typeof messages()[name] !== "string") {
+                    return undefined;
+                }
                 return function (vars) {
                     // Translate directly from the server-provided table.
                     // Calling window.m from t() would call this proxy again
                     // and recurse until the browser stack is exhausted.
-                    return t(String(key), vars);
+                    return t(name, vars);
                 };
             }
         });

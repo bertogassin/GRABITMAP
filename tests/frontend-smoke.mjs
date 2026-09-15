@@ -13,6 +13,24 @@ test("all supported locales have source and compiled messages", async () => {
   }
 });
 
+test("all locale catalogs share the exact base key set", async () => {
+  const base = JSON.parse(
+    await readFile(new URL("messages/ru.json", root), "utf8"),
+  );
+  const baseKeys = Object.keys(base).sort();
+
+  for (const locale of locales) {
+    const messages = JSON.parse(
+      await readFile(new URL(`messages/${locale}.json`, root), "utf8"),
+    );
+    assert.deepEqual(
+      Object.keys(messages).sort(),
+      baseKeys,
+      `${locale} locale keys must match the base catalog`,
+    );
+  }
+});
+
 test("RTL runtime and mobile PWA metadata are present", async () => {
   const runtime = await readFile(new URL("static/i18n-runtime.js", root), "utf8");
   const manifest = JSON.parse(await readFile(new URL("static/manifest.webmanifest", root), "utf8"));
@@ -1094,7 +1112,9 @@ test("browser i18n fallback cannot recurse and generated bare imports are not lo
     readFile(new URL("src/web/templates/common.rs", root), "utf8"),
   ]);
   assert.doesNotMatch(boot, /window\.m && typeof window\.m\[key\]/);
-  assert.match(boot, /return t\(String\(key\), vars\)/);
+  assert.match(boot, /var name = String\(key\)/);
+  assert.match(boot, /typeof messages\(\)\[name\] !== "string"/);
+  assert.match(boot, /return t\(name, vars\)/);
   assert.doesNotMatch(common, /type="module" src="\{paraglide_boot_js\}"/);
   const browser = {
     resursmapI18n: { messages: { greeting: "Привет, {name}" } },
@@ -1102,6 +1122,18 @@ test("browser i18n fallback cannot recurse and generated bare imports are not lo
   vm.runInNewContext(boot, { window: browser });
   assert.equal(browser.rmT("greeting", { name: "Амир" }), "Привет, Амир");
   assert.equal(browser.m.greeting({ name: "Амир" }), "Привет, Амир");
+  assert.equal(browser.m.missing_key, undefined);
+  assert.equal(browser.rmT("missing_key"), "missing_key");
+
+  function componentText(key, fallback) {
+    if (browser.m && typeof browser.m[key] === "function") {
+      return browser.m[key]({});
+    }
+    const translated = browser.rmT(key);
+    return translated && translated !== key ? translated : fallback;
+  }
+
+  assert.equal(componentText("missing_key", "Безопасный текст"), "Безопасный текст");
 });
 
 test("staged deploy keeps a ready backend during replacement", async () => {
