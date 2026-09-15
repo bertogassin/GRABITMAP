@@ -317,5 +317,9 @@
   "chat_document_invalid": "Tài liệu không hợp lệ hoặc dung lượng vượt quá 16 MB",
   "chat_pin": "Ghim",
   "chat_unpin": "Bỏ ghim",
-  "chat_pinned_message": "Tin nhắn đã ghim"
+  "chat_pinned_message": "Tin nhắn đã ghim",
+  "chat_media_queue_full": "Hãy đợi gửi xong các tệp đính kèm hiện tại",
+  "chat_sending_attachment": "Đang gửi tệp đính kèm…",
+  "chat_upload_cancelled": "Đã hủy tải lên",
+  "chat_upload_progress": "Tải lên"
 }

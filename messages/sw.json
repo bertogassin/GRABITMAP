@@ -317,5 +317,9 @@
   "chat_document_invalid": "Hati si sahihi au ukubwa unazidi MB 16",
   "chat_pin": "Bandika",
   "chat_unpin": "Ondoa bandiko",
-  "chat_pinned_message": "Ujumbe uliobandikwa"
+  "chat_pinned_message": "Ujumbe uliobandikwa",
+  "chat_media_queue_full": "Subiri viambatisho vya sasa vitumwe",
+  "chat_sending_attachment": "Inatuma kiambatisho…",
+  "chat_upload_cancelled": "Upakiaji umeghairiwa",
+  "chat_upload_progress": "Upakiaji"
 }

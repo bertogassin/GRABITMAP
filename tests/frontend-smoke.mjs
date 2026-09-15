@@ -264,19 +264,63 @@ test("chat pinning labels are registered in every locale", async () => {
   });
 });
 
+test("chat attachment upload states are registered in every locale", async () => {
+  const keys = [
+    "chat_media_queue_full",
+    "chat_sending_attachment",
+    "chat_upload_cancelled",
+    "chat_upload_progress",
+  ];
+  const translations = {};
+
+  for (const locale of locales) {
+    const messages = JSON.parse(
+      await readFile(new URL("messages/" + locale + ".json", root), "utf8"),
+    );
+    translations[locale] = {};
+
+    for (const key of keys) {
+      assert.equal(typeof messages[key], "string");
+      assert.notEqual(messages[key].trim(), "");
+      translations[locale][key] = messages[key];
+    }
+  }
+
+  assert.deepEqual(translations.ru, {
+    chat_media_queue_full: "Дождитесь отправки текущих вложений",
+    chat_sending_attachment: "Отправка вложения…",
+    chat_upload_cancelled: "Отправка отменена",
+    chat_upload_progress: "Загрузка",
+  });
+  assert.deepEqual(translations.en, {
+    chat_media_queue_full: "Wait for the current attachments to finish sending",
+    chat_sending_attachment: "Sending attachment…",
+    chat_upload_cancelled: "Upload cancelled",
+    chat_upload_progress: "Upload",
+  });
+  assert.deepEqual(translations.fr, {
+    chat_media_queue_full: "Attendez la fin de l’envoi des pièces jointes en cours",
+    chat_sending_attachment: "Envoi de la pièce jointe…",
+    chat_upload_cancelled: "Envoi annulé",
+    chat_upload_progress: "Téléversement",
+  });
+  assert.deepEqual(translations.ar, {
+    chat_media_queue_full: "انتظر حتى يكتمل إرسال المرفقات الحالية",
+    chat_sending_attachment: "جارٍ إرسال المرفق…",
+    chat_upload_cancelled: "تم إلغاء الرفع",
+    chat_upload_progress: "رفع",
+  });
+});
+
 test("browser translation calls cannot add unregistered locale keys", async () => {
   const base = JSON.parse(
     await readFile(new URL("messages/ru.json", root), "utf8"),
   );
   const knownLegacyDebt = [
     "chat_connecting_initial",
-    "chat_media_queue_full",
     "chat_member_muted",
     "chat_mic_request",
     "chat_reply_unavailable",
-    "chat_sending_attachment",
-    "chat_upload_cancelled",
-    "chat_upload_progress",
     "chat_video",
     "chat_video_duration",
     "chat_video_fullscreen",

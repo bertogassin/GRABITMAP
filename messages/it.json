@@ -317,5 +317,9 @@
   "chat_document_invalid": "Documento non valido o dimensione superiore a 16 MB",
   "chat_pin": "Fissa",
   "chat_unpin": "Rimuovi fissaggio",
-  "chat_pinned_message": "Messaggio fissato"
+  "chat_pinned_message": "Messaggio fissato",
+  "chat_media_queue_full": "Attendi il completamento dell’invio degli allegati correnti",
+  "chat_sending_attachment": "Invio dell’allegato…",
+  "chat_upload_cancelled": "Invio annullato",
+  "chat_upload_progress": "Caricamento"
 }

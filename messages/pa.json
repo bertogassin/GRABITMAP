@@ -317,5 +317,9 @@
   "chat_document_invalid": "ਦਸਤਾਵੇਜ਼ ਅਵੈਧ ਹੈ ਜਾਂ ਆਕਾਰ 16 MB ਤੋਂ ਵੱਧ ਹੈ",
   "chat_pin": "ਪਿੰਨ ਕਰੋ",
   "chat_unpin": "ਪਿੰਨ ਹਟਾਓ",
-  "chat_pinned_message": "ਪਿੰਨ ਕੀਤਾ ਸੁਨੇਹਾ"
+  "chat_pinned_message": "ਪਿੰਨ ਕੀਤਾ ਸੁਨੇਹਾ",
+  "chat_media_queue_full": "ਮੌਜੂਦਾ ਅਟੈਚਮੈਂਟ ਭੇਜੇ ਜਾਣ ਤੱਕ ਉਡੀਕ ਕਰੋ",
+  "chat_sending_attachment": "ਅਟੈਚਮੈਂਟ ਭੇਜਿਆ ਜਾ ਰਿਹਾ ਹੈ…",
+  "chat_upload_cancelled": "ਅੱਪਲੋਡ ਰੱਦ ਕੀਤਾ ਗਿਆ",
+  "chat_upload_progress": "ਅੱਪਲੋਡ"
 }

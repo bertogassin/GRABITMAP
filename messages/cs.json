@@ -317,5 +317,9 @@
   "chat_document_invalid": "Neplatný dokument nebo velikost přesahuje 16 MB",
   "chat_pin": "Připnout",
   "chat_unpin": "Odepnout",
-  "chat_pinned_message": "Připnutá zpráva"
+  "chat_pinned_message": "Připnutá zpráva",
+  "chat_media_queue_full": "Počkejte na dokončení odesílání aktuálních příloh",
+  "chat_sending_attachment": "Odesílání přílohy…",
+  "chat_upload_cancelled": "Nahrávání zrušeno",
+  "chat_upload_progress": "Nahrávání"
 }

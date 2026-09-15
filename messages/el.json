@@ -317,5 +317,9 @@
   "chat_document_invalid": "Μη έγκυρο έγγραφο ή μέγεθος άνω των 16 MB",
   "chat_pin": "Καρφίτσωμα",
   "chat_unpin": "Ξεκαρφίτσωμα",
-  "chat_pinned_message": "Καρφιτσωμένο μήνυμα"
+  "chat_pinned_message": "Καρφιτσωμένο μήνυμα",
+  "chat_media_queue_full": "Περιμένετε να ολοκληρωθεί η αποστολή των τρεχόντων συνημμένων",
+  "chat_sending_attachment": "Αποστολή συνημμένου…",
+  "chat_upload_cancelled": "Η μεταφόρτωση ακυρώθηκε",
+  "chat_upload_progress": "Μεταφόρτωση"
 }

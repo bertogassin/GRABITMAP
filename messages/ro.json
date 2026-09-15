@@ -317,5 +317,9 @@
   "chat_document_invalid": "Document nevalid sau dimensiune mai mare de 16 MB",
   "chat_pin": "Fixează",
   "chat_unpin": "Anulează fixarea",
-  "chat_pinned_message": "Mesaj fixat"
+  "chat_pinned_message": "Mesaj fixat",
+  "chat_media_queue_full": "Așteptați finalizarea trimiterii atașamentelor curente",
+  "chat_sending_attachment": "Se trimite atașamentul…",
+  "chat_upload_cancelled": "Încărcare anulată",
+  "chat_upload_progress": "Încărcare"
 }

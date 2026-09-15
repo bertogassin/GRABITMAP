@@ -317,5 +317,9 @@
   "chat_document_invalid": "Nieprawidłowy dokument lub rozmiar przekracza 16 MB",
   "chat_pin": "Przypnij",
   "chat_unpin": "Odepnij",
-  "chat_pinned_message": "Przypięta wiadomość"
+  "chat_pinned_message": "Przypięta wiadomość",
+  "chat_media_queue_full": "Poczekaj na zakończenie wysyłania bieżących załączników",
+  "chat_sending_attachment": "Wysyłanie załącznika…",
+  "chat_upload_cancelled": "Wysyłanie anulowane",
+  "chat_upload_progress": "Przesyłanie"
 }
