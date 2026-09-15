@@ -221,6 +221,49 @@ test("chat document labels are registered in every locale", async () => {
   });
 });
 
+test("chat pinning labels are registered in every locale", async () => {
+  const keys = [
+    "chat_pin",
+    "chat_unpin",
+    "chat_pinned_message",
+  ];
+  const translations = {};
+
+  for (const locale of locales) {
+    const messages = JSON.parse(
+      await readFile(new URL("messages/" + locale + ".json", root), "utf8"),
+    );
+    translations[locale] = {};
+
+    for (const key of keys) {
+      assert.equal(typeof messages[key], "string");
+      assert.notEqual(messages[key].trim(), "");
+      translations[locale][key] = messages[key];
+    }
+  }
+
+  assert.deepEqual(translations.ru, {
+    chat_pin: "Закрепить",
+    chat_unpin: "Открепить",
+    chat_pinned_message: "Закреплённое сообщение",
+  });
+  assert.deepEqual(translations.en, {
+    chat_pin: "Pin",
+    chat_unpin: "Unpin",
+    chat_pinned_message: "Pinned message",
+  });
+  assert.deepEqual(translations.fr, {
+    chat_pin: "Épingler",
+    chat_unpin: "Désépingler",
+    chat_pinned_message: "Message épinglé",
+  });
+  assert.deepEqual(translations.ar, {
+    chat_pin: "تثبيت",
+    chat_unpin: "إلغاء التثبيت",
+    chat_pinned_message: "رسالة مثبتة",
+  });
+});
+
 test("browser translation calls cannot add unregistered locale keys", async () => {
   const base = JSON.parse(
     await readFile(new URL("messages/ru.json", root), "utf8"),
@@ -230,11 +273,8 @@ test("browser translation calls cannot add unregistered locale keys", async () =
     "chat_media_queue_full",
     "chat_member_muted",
     "chat_mic_request",
-    "chat_pin",
-    "chat_pinned_message",
     "chat_reply_unavailable",
     "chat_sending_attachment",
-    "chat_unpin",
     "chat_upload_cancelled",
     "chat_upload_progress",
     "chat_video",

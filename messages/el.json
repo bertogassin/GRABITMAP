@@ -314,5 +314,8 @@
   "chat_attachment_error": "Σφάλμα συνημμένου",
   "chat_attachment_failed": "Το συνημμένο δεν στάλθηκε",
   "chat_document": "Έγγραφο",
-  "chat_document_invalid": "Μη έγκυρο έγγραφο ή μέγεθος άνω των 16 MB"
+  "chat_document_invalid": "Μη έγκυρο έγγραφο ή μέγεθος άνω των 16 MB",
+  "chat_pin": "Καρφίτσωμα",
+  "chat_unpin": "Ξεκαρφίτσωμα",
+  "chat_pinned_message": "Καρφιτσωμένο μήνυμα"
 }

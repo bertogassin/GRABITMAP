@@ -314,5 +314,8 @@
   "chat_attachment_error": "ਅਟੈਚਮੈਂਟ ਗਲਤੀ",
   "chat_attachment_failed": "ਅਟੈਚਮੈਂਟ ਨਹੀਂ ਭੇਜਿਆ ਗਿਆ",
   "chat_document": "ਦਸਤਾਵੇਜ਼",
-  "chat_document_invalid": "ਦਸਤਾਵੇਜ਼ ਅਵੈਧ ਹੈ ਜਾਂ ਆਕਾਰ 16 MB ਤੋਂ ਵੱਧ ਹੈ"
+  "chat_document_invalid": "ਦਸਤਾਵੇਜ਼ ਅਵੈਧ ਹੈ ਜਾਂ ਆਕਾਰ 16 MB ਤੋਂ ਵੱਧ ਹੈ",
+  "chat_pin": "ਪਿੰਨ ਕਰੋ",
+  "chat_unpin": "ਪਿੰਨ ਹਟਾਓ",
+  "chat_pinned_message": "ਪਿੰਨ ਕੀਤਾ ਸੁਨੇਹਾ"
 }

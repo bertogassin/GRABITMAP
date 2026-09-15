@@ -314,5 +314,8 @@
   "chat_attachment_error": "Bilagefel",
   "chat_attachment_failed": "Bilagan skickades inte",
   "chat_document": "Dokument",
-  "chat_document_invalid": "Ogiltigt dokument eller storleken överstiger 16 MB"
+  "chat_document_invalid": "Ogiltigt dokument eller storleken överstiger 16 MB",
+  "chat_pin": "Fäst",
+  "chat_unpin": "Lossa",
+  "chat_pinned_message": "Fäst meddelande"
 }

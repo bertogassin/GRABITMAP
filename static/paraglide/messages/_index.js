@@ -95,6 +95,8 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Chat_Photo_OfflineInputs */
 /** @typedef {{}} Chat_Photo_Over_8mbInputs */
 /** @typedef {{}} Chat_Photo_Too_BigInputs */
+/** @typedef {{}} Chat_PinInputs */
+/** @typedef {{}} Chat_Pinned_MessageInputs */
 /** @typedef {{}} Chat_Profile_MissingInputs */
 /** @typedef {{}} Chat_Rate_LimitedInputs */
 /** @typedef {{}} Chat_RecordingInputs */
@@ -122,6 +124,7 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Chat_Status_SendingInputs */
 /** @typedef {{}} Chat_TitleInputs */
 /** @typedef {{}} Chat_TypingInputs */
+/** @typedef {{}} Chat_UnpinInputs */
 /** @typedef {{}} Chat_User_UnavailableInputs */
 /** @typedef {{}} Chat_VoiceInputs */
 /** @typedef {{}} Chat_Voice_ErrorInputs */
@@ -4445,6 +4448,94 @@ export const chat_photo_too_big = /** @type {((inputs?: Chat_Photo_Too_BigInputs
 /**
 * | output |
 * | --- |
+* | "Pin" |
+*
+* @param {Chat_PinInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_pin = /** @type {((inputs?: Chat_PinInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_PinInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_pin(inputs)
+	if (locale === "fr") return __fr.chat_pin(inputs)
+	if (locale === "es") return __es.chat_pin(inputs)
+	if (locale === "zh") return __zh.chat_pin(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_pin(inputs)
+	if (locale === "hi") return __hi.chat_pin(inputs)
+	if (locale === "ar") return __ar.chat_pin(inputs)
+	if (locale === "pt") return __pt.chat_pin(inputs)
+	if (locale === "de") return __de.chat_pin(inputs)
+	if (locale === "ja") return __ja.chat_pin(inputs)
+	if (locale === "ko") return __ko.chat_pin(inputs)
+	if (locale === "it") return __it.chat_pin(inputs)
+	if (locale === "tr") return __tr.chat_pin(inputs)
+	if (locale === "pl") return __pl.chat_pin(inputs)
+	if (locale === "uk") return __uk.chat_pin(inputs)
+	if (locale === "nl") return __nl.chat_pin(inputs)
+	if (locale === "vi") return __vi.chat_pin(inputs)
+	if (locale === "id") return __id.chat_pin(inputs)
+	if (locale === "ms") return __ms.chat_pin(inputs)
+	if (locale === "th") return __th.chat_pin(inputs)
+	if (locale === "fa") return __fa.chat_pin(inputs)
+	if (locale === "ur") return __ur.chat_pin(inputs)
+	if (locale === "bn") return __bn.chat_pin(inputs)
+	if (locale === "pa") return __pa.chat_pin(inputs)
+	if (locale === "sw") return __sw.chat_pin(inputs)
+	if (locale === "el") return __el.chat_pin(inputs)
+	if (locale === "cs") return __cs.chat_pin(inputs)
+	if (locale === "ro") return __ro.chat_pin(inputs)
+	if (locale === "hu") return __hu.chat_pin(inputs)
+	if (locale === "sv") return __sv.chat_pin(inputs)
+	if (locale === "he") return __he.chat_pin(inputs)
+	return __ru.chat_pin(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Pinned message" |
+*
+* @param {Chat_Pinned_MessageInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_pinned_message = /** @type {((inputs?: Chat_Pinned_MessageInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Pinned_MessageInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_pinned_message(inputs)
+	if (locale === "fr") return __fr.chat_pinned_message(inputs)
+	if (locale === "es") return __es.chat_pinned_message(inputs)
+	if (locale === "zh") return __zh.chat_pinned_message(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_pinned_message(inputs)
+	if (locale === "hi") return __hi.chat_pinned_message(inputs)
+	if (locale === "ar") return __ar.chat_pinned_message(inputs)
+	if (locale === "pt") return __pt.chat_pinned_message(inputs)
+	if (locale === "de") return __de.chat_pinned_message(inputs)
+	if (locale === "ja") return __ja.chat_pinned_message(inputs)
+	if (locale === "ko") return __ko.chat_pinned_message(inputs)
+	if (locale === "it") return __it.chat_pinned_message(inputs)
+	if (locale === "tr") return __tr.chat_pinned_message(inputs)
+	if (locale === "pl") return __pl.chat_pinned_message(inputs)
+	if (locale === "uk") return __uk.chat_pinned_message(inputs)
+	if (locale === "nl") return __nl.chat_pinned_message(inputs)
+	if (locale === "vi") return __vi.chat_pinned_message(inputs)
+	if (locale === "id") return __id.chat_pinned_message(inputs)
+	if (locale === "ms") return __ms.chat_pinned_message(inputs)
+	if (locale === "th") return __th.chat_pinned_message(inputs)
+	if (locale === "fa") return __fa.chat_pinned_message(inputs)
+	if (locale === "ur") return __ur.chat_pinned_message(inputs)
+	if (locale === "bn") return __bn.chat_pinned_message(inputs)
+	if (locale === "pa") return __pa.chat_pinned_message(inputs)
+	if (locale === "sw") return __sw.chat_pinned_message(inputs)
+	if (locale === "el") return __el.chat_pinned_message(inputs)
+	if (locale === "cs") return __cs.chat_pinned_message(inputs)
+	if (locale === "ro") return __ro.chat_pinned_message(inputs)
+	if (locale === "hu") return __hu.chat_pinned_message(inputs)
+	if (locale === "sv") return __sv.chat_pinned_message(inputs)
+	if (locale === "he") return __he.chat_pinned_message(inputs)
+	return __ru.chat_pinned_message(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "Profile not found" |
 *
 * @param {Chat_Profile_MissingInputs} inputs
@@ -5629,6 +5720,50 @@ export const chat_typing = /** @type {((inputs?: Chat_TypingInputs, options?: { 
 	if (locale === "sv") return __sv.chat_typing(inputs)
 	if (locale === "he") return __he.chat_typing(inputs)
 	return __ru.chat_typing(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Unpin" |
+*
+* @param {Chat_UnpinInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_unpin = /** @type {((inputs?: Chat_UnpinInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_UnpinInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_unpin(inputs)
+	if (locale === "fr") return __fr.chat_unpin(inputs)
+	if (locale === "es") return __es.chat_unpin(inputs)
+	if (locale === "zh") return __zh.chat_unpin(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_unpin(inputs)
+	if (locale === "hi") return __hi.chat_unpin(inputs)
+	if (locale === "ar") return __ar.chat_unpin(inputs)
+	if (locale === "pt") return __pt.chat_unpin(inputs)
+	if (locale === "de") return __de.chat_unpin(inputs)
+	if (locale === "ja") return __ja.chat_unpin(inputs)
+	if (locale === "ko") return __ko.chat_unpin(inputs)
+	if (locale === "it") return __it.chat_unpin(inputs)
+	if (locale === "tr") return __tr.chat_unpin(inputs)
+	if (locale === "pl") return __pl.chat_unpin(inputs)
+	if (locale === "uk") return __uk.chat_unpin(inputs)
+	if (locale === "nl") return __nl.chat_unpin(inputs)
+	if (locale === "vi") return __vi.chat_unpin(inputs)
+	if (locale === "id") return __id.chat_unpin(inputs)
+	if (locale === "ms") return __ms.chat_unpin(inputs)
+	if (locale === "th") return __th.chat_unpin(inputs)
+	if (locale === "fa") return __fa.chat_unpin(inputs)
+	if (locale === "ur") return __ur.chat_unpin(inputs)
+	if (locale === "bn") return __bn.chat_unpin(inputs)
+	if (locale === "pa") return __pa.chat_unpin(inputs)
+	if (locale === "sw") return __sw.chat_unpin(inputs)
+	if (locale === "el") return __el.chat_unpin(inputs)
+	if (locale === "cs") return __cs.chat_unpin(inputs)
+	if (locale === "ro") return __ro.chat_unpin(inputs)
+	if (locale === "hu") return __hu.chat_unpin(inputs)
+	if (locale === "sv") return __sv.chat_unpin(inputs)
+	if (locale === "he") return __he.chat_unpin(inputs)
+	return __ru.chat_unpin(inputs)
 });
 /**
 * | output |

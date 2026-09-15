@@ -110,6 +110,27 @@ const NEW = {
     id:"Dokumen tidak valid atau ukurannya melebihi 16 MB",ms:"Dokumen tidak sah atau saiz melebihi 16 MB",th:"เอกสารไม่ถูกต้องหรือมีขนาดเกิน 16 MB",fa:"سند نامعتبر است یا حجم آن بیشتر از ۱۶ مگابایت است",ur:"دستاویز درست نہیں یا سائز 16 MB سے زیادہ ہے",bn:"নথিটি বৈধ নয় অথবা আকার ১৬ MB-এর বেশি",
     pa:"ਦਸਤਾਵੇਜ਼ ਅਵੈਧ ਹੈ ਜਾਂ ਆਕਾਰ 16 MB ਤੋਂ ਵੱਧ ਹੈ",sw:"Hati si sahihi au ukubwa unazidi MB 16",el:"Μη έγκυρο έγγραφο ή μέγεθος άνω των 16 MB",cs:"Neplatný dokument nebo velikost přesahuje 16 MB",ro:"Document nevalid sau dimensiune mai mare de 16 MB",hu:"Érvénytelen dokumentum, vagy a mérete meghaladja a 16 MB-ot",sv:"Ogiltigt dokument eller storleken överstiger 16 MB",he:"מסמך לא תקין או שגודלו עולה על 16 MB",
   }),
+  chat_pin: L({
+    ru:"Закрепить",en:"Pin",fr:"Épingler",es:"Fijar",zh:"置顶","zh-TW":"置頂",
+    hi:"पिन करें",ar:"تثبيت",pt:"Fixar",de:"Anheften",ja:"ピン留め",ko:"고정",
+    it:"Fissa",tr:"Sabitle",pl:"Przypnij",uk:"Закріпити",nl:"Vastmaken",vi:"Ghim",
+    id:"Sematkan",ms:"Semat",th:"ปักหมุด",fa:"سنجاق کردن",ur:"پن کریں",bn:"পিন করুন",
+    pa:"ਪਿੰਨ ਕਰੋ",sw:"Bandika",el:"Καρφίτσωμα",cs:"Připnout",ro:"Fixează",hu:"Kitűzés",sv:"Fäst",he:"הצמדה",
+  }),
+  chat_unpin: L({
+    ru:"Открепить",en:"Unpin",fr:"Désépingler",es:"Desfijar",zh:"取消置顶","zh-TW":"取消置頂",
+    hi:"पिन हटाएँ",ar:"إلغاء التثبيت",pt:"Desafixar",de:"Loslösen",ja:"ピン留めを解除",ko:"고정 해제",
+    it:"Rimuovi fissaggio",tr:"Sabitlemeyi kaldır",pl:"Odepnij",uk:"Відкріпити",nl:"Losmaken",vi:"Bỏ ghim",
+    id:"Lepas sematan",ms:"Nyahsemat",th:"เลิกปักหมุด",fa:"برداشتن سنجاق",ur:"پن ہٹائیں",bn:"পিন সরান",
+    pa:"ਪਿੰਨ ਹਟਾਓ",sw:"Ondoa bandiko",el:"Ξεκαρφίτσωμα",cs:"Odepnout",ro:"Anulează fixarea",hu:"Kitűzés megszüntetése",sv:"Lossa",he:"ביטול הצמדה",
+  }),
+  chat_pinned_message: L({
+    ru:"Закреплённое сообщение",en:"Pinned message",fr:"Message épinglé",es:"Mensaje fijado",zh:"置顶消息","zh-TW":"置頂訊息",
+    hi:"पिन किया गया संदेश",ar:"رسالة مثبتة",pt:"Mensagem fixada",de:"Angeheftete Nachricht",ja:"ピン留めされたメッセージ",ko:"고정된 메시지",
+    it:"Messaggio fissato",tr:"Sabitlenmiş mesaj",pl:"Przypięta wiadomość",uk:"Закріплене повідомлення",nl:"Vastgemaakt bericht",vi:"Tin nhắn đã ghim",
+    id:"Pesan yang disematkan",ms:"Mesej disemat",th:"ข้อความที่ปักหมุด",fa:"پیام سنجاق‌شده",ur:"پن کیا گیا پیغام",bn:"পিন করা বার্তা",
+    pa:"ਪਿੰਨ ਕੀਤਾ ਸੁਨੇਹਾ",sw:"Ujumbe uliobandikwa",el:"Καρφιτσωμένο μήνυμα",cs:"Připnutá zpráva",ro:"Mesaj fixat",hu:"Kitűzött üzenet",sv:"Fäst meddelande",he:"הודעה מוצמדת",
+  }),
   chat_offline: L({
     ru:"не в сети",en:"offline",fr:"hors ligne",es:"desconectado",zh:"离线","zh-TW":"離線",
     hi:"ऑफ़लाइन",ar:"غير متصل",pt:"offline",de:"offline",ja:"オフライン",ko:"오프라인",
