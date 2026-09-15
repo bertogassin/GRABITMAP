@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "Upload interrupted · retrying automatically",
   "chat_attachment_timeout": "Network or validation took too long · try again",
   "chat_attachment_too_large": "File exceeds the allowed size",
-  "chat_attachment_type": "This file type is not supported"
+  "chat_attachment_type": "This file type is not supported",
+  "chat_attachment_error": "Attachment error",
+  "chat_attachment_failed": "Attachment not sent"
 }

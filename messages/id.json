@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "Unggahan terputus · mencoba lagi secara otomatis",
   "chat_attachment_timeout": "Jaringan atau pemeriksaan terlalu lama · coba lagi",
   "chat_attachment_too_large": "File melebihi ukuran yang diizinkan",
-  "chat_attachment_type": "Jenis file ini tidak didukung"
+  "chat_attachment_type": "Jenis file ini tidak didukung",
+  "chat_attachment_error": "Kesalahan lampiran",
+  "chat_attachment_failed": "Lampiran tidak terkirim"
 }

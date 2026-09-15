@@ -14,6 +14,8 @@
 /** @typedef {{}} Chat_All_ReadInputs */
 /** @typedef {{}} Chat_AttachmentInputs */
 /** @typedef {{}} Chat_Attachment_BusyInputs */
+/** @typedef {{}} Chat_Attachment_ErrorInputs */
+/** @typedef {{}} Chat_Attachment_FailedInputs */
 /** @typedef {{}} Chat_Attachment_InterruptedInputs */
 /** @typedef {{}} Chat_Attachment_OpenInputs */
 /** @typedef {{}} Chat_Attachment_ProcessingInputs */
@@ -368,6 +370,14 @@ export const chat_attachment = /** @type {(inputs: Chat_AttachmentInputs) => Loc
 
 export const chat_attachment_busy = /** @type {(inputs: Chat_Attachment_BusyInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`伺服器正在檢查另一個檔案 · 將自動重試`)
+};
+
+export const chat_attachment_error = /** @type {(inputs: Chat_Attachment_ErrorInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`附件錯誤`)
+};
+
+export const chat_attachment_failed = /** @type {(inputs: Chat_Attachment_FailedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`附件未傳送`)
 };
 
 export const chat_attachment_interrupted = /** @type {(inputs: Chat_Attachment_InterruptedInputs) => LocalizedString} */ () => {

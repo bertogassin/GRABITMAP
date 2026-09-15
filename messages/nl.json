@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "Upload onderbroken · automatische nieuwe poging",
   "chat_attachment_timeout": "Netwerk of controle duurde te lang · probeer opnieuw",
   "chat_attachment_too_large": "Bestand overschrijdt de toegestane grootte",
-  "chat_attachment_type": "Dit bestandstype wordt niet ondersteund"
+  "chat_attachment_type": "Dit bestandstype wordt niet ondersteund",
+  "chat_attachment_error": "Bijlagefout",
+  "chat_attachment_failed": "Bijlage niet verzonden"
 }

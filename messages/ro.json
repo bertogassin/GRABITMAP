@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "Încărcarea a fost întreruptă · reîncercare automată",
   "chat_attachment_timeout": "Rețeaua sau verificarea a durat prea mult · încercați din nou",
   "chat_attachment_too_large": "Fișierul depășește dimensiunea permisă",
-  "chat_attachment_type": "Acest tip de fișier nu este acceptat"
+  "chat_attachment_type": "Acest tip de fișier nu este acceptat",
+  "chat_attachment_error": "Eroare la atașament",
+  "chat_attachment_failed": "Atașamentul nu a fost trimis"
 }

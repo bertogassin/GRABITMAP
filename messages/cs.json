@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "Nahrávání bylo přerušeno · automatický nový pokus",
   "chat_attachment_timeout": "Síť nebo kontrola trvala příliš dlouho · zkuste to znovu",
   "chat_attachment_too_large": "Soubor překračuje povolenou velikost",
-  "chat_attachment_type": "Tento typ souboru není podporován"
+  "chat_attachment_type": "Tento typ souboru není podporován",
+  "chat_attachment_error": "Chyba přílohy",
+  "chat_attachment_failed": "Příloha nebyla odeslána"
 }

@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "การอัปโหลดหยุดชะงัก · จะลองอีกครั้งโดยอัตโนมัติ",
   "chat_attachment_timeout": "เครือข่ายหรือการตรวจสอบใช้เวลานานเกินไป · ลองอีกครั้ง",
   "chat_attachment_too_large": "ไฟล์มีขนาดเกินที่อนุญาต",
-  "chat_attachment_type": "ไม่รองรับไฟล์ประเภทนี้"
+  "chat_attachment_type": "ไม่รองรับไฟล์ประเภทนี้",
+  "chat_attachment_error": "ข้อผิดพลาดของไฟล์แนบ",
+  "chat_attachment_failed": "ไม่ได้ส่งไฟล์แนบ"
 }

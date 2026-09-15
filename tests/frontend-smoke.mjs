@@ -145,13 +145,49 @@ test("chat attachment validation errors are registered in every locale", async (
   });
 });
 
+test("chat attachment failure states are registered in every locale", async () => {
+  const keys = [
+    "chat_attachment_error",
+    "chat_attachment_failed",
+  ];
+  const translations = {};
+
+  for (const locale of locales) {
+    const messages = JSON.parse(
+      await readFile(new URL("messages/" + locale + ".json", root), "utf8"),
+    );
+    translations[locale] = {};
+
+    for (const key of keys) {
+      assert.equal(typeof messages[key], "string");
+      assert.notEqual(messages[key].trim(), "");
+      translations[locale][key] = messages[key];
+    }
+  }
+
+  assert.deepEqual(translations.ru, {
+    chat_attachment_error: "Ошибка вложения",
+    chat_attachment_failed: "Вложение не отправлено",
+  });
+  assert.deepEqual(translations.en, {
+    chat_attachment_error: "Attachment error",
+    chat_attachment_failed: "Attachment not sent",
+  });
+  assert.deepEqual(translations.fr, {
+    chat_attachment_error: "Erreur de pièce jointe",
+    chat_attachment_failed: "Pièce jointe non envoyée",
+  });
+  assert.deepEqual(translations.ar, {
+    chat_attachment_error: "خطأ في المرفق",
+    chat_attachment_failed: "لم يُرسل المرفق",
+  });
+});
+
 test("browser translation calls cannot add unregistered locale keys", async () => {
   const base = JSON.parse(
     await readFile(new URL("messages/ru.json", root), "utf8"),
   );
   const knownLegacyDebt = [
-    "chat_attachment_error",
-    "chat_attachment_failed",
     "chat_connecting_initial",
     "chat_document",
     "chat_document_invalid",

@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "上傳中斷 · 將自動重試",
   "chat_attachment_timeout": "網路或檢查耗時過長 · 請重試",
   "chat_attachment_too_large": "檔案超過允許的大小",
-  "chat_attachment_type": "不支援此檔案類型"
+  "chat_attachment_type": "不支援此檔案類型",
+  "chat_attachment_error": "附件錯誤",
+  "chat_attachment_failed": "附件未傳送"
 }

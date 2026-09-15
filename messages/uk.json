@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "Завантаження перервано · повторюємо автоматично",
   "chat_attachment_timeout": "Мережа або перевірка тривала надто довго · повторіть",
   "chat_attachment_too_large": "Файл перевищує допустимий розмір",
-  "chat_attachment_type": "Цей тип файлу не підтримується"
+  "chat_attachment_type": "Цей тип файлу не підтримується",
+  "chat_attachment_error": "Помилка вкладення",
+  "chat_attachment_failed": "Вкладення не надіслано"
 }

@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "अपलोड रुक गया · अपने-आप फिर प्रयास होगा",
   "chat_attachment_timeout": "नेटवर्क या जाँच में बहुत समय लगा · फिर प्रयास करें",
   "chat_attachment_too_large": "फ़ाइल अनुमत आकार से बड़ी है",
-  "chat_attachment_type": "यह फ़ाइल प्रकार समर्थित नहीं है"
+  "chat_attachment_type": "यह फ़ाइल प्रकार समर्थित नहीं है",
+  "chat_attachment_error": "अटैचमेंट में त्रुटि",
+  "chat_attachment_failed": "अटैचमेंट नहीं भेजा गया"
 }

@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "Téléversement interrompu · nouvelle tentative automatique",
   "chat_attachment_timeout": "Le réseau ou la vérification a pris trop de temps · réessayez",
   "chat_attachment_too_large": "Le fichier dépasse la taille autorisée",
-  "chat_attachment_type": "Ce type de fichier n’est pas pris en charge"
+  "chat_attachment_type": "Ce type de fichier n’est pas pris en charge",
+  "chat_attachment_error": "Erreur de pièce jointe",
+  "chat_attachment_failed": "Pièce jointe non envoyée"
 }

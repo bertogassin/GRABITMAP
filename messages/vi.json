@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "Tải lên bị gián đoạn · tự động thử lại",
   "chat_attachment_timeout": "Mạng hoặc quá trình kiểm tra mất quá nhiều thời gian · hãy thử lại",
   "chat_attachment_too_large": "Tệp vượt quá kích thước cho phép",
-  "chat_attachment_type": "Loại tệp này không được hỗ trợ"
+  "chat_attachment_type": "Loại tệp này không được hỗ trợ",
+  "chat_attachment_error": "Lỗi tệp đính kèm",
+  "chat_attachment_failed": "Chưa gửi tệp đính kèm"
 }
