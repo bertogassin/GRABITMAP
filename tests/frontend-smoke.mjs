@@ -31,6 +31,71 @@ test("all locale catalogs share the exact base key set", async () => {
   }
 });
 
+test("browser translation calls cannot add unregistered locale keys", async () => {
+  const base = JSON.parse(
+    await readFile(new URL("messages/ru.json", root), "utf8"),
+  );
+  const knownLegacyDebt = [
+    "chat_attachment",
+    "chat_attachment_busy",
+    "chat_attachment_error",
+    "chat_attachment_failed",
+    "chat_attachment_interrupted",
+    "chat_attachment_open",
+    "chat_attachment_processing",
+    "chat_attachment_ready",
+    "chat_attachment_timeout",
+    "chat_attachment_too_large",
+    "chat_attachment_type",
+    "chat_connecting_initial",
+    "chat_document",
+    "chat_document_invalid",
+    "chat_media_queue_full",
+    "chat_member_muted",
+    "chat_mic_request",
+    "chat_pin",
+    "chat_pinned_message",
+    "chat_reply_unavailable",
+    "chat_sending_attachment",
+    "chat_unpin",
+    "chat_upload_cancelled",
+    "chat_upload_progress",
+    "chat_video",
+    "chat_video_duration",
+    "chat_video_fullscreen",
+    "chat_video_invalid",
+    "chat_video_pip",
+    "chat_video_playback_error",
+    "chat_video_speed",
+    "chat_voice_record_failed",
+    "chat_voice_stop_send",
+    "chat_voice_too_large",
+  ];
+  const usedKeys = new Set();
+  const staticFiles = (await readdir(new URL("static", root)))
+    .filter((name) => name.endsWith(".js"));
+
+  for (const name of staticFiles) {
+    const source = await readFile(new URL(`static/${name}`, root), "utf8");
+    for (const match of source.matchAll(
+      /\b(?:t|tf|lightboxText)\(\s*["']([a-z][a-z0-9_.-]*)["']/g,
+    )) {
+      usedKeys.add(match[1]);
+    }
+    for (const match of source.matchAll(
+      /\blabelAction\([^,]+,\s*["']([a-z][a-z0-9_.-]*)["']/g,
+    )) {
+      usedKeys.add(match[1]);
+    }
+  }
+
+  const unregistered = [...usedKeys]
+    .filter((key) => !(key in base))
+    .sort();
+
+  assert.deepEqual(unregistered, knownLegacyDebt);
+});
+
 test("RTL runtime and mobile PWA metadata are present", async () => {
   const runtime = await readFile(new URL("static/i18n-runtime.js", root), "utf8");
   const manifest = JSON.parse(await readFile(new URL("static/manifest.webmanifest", root), "utf8"));
