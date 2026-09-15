@@ -936,6 +936,21 @@ test("chat edit dialog contains and restores keyboard focus", async () => {
   assert.match(chat, /if \(editor && !editor\.hidden\) \{[\s\S]*closeEditor\(\);/);
 });
 
+test("chat forward dialog contains and restores keyboard focus", async () => {
+  const chat = await readFile(new URL("static/chat-v2.js", root), "utf8");
+
+  assert.match(chat, /var forwardTrigger = null;/);
+  assert.match(chat, /tabindex="-1" data-close-forward aria-label=/);
+  assert.match(chat, /tabindex="-1" role="dialog" aria-modal="true"/);
+  assert.match(chat, /function forwardDialogControls\(\)/);
+  assert.match(chat, /\.chat-forward-target:not\(\[disabled\]\)/);
+  assert.match(chat, /function trapForwardFocus\(event\)/);
+  assert.match(chat, /if \(!controls\.length\) \{[\s\S]*panel\.focus\(\)/);
+  assert.match(chat, /forwardTrigger = sheetTrigger \|\| document\.activeElement;/);
+  assert.match(chat, /forwardTrigger\.isConnected[\s\S]*forwardTrigger\.focus\(\)/);
+  assert.match(chat, /trapForwardFocus\(event\)/);
+});
+
 test("chat overlays share explicit dark and light theme tokens", async () => {
   const [css, mature] = await Promise.all([
     readFile(new URL("static/chat-v2.css", root), "utf8"),

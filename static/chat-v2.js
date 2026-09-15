@@ -3433,6 +3433,7 @@ ResursMapChat.icon = function (name) {
         var sheetTrigger = null;
         var editorTrigger = null;
         var deleteTrigger = null;
+        var forwardTrigger = null;
         var refreshDebounceTimer = null;
         var refreshFallbackTimer = null;
         var lastTapAt = 0;
@@ -3627,10 +3628,10 @@ ResursMapChat.icon = function (name) {
         forwardPicker.hidden = true;
         forwardPicker.innerHTML =
             '<button class="chat-sheet-backdrop" ' +
-                'type="button" data-close-forward aria-label="' +
+                'type="button" tabindex="-1" data-close-forward aria-label="' +
                 escapeHtml(t("chat_close", "Закрыть")) + '"></button>' +
             '<section class="chat-editor-panel chat-forward-panel" ' +
-                'role="dialog" aria-modal="true" aria-label="' +
+                'tabindex="-1" role="dialog" aria-modal="true" aria-label="' +
                 escapeHtml(t("chat_forward_title", "Переслать сообщение")) + '">' +
                 '<div class="chat-sheet-handle"></div>' +
                 '<div class="chat-editor-title">' + t("chat_forward_title", "Переслать сообщение") + '</div>' +
@@ -3807,9 +3808,64 @@ ResursMapChat.icon = function (name) {
             return block;
         }
 
+        function forwardDialogControls() {
+            return forwardPicker.querySelectorAll(
+                ".chat-forward-target:not([disabled])"
+            );
+        }
+
+        function trapForwardFocus(event) {
+            if (event.key !== "Tab" || forwardPicker.hidden) {
+                return;
+            }
+
+            var panel = forwardPicker.querySelector(
+                ".chat-forward-panel"
+            );
+            var controls = forwardDialogControls();
+
+            if (!controls.length) {
+                event.preventDefault();
+                if (panel) {
+                    panel.focus();
+                }
+                return;
+            }
+
+            var first = controls[0];
+            var last = controls[controls.length - 1];
+            var active = document.activeElement;
+
+            if (
+                event.shiftKey &&
+                (active === first || active === panel || !forwardPicker.contains(active))
+            ) {
+                event.preventDefault();
+                last.focus();
+            } else if (
+                !event.shiftKey &&
+                (active === last || !forwardPicker.contains(active))
+            ) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
+
         function closeForwardPicker() {
+            var wasOpen = !forwardPicker.hidden;
             forwardPicker.hidden = true;
             document.body.classList.remove("chat-overlay-open");
+            if (
+                wasOpen &&
+                forwardTrigger &&
+                forwardTrigger.isConnected &&
+                typeof forwardTrigger.focus === "function"
+            ) {
+                forwardTrigger.focus();
+            }
+            if (wasOpen) {
+                forwardTrigger = null;
+            }
         }
 
         function openForwardPicker(message) {
@@ -3817,6 +3873,7 @@ ResursMapChat.icon = function (name) {
                 return;
             }
 
+            forwardTrigger = sheetTrigger || document.activeElement;
             closeSheet();
             forwardPickerPreview.textContent =
                 forwardPreviewLabel(message);
@@ -3826,6 +3883,12 @@ ResursMapChat.icon = function (name) {
                 "</div>";
             forwardPicker.hidden = false;
             document.body.classList.add("chat-overlay-open");
+            var panel = forwardPicker.querySelector(
+                ".chat-forward-panel"
+            );
+            if (panel) {
+                panel.focus();
+            }
 
             requestJson("/api/chat/conversations")
                 .then(function (data) {
@@ -5677,6 +5740,10 @@ ResursMapChat.icon = function (name) {
             }
             if (event.key === "Tab" && confirmBox && !confirmBox.hidden) {
                 trapDeleteFocus(event);
+                return;
+            }
+            if (event.key === "Tab" && forwardPicker && !forwardPicker.hidden) {
+                trapForwardFocus(event);
                 return;
             }
             if (event.key !== "Escape") {
