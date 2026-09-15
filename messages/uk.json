@@ -317,5 +317,9 @@
   "chat_document_invalid": "Недопустимий документ або розмір перевищує 16 МБ",
   "chat_pin": "Закріпити",
   "chat_unpin": "Відкріпити",
-  "chat_pinned_message": "Закріплене повідомлення"
+  "chat_pinned_message": "Закріплене повідомлення",
+  "chat_media_queue_full": "Дочекайтеся завершення надсилання поточних вкладень",
+  "chat_sending_attachment": "Надсилання вкладення…",
+  "chat_upload_cancelled": "Надсилання скасовано",
+  "chat_upload_progress": "Завантаження"
 }

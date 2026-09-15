@@ -317,5 +317,9 @@
   "chat_document_invalid": "دستاویز درست نہیں یا سائز 16 MB سے زیادہ ہے",
   "chat_pin": "پن کریں",
   "chat_unpin": "پن ہٹائیں",
-  "chat_pinned_message": "پن کیا گیا پیغام"
+  "chat_pinned_message": "پن کیا گیا پیغام",
+  "chat_media_queue_full": "موجودہ منسلکات بھیجے جانے تک انتظار کریں",
+  "chat_sending_attachment": "منسلکہ بھیجا جا رہا ہے…",
+  "chat_upload_cancelled": "اپ لوڈ منسوخ کر دیا گیا",
+  "chat_upload_progress": "اپ لوڈ"
 }

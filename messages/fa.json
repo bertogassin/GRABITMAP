@@ -317,5 +317,9 @@
   "chat_document_invalid": "سند نامعتبر است یا حجم آن بیشتر از ۱۶ مگابایت است",
   "chat_pin": "سنجاق کردن",
   "chat_unpin": "برداشتن سنجاق",
-  "chat_pinned_message": "پیام سنجاق‌شده"
+  "chat_pinned_message": "پیام سنجاق‌شده",
+  "chat_media_queue_full": "تا پایان ارسال پیوست‌های فعلی منتظر بمانید",
+  "chat_sending_attachment": "در حال ارسال پیوست…",
+  "chat_upload_cancelled": "ارسال لغو شد",
+  "chat_upload_progress": "بارگذاری"
 }

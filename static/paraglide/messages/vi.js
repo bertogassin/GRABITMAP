@@ -74,6 +74,7 @@
 /** @typedef {{}} Chat_Load_OlderInputs */
 /** @typedef {{}} Chat_LoadingInputs */
 /** @typedef {{}} Chat_Long_AgoInputs */
+/** @typedef {{}} Chat_Media_Queue_FullInputs */
 /** @typedef {{}} Chat_MembersInputs */
 /** @typedef {{}} Chat_MessageInputs */
 /** @typedef {{}} Chat_Mic_DeniedInputs */
@@ -110,6 +111,7 @@
 /** @typedef {{}} Chat_Send_Failed_RetryInputs */
 /** @typedef {{}} Chat_Send_UnavailableInputs */
 /** @typedef {{}} Chat_SendingInputs */
+/** @typedef {{}} Chat_Sending_AttachmentInputs */
 /** @typedef {{ n: NonNullable<unknown> }} Chat_Sending_LeftInputs */
 /** @typedef {{}} Chat_Sending_PhotoInputs */
 /** @typedef {{}} Chat_Sending_VoiceInputs */
@@ -123,6 +125,8 @@
 /** @typedef {{}} Chat_TitleInputs */
 /** @typedef {{}} Chat_TypingInputs */
 /** @typedef {{}} Chat_UnpinInputs */
+/** @typedef {{}} Chat_Upload_CancelledInputs */
+/** @typedef {{}} Chat_Upload_ProgressInputs */
 /** @typedef {{}} Chat_User_UnavailableInputs */
 /** @typedef {{}} Chat_VoiceInputs */
 /** @typedef {{}} Chat_Voice_ErrorInputs */
@@ -617,6 +621,10 @@ export const chat_long_ago = /** @type {(inputs: Chat_Long_AgoInputs) => Localiz
 	return /** @type {LocalizedString} */ (`lâu rồi`)
 };
 
+export const chat_media_queue_full = /** @type {(inputs: Chat_Media_Queue_FullInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Hãy đợi gửi xong các tệp đính kèm hiện tại`)
+};
+
 export const chat_members = /** @type {(inputs: Chat_MembersInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Members`)
 };
@@ -761,6 +769,10 @@ export const chat_sending = /** @type {(inputs: Chat_SendingInputs) => Localized
 	return /** @type {LocalizedString} */ (`Đang gửi…`)
 };
 
+export const chat_sending_attachment = /** @type {(inputs: Chat_Sending_AttachmentInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Đang gửi tệp đính kèm…`)
+};
+
 export const chat_sending_left = /** @type {(inputs: Chat_Sending_LeftInputs) => LocalizedString} */ (i) => {
 	return /** @type {LocalizedString} */ (`Đang gửi · còn ${i?.n}`)
 };
@@ -811,6 +823,14 @@ export const chat_typing = /** @type {(inputs: Chat_TypingInputs) => LocalizedSt
 
 export const chat_unpin = /** @type {(inputs: Chat_UnpinInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Bỏ ghim`)
+};
+
+export const chat_upload_cancelled = /** @type {(inputs: Chat_Upload_CancelledInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Đã hủy tải lên`)
+};
+
+export const chat_upload_progress = /** @type {(inputs: Chat_Upload_ProgressInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Tải lên`)
 };
 
 export const chat_user_unavailable = /** @type {(inputs: Chat_User_UnavailableInputs) => LocalizedString} */ () => {

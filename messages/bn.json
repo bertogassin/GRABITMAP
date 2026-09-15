@@ -317,5 +317,9 @@
   "chat_document_invalid": "নথিটি বৈধ নয় অথবা আকার ১৬ MB-এর বেশি",
   "chat_pin": "পিন করুন",
   "chat_unpin": "পিন সরান",
-  "chat_pinned_message": "পিন করা বার্তা"
+  "chat_pinned_message": "পিন করা বার্তা",
+  "chat_media_queue_full": "বর্তমান সংযুক্তিগুলো পাঠানো শেষ হওয়া পর্যন্ত অপেক্ষা করুন",
+  "chat_sending_attachment": "সংযুক্তি পাঠানো হচ্ছে…",
+  "chat_upload_cancelled": "আপলোড বাতিল করা হয়েছে",
+  "chat_upload_progress": "আপলোড"
 }

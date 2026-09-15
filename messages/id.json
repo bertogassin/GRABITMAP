@@ -317,5 +317,9 @@
   "chat_document_invalid": "Dokumen tidak valid atau ukurannya melebihi 16 MB",
   "chat_pin": "Sematkan",
   "chat_unpin": "Lepas sematan",
-  "chat_pinned_message": "Pesan yang disematkan"
+  "chat_pinned_message": "Pesan yang disematkan",
+  "chat_media_queue_full": "Tunggu hingga lampiran saat ini selesai dikirim",
+  "chat_sending_attachment": "Mengirim lampiran…",
+  "chat_upload_cancelled": "Unggahan dibatalkan",
+  "chat_upload_progress": "Unggahan"
 }

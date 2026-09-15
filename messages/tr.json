@@ -317,5 +317,9 @@
   "chat_document_invalid": "Geçersiz belge veya boyut 16 MB’den büyük",
   "chat_pin": "Sabitle",
   "chat_unpin": "Sabitlemeyi kaldır",
-  "chat_pinned_message": "Sabitlenmiş mesaj"
+  "chat_pinned_message": "Sabitlenmiş mesaj",
+  "chat_media_queue_full": "Mevcut eklerin gönderilmesini bekleyin",
+  "chat_sending_attachment": "Ek gönderiliyor…",
+  "chat_upload_cancelled": "Yükleme iptal edildi",
+  "chat_upload_progress": "Yükleme"
 }

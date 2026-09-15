@@ -317,5 +317,9 @@
   "chat_document_invalid": "Dokumen tidak sah atau saiz melebihi 16 MB",
   "chat_pin": "Semat",
   "chat_unpin": "Nyahsemat",
-  "chat_pinned_message": "Mesej disemat"
+  "chat_pinned_message": "Mesej disemat",
+  "chat_media_queue_full": "Tunggu sehingga lampiran semasa selesai dihantar",
+  "chat_sending_attachment": "Menghantar lampiran…",
+  "chat_upload_cancelled": "Muat naik dibatalkan",
+  "chat_upload_progress": "Muat naik"
 }

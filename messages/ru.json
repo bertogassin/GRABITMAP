@@ -317,5 +317,9 @@
   "chat_document_invalid": "Недопустимый документ или размер больше 16 МБ",
   "chat_pin": "Закрепить",
   "chat_unpin": "Открепить",
-  "chat_pinned_message": "Закреплённое сообщение"
+  "chat_pinned_message": "Закреплённое сообщение",
+  "chat_media_queue_full": "Дождитесь отправки текущих вложений",
+  "chat_sending_attachment": "Отправка вложения…",
+  "chat_upload_cancelled": "Отправка отменена",
+  "chat_upload_progress": "Загрузка"
 }

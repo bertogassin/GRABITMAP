@@ -317,5 +317,9 @@
   "chat_document_invalid": "מסמך לא תקין או שגודלו עולה על 16 MB",
   "chat_pin": "הצמדה",
   "chat_unpin": "ביטול הצמדה",
-  "chat_pinned_message": "הודעה מוצמדת"
+  "chat_pinned_message": "הודעה מוצמדת",
+  "chat_media_queue_full": "יש להמתין לסיום שליחת הקבצים המצורפים הנוכחיים",
+  "chat_sending_attachment": "הקובץ המצורף נשלח…",
+  "chat_upload_cancelled": "ההעלאה בוטלה",
+  "chat_upload_progress": "העלאה"
 }

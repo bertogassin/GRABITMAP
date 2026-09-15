@@ -76,6 +76,7 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Chat_Load_OlderInputs */
 /** @typedef {{}} Chat_LoadingInputs */
 /** @typedef {{}} Chat_Long_AgoInputs */
+/** @typedef {{}} Chat_Media_Queue_FullInputs */
 /** @typedef {{}} Chat_MembersInputs */
 /** @typedef {{}} Chat_MessageInputs */
 /** @typedef {{}} Chat_Mic_DeniedInputs */
@@ -112,6 +113,7 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Chat_Send_Failed_RetryInputs */
 /** @typedef {{}} Chat_Send_UnavailableInputs */
 /** @typedef {{}} Chat_SendingInputs */
+/** @typedef {{}} Chat_Sending_AttachmentInputs */
 /** @typedef {{ n: NonNullable<unknown> }} Chat_Sending_LeftInputs */
 /** @typedef {{}} Chat_Sending_PhotoInputs */
 /** @typedef {{}} Chat_Sending_VoiceInputs */
@@ -125,6 +127,8 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Chat_TitleInputs */
 /** @typedef {{}} Chat_TypingInputs */
 /** @typedef {{}} Chat_UnpinInputs */
+/** @typedef {{}} Chat_Upload_CancelledInputs */
+/** @typedef {{}} Chat_Upload_ProgressInputs */
 /** @typedef {{}} Chat_User_UnavailableInputs */
 /** @typedef {{}} Chat_VoiceInputs */
 /** @typedef {{}} Chat_Voice_ErrorInputs */
@@ -3612,6 +3616,50 @@ export const chat_long_ago = /** @type {((inputs?: Chat_Long_AgoInputs, options?
 /**
 * | output |
 * | --- |
+* | "Wait for the current attachments to finish sending" |
+*
+* @param {Chat_Media_Queue_FullInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_media_queue_full = /** @type {((inputs?: Chat_Media_Queue_FullInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Media_Queue_FullInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_media_queue_full(inputs)
+	if (locale === "fr") return __fr.chat_media_queue_full(inputs)
+	if (locale === "es") return __es.chat_media_queue_full(inputs)
+	if (locale === "zh") return __zh.chat_media_queue_full(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_media_queue_full(inputs)
+	if (locale === "hi") return __hi.chat_media_queue_full(inputs)
+	if (locale === "ar") return __ar.chat_media_queue_full(inputs)
+	if (locale === "pt") return __pt.chat_media_queue_full(inputs)
+	if (locale === "de") return __de.chat_media_queue_full(inputs)
+	if (locale === "ja") return __ja.chat_media_queue_full(inputs)
+	if (locale === "ko") return __ko.chat_media_queue_full(inputs)
+	if (locale === "it") return __it.chat_media_queue_full(inputs)
+	if (locale === "tr") return __tr.chat_media_queue_full(inputs)
+	if (locale === "pl") return __pl.chat_media_queue_full(inputs)
+	if (locale === "uk") return __uk.chat_media_queue_full(inputs)
+	if (locale === "nl") return __nl.chat_media_queue_full(inputs)
+	if (locale === "vi") return __vi.chat_media_queue_full(inputs)
+	if (locale === "id") return __id.chat_media_queue_full(inputs)
+	if (locale === "ms") return __ms.chat_media_queue_full(inputs)
+	if (locale === "th") return __th.chat_media_queue_full(inputs)
+	if (locale === "fa") return __fa.chat_media_queue_full(inputs)
+	if (locale === "ur") return __ur.chat_media_queue_full(inputs)
+	if (locale === "bn") return __bn.chat_media_queue_full(inputs)
+	if (locale === "pa") return __pa.chat_media_queue_full(inputs)
+	if (locale === "sw") return __sw.chat_media_queue_full(inputs)
+	if (locale === "el") return __el.chat_media_queue_full(inputs)
+	if (locale === "cs") return __cs.chat_media_queue_full(inputs)
+	if (locale === "ro") return __ro.chat_media_queue_full(inputs)
+	if (locale === "hu") return __hu.chat_media_queue_full(inputs)
+	if (locale === "sv") return __sv.chat_media_queue_full(inputs)
+	if (locale === "he") return __he.chat_media_queue_full(inputs)
+	return __ru.chat_media_queue_full(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "Members" |
 *
 * @param {Chat_MembersInputs} inputs
@@ -5196,6 +5244,50 @@ export const chat_sending = /** @type {((inputs?: Chat_SendingInputs, options?: 
 /**
 * | output |
 * | --- |
+* | "Sending attachment…" |
+*
+* @param {Chat_Sending_AttachmentInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_sending_attachment = /** @type {((inputs?: Chat_Sending_AttachmentInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Sending_AttachmentInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_sending_attachment(inputs)
+	if (locale === "fr") return __fr.chat_sending_attachment(inputs)
+	if (locale === "es") return __es.chat_sending_attachment(inputs)
+	if (locale === "zh") return __zh.chat_sending_attachment(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_sending_attachment(inputs)
+	if (locale === "hi") return __hi.chat_sending_attachment(inputs)
+	if (locale === "ar") return __ar.chat_sending_attachment(inputs)
+	if (locale === "pt") return __pt.chat_sending_attachment(inputs)
+	if (locale === "de") return __de.chat_sending_attachment(inputs)
+	if (locale === "ja") return __ja.chat_sending_attachment(inputs)
+	if (locale === "ko") return __ko.chat_sending_attachment(inputs)
+	if (locale === "it") return __it.chat_sending_attachment(inputs)
+	if (locale === "tr") return __tr.chat_sending_attachment(inputs)
+	if (locale === "pl") return __pl.chat_sending_attachment(inputs)
+	if (locale === "uk") return __uk.chat_sending_attachment(inputs)
+	if (locale === "nl") return __nl.chat_sending_attachment(inputs)
+	if (locale === "vi") return __vi.chat_sending_attachment(inputs)
+	if (locale === "id") return __id.chat_sending_attachment(inputs)
+	if (locale === "ms") return __ms.chat_sending_attachment(inputs)
+	if (locale === "th") return __th.chat_sending_attachment(inputs)
+	if (locale === "fa") return __fa.chat_sending_attachment(inputs)
+	if (locale === "ur") return __ur.chat_sending_attachment(inputs)
+	if (locale === "bn") return __bn.chat_sending_attachment(inputs)
+	if (locale === "pa") return __pa.chat_sending_attachment(inputs)
+	if (locale === "sw") return __sw.chat_sending_attachment(inputs)
+	if (locale === "el") return __el.chat_sending_attachment(inputs)
+	if (locale === "cs") return __cs.chat_sending_attachment(inputs)
+	if (locale === "ro") return __ro.chat_sending_attachment(inputs)
+	if (locale === "hu") return __hu.chat_sending_attachment(inputs)
+	if (locale === "sv") return __sv.chat_sending_attachment(inputs)
+	if (locale === "he") return __he.chat_sending_attachment(inputs)
+	return __ru.chat_sending_attachment(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "Sending · {n} left" |
 *
 * @param {Chat_Sending_LeftInputs} inputs
@@ -5764,6 +5856,94 @@ export const chat_unpin = /** @type {((inputs?: Chat_UnpinInputs, options?: { lo
 	if (locale === "sv") return __sv.chat_unpin(inputs)
 	if (locale === "he") return __he.chat_unpin(inputs)
 	return __ru.chat_unpin(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Upload cancelled" |
+*
+* @param {Chat_Upload_CancelledInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_upload_cancelled = /** @type {((inputs?: Chat_Upload_CancelledInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Upload_CancelledInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_upload_cancelled(inputs)
+	if (locale === "fr") return __fr.chat_upload_cancelled(inputs)
+	if (locale === "es") return __es.chat_upload_cancelled(inputs)
+	if (locale === "zh") return __zh.chat_upload_cancelled(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_upload_cancelled(inputs)
+	if (locale === "hi") return __hi.chat_upload_cancelled(inputs)
+	if (locale === "ar") return __ar.chat_upload_cancelled(inputs)
+	if (locale === "pt") return __pt.chat_upload_cancelled(inputs)
+	if (locale === "de") return __de.chat_upload_cancelled(inputs)
+	if (locale === "ja") return __ja.chat_upload_cancelled(inputs)
+	if (locale === "ko") return __ko.chat_upload_cancelled(inputs)
+	if (locale === "it") return __it.chat_upload_cancelled(inputs)
+	if (locale === "tr") return __tr.chat_upload_cancelled(inputs)
+	if (locale === "pl") return __pl.chat_upload_cancelled(inputs)
+	if (locale === "uk") return __uk.chat_upload_cancelled(inputs)
+	if (locale === "nl") return __nl.chat_upload_cancelled(inputs)
+	if (locale === "vi") return __vi.chat_upload_cancelled(inputs)
+	if (locale === "id") return __id.chat_upload_cancelled(inputs)
+	if (locale === "ms") return __ms.chat_upload_cancelled(inputs)
+	if (locale === "th") return __th.chat_upload_cancelled(inputs)
+	if (locale === "fa") return __fa.chat_upload_cancelled(inputs)
+	if (locale === "ur") return __ur.chat_upload_cancelled(inputs)
+	if (locale === "bn") return __bn.chat_upload_cancelled(inputs)
+	if (locale === "pa") return __pa.chat_upload_cancelled(inputs)
+	if (locale === "sw") return __sw.chat_upload_cancelled(inputs)
+	if (locale === "el") return __el.chat_upload_cancelled(inputs)
+	if (locale === "cs") return __cs.chat_upload_cancelled(inputs)
+	if (locale === "ro") return __ro.chat_upload_cancelled(inputs)
+	if (locale === "hu") return __hu.chat_upload_cancelled(inputs)
+	if (locale === "sv") return __sv.chat_upload_cancelled(inputs)
+	if (locale === "he") return __he.chat_upload_cancelled(inputs)
+	return __ru.chat_upload_cancelled(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Upload" |
+*
+* @param {Chat_Upload_ProgressInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_upload_progress = /** @type {((inputs?: Chat_Upload_ProgressInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Upload_ProgressInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_upload_progress(inputs)
+	if (locale === "fr") return __fr.chat_upload_progress(inputs)
+	if (locale === "es") return __es.chat_upload_progress(inputs)
+	if (locale === "zh") return __zh.chat_upload_progress(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_upload_progress(inputs)
+	if (locale === "hi") return __hi.chat_upload_progress(inputs)
+	if (locale === "ar") return __ar.chat_upload_progress(inputs)
+	if (locale === "pt") return __pt.chat_upload_progress(inputs)
+	if (locale === "de") return __de.chat_upload_progress(inputs)
+	if (locale === "ja") return __ja.chat_upload_progress(inputs)
+	if (locale === "ko") return __ko.chat_upload_progress(inputs)
+	if (locale === "it") return __it.chat_upload_progress(inputs)
+	if (locale === "tr") return __tr.chat_upload_progress(inputs)
+	if (locale === "pl") return __pl.chat_upload_progress(inputs)
+	if (locale === "uk") return __uk.chat_upload_progress(inputs)
+	if (locale === "nl") return __nl.chat_upload_progress(inputs)
+	if (locale === "vi") return __vi.chat_upload_progress(inputs)
+	if (locale === "id") return __id.chat_upload_progress(inputs)
+	if (locale === "ms") return __ms.chat_upload_progress(inputs)
+	if (locale === "th") return __th.chat_upload_progress(inputs)
+	if (locale === "fa") return __fa.chat_upload_progress(inputs)
+	if (locale === "ur") return __ur.chat_upload_progress(inputs)
+	if (locale === "bn") return __bn.chat_upload_progress(inputs)
+	if (locale === "pa") return __pa.chat_upload_progress(inputs)
+	if (locale === "sw") return __sw.chat_upload_progress(inputs)
+	if (locale === "el") return __el.chat_upload_progress(inputs)
+	if (locale === "cs") return __cs.chat_upload_progress(inputs)
+	if (locale === "ro") return __ro.chat_upload_progress(inputs)
+	if (locale === "hu") return __hu.chat_upload_progress(inputs)
+	if (locale === "sv") return __sv.chat_upload_progress(inputs)
+	if (locale === "he") return __he.chat_upload_progress(inputs)
+	return __ru.chat_upload_progress(inputs)
 });
 /**
 * | output |

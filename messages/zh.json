@@ -317,5 +317,9 @@
   "chat_document_invalid": "文档无效或大小超过 16 MB",
   "chat_pin": "置顶",
   "chat_unpin": "取消置顶",
-  "chat_pinned_message": "置顶消息"
+  "chat_pinned_message": "置顶消息",
+  "chat_media_queue_full": "请等待当前附件发送完成",
+  "chat_sending_attachment": "正在发送附件…",
+  "chat_upload_cancelled": "上传已取消",
+  "chat_upload_progress": "上传"
 }

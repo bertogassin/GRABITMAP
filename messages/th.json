@@ -317,5 +317,9 @@
   "chat_document_invalid": "เอกสารไม่ถูกต้องหรือมีขนาดเกิน 16 MB",
   "chat_pin": "ปักหมุด",
   "chat_unpin": "เลิกปักหมุด",
-  "chat_pinned_message": "ข้อความที่ปักหมุด"
+  "chat_pinned_message": "ข้อความที่ปักหมุด",
+  "chat_media_queue_full": "รอให้ส่งไฟล์แนบปัจจุบันเสร็จก่อน",
+  "chat_sending_attachment": "กำลังส่งไฟล์แนบ…",
+  "chat_upload_cancelled": "ยกเลิกการอัปโหลดแล้ว",
+  "chat_upload_progress": "การอัปโหลด"
 }

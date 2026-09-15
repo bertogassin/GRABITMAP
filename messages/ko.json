@@ -317,5 +317,9 @@
   "chat_document_invalid": "유효하지 않은 문서이거나 크기가 16MB를 초과합니다",
   "chat_pin": "고정",
   "chat_unpin": "고정 해제",
-  "chat_pinned_message": "고정된 메시지"
+  "chat_pinned_message": "고정된 메시지",
+  "chat_media_queue_full": "현재 첨부 파일 전송이 완료될 때까지 기다리세요",
+  "chat_sending_attachment": "첨부 파일 전송 중…",
+  "chat_upload_cancelled": "업로드 취소됨",
+  "chat_upload_progress": "업로드"
 }

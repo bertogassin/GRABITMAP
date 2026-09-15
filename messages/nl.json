@@ -317,5 +317,9 @@
   "chat_document_invalid": "Ongeldig document of groter dan 16 MB",
   "chat_pin": "Vastmaken",
   "chat_unpin": "Losmaken",
-  "chat_pinned_message": "Vastgemaakt bericht"
+  "chat_pinned_message": "Vastgemaakt bericht",
+  "chat_media_queue_full": "Wacht tot de huidige bijlagen zijn verzonden",
+  "chat_sending_attachment": "Bijlage verzenden…",
+  "chat_upload_cancelled": "Upload geannuleerd",
+  "chat_upload_progress": "Upload"
 }

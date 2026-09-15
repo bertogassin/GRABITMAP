@@ -317,5 +317,9 @@
   "chat_document_invalid": "Érvénytelen dokumentum, vagy a mérete meghaladja a 16 MB-ot",
   "chat_pin": "Kitűzés",
   "chat_unpin": "Kitűzés megszüntetése",
-  "chat_pinned_message": "Kitűzött üzenet"
+  "chat_pinned_message": "Kitűzött üzenet",
+  "chat_media_queue_full": "Várja meg a jelenlegi mellékletek elküldését",
+  "chat_sending_attachment": "Melléklet küldése…",
+  "chat_upload_cancelled": "Feltöltés megszakítva",
+  "chat_upload_progress": "Feltöltés"
 }

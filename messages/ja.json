@@ -317,5 +317,9 @@
   "chat_document_invalid": "無効なドキュメント、またはサイズが16 MBを超えています",
   "chat_pin": "ピン留め",
   "chat_unpin": "ピン留めを解除",
-  "chat_pinned_message": "ピン留めされたメッセージ"
+  "chat_pinned_message": "ピン留めされたメッセージ",
+  "chat_media_queue_full": "現在の添付ファイルの送信が完了するまでお待ちください",
+  "chat_sending_attachment": "添付ファイルを送信中…",
+  "chat_upload_cancelled": "アップロードをキャンセルしました",
+  "chat_upload_progress": "アップロード"
 }
