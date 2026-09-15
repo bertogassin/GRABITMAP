@@ -20,7 +20,7 @@ GRABIT — самостоятельная платформа. Аккаунты, 
 ## Локальный запуск
 
 1. Скопируйте `.env.example` в `.env`.
-2. Задайте `ADMIN_KEY`.
+2. Задайте уникальный `ADMIN_KEY` длиной не менее 32 символов.
 3. Для HTTP без HTTPS поставьте `GRABIT_COOKIE_SECURE=0`.
 4. Запустите:
 
@@ -46,16 +46,18 @@ GRABIT — самостоятельная платформа. Аккаунты, 
 docker compose up --build
 ```
 
-Перед продом задайте свой `ADMIN_KEY` и `PUBLIC_BASE_URL=https://grabitmap.com`.
+Перед продом задайте уникальный `ADMIN_KEY` длиной не менее 32 символов и `PUBLIC_BASE_URL=https://grabitmap.com`.
 
 ## Переменные
 
 | Переменная | Зачем |
 |---|---|
-| `ADMIN_KEY` | обязательный секрет админки |
+| `ADMIN_KEY` | обязательный уникальный секрет админки, минимум 32 символа |
 | `GRABIT_COOKIE_SECURE` | `0` для локального HTTP |
 | `PORT` | порт, по умолчанию 3000 |
 | `DATABASE_URL` | SQLite, по умолчанию `sqlite:data/votes.db` |
 | `PUBLIC_BASE_URL` | публичный адрес сайта |
+| `STATIC_DIR` | каталог статических файлов, по умолчанию `static` |
+| `CHAT_MEDIA_DIR` | persistent-каталог медиа чатов |
 | `RESEND_API_KEY` | письма: код входа и сброс пароля |
 | `OWNER_BOOTSTRAP_EMAIL` / `OWNER_BOOTSTRAP_PASSWORD` | первый владелец |
