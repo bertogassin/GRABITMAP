@@ -306,5 +306,9 @@
   "chat_attachment_busy": "El servidor está comprobando otro archivo · reintentando automáticamente",
   "chat_attachment_open": "Abrir / descargar",
   "chat_attachment_processing": "Comprobando y guardando el archivo adjunto…",
-  "chat_attachment_ready": "Archivo adjunto listo · añade un texto"
+  "chat_attachment_ready": "Archivo adjunto listo · añade un texto",
+  "chat_attachment_interrupted": "Carga interrumpida · reintentando automáticamente",
+  "chat_attachment_timeout": "La red o la comprobación tardó demasiado · inténtalo de nuevo",
+  "chat_attachment_too_large": "El archivo supera el tamaño permitido",
+  "chat_attachment_type": "Este tipo de archivo no es compatible"
 }

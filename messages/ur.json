@@ -306,5 +306,9 @@
   "chat_attachment_busy": "سرور دوسری فائل چیک کر رہا ہے · خودکار طور پر دوبارہ کوشش ہوگی",
   "chat_attachment_open": "کھولیں / ڈاؤن لوڈ کریں",
   "chat_attachment_processing": "منسلکہ چیک اور محفوظ کیا جا رہا ہے…",
-  "chat_attachment_ready": "منسلکہ تیار ہے · کیپشن شامل کریں"
+  "chat_attachment_ready": "منسلکہ تیار ہے · کیپشن شامل کریں",
+  "chat_attachment_interrupted": "اپ لوڈ رک گیا · خودکار طور پر دوبارہ کوشش ہوگی",
+  "chat_attachment_timeout": "نیٹ ورک یا جانچ میں بہت زیادہ وقت لگا · دوبارہ کوشش کریں",
+  "chat_attachment_too_large": "فائل کا سائز اجازت شدہ حد سے زیادہ ہے",
+  "chat_attachment_type": "اس فائل کی قسم معاونت یافتہ نہیں ہے"
 }

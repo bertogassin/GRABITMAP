@@ -306,5 +306,9 @@
   "chat_attachment_busy": "O servidor está verificando outro arquivo · nova tentativa automática",
   "chat_attachment_open": "Abrir / baixar",
   "chat_attachment_processing": "Verificando e salvando o anexo…",
-  "chat_attachment_ready": "Anexo pronto · adicione uma legenda"
+  "chat_attachment_ready": "Anexo pronto · adicione uma legenda",
+  "chat_attachment_interrupted": "Upload interrompido · nova tentativa automática",
+  "chat_attachment_timeout": "A rede ou verificação demorou demais · tente novamente",
+  "chat_attachment_too_large": "O arquivo excede o tamanho permitido",
+  "chat_attachment_type": "Este tipo de arquivo não é compatível"
 }

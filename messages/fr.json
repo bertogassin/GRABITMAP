@@ -306,5 +306,9 @@
   "chat_attachment_busy": "Le serveur vérifie un autre fichier · nouvelle tentative automatique",
   "chat_attachment_open": "Ouvrir / télécharger",
   "chat_attachment_processing": "Vérification et enregistrement de la pièce jointe…",
-  "chat_attachment_ready": "Pièce jointe prête · ajoutez une légende"
+  "chat_attachment_ready": "Pièce jointe prête · ajoutez une légende",
+  "chat_attachment_interrupted": "Téléversement interrompu · nouvelle tentative automatique",
+  "chat_attachment_timeout": "Le réseau ou la vérification a pris trop de temps · réessayez",
+  "chat_attachment_too_large": "Le fichier dépasse la taille autorisée",
+  "chat_attachment_type": "Ce type de fichier n’est pas pris en charge"
 }

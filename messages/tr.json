@@ -306,5 +306,9 @@
   "chat_attachment_busy": "Sunucu başka bir dosyayı kontrol ediyor · otomatik olarak yeniden deneniyor",
   "chat_attachment_open": "Aç / indir",
   "chat_attachment_processing": "Ek kontrol ediliyor ve kaydediliyor…",
-  "chat_attachment_ready": "Ek hazır · açıklama ekleyin"
+  "chat_attachment_ready": "Ek hazır · açıklama ekleyin",
+  "chat_attachment_interrupted": "Yükleme kesildi · otomatik olarak yeniden deneniyor",
+  "chat_attachment_timeout": "Ağ veya kontrol çok uzun sürdü · yeniden deneyin",
+  "chat_attachment_too_large": "Dosya izin verilen boyutu aşıyor",
+  "chat_attachment_type": "Bu dosya türü desteklenmiyor"
 }

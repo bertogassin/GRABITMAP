@@ -306,5 +306,9 @@
   "chat_attachment_busy": "השרת בודק קובץ אחר · ניסיון חוזר אוטומטי",
   "chat_attachment_open": "פתיחה / הורדה",
   "chat_attachment_processing": "הקובץ המצורף נבדק ונשמר…",
-  "chat_attachment_ready": "הקובץ המצורף מוכן · הוסיפו כיתוב"
+  "chat_attachment_ready": "הקובץ המצורף מוכן · הוסיפו כיתוב",
+  "chat_attachment_interrupted": "ההעלאה נקטעה · ניסיון חוזר אוטומטי",
+  "chat_attachment_timeout": "הרשת או הבדיקה ארכו זמן רב מדי · נסו שוב",
+  "chat_attachment_too_large": "הקובץ חורג מהגודל המותר",
+  "chat_attachment_type": "סוג הקובץ הזה אינו נתמך"
 }

@@ -97,6 +97,54 @@ test("chat attachment availability states are registered in every locale", async
   });
 });
 
+test("chat attachment validation errors are registered in every locale", async () => {
+  const keys = [
+    "chat_attachment_interrupted",
+    "chat_attachment_timeout",
+    "chat_attachment_too_large",
+    "chat_attachment_type",
+  ];
+  const translations = {};
+
+  for (const locale of locales) {
+    const messages = JSON.parse(
+      await readFile(new URL("messages/" + locale + ".json", root), "utf8"),
+    );
+    translations[locale] = {};
+
+    for (const key of keys) {
+      assert.equal(typeof messages[key], "string");
+      assert.notEqual(messages[key].trim(), "");
+      translations[locale][key] = messages[key];
+    }
+  }
+
+  assert.deepEqual(translations.ru, {
+    chat_attachment_interrupted: "Загрузка прервалась · повторяем автоматически",
+    chat_attachment_timeout: "Сеть или проверка заняла слишком много времени · повторите",
+    chat_attachment_too_large: "Файл превышает допустимый размер",
+    chat_attachment_type: "Этот тип файла не поддерживается",
+  });
+  assert.deepEqual(translations.en, {
+    chat_attachment_interrupted: "Upload interrupted · retrying automatically",
+    chat_attachment_timeout: "Network or validation took too long · try again",
+    chat_attachment_too_large: "File exceeds the allowed size",
+    chat_attachment_type: "This file type is not supported",
+  });
+  assert.deepEqual(translations.fr, {
+    chat_attachment_interrupted: "Téléversement interrompu · nouvelle tentative automatique",
+    chat_attachment_timeout: "Le réseau ou la vérification a pris trop de temps · réessayez",
+    chat_attachment_too_large: "Le fichier dépasse la taille autorisée",
+    chat_attachment_type: "Ce type de fichier n’est pas pris en charge",
+  });
+  assert.deepEqual(translations.ar, {
+    chat_attachment_interrupted: "توقف الرفع · ستتم إعادة المحاولة تلقائيًا",
+    chat_attachment_timeout: "استغرقت الشبكة أو عملية التحقق وقتًا طويلًا · حاول مجددًا",
+    chat_attachment_too_large: "يتجاوز الملف الحجم المسموح",
+    chat_attachment_type: "نوع الملف هذا غير مدعوم",
+  });
+});
+
 test("browser translation calls cannot add unregistered locale keys", async () => {
   const base = JSON.parse(
     await readFile(new URL("messages/ru.json", root), "utf8"),
@@ -104,10 +152,6 @@ test("browser translation calls cannot add unregistered locale keys", async () =
   const knownLegacyDebt = [
     "chat_attachment_error",
     "chat_attachment_failed",
-    "chat_attachment_interrupted",
-    "chat_attachment_timeout",
-    "chat_attachment_too_large",
-    "chat_attachment_type",
     "chat_connecting_initial",
     "chat_document",
     "chat_document_invalid",

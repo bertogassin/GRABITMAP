@@ -306,5 +306,9 @@
   "chat_attachment_busy": "Сервер проверяет другой файл · повторяем автоматически",
   "chat_attachment_open": "Открыть / скачать",
   "chat_attachment_processing": "Проверяем и сохраняем вложение…",
-  "chat_attachment_ready": "Вложение готово · добавьте подпись"
+  "chat_attachment_ready": "Вложение готово · добавьте подпись",
+  "chat_attachment_interrupted": "Загрузка прервалась · повторяем автоматически",
+  "chat_attachment_timeout": "Сеть или проверка заняла слишком много времени · повторите",
+  "chat_attachment_too_large": "Файл превышает допустимый размер",
+  "chat_attachment_type": "Этот тип файла не поддерживается"
 }

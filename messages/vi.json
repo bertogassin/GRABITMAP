@@ -306,5 +306,9 @@
   "chat_attachment_busy": "Máy chủ đang kiểm tra tệp khác · tự động thử lại",
   "chat_attachment_open": "Mở / tải xuống",
   "chat_attachment_processing": "Đang kiểm tra và lưu tệp đính kèm…",
-  "chat_attachment_ready": "Tệp đính kèm đã sẵn sàng · thêm chú thích"
+  "chat_attachment_ready": "Tệp đính kèm đã sẵn sàng · thêm chú thích",
+  "chat_attachment_interrupted": "Tải lên bị gián đoạn · tự động thử lại",
+  "chat_attachment_timeout": "Mạng hoặc quá trình kiểm tra mất quá nhiều thời gian · hãy thử lại",
+  "chat_attachment_too_large": "Tệp vượt quá kích thước cho phép",
+  "chat_attachment_type": "Loại tệp này không được hỗ trợ"
 }

@@ -306,5 +306,9 @@
   "chat_attachment_busy": "Serverul verifică alt fișier · reîncercare automată",
   "chat_attachment_open": "Deschide / descarcă",
   "chat_attachment_processing": "Se verifică și se salvează atașamentul…",
-  "chat_attachment_ready": "Atașamentul este gata · adăugați o legendă"
+  "chat_attachment_ready": "Atașamentul este gata · adăugați o legendă",
+  "chat_attachment_interrupted": "Încărcarea a fost întreruptă · reîncercare automată",
+  "chat_attachment_timeout": "Rețeaua sau verificarea a durat prea mult · încercați din nou",
+  "chat_attachment_too_large": "Fișierul depășește dimensiunea permisă",
+  "chat_attachment_type": "Acest tip de fișier nu este acceptat"
 }

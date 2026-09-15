@@ -306,5 +306,9 @@
   "chat_attachment_busy": "伺服器正在檢查另一個檔案 · 將自動重試",
   "chat_attachment_open": "開啟 / 下載",
   "chat_attachment_processing": "正在檢查並儲存附件…",
-  "chat_attachment_ready": "附件已準備好 · 新增說明"
+  "chat_attachment_ready": "附件已準備好 · 新增說明",
+  "chat_attachment_interrupted": "上傳中斷 · 將自動重試",
+  "chat_attachment_timeout": "網路或檢查耗時過長 · 請重試",
+  "chat_attachment_too_large": "檔案超過允許的大小",
+  "chat_attachment_type": "不支援此檔案類型"
 }

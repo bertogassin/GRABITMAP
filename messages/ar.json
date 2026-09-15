@@ -306,5 +306,9 @@
   "chat_attachment_busy": "الخادم يتحقق من ملف آخر · ستتم إعادة المحاولة تلقائيًا",
   "chat_attachment_open": "فتح / تنزيل",
   "chat_attachment_processing": "جارٍ التحقق من المرفق وحفظه…",
-  "chat_attachment_ready": "المرفق جاهز · أضف تعليقًا"
+  "chat_attachment_ready": "المرفق جاهز · أضف تعليقًا",
+  "chat_attachment_interrupted": "توقف الرفع · ستتم إعادة المحاولة تلقائيًا",
+  "chat_attachment_timeout": "استغرقت الشبكة أو عملية التحقق وقتًا طويلًا · حاول مجددًا",
+  "chat_attachment_too_large": "يتجاوز الملف الحجم المسموح",
+  "chat_attachment_type": "نوع الملف هذا غير مدعوم"
 }

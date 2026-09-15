@@ -306,5 +306,9 @@
   "chat_attachment_busy": "Servern kontrollerar en annan fil · försöker igen automatiskt",
   "chat_attachment_open": "Öppna / ladda ner",
   "chat_attachment_processing": "Kontrollerar och sparar bilagan…",
-  "chat_attachment_ready": "Bilagan är klar · lägg till en bildtext"
+  "chat_attachment_ready": "Bilagan är klar · lägg till en bildtext",
+  "chat_attachment_interrupted": "Uppladdningen avbröts · försöker igen automatiskt",
+  "chat_attachment_timeout": "Nätverket eller kontrollen tog för lång tid · försök igen",
+  "chat_attachment_too_large": "Filen överskrider den tillåtna storleken",
+  "chat_attachment_type": "Den här filtypen stöds inte"
 }

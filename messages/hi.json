@@ -306,5 +306,9 @@
   "chat_attachment_busy": "सर्वर दूसरी फ़ाइल की जाँच कर रहा है · अपने-आप फिर प्रयास होगा",
   "chat_attachment_open": "खोलें / डाउनलोड करें",
   "chat_attachment_processing": "अटैचमेंट की जाँच करके सहेजा जा रहा है…",
-  "chat_attachment_ready": "अटैचमेंट तैयार है · कैप्शन जोड़ें"
+  "chat_attachment_ready": "अटैचमेंट तैयार है · कैप्शन जोड़ें",
+  "chat_attachment_interrupted": "अपलोड रुक गया · अपने-आप फिर प्रयास होगा",
+  "chat_attachment_timeout": "नेटवर्क या जाँच में बहुत समय लगा · फिर प्रयास करें",
+  "chat_attachment_too_large": "फ़ाइल अनुमत आकार से बड़ी है",
+  "chat_attachment_type": "यह फ़ाइल प्रकार समर्थित नहीं है"
 }
