@@ -921,6 +921,21 @@ test("chat delete confirmation contains and restores keyboard focus", async () =
   assert.match(chat, /if \(confirmBox && !confirmBox\.hidden\) \{[\s\S]*closeDelete\(\);/);
 });
 
+test("chat edit dialog contains and restores keyboard focus", async () => {
+  const chat = await readFile(new URL("static/chat-v2.js", root), "utf8");
+
+  assert.match(chat, /var editorTrigger = null;/);
+  assert.match(chat, /tabindex="-1" data-close-editor aria-label=/);
+  assert.match(chat, /function editorDialogControls\(\)/);
+  assert.match(chat, /\.chat-editor-panel textarea:not\(\[disabled\]\)/);
+  assert.match(chat, /function trapEditorFocus\(event\)/);
+  assert.match(chat, /editorTrigger = sheetTrigger \|\| document\.activeElement;/);
+  assert.match(chat, /editorInput\.focus\(\)/);
+  assert.match(chat, /editorTrigger\.isConnected[\s\S]*editorTrigger\.focus\(\)/);
+  assert.match(chat, /trapEditorFocus\(event\)/);
+  assert.match(chat, /if \(editor && !editor\.hidden\) \{[\s\S]*closeEditor\(\);/);
+});
+
 test("chat overlays share explicit dark and light theme tokens", async () => {
   const [css, mature] = await Promise.all([
     readFile(new URL("static/chat-v2.css", root), "utf8"),

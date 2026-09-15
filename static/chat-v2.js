@@ -3431,6 +3431,7 @@ ResursMapChat.icon = function (name) {
         var listingPreviewCache = new Map();
         var selectedMessage = null;
         var sheetTrigger = null;
+        var editorTrigger = null;
         var deleteTrigger = null;
         var refreshDebounceTimer = null;
         var refreshFallbackTimer = null;
@@ -3555,7 +3556,7 @@ ResursMapChat.icon = function (name) {
         editor.hidden = true;
         editor.innerHTML =
             '<button class="chat-sheet-backdrop" ' +
-                'type="button" data-close-editor aria-label="' +
+                'type="button" tabindex="-1" data-close-editor aria-label="' +
                 escapeHtml(t("chat_close", "Закрыть")) + '"></button>' +
             '<section class="chat-editor-panel" ' +
                 'role="dialog" aria-modal="true" aria-label="' +
@@ -5411,6 +5412,7 @@ ResursMapChat.icon = function (name) {
 
         function openEditor(message) {
             selectedMessage = message;
+            editorTrigger = sheetTrigger || document.activeElement;
             closeSheet();
             editorInput.value =
                 String(message.message || "");
@@ -5425,11 +5427,53 @@ ResursMapChat.icon = function (name) {
             );
         }
 
+        function editorDialogControls() {
+            return editor.querySelectorAll(
+                ".chat-editor-panel textarea:not([disabled]), " +
+                ".chat-editor-panel button:not([disabled])"
+            );
+        }
+
+        function trapEditorFocus(event) {
+            if (event.key !== "Tab" || editor.hidden) {
+                return;
+            }
+
+            var controls = editorDialogControls();
+            if (!controls.length) {
+                return;
+            }
+
+            var first = controls[0];
+            var last = controls[controls.length - 1];
+            var active = document.activeElement;
+
+            if (event.shiftKey && (active === first || !editor.contains(active))) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && (active === last || !editor.contains(active))) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
+
         function closeEditor() {
+            var wasOpen = !editor.hidden;
             editor.hidden = true;
             document.body.classList.remove(
                 "chat-overlay-open"
             );
+            if (
+                wasOpen &&
+                editorTrigger &&
+                editorTrigger.isConnected &&
+                typeof editorTrigger.focus === "function"
+            ) {
+                editorTrigger.focus();
+            }
+            if (wasOpen) {
+                editorTrigger = null;
+            }
         }
 
         function deleteDialogControls() {
@@ -5627,6 +5671,10 @@ ResursMapChat.icon = function (name) {
                 trapSheetFocus(event);
                 return;
             }
+            if (event.key === "Tab" && editor && !editor.hidden) {
+                trapEditorFocus(event);
+                return;
+            }
             if (event.key === "Tab" && confirmBox && !confirmBox.hidden) {
                 trapDeleteFocus(event);
                 return;
@@ -5638,7 +5686,7 @@ ResursMapChat.icon = function (name) {
                 closeSheet();
             }
             if (editor && !editor.hidden) {
-                editor.hidden = true;
+                closeEditor();
             }
             if (confirmBox && !confirmBox.hidden) {
                 closeDelete();
