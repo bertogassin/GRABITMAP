@@ -321,5 +321,9 @@
   "chat_media_queue_full": "現在の添付ファイルの送信が完了するまでお待ちください",
   "chat_sending_attachment": "添付ファイルを送信中…",
   "chat_upload_cancelled": "アップロードをキャンセルしました",
-  "chat_upload_progress": "アップロード"
+  "chat_upload_progress": "アップロード",
+  "chat_mic_request": "マイクへのアクセスを許可してください…",
+  "chat_voice_record_failed": "端末が録音を停止しました。もう一度お試しください。",
+  "chat_voice_stop_send": "停止して送信",
+  "chat_voice_too_large": "録音が長すぎます — 最大2分"
 }

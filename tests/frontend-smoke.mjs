@@ -312,6 +312,54 @@ test("chat attachment upload states are registered in every locale", async () =>
   });
 });
 
+test("chat voice states are registered in every locale", async () => {
+  const keys = [
+    "chat_mic_request",
+    "chat_voice_record_failed",
+    "chat_voice_stop_send",
+    "chat_voice_too_large",
+  ];
+  const translations = {};
+
+  for (const locale of locales) {
+    const messages = JSON.parse(
+      await readFile(new URL("messages/" + locale + ".json", root), "utf8"),
+    );
+    translations[locale] = {};
+
+    for (const key of keys) {
+      assert.equal(typeof messages[key], "string");
+      assert.notEqual(messages[key].trim(), "");
+      translations[locale][key] = messages[key];
+    }
+  }
+
+  assert.deepEqual(translations.ru, {
+    chat_mic_request: "Разрешите доступ к микрофону…",
+    chat_voice_record_failed: "Телефон остановил запись. Попробуйте ещё раз.",
+    chat_voice_stop_send: "Остановить и отправить",
+    chat_voice_too_large: "Запись слишком длинная — максимум 2 минуты",
+  });
+  assert.deepEqual(translations.en, {
+    chat_mic_request: "Allow microphone access…",
+    chat_voice_record_failed: "The phone stopped recording. Try again.",
+    chat_voice_stop_send: "Stop and send",
+    chat_voice_too_large: "Recording is too long — maximum 2 minutes",
+  });
+  assert.deepEqual(translations.fr, {
+    chat_mic_request: "Autorisez l’accès au microphone…",
+    chat_voice_record_failed: "Le téléphone a arrêté l’enregistrement. Réessayez.",
+    chat_voice_stop_send: "Arrêter et envoyer",
+    chat_voice_too_large: "L’enregistrement est trop long — 2 minutes maximum",
+  });
+  assert.deepEqual(translations.ar, {
+    chat_mic_request: "اسمح بالوصول إلى الميكروفون…",
+    chat_voice_record_failed: "أوقف الهاتف التسجيل. حاول مجددًا.",
+    chat_voice_stop_send: "إيقاف وإرسال",
+    chat_voice_too_large: "التسجيل طويل جدًا — الحد الأقصى دقيقتان",
+  });
+});
+
 test("browser translation calls cannot add unregistered locale keys", async () => {
   const base = JSON.parse(
     await readFile(new URL("messages/ru.json", root), "utf8"),
@@ -319,7 +367,6 @@ test("browser translation calls cannot add unregistered locale keys", async () =
   const knownLegacyDebt = [
     "chat_connecting_initial",
     "chat_member_muted",
-    "chat_mic_request",
     "chat_reply_unavailable",
     "chat_video",
     "chat_video_duration",
@@ -328,9 +375,6 @@ test("browser translation calls cannot add unregistered locale keys", async () =
     "chat_video_pip",
     "chat_video_playback_error",
     "chat_video_speed",
-    "chat_voice_record_failed",
-    "chat_voice_stop_send",
-    "chat_voice_too_large",
   ];
   const usedKeys = new Set();
   const staticFiles = (await readdir(new URL("static", root)))

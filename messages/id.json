@@ -321,5 +321,9 @@
   "chat_media_queue_full": "Tunggu hingga lampiran saat ini selesai dikirim",
   "chat_sending_attachment": "Mengirim lampiran…",
   "chat_upload_cancelled": "Unggahan dibatalkan",
-  "chat_upload_progress": "Unggahan"
+  "chat_upload_progress": "Unggahan",
+  "chat_mic_request": "Izinkan akses mikrofon…",
+  "chat_voice_record_failed": "Ponsel menghentikan perekaman. Coba lagi.",
+  "chat_voice_stop_send": "Hentikan dan kirim",
+  "chat_voice_too_large": "Rekaman terlalu panjang — maksimal 2 menit"
 }

@@ -321,5 +321,9 @@
   "chat_media_queue_full": "Subiri viambatisho vya sasa vitumwe",
   "chat_sending_attachment": "Inatuma kiambatisho…",
   "chat_upload_cancelled": "Upakiaji umeghairiwa",
-  "chat_upload_progress": "Upakiaji"
+  "chat_upload_progress": "Upakiaji",
+  "chat_mic_request": "Ruhusu ufikiaji wa maikrofoni…",
+  "chat_voice_record_failed": "Simu imesimamisha kurekodi. Jaribu tena.",
+  "chat_voice_stop_send": "Simamisha na utume",
+  "chat_voice_too_large": "Rekodi ni ndefu sana — upeo wa dakika 2"
 }

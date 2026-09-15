@@ -80,6 +80,7 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Chat_MembersInputs */
 /** @typedef {{}} Chat_MessageInputs */
 /** @typedef {{}} Chat_Mic_DeniedInputs */
+/** @typedef {{}} Chat_Mic_RequestInputs */
 /** @typedef {{ n: NonNullable<unknown> }} Chat_Mins_AgoInputs */
 /** @typedef {{}} Chat_New_DialogInputs */
 /** @typedef {{}} Chat_New_GroupInputs */
@@ -134,6 +135,9 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Chat_Voice_ErrorInputs */
 /** @typedef {{}} Chat_Voice_FailedInputs */
 /** @typedef {{}} Chat_Voice_OfflineInputs */
+/** @typedef {{}} Chat_Voice_Record_FailedInputs */
+/** @typedef {{}} Chat_Voice_Stop_SendInputs */
+/** @typedef {{}} Chat_Voice_Too_LargeInputs */
 /** @typedef {{}} Chat_Voice_Too_ShortInputs */
 /** @typedef {{}} Chat_Voice_UnsupportedInputs */
 /** @typedef {{}} Chat_YouInputs */
@@ -3792,6 +3796,50 @@ export const chat_mic_denied = /** @type {((inputs?: Chat_Mic_DeniedInputs, opti
 /**
 * | output |
 * | --- |
+* | "Allow microphone access…" |
+*
+* @param {Chat_Mic_RequestInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_mic_request = /** @type {((inputs?: Chat_Mic_RequestInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Mic_RequestInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_mic_request(inputs)
+	if (locale === "fr") return __fr.chat_mic_request(inputs)
+	if (locale === "es") return __es.chat_mic_request(inputs)
+	if (locale === "zh") return __zh.chat_mic_request(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_mic_request(inputs)
+	if (locale === "hi") return __hi.chat_mic_request(inputs)
+	if (locale === "ar") return __ar.chat_mic_request(inputs)
+	if (locale === "pt") return __pt.chat_mic_request(inputs)
+	if (locale === "de") return __de.chat_mic_request(inputs)
+	if (locale === "ja") return __ja.chat_mic_request(inputs)
+	if (locale === "ko") return __ko.chat_mic_request(inputs)
+	if (locale === "it") return __it.chat_mic_request(inputs)
+	if (locale === "tr") return __tr.chat_mic_request(inputs)
+	if (locale === "pl") return __pl.chat_mic_request(inputs)
+	if (locale === "uk") return __uk.chat_mic_request(inputs)
+	if (locale === "nl") return __nl.chat_mic_request(inputs)
+	if (locale === "vi") return __vi.chat_mic_request(inputs)
+	if (locale === "id") return __id.chat_mic_request(inputs)
+	if (locale === "ms") return __ms.chat_mic_request(inputs)
+	if (locale === "th") return __th.chat_mic_request(inputs)
+	if (locale === "fa") return __fa.chat_mic_request(inputs)
+	if (locale === "ur") return __ur.chat_mic_request(inputs)
+	if (locale === "bn") return __bn.chat_mic_request(inputs)
+	if (locale === "pa") return __pa.chat_mic_request(inputs)
+	if (locale === "sw") return __sw.chat_mic_request(inputs)
+	if (locale === "el") return __el.chat_mic_request(inputs)
+	if (locale === "cs") return __cs.chat_mic_request(inputs)
+	if (locale === "ro") return __ro.chat_mic_request(inputs)
+	if (locale === "hu") return __hu.chat_mic_request(inputs)
+	if (locale === "sv") return __sv.chat_mic_request(inputs)
+	if (locale === "he") return __he.chat_mic_request(inputs)
+	return __ru.chat_mic_request(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "{n} min ago" |
 *
 * @param {Chat_Mins_AgoInputs} inputs
@@ -6164,6 +6212,138 @@ export const chat_voice_offline = /** @type {((inputs?: Chat_Voice_OfflineInputs
 	if (locale === "sv") return __sv.chat_voice_offline(inputs)
 	if (locale === "he") return __he.chat_voice_offline(inputs)
 	return __ru.chat_voice_offline(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "The phone stopped recording. Try again." |
+*
+* @param {Chat_Voice_Record_FailedInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_voice_record_failed = /** @type {((inputs?: Chat_Voice_Record_FailedInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Voice_Record_FailedInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_voice_record_failed(inputs)
+	if (locale === "fr") return __fr.chat_voice_record_failed(inputs)
+	if (locale === "es") return __es.chat_voice_record_failed(inputs)
+	if (locale === "zh") return __zh.chat_voice_record_failed(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_voice_record_failed(inputs)
+	if (locale === "hi") return __hi.chat_voice_record_failed(inputs)
+	if (locale === "ar") return __ar.chat_voice_record_failed(inputs)
+	if (locale === "pt") return __pt.chat_voice_record_failed(inputs)
+	if (locale === "de") return __de.chat_voice_record_failed(inputs)
+	if (locale === "ja") return __ja.chat_voice_record_failed(inputs)
+	if (locale === "ko") return __ko.chat_voice_record_failed(inputs)
+	if (locale === "it") return __it.chat_voice_record_failed(inputs)
+	if (locale === "tr") return __tr.chat_voice_record_failed(inputs)
+	if (locale === "pl") return __pl.chat_voice_record_failed(inputs)
+	if (locale === "uk") return __uk.chat_voice_record_failed(inputs)
+	if (locale === "nl") return __nl.chat_voice_record_failed(inputs)
+	if (locale === "vi") return __vi.chat_voice_record_failed(inputs)
+	if (locale === "id") return __id.chat_voice_record_failed(inputs)
+	if (locale === "ms") return __ms.chat_voice_record_failed(inputs)
+	if (locale === "th") return __th.chat_voice_record_failed(inputs)
+	if (locale === "fa") return __fa.chat_voice_record_failed(inputs)
+	if (locale === "ur") return __ur.chat_voice_record_failed(inputs)
+	if (locale === "bn") return __bn.chat_voice_record_failed(inputs)
+	if (locale === "pa") return __pa.chat_voice_record_failed(inputs)
+	if (locale === "sw") return __sw.chat_voice_record_failed(inputs)
+	if (locale === "el") return __el.chat_voice_record_failed(inputs)
+	if (locale === "cs") return __cs.chat_voice_record_failed(inputs)
+	if (locale === "ro") return __ro.chat_voice_record_failed(inputs)
+	if (locale === "hu") return __hu.chat_voice_record_failed(inputs)
+	if (locale === "sv") return __sv.chat_voice_record_failed(inputs)
+	if (locale === "he") return __he.chat_voice_record_failed(inputs)
+	return __ru.chat_voice_record_failed(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Stop and send" |
+*
+* @param {Chat_Voice_Stop_SendInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_voice_stop_send = /** @type {((inputs?: Chat_Voice_Stop_SendInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Voice_Stop_SendInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_voice_stop_send(inputs)
+	if (locale === "fr") return __fr.chat_voice_stop_send(inputs)
+	if (locale === "es") return __es.chat_voice_stop_send(inputs)
+	if (locale === "zh") return __zh.chat_voice_stop_send(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_voice_stop_send(inputs)
+	if (locale === "hi") return __hi.chat_voice_stop_send(inputs)
+	if (locale === "ar") return __ar.chat_voice_stop_send(inputs)
+	if (locale === "pt") return __pt.chat_voice_stop_send(inputs)
+	if (locale === "de") return __de.chat_voice_stop_send(inputs)
+	if (locale === "ja") return __ja.chat_voice_stop_send(inputs)
+	if (locale === "ko") return __ko.chat_voice_stop_send(inputs)
+	if (locale === "it") return __it.chat_voice_stop_send(inputs)
+	if (locale === "tr") return __tr.chat_voice_stop_send(inputs)
+	if (locale === "pl") return __pl.chat_voice_stop_send(inputs)
+	if (locale === "uk") return __uk.chat_voice_stop_send(inputs)
+	if (locale === "nl") return __nl.chat_voice_stop_send(inputs)
+	if (locale === "vi") return __vi.chat_voice_stop_send(inputs)
+	if (locale === "id") return __id.chat_voice_stop_send(inputs)
+	if (locale === "ms") return __ms.chat_voice_stop_send(inputs)
+	if (locale === "th") return __th.chat_voice_stop_send(inputs)
+	if (locale === "fa") return __fa.chat_voice_stop_send(inputs)
+	if (locale === "ur") return __ur.chat_voice_stop_send(inputs)
+	if (locale === "bn") return __bn.chat_voice_stop_send(inputs)
+	if (locale === "pa") return __pa.chat_voice_stop_send(inputs)
+	if (locale === "sw") return __sw.chat_voice_stop_send(inputs)
+	if (locale === "el") return __el.chat_voice_stop_send(inputs)
+	if (locale === "cs") return __cs.chat_voice_stop_send(inputs)
+	if (locale === "ro") return __ro.chat_voice_stop_send(inputs)
+	if (locale === "hu") return __hu.chat_voice_stop_send(inputs)
+	if (locale === "sv") return __sv.chat_voice_stop_send(inputs)
+	if (locale === "he") return __he.chat_voice_stop_send(inputs)
+	return __ru.chat_voice_stop_send(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Recording is too long — maximum 2 minutes" |
+*
+* @param {Chat_Voice_Too_LargeInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_voice_too_large = /** @type {((inputs?: Chat_Voice_Too_LargeInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Voice_Too_LargeInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_voice_too_large(inputs)
+	if (locale === "fr") return __fr.chat_voice_too_large(inputs)
+	if (locale === "es") return __es.chat_voice_too_large(inputs)
+	if (locale === "zh") return __zh.chat_voice_too_large(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_voice_too_large(inputs)
+	if (locale === "hi") return __hi.chat_voice_too_large(inputs)
+	if (locale === "ar") return __ar.chat_voice_too_large(inputs)
+	if (locale === "pt") return __pt.chat_voice_too_large(inputs)
+	if (locale === "de") return __de.chat_voice_too_large(inputs)
+	if (locale === "ja") return __ja.chat_voice_too_large(inputs)
+	if (locale === "ko") return __ko.chat_voice_too_large(inputs)
+	if (locale === "it") return __it.chat_voice_too_large(inputs)
+	if (locale === "tr") return __tr.chat_voice_too_large(inputs)
+	if (locale === "pl") return __pl.chat_voice_too_large(inputs)
+	if (locale === "uk") return __uk.chat_voice_too_large(inputs)
+	if (locale === "nl") return __nl.chat_voice_too_large(inputs)
+	if (locale === "vi") return __vi.chat_voice_too_large(inputs)
+	if (locale === "id") return __id.chat_voice_too_large(inputs)
+	if (locale === "ms") return __ms.chat_voice_too_large(inputs)
+	if (locale === "th") return __th.chat_voice_too_large(inputs)
+	if (locale === "fa") return __fa.chat_voice_too_large(inputs)
+	if (locale === "ur") return __ur.chat_voice_too_large(inputs)
+	if (locale === "bn") return __bn.chat_voice_too_large(inputs)
+	if (locale === "pa") return __pa.chat_voice_too_large(inputs)
+	if (locale === "sw") return __sw.chat_voice_too_large(inputs)
+	if (locale === "el") return __el.chat_voice_too_large(inputs)
+	if (locale === "cs") return __cs.chat_voice_too_large(inputs)
+	if (locale === "ro") return __ro.chat_voice_too_large(inputs)
+	if (locale === "hu") return __hu.chat_voice_too_large(inputs)
+	if (locale === "sv") return __sv.chat_voice_too_large(inputs)
+	if (locale === "he") return __he.chat_voice_too_large(inputs)
+	return __ru.chat_voice_too_large(inputs)
 });
 /**
 * | output |

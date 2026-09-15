@@ -321,5 +321,9 @@
   "chat_media_queue_full": "ਮੌਜੂਦਾ ਅਟੈਚਮੈਂਟ ਭੇਜੇ ਜਾਣ ਤੱਕ ਉਡੀਕ ਕਰੋ",
   "chat_sending_attachment": "ਅਟੈਚਮੈਂਟ ਭੇਜਿਆ ਜਾ ਰਿਹਾ ਹੈ…",
   "chat_upload_cancelled": "ਅੱਪਲੋਡ ਰੱਦ ਕੀਤਾ ਗਿਆ",
-  "chat_upload_progress": "ਅੱਪਲੋਡ"
+  "chat_upload_progress": "ਅੱਪਲੋਡ",
+  "chat_mic_request": "ਮਾਈਕ੍ਰੋਫ਼ੋਨ ਦੀ ਪਹੁੰਚ ਦੀ ਇਜਾਜ਼ਤ ਦਿਓ…",
+  "chat_voice_record_failed": "ਫ਼ੋਨ ਨੇ ਰਿਕਾਰਡਿੰਗ ਰੋਕ ਦਿੱਤੀ। ਮੁੜ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
+  "chat_voice_stop_send": "ਰੋਕੋ ਅਤੇ ਭੇਜੋ",
+  "chat_voice_too_large": "ਰਿਕਾਰਡਿੰਗ ਬਹੁਤ ਲੰਬੀ ਹੈ — ਵੱਧ ਤੋਂ ਵੱਧ 2 ਮਿੰਟ"
 }

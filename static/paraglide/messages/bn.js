@@ -78,6 +78,7 @@
 /** @typedef {{}} Chat_MembersInputs */
 /** @typedef {{}} Chat_MessageInputs */
 /** @typedef {{}} Chat_Mic_DeniedInputs */
+/** @typedef {{}} Chat_Mic_RequestInputs */
 /** @typedef {{ n: NonNullable<unknown> }} Chat_Mins_AgoInputs */
 /** @typedef {{}} Chat_New_DialogInputs */
 /** @typedef {{}} Chat_New_GroupInputs */
@@ -132,6 +133,9 @@
 /** @typedef {{}} Chat_Voice_ErrorInputs */
 /** @typedef {{}} Chat_Voice_FailedInputs */
 /** @typedef {{}} Chat_Voice_OfflineInputs */
+/** @typedef {{}} Chat_Voice_Record_FailedInputs */
+/** @typedef {{}} Chat_Voice_Stop_SendInputs */
+/** @typedef {{}} Chat_Voice_Too_LargeInputs */
 /** @typedef {{}} Chat_Voice_Too_ShortInputs */
 /** @typedef {{}} Chat_Voice_UnsupportedInputs */
 /** @typedef {{}} Chat_YouInputs */
@@ -637,6 +641,10 @@ export const chat_mic_denied = /** @type {(inputs: Chat_Mic_DeniedInputs) => Loc
 	return /** @type {LocalizedString} */ (`মাইকের অনুমতি নেই`)
 };
 
+export const chat_mic_request = /** @type {(inputs: Chat_Mic_RequestInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`মাইক্রোফোন ব্যবহারের অনুমতি দিন…`)
+};
+
 export const chat_mins_ago = /** @type {(inputs: Chat_Mins_AgoInputs) => LocalizedString} */ (i) => {
 	return /** @type {LocalizedString} */ (`${i?.n} মিনিট আগে`)
 };
@@ -851,6 +859,18 @@ export const chat_voice_failed = /** @type {(inputs: Chat_Voice_FailedInputs) =>
 
 export const chat_voice_offline = /** @type {(inputs: Chat_Voice_OfflineInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`নেট নেই — অফলাইনে ভয়েস যায় না`)
+};
+
+export const chat_voice_record_failed = /** @type {(inputs: Chat_Voice_Record_FailedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`ফোন রেকর্ডিং বন্ধ করেছে। আবার চেষ্টা করুন।`)
+};
+
+export const chat_voice_stop_send = /** @type {(inputs: Chat_Voice_Stop_SendInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`থামান এবং পাঠান`)
+};
+
+export const chat_voice_too_large = /** @type {(inputs: Chat_Voice_Too_LargeInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`রেকর্ডিংটি খুব দীর্ঘ — সর্বোচ্চ ২ মিনিট`)
 };
 
 export const chat_voice_too_short = /** @type {(inputs: Chat_Voice_Too_ShortInputs) => LocalizedString} */ () => {

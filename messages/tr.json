@@ -321,5 +321,9 @@
   "chat_media_queue_full": "Mevcut eklerin gönderilmesini bekleyin",
   "chat_sending_attachment": "Ek gönderiliyor…",
   "chat_upload_cancelled": "Yükleme iptal edildi",
-  "chat_upload_progress": "Yükleme"
+  "chat_upload_progress": "Yükleme",
+  "chat_mic_request": "Mikrofon erişimine izin verin…",
+  "chat_voice_record_failed": "Telefon kaydı durdurdu. Tekrar deneyin.",
+  "chat_voice_stop_send": "Durdur ve gönder",
+  "chat_voice_too_large": "Kayıt çok uzun — en fazla 2 dakika"
 }

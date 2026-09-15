@@ -321,5 +321,9 @@
   "chat_media_queue_full": "请等待当前附件发送完成",
   "chat_sending_attachment": "正在发送附件…",
   "chat_upload_cancelled": "上传已取消",
-  "chat_upload_progress": "上传"
+  "chat_upload_progress": "上传",
+  "chat_mic_request": "请允许访问麦克风…",
+  "chat_voice_record_failed": "手机停止了录音。请重试。",
+  "chat_voice_stop_send": "停止并发送",
+  "chat_voice_too_large": "录音时间过长 — 最长 2 分钟"
 }

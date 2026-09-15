@@ -321,5 +321,9 @@
   "chat_media_queue_full": "รอให้ส่งไฟล์แนบปัจจุบันเสร็จก่อน",
   "chat_sending_attachment": "กำลังส่งไฟล์แนบ…",
   "chat_upload_cancelled": "ยกเลิกการอัปโหลดแล้ว",
-  "chat_upload_progress": "การอัปโหลด"
+  "chat_upload_progress": "การอัปโหลด",
+  "chat_mic_request": "อนุญาตการเข้าถึงไมโครโฟน…",
+  "chat_voice_record_failed": "โทรศัพท์หยุดการบันทึกเสียง โปรดลองอีกครั้ง",
+  "chat_voice_stop_send": "หยุดและส่ง",
+  "chat_voice_too_large": "การบันทึกยาวเกินไป — สูงสุด 2 นาที"
 }

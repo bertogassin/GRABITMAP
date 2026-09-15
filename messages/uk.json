@@ -321,5 +321,9 @@
   "chat_media_queue_full": "Дочекайтеся завершення надсилання поточних вкладень",
   "chat_sending_attachment": "Надсилання вкладення…",
   "chat_upload_cancelled": "Надсилання скасовано",
-  "chat_upload_progress": "Завантаження"
+  "chat_upload_progress": "Завантаження",
+  "chat_mic_request": "Дозвольте доступ до мікрофона…",
+  "chat_voice_record_failed": "Телефон зупинив запис. Спробуйте ще раз.",
+  "chat_voice_stop_send": "Зупинити й надіслати",
+  "chat_voice_too_large": "Запис надто довгий — максимум 2 хвилини"
 }

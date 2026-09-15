@@ -321,5 +321,9 @@
   "chat_media_queue_full": "تا پایان ارسال پیوست‌های فعلی منتظر بمانید",
   "chat_sending_attachment": "در حال ارسال پیوست…",
   "chat_upload_cancelled": "ارسال لغو شد",
-  "chat_upload_progress": "بارگذاری"
+  "chat_upload_progress": "بارگذاری",
+  "chat_mic_request": "اجازه دسترسی به میکروفون را بدهید…",
+  "chat_voice_record_failed": "تلفن ضبط را متوقف کرد. دوباره تلاش کنید.",
+  "chat_voice_stop_send": "توقف و ارسال",
+  "chat_voice_too_large": "ضبط بیش از حد طولانی است — حداکثر ۲ دقیقه"
 }

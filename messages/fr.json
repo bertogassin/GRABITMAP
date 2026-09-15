@@ -321,5 +321,9 @@
   "chat_media_queue_full": "Attendez la fin de l’envoi des pièces jointes en cours",
   "chat_sending_attachment": "Envoi de la pièce jointe…",
   "chat_upload_cancelled": "Envoi annulé",
-  "chat_upload_progress": "Téléversement"
+  "chat_upload_progress": "Téléversement",
+  "chat_mic_request": "Autorisez l’accès au microphone…",
+  "chat_voice_record_failed": "Le téléphone a arrêté l’enregistrement. Réessayez.",
+  "chat_voice_stop_send": "Arrêter et envoyer",
+  "chat_voice_too_large": "L’enregistrement est trop long — 2 minutes maximum"
 }

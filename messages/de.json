@@ -321,5 +321,9 @@
   "chat_media_queue_full": "Warten Sie, bis die aktuellen Anhänge gesendet wurden",
   "chat_sending_attachment": "Anhang wird gesendet…",
   "chat_upload_cancelled": "Upload abgebrochen",
-  "chat_upload_progress": "Upload"
+  "chat_upload_progress": "Upload",
+  "chat_mic_request": "Mikrofonzugriff erlauben…",
+  "chat_voice_record_failed": "Das Telefon hat die Aufnahme beendet. Versuchen Sie es erneut.",
+  "chat_voice_stop_send": "Stoppen und senden",
+  "chat_voice_too_large": "Die Aufnahme ist zu lang — maximal 2 Minuten"
 }
