@@ -3431,6 +3431,7 @@ ResursMapChat.icon = function (name) {
         var listingPreviewCache = new Map();
         var selectedMessage = null;
         var sheetTrigger = null;
+        var deleteTrigger = null;
         var refreshDebounceTimer = null;
         var refreshFallbackTimer = null;
         var lastTapAt = 0;
@@ -3586,7 +3587,7 @@ ResursMapChat.icon = function (name) {
         confirmBox.hidden = true;
         confirmBox.innerHTML =
             '<button class="chat-sheet-backdrop" ' +
-                'type="button" data-close-delete aria-label="' +
+                'type="button" tabindex="-1" data-close-delete aria-label="' +
                 escapeHtml(t("chat_close", "Закрыть")) + '"></button>' +
             '<section class="chat-editor-panel chat-delete-panel" ' +
                 'role="dialog" aria-modal="true" aria-label="' +
@@ -5431,20 +5432,66 @@ ResursMapChat.icon = function (name) {
             );
         }
 
+        function deleteDialogControls() {
+            return confirmBox.querySelectorAll(
+                ".chat-delete-panel button:not([disabled])"
+            );
+        }
+
+        function trapDeleteFocus(event) {
+            if (event.key !== "Tab" || confirmBox.hidden) {
+                return;
+            }
+
+            var controls = deleteDialogControls();
+            if (!controls.length) {
+                return;
+            }
+
+            var first = controls[0];
+            var last = controls[controls.length - 1];
+            var active = document.activeElement;
+
+            if (event.shiftKey && (active === first || !confirmBox.contains(active))) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && (active === last || !confirmBox.contains(active))) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
+
         function openDelete(message) {
             selectedMessage = message;
+            deleteTrigger = sheetTrigger || document.activeElement;
             closeSheet();
             confirmBox.hidden = false;
             document.body.classList.add(
                 "chat-overlay-open"
             );
+            var controls = deleteDialogControls();
+            if (controls.length) {
+                controls[0].focus();
+            }
         }
 
         function closeDelete() {
+            var wasOpen = !confirmBox.hidden;
             confirmBox.hidden = true;
             document.body.classList.remove(
                 "chat-overlay-open"
             );
+            if (
+                wasOpen &&
+                deleteTrigger &&
+                deleteTrigger.isConnected &&
+                typeof deleteTrigger.focus === "function"
+            ) {
+                deleteTrigger.focus();
+            }
+            if (wasOpen) {
+                deleteTrigger = null;
+            }
         }
 
         history.querySelectorAll(".chat-message-more")
@@ -5580,6 +5627,10 @@ ResursMapChat.icon = function (name) {
                 trapSheetFocus(event);
                 return;
             }
+            if (event.key === "Tab" && confirmBox && !confirmBox.hidden) {
+                trapDeleteFocus(event);
+                return;
+            }
             if (event.key !== "Escape") {
                 return;
             }
@@ -5590,7 +5641,7 @@ ResursMapChat.icon = function (name) {
                 editor.hidden = true;
             }
             if (confirmBox && !confirmBox.hidden) {
-                confirmBox.hidden = true;
+                closeDelete();
             }
             if (forwardPicker && !forwardPicker.hidden) {
                 closeForwardPicker();

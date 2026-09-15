@@ -906,6 +906,21 @@ test("chat message action sheet owns and restores keyboard focus", async () => {
   assert.match(chat, /trapSheetFocus\(event\)/);
 });
 
+test("chat delete confirmation contains and restores keyboard focus", async () => {
+  const chat = await readFile(new URL("static/chat-v2.js", root), "utf8");
+
+  assert.match(chat, /var deleteTrigger = null;/);
+  assert.match(chat, /tabindex="-1" data-close-delete aria-label=/);
+  assert.match(chat, /function deleteDialogControls\(\)/);
+  assert.match(chat, /\.chat-delete-panel button:not\(\[disabled\]\)/);
+  assert.match(chat, /function trapDeleteFocus\(event\)/);
+  assert.match(chat, /deleteTrigger = sheetTrigger \|\| document\.activeElement;/);
+  assert.match(chat, /deleteDialogControls\(\)[\s\S]*controls\[0\]\.focus\(\)/);
+  assert.match(chat, /deleteTrigger\.isConnected[\s\S]*deleteTrigger\.focus\(\)/);
+  assert.match(chat, /trapDeleteFocus\(event\)/);
+  assert.match(chat, /if \(confirmBox && !confirmBox\.hidden\) \{[\s\S]*closeDelete\(\);/);
+});
+
 test("chat overlays share explicit dark and light theme tokens", async () => {
   const [css, mature] = await Promise.all([
     readFile(new URL("static/chat-v2.css", root), "utf8"),
