@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "파일이 허용된 크기를 초과합니다",
   "chat_attachment_type": "이 파일 형식은 지원되지 않습니다",
   "chat_attachment_error": "첨부 파일 오류",
-  "chat_attachment_failed": "첨부 파일이 전송되지 않음"
+  "chat_attachment_failed": "첨부 파일이 전송되지 않음",
+  "chat_document": "문서",
+  "chat_document_invalid": "유효하지 않은 문서이거나 크기가 16MB를 초과합니다"
 }

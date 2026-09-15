@@ -38,6 +38,8 @@
 /** @typedef {{}} Chat_DeletingInputs */
 /** @typedef {{}} Chat_Dialog_Open_FailedInputs */
 /** @typedef {{}} Chat_DialogsInputs */
+/** @typedef {{}} Chat_DocumentInputs */
+/** @typedef {{}} Chat_Document_InvalidInputs */
 /** @typedef {{}} Chat_EditInputs */
 /** @typedef {{}} Chat_Edit_TitleInputs */
 /** @typedef {{}} Chat_EditedInputs */
@@ -466,6 +468,14 @@ export const chat_dialog_open_failed = /** @type {(inputs: Chat_Dialog_Open_Fail
 
 export const chat_dialogs = /** @type {(inputs: Chat_DialogsInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Conversations`)
+};
+
+export const chat_document = /** @type {(inputs: Chat_DocumentInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Documento`)
+};
+
+export const chat_document_invalid = /** @type {(inputs: Chat_Document_InvalidInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Documento non valido o dimensione superiore a 16 MB`)
 };
 
 export const chat_edit = /** @type {(inputs: Chat_EditInputs) => LocalizedString} */ () => {

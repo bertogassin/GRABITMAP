@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "Le fichier dépasse la taille autorisée",
   "chat_attachment_type": "Ce type de fichier n’est pas pris en charge",
   "chat_attachment_error": "Erreur de pièce jointe",
-  "chat_attachment_failed": "Pièce jointe non envoyée"
+  "chat_attachment_failed": "Pièce jointe non envoyée",
+  "chat_document": "Document",
+  "chat_document_invalid": "Document non valide ou taille supérieure à 16 Mo"
 }

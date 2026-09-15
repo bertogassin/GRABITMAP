@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "Fail melebihi saiz yang dibenarkan",
   "chat_attachment_type": "Jenis fail ini tidak disokong",
   "chat_attachment_error": "Ralat lampiran",
-  "chat_attachment_failed": "Lampiran tidak dihantar"
+  "chat_attachment_failed": "Lampiran tidak dihantar",
+  "chat_document": "Dokumen",
+  "chat_document_invalid": "Dokumen tidak sah atau saiz melebihi 16 MB"
 }

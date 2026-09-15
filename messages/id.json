@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "File melebihi ukuran yang diizinkan",
   "chat_attachment_type": "Jenis file ini tidak didukung",
   "chat_attachment_error": "Kesalahan lampiran",
-  "chat_attachment_failed": "Lampiran tidak terkirim"
+  "chat_attachment_failed": "Lampiran tidak terkirim",
+  "chat_document": "Dokumen",
+  "chat_document_invalid": "Dokumen tidak valid atau ukurannya melebihi 16 MB"
 }

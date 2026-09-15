@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "Faili imezidi ukubwa unaoruhusiwa",
   "chat_attachment_type": "Aina hii ya faili haitumiki",
   "chat_attachment_error": "Hitilafu ya kiambatisho",
-  "chat_attachment_failed": "Kiambatisho hakijatumwa"
+  "chat_attachment_failed": "Kiambatisho hakijatumwa",
+  "chat_document": "Hati",
+  "chat_document_invalid": "Hati si sahihi au ukubwa unazidi MB 16"
 }

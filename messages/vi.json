@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "Tệp vượt quá kích thước cho phép",
   "chat_attachment_type": "Loại tệp này không được hỗ trợ",
   "chat_attachment_error": "Lỗi tệp đính kèm",
-  "chat_attachment_failed": "Chưa gửi tệp đính kèm"
+  "chat_attachment_failed": "Chưa gửi tệp đính kèm",
+  "chat_document": "Tài liệu",
+  "chat_document_invalid": "Tài liệu không hợp lệ hoặc dung lượng vượt quá 16 MB"
 }

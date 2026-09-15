@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "A fájl meghaladja a megengedett méretet",
   "chat_attachment_type": "Ez a fájltípus nem támogatott",
   "chat_attachment_error": "Melléklet-hiba",
-  "chat_attachment_failed": "A melléklet nem lett elküldve"
+  "chat_attachment_failed": "A melléklet nem lett elküldve",
+  "chat_document": "Dokumentum",
+  "chat_document_invalid": "Érvénytelen dokumentum, vagy a mérete meghaladja a 16 MB-ot"
 }

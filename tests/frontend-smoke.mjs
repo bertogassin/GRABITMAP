@@ -183,14 +183,50 @@ test("chat attachment failure states are registered in every locale", async () =
   });
 });
 
+test("chat document labels are registered in every locale", async () => {
+  const keys = [
+    "chat_document",
+    "chat_document_invalid",
+  ];
+  const translations = {};
+
+  for (const locale of locales) {
+    const messages = JSON.parse(
+      await readFile(new URL("messages/" + locale + ".json", root), "utf8"),
+    );
+    translations[locale] = {};
+
+    for (const key of keys) {
+      assert.equal(typeof messages[key], "string");
+      assert.notEqual(messages[key].trim(), "");
+      translations[locale][key] = messages[key];
+    }
+  }
+
+  assert.deepEqual(translations.ru, {
+    chat_document: "Документ",
+    chat_document_invalid: "Недопустимый документ или размер больше 16 МБ",
+  });
+  assert.deepEqual(translations.en, {
+    chat_document: "Document",
+    chat_document_invalid: "Invalid document or file exceeds 16 MB",
+  });
+  assert.deepEqual(translations.fr, {
+    chat_document: "Document",
+    chat_document_invalid: "Document non valide ou taille supérieure à 16 Mo",
+  });
+  assert.deepEqual(translations.ar, {
+    chat_document: "مستند",
+    chat_document_invalid: "مستند غير صالح أو حجمه أكبر من 16 ميغابايت",
+  });
+});
+
 test("browser translation calls cannot add unregistered locale keys", async () => {
   const base = JSON.parse(
     await readFile(new URL("messages/ru.json", root), "utf8"),
   );
   const knownLegacyDebt = [
     "chat_connecting_initial",
-    "chat_document",
-    "chat_document_invalid",
     "chat_media_queue_full",
     "chat_member_muted",
     "chat_mic_request",

@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "ਫ਼ਾਈਲ ਮਨਜ਼ੂਰਸ਼ੁਦਾ ਆਕਾਰ ਤੋਂ ਵੱਡੀ ਹੈ",
   "chat_attachment_type": "ਇਹ ਫ਼ਾਈਲ ਕਿਸਮ ਸਮਰਥਿਤ ਨਹੀਂ ਹੈ",
   "chat_attachment_error": "ਅਟੈਚਮੈਂਟ ਗਲਤੀ",
-  "chat_attachment_failed": "ਅਟੈਚਮੈਂਟ ਨਹੀਂ ਭੇਜਿਆ ਗਿਆ"
+  "chat_attachment_failed": "ਅਟੈਚਮੈਂਟ ਨਹੀਂ ਭੇਜਿਆ ਗਿਆ",
+  "chat_document": "ਦਸਤਾਵੇਜ਼",
+  "chat_document_invalid": "ਦਸਤਾਵੇਜ਼ ਅਵੈਧ ਹੈ ਜਾਂ ਆਕਾਰ 16 MB ਤੋਂ ਵੱਧ ਹੈ"
 }

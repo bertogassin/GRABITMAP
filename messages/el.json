@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "Το αρχείο υπερβαίνει το επιτρεπόμενο μέγεθος",
   "chat_attachment_type": "Αυτός ο τύπος αρχείου δεν υποστηρίζεται",
   "chat_attachment_error": "Σφάλμα συνημμένου",
-  "chat_attachment_failed": "Το συνημμένο δεν στάλθηκε"
+  "chat_attachment_failed": "Το συνημμένο δεν στάλθηκε",
+  "chat_document": "Έγγραφο",
+  "chat_document_invalid": "Μη έγκυρο έγγραφο ή μέγεθος άνω των 16 MB"
 }

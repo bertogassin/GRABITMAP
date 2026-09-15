@@ -40,6 +40,8 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Chat_DeletingInputs */
 /** @typedef {{}} Chat_Dialog_Open_FailedInputs */
 /** @typedef {{}} Chat_DialogsInputs */
+/** @typedef {{}} Chat_DocumentInputs */
+/** @typedef {{}} Chat_Document_InvalidInputs */
 /** @typedef {{}} Chat_EditInputs */
 /** @typedef {{}} Chat_Edit_TitleInputs */
 /** @typedef {{}} Chat_EditedInputs */
@@ -2019,6 +2021,94 @@ export const chat_dialogs = /** @type {((inputs?: Chat_DialogsInputs, options?: 
 	if (locale === "sv") return __sv.chat_dialogs(inputs)
 	if (locale === "he") return __he.chat_dialogs(inputs)
 	return __ru.chat_dialogs(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Document" |
+*
+* @param {Chat_DocumentInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_document = /** @type {((inputs?: Chat_DocumentInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_DocumentInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_document(inputs)
+	if (locale === "fr") return __fr.chat_document(inputs)
+	if (locale === "es") return __es.chat_document(inputs)
+	if (locale === "zh") return __zh.chat_document(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_document(inputs)
+	if (locale === "hi") return __hi.chat_document(inputs)
+	if (locale === "ar") return __ar.chat_document(inputs)
+	if (locale === "pt") return __pt.chat_document(inputs)
+	if (locale === "de") return __de.chat_document(inputs)
+	if (locale === "ja") return __ja.chat_document(inputs)
+	if (locale === "ko") return __ko.chat_document(inputs)
+	if (locale === "it") return __it.chat_document(inputs)
+	if (locale === "tr") return __tr.chat_document(inputs)
+	if (locale === "pl") return __pl.chat_document(inputs)
+	if (locale === "uk") return __uk.chat_document(inputs)
+	if (locale === "nl") return __nl.chat_document(inputs)
+	if (locale === "vi") return __vi.chat_document(inputs)
+	if (locale === "id") return __id.chat_document(inputs)
+	if (locale === "ms") return __ms.chat_document(inputs)
+	if (locale === "th") return __th.chat_document(inputs)
+	if (locale === "fa") return __fa.chat_document(inputs)
+	if (locale === "ur") return __ur.chat_document(inputs)
+	if (locale === "bn") return __bn.chat_document(inputs)
+	if (locale === "pa") return __pa.chat_document(inputs)
+	if (locale === "sw") return __sw.chat_document(inputs)
+	if (locale === "el") return __el.chat_document(inputs)
+	if (locale === "cs") return __cs.chat_document(inputs)
+	if (locale === "ro") return __ro.chat_document(inputs)
+	if (locale === "hu") return __hu.chat_document(inputs)
+	if (locale === "sv") return __sv.chat_document(inputs)
+	if (locale === "he") return __he.chat_document(inputs)
+	return __ru.chat_document(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Invalid document or file exceeds 16 MB" |
+*
+* @param {Chat_Document_InvalidInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_document_invalid = /** @type {((inputs?: Chat_Document_InvalidInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Document_InvalidInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_document_invalid(inputs)
+	if (locale === "fr") return __fr.chat_document_invalid(inputs)
+	if (locale === "es") return __es.chat_document_invalid(inputs)
+	if (locale === "zh") return __zh.chat_document_invalid(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_document_invalid(inputs)
+	if (locale === "hi") return __hi.chat_document_invalid(inputs)
+	if (locale === "ar") return __ar.chat_document_invalid(inputs)
+	if (locale === "pt") return __pt.chat_document_invalid(inputs)
+	if (locale === "de") return __de.chat_document_invalid(inputs)
+	if (locale === "ja") return __ja.chat_document_invalid(inputs)
+	if (locale === "ko") return __ko.chat_document_invalid(inputs)
+	if (locale === "it") return __it.chat_document_invalid(inputs)
+	if (locale === "tr") return __tr.chat_document_invalid(inputs)
+	if (locale === "pl") return __pl.chat_document_invalid(inputs)
+	if (locale === "uk") return __uk.chat_document_invalid(inputs)
+	if (locale === "nl") return __nl.chat_document_invalid(inputs)
+	if (locale === "vi") return __vi.chat_document_invalid(inputs)
+	if (locale === "id") return __id.chat_document_invalid(inputs)
+	if (locale === "ms") return __ms.chat_document_invalid(inputs)
+	if (locale === "th") return __th.chat_document_invalid(inputs)
+	if (locale === "fa") return __fa.chat_document_invalid(inputs)
+	if (locale === "ur") return __ur.chat_document_invalid(inputs)
+	if (locale === "bn") return __bn.chat_document_invalid(inputs)
+	if (locale === "pa") return __pa.chat_document_invalid(inputs)
+	if (locale === "sw") return __sw.chat_document_invalid(inputs)
+	if (locale === "el") return __el.chat_document_invalid(inputs)
+	if (locale === "cs") return __cs.chat_document_invalid(inputs)
+	if (locale === "ro") return __ro.chat_document_invalid(inputs)
+	if (locale === "hu") return __hu.chat_document_invalid(inputs)
+	if (locale === "sv") return __sv.chat_document_invalid(inputs)
+	if (locale === "he") return __he.chat_document_invalid(inputs)
+	return __ru.chat_document_invalid(inputs)
 });
 /**
 * | output |

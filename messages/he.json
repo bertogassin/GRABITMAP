@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "הקובץ חורג מהגודל המותר",
   "chat_attachment_type": "סוג הקובץ הזה אינו נתמך",
   "chat_attachment_error": "שגיאה בקובץ המצורף",
-  "chat_attachment_failed": "הקובץ המצורף לא נשלח"
+  "chat_attachment_failed": "הקובץ המצורף לא נשלח",
+  "chat_document": "מסמך",
+  "chat_document_invalid": "מסמך לא תקין או שגודלו עולה על 16 MB"
 }

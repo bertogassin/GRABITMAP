@@ -312,5 +312,7 @@
   "chat_attachment_too_large": "Dosya izin verilen boyutu aşıyor",
   "chat_attachment_type": "Bu dosya türü desteklenmiyor",
   "chat_attachment_error": "Ek hatası",
-  "chat_attachment_failed": "Ek gönderilmedi"
+  "chat_attachment_failed": "Ek gönderilmedi",
+  "chat_document": "Belge",
+  "chat_document_invalid": "Geçersiz belge veya boyut 16 MB’den büyük"
 }
