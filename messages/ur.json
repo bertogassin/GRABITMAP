@@ -325,5 +325,12 @@
   "chat_mic_request": "مائیکروفون تک رسائی کی اجازت دیں…",
   "chat_voice_record_failed": "فون نے ریکارڈنگ روک دی۔ دوبارہ کوشش کریں۔",
   "chat_voice_stop_send": "روکیں اور بھیجیں",
-  "chat_voice_too_large": "ریکارڈنگ بہت طویل ہے — زیادہ سے زیادہ 2 منٹ"
+  "chat_voice_too_large": "ریکارڈنگ بہت طویل ہے — زیادہ سے زیادہ 2 منٹ",
+  "chat_video": "ویڈیو",
+  "chat_video_duration": "ویڈیو 3 منٹ سے زیادہ طویل نہیں ہونی چاہیے",
+  "chat_video_fullscreen": "فل اسکرین",
+  "chat_video_invalid": "ویڈیو: MP4/WebM، زیادہ سے زیادہ 40 MB",
+  "chat_video_pip": "چھوٹی ونڈو",
+  "chat_video_playback_error": "ویڈیو نہیں چل سکی · فائل کھولیں",
+  "chat_video_speed": "رفتار"
 }

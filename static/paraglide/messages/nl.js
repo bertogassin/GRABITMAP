@@ -129,6 +129,13 @@
 /** @typedef {{}} Chat_Upload_CancelledInputs */
 /** @typedef {{}} Chat_Upload_ProgressInputs */
 /** @typedef {{}} Chat_User_UnavailableInputs */
+/** @typedef {{}} Chat_VideoInputs */
+/** @typedef {{}} Chat_Video_DurationInputs */
+/** @typedef {{}} Chat_Video_FullscreenInputs */
+/** @typedef {{}} Chat_Video_InvalidInputs */
+/** @typedef {{}} Chat_Video_PipInputs */
+/** @typedef {{}} Chat_Video_Playback_ErrorInputs */
+/** @typedef {{}} Chat_Video_SpeedInputs */
 /** @typedef {{}} Chat_VoiceInputs */
 /** @typedef {{}} Chat_Voice_ErrorInputs */
 /** @typedef {{}} Chat_Voice_FailedInputs */
@@ -843,6 +850,34 @@ export const chat_upload_progress = /** @type {(inputs: Chat_Upload_ProgressInpu
 
 export const chat_user_unavailable = /** @type {(inputs: Chat_User_UnavailableInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Gebruiker niet beschikbaar`)
+};
+
+export const chat_video = /** @type {(inputs: Chat_VideoInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Video`)
+};
+
+export const chat_video_duration = /** @type {(inputs: Chat_Video_DurationInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`De video mag niet langer zijn dan 3 minuten`)
+};
+
+export const chat_video_fullscreen = /** @type {(inputs: Chat_Video_FullscreenInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Volledig scherm`)
+};
+
+export const chat_video_invalid = /** @type {(inputs: Chat_Video_InvalidInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Video: MP4/WebM, maximaal 40 MB`)
+};
+
+export const chat_video_pip = /** @type {(inputs: Chat_Video_PipInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Klein venster`)
+};
+
+export const chat_video_playback_error = /** @type {(inputs: Chat_Video_Playback_ErrorInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Video kan niet worden afgespeeld · Bestand openen`)
+};
+
+export const chat_video_speed = /** @type {(inputs: Chat_Video_SpeedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Snelheid`)
 };
 
 export const chat_voice = /** @type {(inputs: Chat_VoiceInputs) => LocalizedString} */ () => {

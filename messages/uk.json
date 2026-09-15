@@ -325,5 +325,12 @@
   "chat_mic_request": "Дозвольте доступ до мікрофона…",
   "chat_voice_record_failed": "Телефон зупинив запис. Спробуйте ще раз.",
   "chat_voice_stop_send": "Зупинити й надіслати",
-  "chat_voice_too_large": "Запис надто довгий — максимум 2 хвилини"
+  "chat_voice_too_large": "Запис надто довгий — максимум 2 хвилини",
+  "chat_video": "Відео",
+  "chat_video_duration": "Відео має бути не довшим за 3 хвилини",
+  "chat_video_fullscreen": "На весь екран",
+  "chat_video_invalid": "Відео: MP4/WebM, максимум 40 МБ",
+  "chat_video_pip": "Маленьке вікно",
+  "chat_video_playback_error": "Не вдалося відтворити відео · Відкрити файл",
+  "chat_video_speed": "Швидкість"
 }

@@ -325,5 +325,12 @@
   "chat_mic_request": "Ruhusu ufikiaji wa maikrofoni…",
   "chat_voice_record_failed": "Simu imesimamisha kurekodi. Jaribu tena.",
   "chat_voice_stop_send": "Simamisha na utume",
-  "chat_voice_too_large": "Rekodi ni ndefu sana — upeo wa dakika 2"
+  "chat_voice_too_large": "Rekodi ni ndefu sana — upeo wa dakika 2",
+  "chat_video": "Video",
+  "chat_video_duration": "Video isiwe ndefu zaidi ya dakika 3",
+  "chat_video_fullscreen": "Skrini nzima",
+  "chat_video_invalid": "Video: MP4/WebM, upeo wa MB 40",
+  "chat_video_pip": "Dirisha dogo",
+  "chat_video_playback_error": "Video haikuweza kuchezwa · Fungua faili",
+  "chat_video_speed": "Kasi"
 }

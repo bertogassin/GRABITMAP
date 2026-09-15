@@ -325,5 +325,12 @@
   "chat_mic_request": "Permite el acceso al micrófono…",
   "chat_voice_record_failed": "El teléfono detuvo la grabación. Inténtalo de nuevo.",
   "chat_voice_stop_send": "Detener y enviar",
-  "chat_voice_too_large": "La grabación es demasiado larga — máximo 2 minutos"
+  "chat_voice_too_large": "La grabación es demasiado larga — máximo 2 minutos",
+  "chat_video": "Vídeo",
+  "chat_video_duration": "El vídeo no debe durar más de 3 minutos",
+  "chat_video_fullscreen": "Pantalla completa",
+  "chat_video_invalid": "Vídeo: MP4/WebM, máximo 40 MB",
+  "chat_video_pip": "Ventana pequeña",
+  "chat_video_playback_error": "No se pudo reproducir el vídeo · Abrir archivo",
+  "chat_video_speed": "Velocidad"
 }

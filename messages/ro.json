@@ -325,5 +325,12 @@
   "chat_mic_request": "Permiteți accesul la microfon…",
   "chat_voice_record_failed": "Telefonul a oprit înregistrarea. Încercați din nou.",
   "chat_voice_stop_send": "Oprește și trimite",
-  "chat_voice_too_large": "Înregistrarea este prea lungă — maximum 2 minute"
+  "chat_voice_too_large": "Înregistrarea este prea lungă — maximum 2 minute",
+  "chat_video": "Videoclip",
+  "chat_video_duration": "Videoclipul nu trebuie să depășească 3 minute",
+  "chat_video_fullscreen": "Ecran complet",
+  "chat_video_invalid": "Video: MP4/WebM, maximum 40 MB",
+  "chat_video_pip": "Fereastră mică",
+  "chat_video_playback_error": "Videoclipul nu a putut fi redat · Deschide fișierul",
+  "chat_video_speed": "Viteză"
 }

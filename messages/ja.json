@@ -325,5 +325,12 @@
   "chat_mic_request": "マイクへのアクセスを許可してください…",
   "chat_voice_record_failed": "端末が録音を停止しました。もう一度お試しください。",
   "chat_voice_stop_send": "停止して送信",
-  "chat_voice_too_large": "録音が長すぎます — 最大2分"
+  "chat_voice_too_large": "録音が長すぎます — 最大2分",
+  "chat_video": "動画",
+  "chat_video_duration": "動画は3分以内にしてください",
+  "chat_video_fullscreen": "全画面",
+  "chat_video_invalid": "動画：MP4/WebM、最大40 MB",
+  "chat_video_pip": "ピクチャーインピクチャー",
+  "chat_video_playback_error": "動画を再生できませんでした · ファイルを開く",
+  "chat_video_speed": "速度"
 }

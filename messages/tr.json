@@ -325,5 +325,12 @@
   "chat_mic_request": "Mikrofon erişimine izin verin…",
   "chat_voice_record_failed": "Telefon kaydı durdurdu. Tekrar deneyin.",
   "chat_voice_stop_send": "Durdur ve gönder",
-  "chat_voice_too_large": "Kayıt çok uzun — en fazla 2 dakika"
+  "chat_voice_too_large": "Kayıt çok uzun — en fazla 2 dakika",
+  "chat_video": "Video",
+  "chat_video_duration": "Video 3 dakikadan uzun olmamalıdır",
+  "chat_video_fullscreen": "Tam ekran",
+  "chat_video_invalid": "Video: MP4/WebM, en fazla 40 MB",
+  "chat_video_pip": "Küçük pencere",
+  "chat_video_playback_error": "Video oynatılamadı · Dosyayı aç",
+  "chat_video_speed": "Hız"
 }

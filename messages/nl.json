@@ -325,5 +325,12 @@
   "chat_mic_request": "Geef toegang tot de microfoon…",
   "chat_voice_record_failed": "De telefoon heeft de opname gestopt. Probeer het opnieuw.",
   "chat_voice_stop_send": "Stoppen en verzenden",
-  "chat_voice_too_large": "De opname is te lang — maximaal 2 minuten"
+  "chat_voice_too_large": "De opname is te lang — maximaal 2 minuten",
+  "chat_video": "Video",
+  "chat_video_duration": "De video mag niet langer zijn dan 3 minuten",
+  "chat_video_fullscreen": "Volledig scherm",
+  "chat_video_invalid": "Video: MP4/WebM, maximaal 40 MB",
+  "chat_video_pip": "Klein venster",
+  "chat_video_playback_error": "Video kan niet worden afgespeeld · Bestand openen",
+  "chat_video_speed": "Snelheid"
 }

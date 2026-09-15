@@ -325,5 +325,12 @@
   "chat_mic_request": "יש לאפשר גישה למיקרופון…",
   "chat_voice_record_failed": "הטלפון הפסיק את ההקלטה. נסו שוב.",
   "chat_voice_stop_send": "עצירה ושליחה",
-  "chat_voice_too_large": "ההקלטה ארוכה מדי — עד 2 דקות"
+  "chat_voice_too_large": "ההקלטה ארוכה מדי — עד 2 דקות",
+  "chat_video": "סרטון",
+  "chat_video_duration": "אורך הסרטון לא יכול לעלות על 3 דקות",
+  "chat_video_fullscreen": "מסך מלא",
+  "chat_video_invalid": "סרטון: MP4/WebM, עד 40 MB",
+  "chat_video_pip": "חלון קטן",
+  "chat_video_playback_error": "לא ניתן להפעיל את הסרטון · פתיחת הקובץ",
+  "chat_video_speed": "מהירות"
 }
