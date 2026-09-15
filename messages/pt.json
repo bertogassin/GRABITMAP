@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "Upload interrompido · nova tentativa automática",
   "chat_attachment_timeout": "A rede ou verificação demorou demais · tente novamente",
   "chat_attachment_too_large": "O arquivo excede o tamanho permitido",
-  "chat_attachment_type": "Este tipo de arquivo não é compatível"
+  "chat_attachment_type": "Este tipo de arquivo não é compatível",
+  "chat_attachment_error": "Erro no anexo",
+  "chat_attachment_failed": "Anexo não enviado"
 }

@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "আপলোড বাধাগ্রস্ত হয়েছে · স্বয়ংক্রিয়ভাবে আবার চেষ্টা করা হবে",
   "chat_attachment_timeout": "নেটওয়ার্ক বা যাচাইয়ে বেশি সময় লেগেছে · আবার চেষ্টা করুন",
   "chat_attachment_too_large": "ফাইলের আকার অনুমোদিত সীমার বেশি",
-  "chat_attachment_type": "এই ধরনের ফাইল সমর্থিত নয়"
+  "chat_attachment_type": "এই ধরনের ফাইল সমর্থিত নয়",
+  "chat_attachment_error": "সংযুক্তিতে ত্রুটি",
+  "chat_attachment_failed": "সংযুক্তি পাঠানো হয়নি"
 }

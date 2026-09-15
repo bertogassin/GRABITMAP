@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "بارگذاری قطع شد · تلاش مجدد به‌صورت خودکار",
   "chat_attachment_timeout": "شبکه یا بررسی بیش از حد طول کشید · دوباره تلاش کنید",
   "chat_attachment_too_large": "حجم فایل از حد مجاز بیشتر است",
-  "chat_attachment_type": "این نوع فایل پشتیبانی نمی‌شود"
+  "chat_attachment_type": "این نوع فایل پشتیبانی نمی‌شود",
+  "chat_attachment_error": "خطای پیوست",
+  "chat_attachment_failed": "پیوست ارسال نشد"
 }

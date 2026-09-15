@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "ההעלאה נקטעה · ניסיון חוזר אוטומטי",
   "chat_attachment_timeout": "הרשת או הבדיקה ארכו זמן רב מדי · נסו שוב",
   "chat_attachment_too_large": "הקובץ חורג מהגודל המותר",
-  "chat_attachment_type": "סוג הקובץ הזה אינו נתמך"
+  "chat_attachment_type": "סוג הקובץ הזה אינו נתמך",
+  "chat_attachment_error": "שגיאה בקובץ המצורף",
+  "chat_attachment_failed": "הקובץ המצורף לא נשלח"
 }

@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "アップロードが中断されました · 自動的に再試行します",
   "chat_attachment_timeout": "通信または確認に時間がかかりすぎました · 再試行してください",
   "chat_attachment_too_large": "ファイルが許容サイズを超えています",
-  "chat_attachment_type": "このファイル形式はサポートされていません"
+  "chat_attachment_type": "このファイル形式はサポートされていません",
+  "chat_attachment_error": "添付ファイルエラー",
+  "chat_attachment_failed": "添付ファイルは送信されませんでした"
 }

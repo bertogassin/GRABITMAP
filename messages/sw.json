@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "Upakiaji umekatizwa · inajaribu tena kiotomatiki",
   "chat_attachment_timeout": "Mtandao au ukaguzi umechukua muda mrefu · jaribu tena",
   "chat_attachment_too_large": "Faili imezidi ukubwa unaoruhusiwa",
-  "chat_attachment_type": "Aina hii ya faili haitumiki"
+  "chat_attachment_type": "Aina hii ya faili haitumiki",
+  "chat_attachment_error": "Hitilafu ya kiambatisho",
+  "chat_attachment_failed": "Kiambatisho hakijatumwa"
 }

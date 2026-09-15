@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "업로드 중단됨 · 자동으로 다시 시도합니다",
   "chat_attachment_timeout": "네트워크 또는 확인 시간이 너무 오래 걸림 · 다시 시도하세요",
   "chat_attachment_too_large": "파일이 허용된 크기를 초과합니다",
-  "chat_attachment_type": "이 파일 형식은 지원되지 않습니다"
+  "chat_attachment_type": "이 파일 형식은 지원되지 않습니다",
+  "chat_attachment_error": "첨부 파일 오류",
+  "chat_attachment_failed": "첨부 파일이 전송되지 않음"
 }

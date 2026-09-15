@@ -14,6 +14,8 @@
 /** @typedef {{}} Chat_All_ReadInputs */
 /** @typedef {{}} Chat_AttachmentInputs */
 /** @typedef {{}} Chat_Attachment_BusyInputs */
+/** @typedef {{}} Chat_Attachment_ErrorInputs */
+/** @typedef {{}} Chat_Attachment_FailedInputs */
 /** @typedef {{}} Chat_Attachment_InterruptedInputs */
 /** @typedef {{}} Chat_Attachment_OpenInputs */
 /** @typedef {{}} Chat_Attachment_ProcessingInputs */
@@ -368,6 +370,14 @@ export const chat_attachment = /** @type {(inputs: Chat_AttachmentInputs) => Loc
 
 export const chat_attachment_busy = /** @type {(inputs: Chat_Attachment_BusyInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`ਸਰਵਰ ਹੋਰ ਫ਼ਾਈਲ ਦੀ ਜਾਂਚ ਕਰ ਰਿਹਾ ਹੈ · ਆਪਣੇ ਆਪ ਮੁੜ ਕੋਸ਼ਿਸ਼ ਹੋਵੇਗੀ`)
+};
+
+export const chat_attachment_error = /** @type {(inputs: Chat_Attachment_ErrorInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`ਅਟੈਚਮੈਂਟ ਗਲਤੀ`)
+};
+
+export const chat_attachment_failed = /** @type {(inputs: Chat_Attachment_FailedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`ਅਟੈਚਮੈਂਟ ਨਹੀਂ ਭੇਜਿਆ ਗਿਆ`)
 };
 
 export const chat_attachment_interrupted = /** @type {(inputs: Chat_Attachment_InterruptedInputs) => LocalizedString} */ () => {

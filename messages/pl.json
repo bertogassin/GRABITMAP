@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "Przesyłanie przerwane · automatyczna ponowna próba",
   "chat_attachment_timeout": "Sieć lub sprawdzanie trwało zbyt długo · spróbuj ponownie",
   "chat_attachment_too_large": "Plik przekracza dozwolony rozmiar",
-  "chat_attachment_type": "Ten typ pliku nie jest obsługiwany"
+  "chat_attachment_type": "Ten typ pliku nie jest obsługiwany",
+  "chat_attachment_error": "Błąd załącznika",
+  "chat_attachment_failed": "Załącznik nie został wysłany"
 }

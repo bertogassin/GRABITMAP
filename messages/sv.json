@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "Uppladdningen avbröts · försöker igen automatiskt",
   "chat_attachment_timeout": "Nätverket eller kontrollen tog för lång tid · försök igen",
   "chat_attachment_too_large": "Filen överskrider den tillåtna storleken",
-  "chat_attachment_type": "Den här filtypen stöds inte"
+  "chat_attachment_type": "Den här filtypen stöds inte",
+  "chat_attachment_error": "Bilagefel",
+  "chat_attachment_failed": "Bilagan skickades inte"
 }

@@ -14,6 +14,8 @@
 /** @typedef {{}} Chat_All_ReadInputs */
 /** @typedef {{}} Chat_AttachmentInputs */
 /** @typedef {{}} Chat_Attachment_BusyInputs */
+/** @typedef {{}} Chat_Attachment_ErrorInputs */
+/** @typedef {{}} Chat_Attachment_FailedInputs */
 /** @typedef {{}} Chat_Attachment_InterruptedInputs */
 /** @typedef {{}} Chat_Attachment_OpenInputs */
 /** @typedef {{}} Chat_Attachment_ProcessingInputs */
@@ -368,6 +370,14 @@ export const chat_attachment = /** @type {(inputs: Chat_AttachmentInputs) => Loc
 
 export const chat_attachment_busy = /** @type {(inputs: Chat_Attachment_BusyInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`서버가 다른 파일을 확인 중 · 자동으로 다시 시도합니다`)
+};
+
+export const chat_attachment_error = /** @type {(inputs: Chat_Attachment_ErrorInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`첨부 파일 오류`)
+};
+
+export const chat_attachment_failed = /** @type {(inputs: Chat_Attachment_FailedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`첨부 파일이 전송되지 않음`)
 };
 
 export const chat_attachment_interrupted = /** @type {(inputs: Chat_Attachment_InterruptedInputs) => LocalizedString} */ () => {

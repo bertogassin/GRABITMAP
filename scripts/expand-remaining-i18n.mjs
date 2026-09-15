@@ -82,6 +82,20 @@ const NEW = {
     id:"Jenis file ini tidak didukung",ms:"Jenis fail ini tidak disokong",th:"ไม่รองรับไฟล์ประเภทนี้",fa:"این نوع فایل پشتیبانی نمی‌شود",ur:"اس فائل کی قسم معاونت یافتہ نہیں ہے",bn:"এই ধরনের ফাইল সমর্থিত নয়",
     pa:"ਇਹ ਫ਼ਾਈਲ ਕਿਸਮ ਸਮਰਥਿਤ ਨਹੀਂ ਹੈ",sw:"Aina hii ya faili haitumiki",el:"Αυτός ο τύπος αρχείου δεν υποστηρίζεται",cs:"Tento typ souboru není podporován",ro:"Acest tip de fișier nu este acceptat",hu:"Ez a fájltípus nem támogatott",sv:"Den här filtypen stöds inte",he:"סוג הקובץ הזה אינו נתמך",
   }),
+  chat_attachment_error: L({
+    ru:"Ошибка вложения",en:"Attachment error",fr:"Erreur de pièce jointe",es:"Error del archivo adjunto",zh:"附件错误","zh-TW":"附件錯誤",
+    hi:"अटैचमेंट में त्रुटि",ar:"خطأ في المرفق",pt:"Erro no anexo",de:"Anhangfehler",ja:"添付ファイルエラー",ko:"첨부 파일 오류",
+    it:"Errore dell’allegato",tr:"Ek hatası",pl:"Błąd załącznika",uk:"Помилка вкладення",nl:"Bijlagefout",vi:"Lỗi tệp đính kèm",
+    id:"Kesalahan lampiran",ms:"Ralat lampiran",th:"ข้อผิดพลาดของไฟล์แนบ",fa:"خطای پیوست",ur:"منسلکہ کی خرابی",bn:"সংযুক্তিতে ত্রুটি",
+    pa:"ਅਟੈਚਮੈਂਟ ਗਲਤੀ",sw:"Hitilafu ya kiambatisho",el:"Σφάλμα συνημμένου",cs:"Chyba přílohy",ro:"Eroare la atașament",hu:"Melléklet-hiba",sv:"Bilagefel",he:"שגיאה בקובץ המצורף",
+  }),
+  chat_attachment_failed: L({
+    ru:"Вложение не отправлено",en:"Attachment not sent",fr:"Pièce jointe non envoyée",es:"Archivo adjunto no enviado",zh:"附件未发送","zh-TW":"附件未傳送",
+    hi:"अटैचमेंट नहीं भेजा गया",ar:"لم يُرسل المرفق",pt:"Anexo não enviado",de:"Anhang nicht gesendet",ja:"添付ファイルは送信されませんでした",ko:"첨부 파일이 전송되지 않음",
+    it:"Allegato non inviato",tr:"Ek gönderilmedi",pl:"Załącznik nie został wysłany",uk:"Вкладення не надіслано",nl:"Bijlage niet verzonden",vi:"Chưa gửi tệp đính kèm",
+    id:"Lampiran tidak terkirim",ms:"Lampiran tidak dihantar",th:"ไม่ได้ส่งไฟล์แนบ",fa:"پیوست ارسال نشد",ur:"منسلکہ نہیں بھیجا گیا",bn:"সংযুক্তি পাঠানো হয়নি",
+    pa:"ਅਟੈਚਮੈਂਟ ਨਹੀਂ ਭੇਜਿਆ ਗਿਆ",sw:"Kiambatisho hakijatumwa",el:"Το συνημμένο δεν στάλθηκε",cs:"Příloha nebyla odeslána",ro:"Atașamentul nu a fost trimis",hu:"A melléklet nem lett elküldve",sv:"Bilagan skickades inte",he:"הקובץ המצורף לא נשלח",
+  }),
   chat_offline: L({
     ru:"не в сети",en:"offline",fr:"hors ligne",es:"desconectado",zh:"离线","zh-TW":"離線",
     hi:"ऑफ़लाइन",ar:"غير متصل",pt:"offline",de:"offline",ja:"オフライン",ko:"오프라인",

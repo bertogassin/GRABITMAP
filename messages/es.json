@@ -310,5 +310,7 @@
   "chat_attachment_interrupted": "Carga interrumpida · reintentando automáticamente",
   "chat_attachment_timeout": "La red o la comprobación tardó demasiado · inténtalo de nuevo",
   "chat_attachment_too_large": "El archivo supera el tamaño permitido",
-  "chat_attachment_type": "Este tipo de archivo no es compatible"
+  "chat_attachment_type": "Este tipo de archivo no es compatible",
+  "chat_attachment_error": "Error del archivo adjunto",
+  "chat_attachment_failed": "Archivo adjunto no enviado"
 }
