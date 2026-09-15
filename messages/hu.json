@@ -314,5 +314,8 @@
   "chat_attachment_error": "Melléklet-hiba",
   "chat_attachment_failed": "A melléklet nem lett elküldve",
   "chat_document": "Dokumentum",
-  "chat_document_invalid": "Érvénytelen dokumentum, vagy a mérete meghaladja a 16 MB-ot"
+  "chat_document_invalid": "Érvénytelen dokumentum, vagy a mérete meghaladja a 16 MB-ot",
+  "chat_pin": "Kitűzés",
+  "chat_unpin": "Kitűzés megszüntetése",
+  "chat_pinned_message": "Kitűzött üzenet"
 }

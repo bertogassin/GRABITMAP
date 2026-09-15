@@ -314,5 +314,8 @@
   "chat_attachment_error": "שגיאה בקובץ המצורף",
   "chat_attachment_failed": "הקובץ המצורף לא נשלח",
   "chat_document": "מסמך",
-  "chat_document_invalid": "מסמך לא תקין או שגודלו עולה על 16 MB"
+  "chat_document_invalid": "מסמך לא תקין או שגודלו עולה על 16 MB",
+  "chat_pin": "הצמדה",
+  "chat_unpin": "ביטול הצמדה",
+  "chat_pinned_message": "הודעה מוצמדת"
 }

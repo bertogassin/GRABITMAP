@@ -93,6 +93,8 @@
 /** @typedef {{}} Chat_Photo_OfflineInputs */
 /** @typedef {{}} Chat_Photo_Over_8mbInputs */
 /** @typedef {{}} Chat_Photo_Too_BigInputs */
+/** @typedef {{}} Chat_PinInputs */
+/** @typedef {{}} Chat_Pinned_MessageInputs */
 /** @typedef {{}} Chat_Profile_MissingInputs */
 /** @typedef {{}} Chat_Rate_LimitedInputs */
 /** @typedef {{}} Chat_RecordingInputs */
@@ -120,6 +122,7 @@
 /** @typedef {{}} Chat_Status_SendingInputs */
 /** @typedef {{}} Chat_TitleInputs */
 /** @typedef {{}} Chat_TypingInputs */
+/** @typedef {{}} Chat_UnpinInputs */
 /** @typedef {{}} Chat_User_UnavailableInputs */
 /** @typedef {{}} Chat_VoiceInputs */
 /** @typedef {{}} Chat_Voice_ErrorInputs */
@@ -690,6 +693,14 @@ export const chat_photo_too_big = /** @type {(inputs: Chat_Photo_Too_BigInputs) 
 	return /** @type {LocalizedString} */ (`Photo trop grande`)
 };
 
+export const chat_pin = /** @type {(inputs: Chat_PinInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Épingler`)
+};
+
+export const chat_pinned_message = /** @type {(inputs: Chat_Pinned_MessageInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Message épinglé`)
+};
+
 export const chat_profile_missing = /** @type {(inputs: Chat_Profile_MissingInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Profil introuvable`)
 };
@@ -796,6 +807,10 @@ export const chat_title = /** @type {(inputs: Chat_TitleInputs) => LocalizedStri
 
 export const chat_typing = /** @type {(inputs: Chat_TypingInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`typing…`)
+};
+
+export const chat_unpin = /** @type {(inputs: Chat_UnpinInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Désépingler`)
 };
 
 export const chat_user_unavailable = /** @type {(inputs: Chat_User_UnavailableInputs) => LocalizedString} */ () => {

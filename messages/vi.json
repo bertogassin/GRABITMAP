@@ -314,5 +314,8 @@
   "chat_attachment_error": "Lỗi tệp đính kèm",
   "chat_attachment_failed": "Chưa gửi tệp đính kèm",
   "chat_document": "Tài liệu",
-  "chat_document_invalid": "Tài liệu không hợp lệ hoặc dung lượng vượt quá 16 MB"
+  "chat_document_invalid": "Tài liệu không hợp lệ hoặc dung lượng vượt quá 16 MB",
+  "chat_pin": "Ghim",
+  "chat_unpin": "Bỏ ghim",
+  "chat_pinned_message": "Tin nhắn đã ghim"
 }

@@ -314,5 +314,8 @@
   "chat_attachment_error": "Chyba přílohy",
   "chat_attachment_failed": "Příloha nebyla odeslána",
   "chat_document": "Dokument",
-  "chat_document_invalid": "Neplatný dokument nebo velikost přesahuje 16 MB"
+  "chat_document_invalid": "Neplatný dokument nebo velikost přesahuje 16 MB",
+  "chat_pin": "Připnout",
+  "chat_unpin": "Odepnout",
+  "chat_pinned_message": "Připnutá zpráva"
 }

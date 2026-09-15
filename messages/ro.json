@@ -314,5 +314,8 @@
   "chat_attachment_error": "Eroare la atașament",
   "chat_attachment_failed": "Atașamentul nu a fost trimis",
   "chat_document": "Document",
-  "chat_document_invalid": "Document nevalid sau dimensiune mai mare de 16 MB"
+  "chat_document_invalid": "Document nevalid sau dimensiune mai mare de 16 MB",
+  "chat_pin": "Fixează",
+  "chat_unpin": "Anulează fixarea",
+  "chat_pinned_message": "Mesaj fixat"
 }

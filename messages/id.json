@@ -314,5 +314,8 @@
   "chat_attachment_error": "Kesalahan lampiran",
   "chat_attachment_failed": "Lampiran tidak terkirim",
   "chat_document": "Dokumen",
-  "chat_document_invalid": "Dokumen tidak valid atau ukurannya melebihi 16 MB"
+  "chat_document_invalid": "Dokumen tidak valid atau ukurannya melebihi 16 MB",
+  "chat_pin": "Sematkan",
+  "chat_unpin": "Lepas sematan",
+  "chat_pinned_message": "Pesan yang disematkan"
 }

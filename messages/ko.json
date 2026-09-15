@@ -314,5 +314,8 @@
   "chat_attachment_error": "첨부 파일 오류",
   "chat_attachment_failed": "첨부 파일이 전송되지 않음",
   "chat_document": "문서",
-  "chat_document_invalid": "유효하지 않은 문서이거나 크기가 16MB를 초과합니다"
+  "chat_document_invalid": "유효하지 않은 문서이거나 크기가 16MB를 초과합니다",
+  "chat_pin": "고정",
+  "chat_unpin": "고정 해제",
+  "chat_pinned_message": "고정된 메시지"
 }

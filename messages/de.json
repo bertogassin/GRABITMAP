@@ -314,5 +314,8 @@
   "chat_attachment_error": "Anhangfehler",
   "chat_attachment_failed": "Anhang nicht gesendet",
   "chat_document": "Dokument",
-  "chat_document_invalid": "Ungültiges Dokument oder größer als 16 MB"
+  "chat_document_invalid": "Ungültiges Dokument oder größer als 16 MB",
+  "chat_pin": "Anheften",
+  "chat_unpin": "Loslösen",
+  "chat_pinned_message": "Angeheftete Nachricht"
 }

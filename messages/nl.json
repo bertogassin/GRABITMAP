@@ -314,5 +314,8 @@
   "chat_attachment_error": "Bijlagefout",
   "chat_attachment_failed": "Bijlage niet verzonden",
   "chat_document": "Document",
-  "chat_document_invalid": "Ongeldig document of groter dan 16 MB"
+  "chat_document_invalid": "Ongeldig document of groter dan 16 MB",
+  "chat_pin": "Vastmaken",
+  "chat_unpin": "Losmaken",
+  "chat_pinned_message": "Vastgemaakt bericht"
 }

@@ -314,5 +314,8 @@
   "chat_attachment_error": "Ralat lampiran",
   "chat_attachment_failed": "Lampiran tidak dihantar",
   "chat_document": "Dokumen",
-  "chat_document_invalid": "Dokumen tidak sah atau saiz melebihi 16 MB"
+  "chat_document_invalid": "Dokumen tidak sah atau saiz melebihi 16 MB",
+  "chat_pin": "Semat",
+  "chat_unpin": "Nyahsemat",
+  "chat_pinned_message": "Mesej disemat"
 }

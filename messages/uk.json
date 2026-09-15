@@ -314,5 +314,8 @@
   "chat_attachment_error": "Помилка вкладення",
   "chat_attachment_failed": "Вкладення не надіслано",
   "chat_document": "Документ",
-  "chat_document_invalid": "Недопустимий документ або розмір перевищує 16 МБ"
+  "chat_document_invalid": "Недопустимий документ або розмір перевищує 16 МБ",
+  "chat_pin": "Закріпити",
+  "chat_unpin": "Відкріпити",
+  "chat_pinned_message": "Закріплене повідомлення"
 }

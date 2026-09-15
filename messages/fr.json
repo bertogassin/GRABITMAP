@@ -314,5 +314,8 @@
   "chat_attachment_error": "Erreur de pièce jointe",
   "chat_attachment_failed": "Pièce jointe non envoyée",
   "chat_document": "Document",
-  "chat_document_invalid": "Document non valide ou taille supérieure à 16 Mo"
+  "chat_document_invalid": "Document non valide ou taille supérieure à 16 Mo",
+  "chat_pin": "Épingler",
+  "chat_unpin": "Désépingler",
+  "chat_pinned_message": "Message épinglé"
 }

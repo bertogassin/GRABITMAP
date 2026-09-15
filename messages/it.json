@@ -314,5 +314,8 @@
   "chat_attachment_error": "Errore dell’allegato",
   "chat_attachment_failed": "Allegato non inviato",
   "chat_document": "Documento",
-  "chat_document_invalid": "Documento non valido o dimensione superiore a 16 MB"
+  "chat_document_invalid": "Documento non valido o dimensione superiore a 16 MB",
+  "chat_pin": "Fissa",
+  "chat_unpin": "Rimuovi fissaggio",
+  "chat_pinned_message": "Messaggio fissato"
 }

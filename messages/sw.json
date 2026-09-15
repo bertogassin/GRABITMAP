@@ -314,5 +314,8 @@
   "chat_attachment_error": "Hitilafu ya kiambatisho",
   "chat_attachment_failed": "Kiambatisho hakijatumwa",
   "chat_document": "Hati",
-  "chat_document_invalid": "Hati si sahihi au ukubwa unazidi MB 16"
+  "chat_document_invalid": "Hati si sahihi au ukubwa unazidi MB 16",
+  "chat_pin": "Bandika",
+  "chat_unpin": "Ondoa bandiko",
+  "chat_pinned_message": "Ujumbe uliobandikwa"
 }

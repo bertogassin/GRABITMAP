@@ -314,5 +314,8 @@
   "chat_attachment_error": "منسلکہ کی خرابی",
   "chat_attachment_failed": "منسلکہ نہیں بھیجا گیا",
   "chat_document": "دستاویز",
-  "chat_document_invalid": "دستاویز درست نہیں یا سائز 16 MB سے زیادہ ہے"
+  "chat_document_invalid": "دستاویز درست نہیں یا سائز 16 MB سے زیادہ ہے",
+  "chat_pin": "پن کریں",
+  "chat_unpin": "پن ہٹائیں",
+  "chat_pinned_message": "پن کیا گیا پیغام"
 }
