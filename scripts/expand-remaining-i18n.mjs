@@ -16,6 +16,13 @@ function L(map) {
 }
 
 const NEW = {
+  chat_attachment: L({
+    ru:"Вложение",en:"Attachment",fr:"Pièce jointe",es:"Archivo adjunto",zh:"附件","zh-TW":"附件",
+    hi:"अटैचमेंट",ar:"مرفق",pt:"Anexo",de:"Anhang",ja:"添付ファイル",ko:"첨부 파일",
+    it:"Allegato",tr:"Ek",pl:"Załącznik",uk:"Вкладення",nl:"Bijlage",vi:"Tệp đính kèm",
+    id:"Lampiran",ms:"Lampiran",th:"ไฟล์แนบ",fa:"پیوست",ur:"منسلکہ",bn:"সংযুক্তি",
+    pa:"ਅਟੈਚਮੈਂਟ",sw:"Kiambatisho",el:"Συνημμένο",cs:"Příloha",ro:"Atașament",hu:"Melléklet",sv:"Bilaga",he:"קובץ מצורף",
+  }),
   chat_offline: L({
     ru:"не в сети",en:"offline",fr:"hors ligne",es:"desconectado",zh:"离线","zh-TW":"離線",
     hi:"ऑफ़लाइन",ar:"غير متصل",pt:"offline",de:"offline",ja:"オフライン",ko:"오프라인",

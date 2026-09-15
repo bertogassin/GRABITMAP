@@ -301,5 +301,6 @@
   "chat_share_cancel": "共有をキャンセル",
   "chat_share_ready": "掲載カードを送信できます",
   "chat_listing_verified": "確認済み",
-  "chat_listing_open": "開く"
+  "chat_listing_open": "開く",
+  "chat_attachment": "添付ファイル"
 }

@@ -301,5 +301,6 @@
   "chat_share_cancel": "साझा करना रद्द करें",
   "chat_share_ready": "विज्ञापन कार्ड भेजने के लिए तैयार है",
   "chat_listing_verified": "सत्यापित",
-  "chat_listing_open": "खोलें"
+  "chat_listing_open": "खोलें",
+  "chat_attachment": "अटैचमेंट"
 }

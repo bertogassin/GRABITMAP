@@ -301,5 +301,6 @@
   "chat_share_cancel": "공유 취소",
   "chat_share_ready": "게시물 카드가 전송 준비되었습니다",
   "chat_listing_verified": "인증됨",
-  "chat_listing_open": "열기"
+  "chat_listing_open": "열기",
+  "chat_attachment": "첨부 파일"
 }

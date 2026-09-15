@@ -31,12 +31,29 @@ test("all locale catalogs share the exact base key set", async () => {
   }
 });
 
+test("chat attachment label is registered in every locale", async () => {
+  const translations = {};
+
+  for (const locale of locales) {
+    const messages = JSON.parse(
+      await readFile(new URL(`messages/${locale}.json`, root), "utf8"),
+    );
+    assert.equal(typeof messages.chat_attachment, "string");
+    assert.notEqual(messages.chat_attachment.trim(), "");
+    translations[locale] = messages.chat_attachment;
+  }
+
+  assert.equal(translations.ru, "Вложение");
+  assert.equal(translations.en, "Attachment");
+  assert.equal(translations.fr, "Pièce jointe");
+  assert.equal(translations.ar, "مرفق");
+});
+
 test("browser translation calls cannot add unregistered locale keys", async () => {
   const base = JSON.parse(
     await readFile(new URL("messages/ru.json", root), "utf8"),
   );
   const knownLegacyDebt = [
-    "chat_attachment",
     "chat_attachment_busy",
     "chat_attachment_error",
     "chat_attachment_failed",

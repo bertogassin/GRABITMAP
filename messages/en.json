@@ -301,5 +301,6 @@
   "chat_share_cancel": "Cancel sharing",
   "chat_share_ready": "Listing card is ready to send",
   "chat_listing_verified": "Verified",
-  "chat_listing_open": "Open"
+  "chat_listing_open": "Open",
+  "chat_attachment": "Attachment"
 }

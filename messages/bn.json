@@ -301,5 +301,6 @@
   "chat_share_cancel": "শেয়ার বাতিল করুন",
   "chat_share_ready": "বিজ্ঞাপনের কার্ড পাঠানোর জন্য প্রস্তুত",
   "chat_listing_verified": "যাচাইকৃত",
-  "chat_listing_open": "খুলুন"
+  "chat_listing_open": "খুলুন",
+  "chat_attachment": "সংযুক্তি"
 }
