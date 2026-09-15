@@ -15,6 +15,38 @@ mod web;
 
 use state::app_state::AppState;
 
+fn validate_admin_key(value: Option<&str>) -> Result<String, &'static str> {
+    let value = value.map(str::trim).filter(|value| !value.is_empty());
+
+    let Some(value) = value else {
+        return Err("ADMIN_KEY is required");
+    };
+
+    if value == "change-me" || value.len() < 32 {
+        return Err("ADMIN_KEY must be at least 32 characters and must not use the example value");
+    }
+
+    Ok(value.to_string())
+}
+
+fn validate_stripe_configuration(
+    stripe_secret: Option<&str>,
+    public_base_url: Option<&str>,
+) -> Result<(), &'static str> {
+    let stripe_enabled = stripe_secret
+        .map(str::trim)
+        .is_some_and(|value| !value.is_empty());
+    let public_base_url_present = public_base_url
+        .map(str::trim)
+        .is_some_and(|value| !value.is_empty());
+
+    if stripe_enabled && !public_base_url_present {
+        return Err("PUBLIC_BASE_URL is required when Stripe payments are enabled");
+    }
+
+    Ok(())
+}
+
 async fn shutdown_signal() {
     let ctrl_c = async {
         if let Err(error) = tokio::signal::ctrl_c().await {
@@ -48,6 +80,16 @@ async fn shutdown_signal() {
 async fn main() {
     let _ = dotenvy::dotenv();
 
+    let admin_key_value = env::var("ADMIN_KEY").ok();
+    let admin_key = validate_admin_key(admin_key_value.as_deref())
+        .unwrap_or_else(|message| panic!("{message}"));
+
+    let stripe_secret = env::var("STRIPE_SECRET_KEY").ok();
+    let public_base_url = env::var("PUBLIC_BASE_URL").ok();
+
+    validate_stripe_configuration(stripe_secret.as_deref(), public_base_url.as_deref())
+        .unwrap_or_else(|message| panic!("{message}"));
+
     drop(db::queries::init_db().expect("Не удалось инициализировать базу данных"));
 
     db::owner_bootstrap::bootstrap_owner_from_env()
@@ -68,8 +110,6 @@ async fn main() {
         .ok()
         .map(|value| value.trim().to_string())
         .filter(|value| !value.is_empty());
-
-    let admin_key = env::var("ADMIN_KEY").expect("ADMIN_KEY не задан");
 
     let state = AppState::new(db_pool.clone(), bot_token.clone(), admin_key);
 
@@ -97,4 +137,52 @@ async fn main() {
         .with_graceful_shutdown(shutdown_signal())
         .await
         .expect("Ошибка HTTP сервера");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{validate_admin_key, validate_stripe_configuration};
+
+    #[test]
+    fn admin_key_accepts_secure_value() {
+        let key = "a".repeat(32);
+        assert_eq!(validate_admin_key(Some(&key)), Ok(key));
+    }
+
+    #[test]
+    fn admin_key_rejects_missing_or_empty_value() {
+        assert!(validate_admin_key(None).is_err());
+        assert!(validate_admin_key(Some("")).is_err());
+        assert!(validate_admin_key(Some("   ")).is_err());
+    }
+
+    #[test]
+    fn admin_key_rejects_example_value() {
+        assert!(validate_admin_key(Some("change-me")).is_err());
+    }
+
+    #[test]
+    fn admin_key_rejects_short_value() {
+        assert!(validate_admin_key(Some("short-secret")).is_err());
+    }
+
+    #[test]
+    fn stripe_requires_public_base_url_when_enabled() {
+        assert!(validate_stripe_configuration(Some("sk_test_value"), None).is_err());
+        assert!(validate_stripe_configuration(Some("sk_test_value"), Some(" ")).is_err());
+    }
+
+    #[test]
+    fn stripe_accepts_configured_public_base_url() {
+        assert_eq!(
+            validate_stripe_configuration(Some("sk_test_value"), Some("https://grabitmap.com"),),
+            Ok(())
+        );
+    }
+
+    #[test]
+    fn stripe_without_secret_does_not_require_public_base_url() {
+        assert_eq!(validate_stripe_configuration(None, None), Ok(()));
+        assert_eq!(validate_stripe_configuration(Some(" "), None), Ok(()));
+    }
 }
