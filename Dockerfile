@@ -3,6 +3,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY project.inlang ./project.inlang
+COPY messages ./messages
 COPY scripts ./scripts
 COPY static ./static
 RUN npm run i18n

@@ -1165,6 +1165,34 @@ test("production compose keeps Caddy in front of the private app", async () => {
   assert.match(compose, /\n  caddy-config:/);
 });
 
+test("Docker frontend build copies locale sources before compiling i18n", async () => {
+  const dockerfile = await readFile(
+    new URL("Dockerfile", root),
+    "utf8",
+  );
+  const frontendStart = dockerfile.indexOf("FROM node:");
+  const rustStart = dockerfile.indexOf("FROM rust:");
+
+  assert.notEqual(frontendStart, -1);
+  assert.notEqual(rustStart, -1);
+  assert.ok(frontendStart < rustStart);
+
+  const frontendStage = dockerfile.slice(frontendStart, rustStart);
+  const messagesCopy = frontendStage.indexOf(
+    "COPY messages ./messages",
+  );
+  const compileI18n = frontendStage.indexOf(
+    "RUN npm run i18n",
+  );
+
+  assert.notEqual(messagesCopy, -1);
+  assert.notEqual(compileI18n, -1);
+  assert.ok(
+    messagesCopy < compileI18n,
+    "locale sources must be copied before Paraglide compilation",
+  );
+});
+
 test("Docker build includes Rust compile-time locale sources", async () => {
   const dockerfile = await readFile(new URL("Dockerfile", root), "utf8");
   assert.match(dockerfile, /COPY messages \.\/messages/);
