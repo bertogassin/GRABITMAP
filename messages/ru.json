@@ -301,5 +301,6 @@
   "chat_share_cancel": "Отменить отправку",
   "chat_share_ready": "Карточка объявления готова к отправке",
   "chat_listing_verified": "Проверено",
-  "chat_listing_open": "Открыть"
+  "chat_listing_open": "Открыть",
+  "chat_attachment": "Вложение"
 }

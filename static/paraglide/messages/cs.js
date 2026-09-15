@@ -12,6 +12,7 @@
 /** @typedef {{}} Back_To_CitiesInputs */
 /** @typedef {{}} Chat_Actions_AriaInputs */
 /** @typedef {{}} Chat_All_ReadInputs */
+/** @typedef {{}} Chat_AttachmentInputs */
 /** @typedef {{}} Chat_CancelInputs */
 /** @typedef {{}} Chat_Cancel_ReplyInputs */
 /** @typedef {{}} Chat_CloseInputs */
@@ -351,6 +352,10 @@ export const chat_actions_aria = /** @type {(inputs: Chat_Actions_AriaInputs) =>
 
 export const chat_all_read = /** @type {(inputs: Chat_All_ReadInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`All read`)
+};
+
+export const chat_attachment = /** @type {(inputs: Chat_AttachmentInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Příloha`)
 };
 
 export const chat_cancel = /** @type {(inputs: Chat_CancelInputs) => LocalizedString} */ () => {

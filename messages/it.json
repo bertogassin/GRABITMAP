@@ -301,5 +301,6 @@
   "chat_share_cancel": "Annulla condivisione",
   "chat_share_ready": "La scheda dell’annuncio è pronta",
   "chat_listing_verified": "Verificato",
-  "chat_listing_open": "Apri"
+  "chat_listing_open": "Apri",
+  "chat_attachment": "Allegato"
 }

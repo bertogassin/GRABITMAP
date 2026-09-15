@@ -301,5 +301,6 @@
   "chat_share_cancel": "Paylaşımı iptal et",
   "chat_share_ready": "İlan kartı gönderilmeye hazır",
   "chat_listing_verified": "Doğrulandı",
-  "chat_listing_open": "Aç"
+  "chat_listing_open": "Aç",
+  "chat_attachment": "Ek"
 }

@@ -301,5 +301,6 @@
   "chat_share_cancel": "ยกเลิกการแชร์",
   "chat_share_ready": "การ์ดประกาศพร้อมส่งแล้ว",
   "chat_listing_verified": "ยืนยันแล้ว",
-  "chat_listing_open": "เปิด"
+  "chat_listing_open": "เปิด",
+  "chat_attachment": "ไฟล์แนบ"
 }

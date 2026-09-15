@@ -301,5 +301,6 @@
   "chat_share_cancel": "Скасувати надсилання",
   "chat_share_ready": "Картка оголошення готова",
   "chat_listing_verified": "Перевірено",
-  "chat_listing_open": "Відкрити"
+  "chat_listing_open": "Відкрити",
+  "chat_attachment": "Вкладення"
 }

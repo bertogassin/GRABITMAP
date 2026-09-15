@@ -301,5 +301,6 @@
   "chat_share_cancel": "Annuler le partage",
   "chat_share_ready": "La carte de l’annonce est prête à envoyer",
   "chat_listing_verified": "Vérifié",
-  "chat_listing_open": "Ouvrir"
+  "chat_listing_open": "Ouvrir",
+  "chat_attachment": "Pièce jointe"
 }

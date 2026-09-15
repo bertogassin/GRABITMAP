@@ -301,5 +301,6 @@
   "chat_share_cancel": "Teilen abbrechen",
   "chat_share_ready": "Anzeigenkarte ist versandbereit",
   "chat_listing_verified": "Geprüft",
-  "chat_listing_open": "Öffnen"
+  "chat_listing_open": "Öffnen",
+  "chat_attachment": "Anhang"
 }

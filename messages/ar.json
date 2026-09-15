@@ -301,5 +301,6 @@
   "chat_share_cancel": "إلغاء المشاركة",
   "chat_share_ready": "بطاقة الإعلان جاهزة للإرسال",
   "chat_listing_verified": "موثّق",
-  "chat_listing_open": "فتح"
+  "chat_listing_open": "فتح",
+  "chat_attachment": "مرفق"
 }

@@ -301,5 +301,6 @@
   "chat_share_cancel": "取消分享",
   "chat_share_ready": "刊登卡片已可傳送",
   "chat_listing_verified": "已驗證",
-  "chat_listing_open": "開啟"
+  "chat_listing_open": "開啟",
+  "chat_attachment": "附件"
 }
