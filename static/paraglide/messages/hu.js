@@ -14,9 +14,13 @@
 /** @typedef {{}} Chat_All_ReadInputs */
 /** @typedef {{}} Chat_AttachmentInputs */
 /** @typedef {{}} Chat_Attachment_BusyInputs */
+/** @typedef {{}} Chat_Attachment_InterruptedInputs */
 /** @typedef {{}} Chat_Attachment_OpenInputs */
 /** @typedef {{}} Chat_Attachment_ProcessingInputs */
 /** @typedef {{}} Chat_Attachment_ReadyInputs */
+/** @typedef {{}} Chat_Attachment_TimeoutInputs */
+/** @typedef {{}} Chat_Attachment_Too_LargeInputs */
+/** @typedef {{}} Chat_Attachment_TypeInputs */
 /** @typedef {{}} Chat_CancelInputs */
 /** @typedef {{}} Chat_Cancel_ReplyInputs */
 /** @typedef {{}} Chat_CloseInputs */
@@ -366,6 +370,10 @@ export const chat_attachment_busy = /** @type {(inputs: Chat_Attachment_BusyInpu
 	return /** @type {LocalizedString} */ (`A szerver egy másik fájlt ellenőriz · automatikus újrapróbálkozás`)
 };
 
+export const chat_attachment_interrupted = /** @type {(inputs: Chat_Attachment_InterruptedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`A feltöltés megszakadt · automatikus újrapróbálkozás`)
+};
+
 export const chat_attachment_open = /** @type {(inputs: Chat_Attachment_OpenInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Megnyitás / letöltés`)
 };
@@ -376,6 +384,18 @@ export const chat_attachment_processing = /** @type {(inputs: Chat_Attachment_Pr
 
 export const chat_attachment_ready = /** @type {(inputs: Chat_Attachment_ReadyInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`A melléklet kész · adjon hozzá feliratot`)
+};
+
+export const chat_attachment_timeout = /** @type {(inputs: Chat_Attachment_TimeoutInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`A hálózat vagy az ellenőrzés túl sokáig tartott · próbálja újra`)
+};
+
+export const chat_attachment_too_large = /** @type {(inputs: Chat_Attachment_Too_LargeInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`A fájl meghaladja a megengedett méretet`)
+};
+
+export const chat_attachment_type = /** @type {(inputs: Chat_Attachment_TypeInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ez a fájltípus nem támogatott`)
 };
 
 export const chat_cancel = /** @type {(inputs: Chat_CancelInputs) => LocalizedString} */ () => {

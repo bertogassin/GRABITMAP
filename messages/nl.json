@@ -306,5 +306,9 @@
   "chat_attachment_busy": "Server controleert een ander bestand · automatische nieuwe poging",
   "chat_attachment_open": "Openen / downloaden",
   "chat_attachment_processing": "Bijlage controleren en opslaan…",
-  "chat_attachment_ready": "Bijlage gereed · voeg een bijschrift toe"
+  "chat_attachment_ready": "Bijlage gereed · voeg een bijschrift toe",
+  "chat_attachment_interrupted": "Upload onderbroken · automatische nieuwe poging",
+  "chat_attachment_timeout": "Netwerk of controle duurde te lang · probeer opnieuw",
+  "chat_attachment_too_large": "Bestand overschrijdt de toegestane grootte",
+  "chat_attachment_type": "Dit bestandstype wordt niet ondersteund"
 }

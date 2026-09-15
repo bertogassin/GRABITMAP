@@ -14,9 +14,13 @@
 /** @typedef {{}} Chat_All_ReadInputs */
 /** @typedef {{}} Chat_AttachmentInputs */
 /** @typedef {{}} Chat_Attachment_BusyInputs */
+/** @typedef {{}} Chat_Attachment_InterruptedInputs */
 /** @typedef {{}} Chat_Attachment_OpenInputs */
 /** @typedef {{}} Chat_Attachment_ProcessingInputs */
 /** @typedef {{}} Chat_Attachment_ReadyInputs */
+/** @typedef {{}} Chat_Attachment_TimeoutInputs */
+/** @typedef {{}} Chat_Attachment_Too_LargeInputs */
+/** @typedef {{}} Chat_Attachment_TypeInputs */
 /** @typedef {{}} Chat_CancelInputs */
 /** @typedef {{}} Chat_Cancel_ReplyInputs */
 /** @typedef {{}} Chat_CloseInputs */
@@ -366,6 +370,10 @@ export const chat_attachment_busy = /** @type {(inputs: Chat_Attachment_BusyInpu
 	return /** @type {LocalizedString} */ (`Servern kontrollerar en annan fil · försöker igen automatiskt`)
 };
 
+export const chat_attachment_interrupted = /** @type {(inputs: Chat_Attachment_InterruptedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Uppladdningen avbröts · försöker igen automatiskt`)
+};
+
 export const chat_attachment_open = /** @type {(inputs: Chat_Attachment_OpenInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Öppna / ladda ner`)
 };
@@ -376,6 +384,18 @@ export const chat_attachment_processing = /** @type {(inputs: Chat_Attachment_Pr
 
 export const chat_attachment_ready = /** @type {(inputs: Chat_Attachment_ReadyInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Bilagan är klar · lägg till en bildtext`)
+};
+
+export const chat_attachment_timeout = /** @type {(inputs: Chat_Attachment_TimeoutInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Nätverket eller kontrollen tog för lång tid · försök igen`)
+};
+
+export const chat_attachment_too_large = /** @type {(inputs: Chat_Attachment_Too_LargeInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Filen överskrider den tillåtna storleken`)
+};
+
+export const chat_attachment_type = /** @type {(inputs: Chat_Attachment_TypeInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Den här filtypen stöds inte`)
 };
 
 export const chat_cancel = /** @type {(inputs: Chat_CancelInputs) => LocalizedString} */ () => {

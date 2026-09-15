@@ -306,5 +306,9 @@
   "chat_attachment_busy": "Server prüft eine andere Datei · automatischer neuer Versuch",
   "chat_attachment_open": "Öffnen / herunterladen",
   "chat_attachment_processing": "Anhang wird geprüft und gespeichert…",
-  "chat_attachment_ready": "Anhang bereit · Beschriftung hinzufügen"
+  "chat_attachment_ready": "Anhang bereit · Beschriftung hinzufügen",
+  "chat_attachment_interrupted": "Upload unterbrochen · automatischer neuer Versuch",
+  "chat_attachment_timeout": "Netzwerk oder Prüfung dauerte zu lange · erneut versuchen",
+  "chat_attachment_too_large": "Datei überschreitet die zulässige Größe",
+  "chat_attachment_type": "Dieser Dateityp wird nicht unterstützt"
 }

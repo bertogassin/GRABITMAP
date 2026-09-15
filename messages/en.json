@@ -306,5 +306,9 @@
   "chat_attachment_busy": "Server is checking another file · retrying automatically",
   "chat_attachment_open": "Open / download",
   "chat_attachment_processing": "Checking and saving attachment…",
-  "chat_attachment_ready": "Attachment ready · add a caption"
+  "chat_attachment_ready": "Attachment ready · add a caption",
+  "chat_attachment_interrupted": "Upload interrupted · retrying automatically",
+  "chat_attachment_timeout": "Network or validation took too long · try again",
+  "chat_attachment_too_large": "File exceeds the allowed size",
+  "chat_attachment_type": "This file type is not supported"
 }

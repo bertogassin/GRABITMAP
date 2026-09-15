@@ -306,5 +306,9 @@
   "chat_attachment_busy": "Server kontroluje jiný soubor · automatický nový pokus",
   "chat_attachment_open": "Otevřít / stáhnout",
   "chat_attachment_processing": "Kontrola a ukládání přílohy…",
-  "chat_attachment_ready": "Příloha je připravena · přidejte popisek"
+  "chat_attachment_ready": "Příloha je připravena · přidejte popisek",
+  "chat_attachment_interrupted": "Nahrávání bylo přerušeno · automatický nový pokus",
+  "chat_attachment_timeout": "Síť nebo kontrola trvala příliš dlouho · zkuste to znovu",
+  "chat_attachment_too_large": "Soubor překračuje povolenou velikost",
+  "chat_attachment_type": "Tento typ souboru není podporován"
 }

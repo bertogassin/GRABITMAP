@@ -306,5 +306,9 @@
   "chat_attachment_busy": "Il server sta verificando un altro file · nuovo tentativo automatico",
   "chat_attachment_open": "Apri / scarica",
   "chat_attachment_processing": "Verifica e salvataggio dell’allegato…",
-  "chat_attachment_ready": "Allegato pronto · aggiungi una didascalia"
+  "chat_attachment_ready": "Allegato pronto · aggiungi una didascalia",
+  "chat_attachment_interrupted": "Caricamento interrotto · nuovo tentativo automatico",
+  "chat_attachment_timeout": "La rete o la verifica ha richiesto troppo tempo · riprova",
+  "chat_attachment_too_large": "Il file supera la dimensione consentita",
+  "chat_attachment_type": "Questo tipo di file non è supportato"
 }

@@ -14,9 +14,13 @@
 /** @typedef {{}} Chat_All_ReadInputs */
 /** @typedef {{}} Chat_AttachmentInputs */
 /** @typedef {{}} Chat_Attachment_BusyInputs */
+/** @typedef {{}} Chat_Attachment_InterruptedInputs */
 /** @typedef {{}} Chat_Attachment_OpenInputs */
 /** @typedef {{}} Chat_Attachment_ProcessingInputs */
 /** @typedef {{}} Chat_Attachment_ReadyInputs */
+/** @typedef {{}} Chat_Attachment_TimeoutInputs */
+/** @typedef {{}} Chat_Attachment_Too_LargeInputs */
+/** @typedef {{}} Chat_Attachment_TypeInputs */
 /** @typedef {{}} Chat_CancelInputs */
 /** @typedef {{}} Chat_Cancel_ReplyInputs */
 /** @typedef {{}} Chat_CloseInputs */
@@ -366,6 +370,10 @@ export const chat_attachment_busy = /** @type {(inputs: Chat_Attachment_BusyInpu
 	return /** @type {LocalizedString} */ (`सर्वर दूसरी फ़ाइल की जाँच कर रहा है · अपने-आप फिर प्रयास होगा`)
 };
 
+export const chat_attachment_interrupted = /** @type {(inputs: Chat_Attachment_InterruptedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`अपलोड रुक गया · अपने-आप फिर प्रयास होगा`)
+};
+
 export const chat_attachment_open = /** @type {(inputs: Chat_Attachment_OpenInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`खोलें / डाउनलोड करें`)
 };
@@ -376,6 +384,18 @@ export const chat_attachment_processing = /** @type {(inputs: Chat_Attachment_Pr
 
 export const chat_attachment_ready = /** @type {(inputs: Chat_Attachment_ReadyInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`अटैचमेंट तैयार है · कैप्शन जोड़ें`)
+};
+
+export const chat_attachment_timeout = /** @type {(inputs: Chat_Attachment_TimeoutInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`नेटवर्क या जाँच में बहुत समय लगा · फिर प्रयास करें`)
+};
+
+export const chat_attachment_too_large = /** @type {(inputs: Chat_Attachment_Too_LargeInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`फ़ाइल अनुमत आकार से बड़ी है`)
+};
+
+export const chat_attachment_type = /** @type {(inputs: Chat_Attachment_TypeInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`यह फ़ाइल प्रकार समर्थित नहीं है`)
 };
 
 export const chat_cancel = /** @type {(inputs: Chat_CancelInputs) => LocalizedString} */ () => {

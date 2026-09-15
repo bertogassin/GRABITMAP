@@ -306,5 +306,9 @@
   "chat_attachment_busy": "Ο διακομιστής ελέγχει άλλο αρχείο · αυτόματη επανάληψη",
   "chat_attachment_open": "Άνοιγμα / λήψη",
   "chat_attachment_processing": "Έλεγχος και αποθήκευση συνημμένου…",
-  "chat_attachment_ready": "Το συνημμένο είναι έτοιμο · προσθέστε λεζάντα"
+  "chat_attachment_ready": "Το συνημμένο είναι έτοιμο · προσθέστε λεζάντα",
+  "chat_attachment_interrupted": "Η μεταφόρτωση διακόπηκε · αυτόματη επανάληψη",
+  "chat_attachment_timeout": "Το δίκτυο ή ο έλεγχος άργησε πολύ · δοκιμάστε ξανά",
+  "chat_attachment_too_large": "Το αρχείο υπερβαίνει το επιτρεπόμενο μέγεθος",
+  "chat_attachment_type": "Αυτός ο τύπος αρχείου δεν υποστηρίζεται"
 }

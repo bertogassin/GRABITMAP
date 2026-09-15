@@ -16,9 +16,13 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Chat_All_ReadInputs */
 /** @typedef {{}} Chat_AttachmentInputs */
 /** @typedef {{}} Chat_Attachment_BusyInputs */
+/** @typedef {{}} Chat_Attachment_InterruptedInputs */
 /** @typedef {{}} Chat_Attachment_OpenInputs */
 /** @typedef {{}} Chat_Attachment_ProcessingInputs */
 /** @typedef {{}} Chat_Attachment_ReadyInputs */
+/** @typedef {{}} Chat_Attachment_TimeoutInputs */
+/** @typedef {{}} Chat_Attachment_Too_LargeInputs */
+/** @typedef {{}} Chat_Attachment_TypeInputs */
 /** @typedef {{}} Chat_CancelInputs */
 /** @typedef {{}} Chat_Cancel_ReplyInputs */
 /** @typedef {{}} Chat_CloseInputs */
@@ -961,6 +965,50 @@ export const chat_attachment_busy = /** @type {((inputs?: Chat_Attachment_BusyIn
 /**
 * | output |
 * | --- |
+* | "Upload interrupted · retrying automatically" |
+*
+* @param {Chat_Attachment_InterruptedInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_attachment_interrupted = /** @type {((inputs?: Chat_Attachment_InterruptedInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Attachment_InterruptedInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_attachment_interrupted(inputs)
+	if (locale === "fr") return __fr.chat_attachment_interrupted(inputs)
+	if (locale === "es") return __es.chat_attachment_interrupted(inputs)
+	if (locale === "zh") return __zh.chat_attachment_interrupted(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_attachment_interrupted(inputs)
+	if (locale === "hi") return __hi.chat_attachment_interrupted(inputs)
+	if (locale === "ar") return __ar.chat_attachment_interrupted(inputs)
+	if (locale === "pt") return __pt.chat_attachment_interrupted(inputs)
+	if (locale === "de") return __de.chat_attachment_interrupted(inputs)
+	if (locale === "ja") return __ja.chat_attachment_interrupted(inputs)
+	if (locale === "ko") return __ko.chat_attachment_interrupted(inputs)
+	if (locale === "it") return __it.chat_attachment_interrupted(inputs)
+	if (locale === "tr") return __tr.chat_attachment_interrupted(inputs)
+	if (locale === "pl") return __pl.chat_attachment_interrupted(inputs)
+	if (locale === "uk") return __uk.chat_attachment_interrupted(inputs)
+	if (locale === "nl") return __nl.chat_attachment_interrupted(inputs)
+	if (locale === "vi") return __vi.chat_attachment_interrupted(inputs)
+	if (locale === "id") return __id.chat_attachment_interrupted(inputs)
+	if (locale === "ms") return __ms.chat_attachment_interrupted(inputs)
+	if (locale === "th") return __th.chat_attachment_interrupted(inputs)
+	if (locale === "fa") return __fa.chat_attachment_interrupted(inputs)
+	if (locale === "ur") return __ur.chat_attachment_interrupted(inputs)
+	if (locale === "bn") return __bn.chat_attachment_interrupted(inputs)
+	if (locale === "pa") return __pa.chat_attachment_interrupted(inputs)
+	if (locale === "sw") return __sw.chat_attachment_interrupted(inputs)
+	if (locale === "el") return __el.chat_attachment_interrupted(inputs)
+	if (locale === "cs") return __cs.chat_attachment_interrupted(inputs)
+	if (locale === "ro") return __ro.chat_attachment_interrupted(inputs)
+	if (locale === "hu") return __hu.chat_attachment_interrupted(inputs)
+	if (locale === "sv") return __sv.chat_attachment_interrupted(inputs)
+	if (locale === "he") return __he.chat_attachment_interrupted(inputs)
+	return __ru.chat_attachment_interrupted(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "Open / download" |
 *
 * @param {Chat_Attachment_OpenInputs} inputs
@@ -1089,6 +1137,138 @@ export const chat_attachment_ready = /** @type {((inputs?: Chat_Attachment_Ready
 	if (locale === "sv") return __sv.chat_attachment_ready(inputs)
 	if (locale === "he") return __he.chat_attachment_ready(inputs)
 	return __ru.chat_attachment_ready(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Network or validation took too long · try again" |
+*
+* @param {Chat_Attachment_TimeoutInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_attachment_timeout = /** @type {((inputs?: Chat_Attachment_TimeoutInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Attachment_TimeoutInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_attachment_timeout(inputs)
+	if (locale === "fr") return __fr.chat_attachment_timeout(inputs)
+	if (locale === "es") return __es.chat_attachment_timeout(inputs)
+	if (locale === "zh") return __zh.chat_attachment_timeout(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_attachment_timeout(inputs)
+	if (locale === "hi") return __hi.chat_attachment_timeout(inputs)
+	if (locale === "ar") return __ar.chat_attachment_timeout(inputs)
+	if (locale === "pt") return __pt.chat_attachment_timeout(inputs)
+	if (locale === "de") return __de.chat_attachment_timeout(inputs)
+	if (locale === "ja") return __ja.chat_attachment_timeout(inputs)
+	if (locale === "ko") return __ko.chat_attachment_timeout(inputs)
+	if (locale === "it") return __it.chat_attachment_timeout(inputs)
+	if (locale === "tr") return __tr.chat_attachment_timeout(inputs)
+	if (locale === "pl") return __pl.chat_attachment_timeout(inputs)
+	if (locale === "uk") return __uk.chat_attachment_timeout(inputs)
+	if (locale === "nl") return __nl.chat_attachment_timeout(inputs)
+	if (locale === "vi") return __vi.chat_attachment_timeout(inputs)
+	if (locale === "id") return __id.chat_attachment_timeout(inputs)
+	if (locale === "ms") return __ms.chat_attachment_timeout(inputs)
+	if (locale === "th") return __th.chat_attachment_timeout(inputs)
+	if (locale === "fa") return __fa.chat_attachment_timeout(inputs)
+	if (locale === "ur") return __ur.chat_attachment_timeout(inputs)
+	if (locale === "bn") return __bn.chat_attachment_timeout(inputs)
+	if (locale === "pa") return __pa.chat_attachment_timeout(inputs)
+	if (locale === "sw") return __sw.chat_attachment_timeout(inputs)
+	if (locale === "el") return __el.chat_attachment_timeout(inputs)
+	if (locale === "cs") return __cs.chat_attachment_timeout(inputs)
+	if (locale === "ro") return __ro.chat_attachment_timeout(inputs)
+	if (locale === "hu") return __hu.chat_attachment_timeout(inputs)
+	if (locale === "sv") return __sv.chat_attachment_timeout(inputs)
+	if (locale === "he") return __he.chat_attachment_timeout(inputs)
+	return __ru.chat_attachment_timeout(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "File exceeds the allowed size" |
+*
+* @param {Chat_Attachment_Too_LargeInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_attachment_too_large = /** @type {((inputs?: Chat_Attachment_Too_LargeInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Attachment_Too_LargeInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_attachment_too_large(inputs)
+	if (locale === "fr") return __fr.chat_attachment_too_large(inputs)
+	if (locale === "es") return __es.chat_attachment_too_large(inputs)
+	if (locale === "zh") return __zh.chat_attachment_too_large(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_attachment_too_large(inputs)
+	if (locale === "hi") return __hi.chat_attachment_too_large(inputs)
+	if (locale === "ar") return __ar.chat_attachment_too_large(inputs)
+	if (locale === "pt") return __pt.chat_attachment_too_large(inputs)
+	if (locale === "de") return __de.chat_attachment_too_large(inputs)
+	if (locale === "ja") return __ja.chat_attachment_too_large(inputs)
+	if (locale === "ko") return __ko.chat_attachment_too_large(inputs)
+	if (locale === "it") return __it.chat_attachment_too_large(inputs)
+	if (locale === "tr") return __tr.chat_attachment_too_large(inputs)
+	if (locale === "pl") return __pl.chat_attachment_too_large(inputs)
+	if (locale === "uk") return __uk.chat_attachment_too_large(inputs)
+	if (locale === "nl") return __nl.chat_attachment_too_large(inputs)
+	if (locale === "vi") return __vi.chat_attachment_too_large(inputs)
+	if (locale === "id") return __id.chat_attachment_too_large(inputs)
+	if (locale === "ms") return __ms.chat_attachment_too_large(inputs)
+	if (locale === "th") return __th.chat_attachment_too_large(inputs)
+	if (locale === "fa") return __fa.chat_attachment_too_large(inputs)
+	if (locale === "ur") return __ur.chat_attachment_too_large(inputs)
+	if (locale === "bn") return __bn.chat_attachment_too_large(inputs)
+	if (locale === "pa") return __pa.chat_attachment_too_large(inputs)
+	if (locale === "sw") return __sw.chat_attachment_too_large(inputs)
+	if (locale === "el") return __el.chat_attachment_too_large(inputs)
+	if (locale === "cs") return __cs.chat_attachment_too_large(inputs)
+	if (locale === "ro") return __ro.chat_attachment_too_large(inputs)
+	if (locale === "hu") return __hu.chat_attachment_too_large(inputs)
+	if (locale === "sv") return __sv.chat_attachment_too_large(inputs)
+	if (locale === "he") return __he.chat_attachment_too_large(inputs)
+	return __ru.chat_attachment_too_large(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "This file type is not supported" |
+*
+* @param {Chat_Attachment_TypeInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_attachment_type = /** @type {((inputs?: Chat_Attachment_TypeInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Attachment_TypeInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_attachment_type(inputs)
+	if (locale === "fr") return __fr.chat_attachment_type(inputs)
+	if (locale === "es") return __es.chat_attachment_type(inputs)
+	if (locale === "zh") return __zh.chat_attachment_type(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_attachment_type(inputs)
+	if (locale === "hi") return __hi.chat_attachment_type(inputs)
+	if (locale === "ar") return __ar.chat_attachment_type(inputs)
+	if (locale === "pt") return __pt.chat_attachment_type(inputs)
+	if (locale === "de") return __de.chat_attachment_type(inputs)
+	if (locale === "ja") return __ja.chat_attachment_type(inputs)
+	if (locale === "ko") return __ko.chat_attachment_type(inputs)
+	if (locale === "it") return __it.chat_attachment_type(inputs)
+	if (locale === "tr") return __tr.chat_attachment_type(inputs)
+	if (locale === "pl") return __pl.chat_attachment_type(inputs)
+	if (locale === "uk") return __uk.chat_attachment_type(inputs)
+	if (locale === "nl") return __nl.chat_attachment_type(inputs)
+	if (locale === "vi") return __vi.chat_attachment_type(inputs)
+	if (locale === "id") return __id.chat_attachment_type(inputs)
+	if (locale === "ms") return __ms.chat_attachment_type(inputs)
+	if (locale === "th") return __th.chat_attachment_type(inputs)
+	if (locale === "fa") return __fa.chat_attachment_type(inputs)
+	if (locale === "ur") return __ur.chat_attachment_type(inputs)
+	if (locale === "bn") return __bn.chat_attachment_type(inputs)
+	if (locale === "pa") return __pa.chat_attachment_type(inputs)
+	if (locale === "sw") return __sw.chat_attachment_type(inputs)
+	if (locale === "el") return __el.chat_attachment_type(inputs)
+	if (locale === "cs") return __cs.chat_attachment_type(inputs)
+	if (locale === "ro") return __ro.chat_attachment_type(inputs)
+	if (locale === "hu") return __hu.chat_attachment_type(inputs)
+	if (locale === "sv") return __sv.chat_attachment_type(inputs)
+	if (locale === "he") return __he.chat_attachment_type(inputs)
+	return __ru.chat_attachment_type(inputs)
 });
 /**
 * | output |

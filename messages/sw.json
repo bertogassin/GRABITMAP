@@ -306,5 +306,9 @@
   "chat_attachment_busy": "Seva inakagua faili nyingine · inajaribu tena kiotomatiki",
   "chat_attachment_open": "Fungua / pakua",
   "chat_attachment_processing": "Inakagua na kuhifadhi kiambatisho…",
-  "chat_attachment_ready": "Kiambatisho kiko tayari · ongeza maelezo"
+  "chat_attachment_ready": "Kiambatisho kiko tayari · ongeza maelezo",
+  "chat_attachment_interrupted": "Upakiaji umekatizwa · inajaribu tena kiotomatiki",
+  "chat_attachment_timeout": "Mtandao au ukaguzi umechukua muda mrefu · jaribu tena",
+  "chat_attachment_too_large": "Faili imezidi ukubwa unaoruhusiwa",
+  "chat_attachment_type": "Aina hii ya faili haitumiki"
 }

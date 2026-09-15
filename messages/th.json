@@ -306,5 +306,9 @@
   "chat_attachment_busy": "เซิร์ฟเวอร์กำลังตรวจสอบไฟล์อื่น · จะลองอีกครั้งโดยอัตโนมัติ",
   "chat_attachment_open": "เปิด / ดาวน์โหลด",
   "chat_attachment_processing": "กำลังตรวจสอบและบันทึกไฟล์แนบ…",
-  "chat_attachment_ready": "ไฟล์แนบพร้อมแล้ว · เพิ่มคำบรรยาย"
+  "chat_attachment_ready": "ไฟล์แนบพร้อมแล้ว · เพิ่มคำบรรยาย",
+  "chat_attachment_interrupted": "การอัปโหลดหยุดชะงัก · จะลองอีกครั้งโดยอัตโนมัติ",
+  "chat_attachment_timeout": "เครือข่ายหรือการตรวจสอบใช้เวลานานเกินไป · ลองอีกครั้ง",
+  "chat_attachment_too_large": "ไฟล์มีขนาดเกินที่อนุญาต",
+  "chat_attachment_type": "ไม่รองรับไฟล์ประเภทนี้"
 }

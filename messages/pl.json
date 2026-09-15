@@ -306,5 +306,9 @@
   "chat_attachment_busy": "Serwer sprawdza inny plik · automatyczna ponowna próba",
   "chat_attachment_open": "Otwórz / pobierz",
   "chat_attachment_processing": "Sprawdzanie i zapisywanie załącznika…",
-  "chat_attachment_ready": "Załącznik gotowy · dodaj podpis"
+  "chat_attachment_ready": "Załącznik gotowy · dodaj podpis",
+  "chat_attachment_interrupted": "Przesyłanie przerwane · automatyczna ponowna próba",
+  "chat_attachment_timeout": "Sieć lub sprawdzanie trwało zbyt długo · spróbuj ponownie",
+  "chat_attachment_too_large": "Plik przekracza dozwolony rozmiar",
+  "chat_attachment_type": "Ten typ pliku nie jest obsługiwany"
 }

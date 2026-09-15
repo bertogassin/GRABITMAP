@@ -306,5 +306,9 @@
   "chat_attachment_busy": "سرور در حال بررسی فایل دیگری است · تلاش مجدد به‌صورت خودکار",
   "chat_attachment_open": "باز کردن / دانلود",
   "chat_attachment_processing": "در حال بررسی و ذخیره پیوست…",
-  "chat_attachment_ready": "پیوست آماده است · توضیح اضافه کنید"
+  "chat_attachment_ready": "پیوست آماده است · توضیح اضافه کنید",
+  "chat_attachment_interrupted": "بارگذاری قطع شد · تلاش مجدد به‌صورت خودکار",
+  "chat_attachment_timeout": "شبکه یا بررسی بیش از حد طول کشید · دوباره تلاش کنید",
+  "chat_attachment_too_large": "حجم فایل از حد مجاز بیشتر است",
+  "chat_attachment_type": "این نوع فایل پشتیبانی نمی‌شود"
 }

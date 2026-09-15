@@ -306,5 +306,9 @@
   "chat_attachment_busy": "A szerver egy másik fájlt ellenőriz · automatikus újrapróbálkozás",
   "chat_attachment_open": "Megnyitás / letöltés",
   "chat_attachment_processing": "A melléklet ellenőrzése és mentése…",
-  "chat_attachment_ready": "A melléklet kész · adjon hozzá feliratot"
+  "chat_attachment_ready": "A melléklet kész · adjon hozzá feliratot",
+  "chat_attachment_interrupted": "A feltöltés megszakadt · automatikus újrapróbálkozás",
+  "chat_attachment_timeout": "A hálózat vagy az ellenőrzés túl sokáig tartott · próbálja újra",
+  "chat_attachment_too_large": "A fájl meghaladja a megengedett méretet",
+  "chat_attachment_type": "Ez a fájltípus nem támogatott"
 }
