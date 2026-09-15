@@ -325,5 +325,12 @@
   "chat_mic_request": "Engedélyezze a mikrofonhoz való hozzáférést…",
   "chat_voice_record_failed": "A telefon leállította a felvételt. Próbálja újra.",
   "chat_voice_stop_send": "Leállítás és küldés",
-  "chat_voice_too_large": "A felvétel túl hosszú — legfeljebb 2 perc"
+  "chat_voice_too_large": "A felvétel túl hosszú — legfeljebb 2 perc",
+  "chat_video": "Videó",
+  "chat_video_duration": "A videó legfeljebb 3 perces lehet",
+  "chat_video_fullscreen": "Teljes képernyő",
+  "chat_video_invalid": "Videó: MP4/WebM, legfeljebb 40 MB",
+  "chat_video_pip": "Kis ablak",
+  "chat_video_playback_error": "A videó nem játszható le · Fájl megnyitása",
+  "chat_video_speed": "Sebesség"
 }

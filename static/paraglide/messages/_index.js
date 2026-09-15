@@ -131,6 +131,13 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Chat_Upload_CancelledInputs */
 /** @typedef {{}} Chat_Upload_ProgressInputs */
 /** @typedef {{}} Chat_User_UnavailableInputs */
+/** @typedef {{}} Chat_VideoInputs */
+/** @typedef {{}} Chat_Video_DurationInputs */
+/** @typedef {{}} Chat_Video_FullscreenInputs */
+/** @typedef {{}} Chat_Video_InvalidInputs */
+/** @typedef {{}} Chat_Video_PipInputs */
+/** @typedef {{}} Chat_Video_Playback_ErrorInputs */
+/** @typedef {{}} Chat_Video_SpeedInputs */
 /** @typedef {{}} Chat_VoiceInputs */
 /** @typedef {{}} Chat_Voice_ErrorInputs */
 /** @typedef {{}} Chat_Voice_FailedInputs */
@@ -6036,6 +6043,314 @@ export const chat_user_unavailable = /** @type {((inputs?: Chat_User_Unavailable
 	if (locale === "sv") return __sv.chat_user_unavailable(inputs)
 	if (locale === "he") return __he.chat_user_unavailable(inputs)
 	return __ru.chat_user_unavailable(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Video" |
+*
+* @param {Chat_VideoInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_video = /** @type {((inputs?: Chat_VideoInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_VideoInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_video(inputs)
+	if (locale === "fr") return __fr.chat_video(inputs)
+	if (locale === "es") return __es.chat_video(inputs)
+	if (locale === "zh") return __zh.chat_video(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_video(inputs)
+	if (locale === "hi") return __hi.chat_video(inputs)
+	if (locale === "ar") return __ar.chat_video(inputs)
+	if (locale === "pt") return __pt.chat_video(inputs)
+	if (locale === "de") return __de.chat_video(inputs)
+	if (locale === "ja") return __ja.chat_video(inputs)
+	if (locale === "ko") return __ko.chat_video(inputs)
+	if (locale === "it") return __it.chat_video(inputs)
+	if (locale === "tr") return __tr.chat_video(inputs)
+	if (locale === "pl") return __pl.chat_video(inputs)
+	if (locale === "uk") return __uk.chat_video(inputs)
+	if (locale === "nl") return __nl.chat_video(inputs)
+	if (locale === "vi") return __vi.chat_video(inputs)
+	if (locale === "id") return __id.chat_video(inputs)
+	if (locale === "ms") return __ms.chat_video(inputs)
+	if (locale === "th") return __th.chat_video(inputs)
+	if (locale === "fa") return __fa.chat_video(inputs)
+	if (locale === "ur") return __ur.chat_video(inputs)
+	if (locale === "bn") return __bn.chat_video(inputs)
+	if (locale === "pa") return __pa.chat_video(inputs)
+	if (locale === "sw") return __sw.chat_video(inputs)
+	if (locale === "el") return __el.chat_video(inputs)
+	if (locale === "cs") return __cs.chat_video(inputs)
+	if (locale === "ro") return __ro.chat_video(inputs)
+	if (locale === "hu") return __hu.chat_video(inputs)
+	if (locale === "sv") return __sv.chat_video(inputs)
+	if (locale === "he") return __he.chat_video(inputs)
+	return __ru.chat_video(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Video must be no longer than 3 minutes" |
+*
+* @param {Chat_Video_DurationInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_video_duration = /** @type {((inputs?: Chat_Video_DurationInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Video_DurationInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_video_duration(inputs)
+	if (locale === "fr") return __fr.chat_video_duration(inputs)
+	if (locale === "es") return __es.chat_video_duration(inputs)
+	if (locale === "zh") return __zh.chat_video_duration(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_video_duration(inputs)
+	if (locale === "hi") return __hi.chat_video_duration(inputs)
+	if (locale === "ar") return __ar.chat_video_duration(inputs)
+	if (locale === "pt") return __pt.chat_video_duration(inputs)
+	if (locale === "de") return __de.chat_video_duration(inputs)
+	if (locale === "ja") return __ja.chat_video_duration(inputs)
+	if (locale === "ko") return __ko.chat_video_duration(inputs)
+	if (locale === "it") return __it.chat_video_duration(inputs)
+	if (locale === "tr") return __tr.chat_video_duration(inputs)
+	if (locale === "pl") return __pl.chat_video_duration(inputs)
+	if (locale === "uk") return __uk.chat_video_duration(inputs)
+	if (locale === "nl") return __nl.chat_video_duration(inputs)
+	if (locale === "vi") return __vi.chat_video_duration(inputs)
+	if (locale === "id") return __id.chat_video_duration(inputs)
+	if (locale === "ms") return __ms.chat_video_duration(inputs)
+	if (locale === "th") return __th.chat_video_duration(inputs)
+	if (locale === "fa") return __fa.chat_video_duration(inputs)
+	if (locale === "ur") return __ur.chat_video_duration(inputs)
+	if (locale === "bn") return __bn.chat_video_duration(inputs)
+	if (locale === "pa") return __pa.chat_video_duration(inputs)
+	if (locale === "sw") return __sw.chat_video_duration(inputs)
+	if (locale === "el") return __el.chat_video_duration(inputs)
+	if (locale === "cs") return __cs.chat_video_duration(inputs)
+	if (locale === "ro") return __ro.chat_video_duration(inputs)
+	if (locale === "hu") return __hu.chat_video_duration(inputs)
+	if (locale === "sv") return __sv.chat_video_duration(inputs)
+	if (locale === "he") return __he.chat_video_duration(inputs)
+	return __ru.chat_video_duration(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Full screen" |
+*
+* @param {Chat_Video_FullscreenInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_video_fullscreen = /** @type {((inputs?: Chat_Video_FullscreenInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Video_FullscreenInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_video_fullscreen(inputs)
+	if (locale === "fr") return __fr.chat_video_fullscreen(inputs)
+	if (locale === "es") return __es.chat_video_fullscreen(inputs)
+	if (locale === "zh") return __zh.chat_video_fullscreen(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_video_fullscreen(inputs)
+	if (locale === "hi") return __hi.chat_video_fullscreen(inputs)
+	if (locale === "ar") return __ar.chat_video_fullscreen(inputs)
+	if (locale === "pt") return __pt.chat_video_fullscreen(inputs)
+	if (locale === "de") return __de.chat_video_fullscreen(inputs)
+	if (locale === "ja") return __ja.chat_video_fullscreen(inputs)
+	if (locale === "ko") return __ko.chat_video_fullscreen(inputs)
+	if (locale === "it") return __it.chat_video_fullscreen(inputs)
+	if (locale === "tr") return __tr.chat_video_fullscreen(inputs)
+	if (locale === "pl") return __pl.chat_video_fullscreen(inputs)
+	if (locale === "uk") return __uk.chat_video_fullscreen(inputs)
+	if (locale === "nl") return __nl.chat_video_fullscreen(inputs)
+	if (locale === "vi") return __vi.chat_video_fullscreen(inputs)
+	if (locale === "id") return __id.chat_video_fullscreen(inputs)
+	if (locale === "ms") return __ms.chat_video_fullscreen(inputs)
+	if (locale === "th") return __th.chat_video_fullscreen(inputs)
+	if (locale === "fa") return __fa.chat_video_fullscreen(inputs)
+	if (locale === "ur") return __ur.chat_video_fullscreen(inputs)
+	if (locale === "bn") return __bn.chat_video_fullscreen(inputs)
+	if (locale === "pa") return __pa.chat_video_fullscreen(inputs)
+	if (locale === "sw") return __sw.chat_video_fullscreen(inputs)
+	if (locale === "el") return __el.chat_video_fullscreen(inputs)
+	if (locale === "cs") return __cs.chat_video_fullscreen(inputs)
+	if (locale === "ro") return __ro.chat_video_fullscreen(inputs)
+	if (locale === "hu") return __hu.chat_video_fullscreen(inputs)
+	if (locale === "sv") return __sv.chat_video_fullscreen(inputs)
+	if (locale === "he") return __he.chat_video_fullscreen(inputs)
+	return __ru.chat_video_fullscreen(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Video: MP4/WebM, maximum 40 MB" |
+*
+* @param {Chat_Video_InvalidInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_video_invalid = /** @type {((inputs?: Chat_Video_InvalidInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Video_InvalidInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_video_invalid(inputs)
+	if (locale === "fr") return __fr.chat_video_invalid(inputs)
+	if (locale === "es") return __es.chat_video_invalid(inputs)
+	if (locale === "zh") return __zh.chat_video_invalid(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_video_invalid(inputs)
+	if (locale === "hi") return __hi.chat_video_invalid(inputs)
+	if (locale === "ar") return __ar.chat_video_invalid(inputs)
+	if (locale === "pt") return __pt.chat_video_invalid(inputs)
+	if (locale === "de") return __de.chat_video_invalid(inputs)
+	if (locale === "ja") return __ja.chat_video_invalid(inputs)
+	if (locale === "ko") return __ko.chat_video_invalid(inputs)
+	if (locale === "it") return __it.chat_video_invalid(inputs)
+	if (locale === "tr") return __tr.chat_video_invalid(inputs)
+	if (locale === "pl") return __pl.chat_video_invalid(inputs)
+	if (locale === "uk") return __uk.chat_video_invalid(inputs)
+	if (locale === "nl") return __nl.chat_video_invalid(inputs)
+	if (locale === "vi") return __vi.chat_video_invalid(inputs)
+	if (locale === "id") return __id.chat_video_invalid(inputs)
+	if (locale === "ms") return __ms.chat_video_invalid(inputs)
+	if (locale === "th") return __th.chat_video_invalid(inputs)
+	if (locale === "fa") return __fa.chat_video_invalid(inputs)
+	if (locale === "ur") return __ur.chat_video_invalid(inputs)
+	if (locale === "bn") return __bn.chat_video_invalid(inputs)
+	if (locale === "pa") return __pa.chat_video_invalid(inputs)
+	if (locale === "sw") return __sw.chat_video_invalid(inputs)
+	if (locale === "el") return __el.chat_video_invalid(inputs)
+	if (locale === "cs") return __cs.chat_video_invalid(inputs)
+	if (locale === "ro") return __ro.chat_video_invalid(inputs)
+	if (locale === "hu") return __hu.chat_video_invalid(inputs)
+	if (locale === "sv") return __sv.chat_video_invalid(inputs)
+	if (locale === "he") return __he.chat_video_invalid(inputs)
+	return __ru.chat_video_invalid(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Small window" |
+*
+* @param {Chat_Video_PipInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_video_pip = /** @type {((inputs?: Chat_Video_PipInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Video_PipInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_video_pip(inputs)
+	if (locale === "fr") return __fr.chat_video_pip(inputs)
+	if (locale === "es") return __es.chat_video_pip(inputs)
+	if (locale === "zh") return __zh.chat_video_pip(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_video_pip(inputs)
+	if (locale === "hi") return __hi.chat_video_pip(inputs)
+	if (locale === "ar") return __ar.chat_video_pip(inputs)
+	if (locale === "pt") return __pt.chat_video_pip(inputs)
+	if (locale === "de") return __de.chat_video_pip(inputs)
+	if (locale === "ja") return __ja.chat_video_pip(inputs)
+	if (locale === "ko") return __ko.chat_video_pip(inputs)
+	if (locale === "it") return __it.chat_video_pip(inputs)
+	if (locale === "tr") return __tr.chat_video_pip(inputs)
+	if (locale === "pl") return __pl.chat_video_pip(inputs)
+	if (locale === "uk") return __uk.chat_video_pip(inputs)
+	if (locale === "nl") return __nl.chat_video_pip(inputs)
+	if (locale === "vi") return __vi.chat_video_pip(inputs)
+	if (locale === "id") return __id.chat_video_pip(inputs)
+	if (locale === "ms") return __ms.chat_video_pip(inputs)
+	if (locale === "th") return __th.chat_video_pip(inputs)
+	if (locale === "fa") return __fa.chat_video_pip(inputs)
+	if (locale === "ur") return __ur.chat_video_pip(inputs)
+	if (locale === "bn") return __bn.chat_video_pip(inputs)
+	if (locale === "pa") return __pa.chat_video_pip(inputs)
+	if (locale === "sw") return __sw.chat_video_pip(inputs)
+	if (locale === "el") return __el.chat_video_pip(inputs)
+	if (locale === "cs") return __cs.chat_video_pip(inputs)
+	if (locale === "ro") return __ro.chat_video_pip(inputs)
+	if (locale === "hu") return __hu.chat_video_pip(inputs)
+	if (locale === "sv") return __sv.chat_video_pip(inputs)
+	if (locale === "he") return __he.chat_video_pip(inputs)
+	return __ru.chat_video_pip(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Couldn’t play video · Open file" |
+*
+* @param {Chat_Video_Playback_ErrorInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_video_playback_error = /** @type {((inputs?: Chat_Video_Playback_ErrorInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Video_Playback_ErrorInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_video_playback_error(inputs)
+	if (locale === "fr") return __fr.chat_video_playback_error(inputs)
+	if (locale === "es") return __es.chat_video_playback_error(inputs)
+	if (locale === "zh") return __zh.chat_video_playback_error(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_video_playback_error(inputs)
+	if (locale === "hi") return __hi.chat_video_playback_error(inputs)
+	if (locale === "ar") return __ar.chat_video_playback_error(inputs)
+	if (locale === "pt") return __pt.chat_video_playback_error(inputs)
+	if (locale === "de") return __de.chat_video_playback_error(inputs)
+	if (locale === "ja") return __ja.chat_video_playback_error(inputs)
+	if (locale === "ko") return __ko.chat_video_playback_error(inputs)
+	if (locale === "it") return __it.chat_video_playback_error(inputs)
+	if (locale === "tr") return __tr.chat_video_playback_error(inputs)
+	if (locale === "pl") return __pl.chat_video_playback_error(inputs)
+	if (locale === "uk") return __uk.chat_video_playback_error(inputs)
+	if (locale === "nl") return __nl.chat_video_playback_error(inputs)
+	if (locale === "vi") return __vi.chat_video_playback_error(inputs)
+	if (locale === "id") return __id.chat_video_playback_error(inputs)
+	if (locale === "ms") return __ms.chat_video_playback_error(inputs)
+	if (locale === "th") return __th.chat_video_playback_error(inputs)
+	if (locale === "fa") return __fa.chat_video_playback_error(inputs)
+	if (locale === "ur") return __ur.chat_video_playback_error(inputs)
+	if (locale === "bn") return __bn.chat_video_playback_error(inputs)
+	if (locale === "pa") return __pa.chat_video_playback_error(inputs)
+	if (locale === "sw") return __sw.chat_video_playback_error(inputs)
+	if (locale === "el") return __el.chat_video_playback_error(inputs)
+	if (locale === "cs") return __cs.chat_video_playback_error(inputs)
+	if (locale === "ro") return __ro.chat_video_playback_error(inputs)
+	if (locale === "hu") return __hu.chat_video_playback_error(inputs)
+	if (locale === "sv") return __sv.chat_video_playback_error(inputs)
+	if (locale === "he") return __he.chat_video_playback_error(inputs)
+	return __ru.chat_video_playback_error(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Speed" |
+*
+* @param {Chat_Video_SpeedInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_video_speed = /** @type {((inputs?: Chat_Video_SpeedInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Video_SpeedInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_video_speed(inputs)
+	if (locale === "fr") return __fr.chat_video_speed(inputs)
+	if (locale === "es") return __es.chat_video_speed(inputs)
+	if (locale === "zh") return __zh.chat_video_speed(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_video_speed(inputs)
+	if (locale === "hi") return __hi.chat_video_speed(inputs)
+	if (locale === "ar") return __ar.chat_video_speed(inputs)
+	if (locale === "pt") return __pt.chat_video_speed(inputs)
+	if (locale === "de") return __de.chat_video_speed(inputs)
+	if (locale === "ja") return __ja.chat_video_speed(inputs)
+	if (locale === "ko") return __ko.chat_video_speed(inputs)
+	if (locale === "it") return __it.chat_video_speed(inputs)
+	if (locale === "tr") return __tr.chat_video_speed(inputs)
+	if (locale === "pl") return __pl.chat_video_speed(inputs)
+	if (locale === "uk") return __uk.chat_video_speed(inputs)
+	if (locale === "nl") return __nl.chat_video_speed(inputs)
+	if (locale === "vi") return __vi.chat_video_speed(inputs)
+	if (locale === "id") return __id.chat_video_speed(inputs)
+	if (locale === "ms") return __ms.chat_video_speed(inputs)
+	if (locale === "th") return __th.chat_video_speed(inputs)
+	if (locale === "fa") return __fa.chat_video_speed(inputs)
+	if (locale === "ur") return __ur.chat_video_speed(inputs)
+	if (locale === "bn") return __bn.chat_video_speed(inputs)
+	if (locale === "pa") return __pa.chat_video_speed(inputs)
+	if (locale === "sw") return __sw.chat_video_speed(inputs)
+	if (locale === "el") return __el.chat_video_speed(inputs)
+	if (locale === "cs") return __cs.chat_video_speed(inputs)
+	if (locale === "ro") return __ro.chat_video_speed(inputs)
+	if (locale === "hu") return __hu.chat_video_speed(inputs)
+	if (locale === "sv") return __sv.chat_video_speed(inputs)
+	if (locale === "he") return __he.chat_video_speed(inputs)
+	return __ru.chat_video_speed(inputs)
 });
 /**
 * | output |

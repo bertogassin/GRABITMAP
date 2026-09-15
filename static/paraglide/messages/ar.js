@@ -129,6 +129,13 @@
 /** @typedef {{}} Chat_Upload_CancelledInputs */
 /** @typedef {{}} Chat_Upload_ProgressInputs */
 /** @typedef {{}} Chat_User_UnavailableInputs */
+/** @typedef {{}} Chat_VideoInputs */
+/** @typedef {{}} Chat_Video_DurationInputs */
+/** @typedef {{}} Chat_Video_FullscreenInputs */
+/** @typedef {{}} Chat_Video_InvalidInputs */
+/** @typedef {{}} Chat_Video_PipInputs */
+/** @typedef {{}} Chat_Video_Playback_ErrorInputs */
+/** @typedef {{}} Chat_Video_SpeedInputs */
 /** @typedef {{}} Chat_VoiceInputs */
 /** @typedef {{}} Chat_Voice_ErrorInputs */
 /** @typedef {{}} Chat_Voice_FailedInputs */
@@ -843,6 +850,34 @@ export const chat_upload_progress = /** @type {(inputs: Chat_Upload_ProgressInpu
 
 export const chat_user_unavailable = /** @type {(inputs: Chat_User_UnavailableInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`المستخدم غير متاح`)
+};
+
+export const chat_video = /** @type {(inputs: Chat_VideoInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`فيديو`)
+};
+
+export const chat_video_duration = /** @type {(inputs: Chat_Video_DurationInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`يجب ألا تتجاوز مدة الفيديو 3 دقائق`)
+};
+
+export const chat_video_fullscreen = /** @type {(inputs: Chat_Video_FullscreenInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`ملء الشاشة`)
+};
+
+export const chat_video_invalid = /** @type {(inputs: Chat_Video_InvalidInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`فيديو: MP4/WebM، بحد أقصى 40 ميغابايت`)
+};
+
+export const chat_video_pip = /** @type {(inputs: Chat_Video_PipInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`نافذة صغيرة`)
+};
+
+export const chat_video_playback_error = /** @type {(inputs: Chat_Video_Playback_ErrorInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`تعذر تشغيل الفيديو · فتح الملف`)
+};
+
+export const chat_video_speed = /** @type {(inputs: Chat_Video_SpeedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`السرعة`)
 };
 
 export const chat_voice = /** @type {(inputs: Chat_VoiceInputs) => LocalizedString} */ () => {

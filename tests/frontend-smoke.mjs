@@ -360,6 +360,69 @@ test("chat voice states are registered in every locale", async () => {
   });
 });
 
+test("chat video labels are registered in every locale", async () => {
+  const keys = [
+    "chat_video",
+    "chat_video_duration",
+    "chat_video_fullscreen",
+    "chat_video_invalid",
+    "chat_video_pip",
+    "chat_video_playback_error",
+    "chat_video_speed",
+  ];
+  const translations = {};
+
+  for (const locale of locales) {
+    const messages = JSON.parse(
+      await readFile(new URL("messages/" + locale + ".json", root), "utf8"),
+    );
+    translations[locale] = {};
+
+    for (const key of keys) {
+      assert.equal(typeof messages[key], "string");
+      assert.notEqual(messages[key].trim(), "");
+      translations[locale][key] = messages[key];
+    }
+  }
+
+  assert.deepEqual(translations.ru, {
+    chat_video: "Видео",
+    chat_video_duration: "Видео должно быть не длиннее 3 минут",
+    chat_video_fullscreen: "На весь экран",
+    chat_video_invalid: "Видео: MP4/WebM, максимум 40 МБ",
+    chat_video_pip: "Маленькое окно",
+    chat_video_playback_error: "Не удалось воспроизвести видео · Открыть файл",
+    chat_video_speed: "Скорость",
+  });
+  assert.deepEqual(translations.en, {
+    chat_video: "Video",
+    chat_video_duration: "Video must be no longer than 3 minutes",
+    chat_video_fullscreen: "Full screen",
+    chat_video_invalid: "Video: MP4/WebM, maximum 40 MB",
+    chat_video_pip: "Small window",
+    chat_video_playback_error: "Couldn’t play video · Open file",
+    chat_video_speed: "Speed",
+  });
+  assert.deepEqual(translations.fr, {
+    chat_video: "Vidéo",
+    chat_video_duration: "La vidéo ne doit pas dépasser 3 minutes",
+    chat_video_fullscreen: "Plein écran",
+    chat_video_invalid: "Vidéo : MP4/WebM, 40 Mo maximum",
+    chat_video_pip: "Petite fenêtre",
+    chat_video_playback_error: "Impossible de lire la vidéo · Ouvrir le fichier",
+    chat_video_speed: "Vitesse",
+  });
+  assert.deepEqual(translations.ar, {
+    chat_video: "فيديو",
+    chat_video_duration: "يجب ألا تتجاوز مدة الفيديو 3 دقائق",
+    chat_video_fullscreen: "ملء الشاشة",
+    chat_video_invalid: "فيديو: MP4/WebM، بحد أقصى 40 ميغابايت",
+    chat_video_pip: "نافذة صغيرة",
+    chat_video_playback_error: "تعذر تشغيل الفيديو · فتح الملف",
+    chat_video_speed: "السرعة",
+  });
+});
+
 test("browser translation calls cannot add unregistered locale keys", async () => {
   const base = JSON.parse(
     await readFile(new URL("messages/ru.json", root), "utf8"),
@@ -368,13 +431,6 @@ test("browser translation calls cannot add unregistered locale keys", async () =
     "chat_connecting_initial",
     "chat_member_muted",
     "chat_reply_unavailable",
-    "chat_video",
-    "chat_video_duration",
-    "chat_video_fullscreen",
-    "chat_video_invalid",
-    "chat_video_pip",
-    "chat_video_playback_error",
-    "chat_video_speed",
   ];
   const usedKeys = new Set();
   const staticFiles = (await readdir(new URL("static", root)))

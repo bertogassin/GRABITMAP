@@ -325,5 +325,12 @@
   "chat_mic_request": "อนุญาตการเข้าถึงไมโครโฟน…",
   "chat_voice_record_failed": "โทรศัพท์หยุดการบันทึกเสียง โปรดลองอีกครั้ง",
   "chat_voice_stop_send": "หยุดและส่ง",
-  "chat_voice_too_large": "การบันทึกยาวเกินไป — สูงสุด 2 นาที"
+  "chat_voice_too_large": "การบันทึกยาวเกินไป — สูงสุด 2 นาที",
+  "chat_video": "วิดีโอ",
+  "chat_video_duration": "วิดีโอต้องมีความยาวไม่เกิน 3 นาที",
+  "chat_video_fullscreen": "เต็มหน้าจอ",
+  "chat_video_invalid": "วิดีโอ: MP4/WebM สูงสุด 40 MB",
+  "chat_video_pip": "หน้าต่างขนาดเล็ก",
+  "chat_video_playback_error": "ไม่สามารถเล่นวิดีโอได้ · เปิดไฟล์",
+  "chat_video_speed": "ความเร็ว"
 }

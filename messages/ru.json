@@ -325,5 +325,12 @@
   "chat_mic_request": "Разрешите доступ к микрофону…",
   "chat_voice_record_failed": "Телефон остановил запись. Попробуйте ещё раз.",
   "chat_voice_stop_send": "Остановить и отправить",
-  "chat_voice_too_large": "Запись слишком длинная — максимум 2 минуты"
+  "chat_voice_too_large": "Запись слишком длинная — максимум 2 минуты",
+  "chat_video": "Видео",
+  "chat_video_duration": "Видео должно быть не длиннее 3 минут",
+  "chat_video_fullscreen": "На весь экран",
+  "chat_video_invalid": "Видео: MP4/WebM, максимум 40 МБ",
+  "chat_video_pip": "Маленькое окно",
+  "chat_video_playback_error": "Не удалось воспроизвести видео · Открыть файл",
+  "chat_video_speed": "Скорость"
 }

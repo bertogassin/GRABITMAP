@@ -325,5 +325,12 @@
   "chat_mic_request": "Επιτρέψτε την πρόσβαση στο μικρόφωνο…",
   "chat_voice_record_failed": "Το τηλέφωνο διέκοψε την εγγραφή. Δοκιμάστε ξανά.",
   "chat_voice_stop_send": "Διακοπή και αποστολή",
-  "chat_voice_too_large": "Η εγγραφή είναι πολύ μεγάλη — έως 2 λεπτά"
+  "chat_voice_too_large": "Η εγγραφή είναι πολύ μεγάλη — έως 2 λεπτά",
+  "chat_video": "Βίντεο",
+  "chat_video_duration": "Το βίντεο δεν πρέπει να ξεπερνά τα 3 λεπτά",
+  "chat_video_fullscreen": "Πλήρης οθόνη",
+  "chat_video_invalid": "Βίντεο: MP4/WebM, έως 40 MB",
+  "chat_video_pip": "Μικρό παράθυρο",
+  "chat_video_playback_error": "Δεν ήταν δυνατή η αναπαραγωγή του βίντεο · Άνοιγμα αρχείου",
+  "chat_video_speed": "Ταχύτητα"
 }

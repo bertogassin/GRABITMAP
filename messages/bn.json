@@ -325,5 +325,12 @@
   "chat_mic_request": "মাইক্রোফোন ব্যবহারের অনুমতি দিন…",
   "chat_voice_record_failed": "ফোন রেকর্ডিং বন্ধ করেছে। আবার চেষ্টা করুন।",
   "chat_voice_stop_send": "থামান এবং পাঠান",
-  "chat_voice_too_large": "রেকর্ডিংটি খুব দীর্ঘ — সর্বোচ্চ ২ মিনিট"
+  "chat_voice_too_large": "রেকর্ডিংটি খুব দীর্ঘ — সর্বোচ্চ ২ মিনিট",
+  "chat_video": "ভিডিও",
+  "chat_video_duration": "ভিডিওটি ৩ মিনিটের বেশি দীর্ঘ হওয়া যাবে না",
+  "chat_video_fullscreen": "পূর্ণ পর্দা",
+  "chat_video_invalid": "ভিডিও: MP4/WebM, সর্বোচ্চ ৪০ MB",
+  "chat_video_pip": "ছোট উইন্ডো",
+  "chat_video_playback_error": "ভিডিও চালানো যায়নি · ফাইল খুলুন",
+  "chat_video_speed": "গতি"
 }

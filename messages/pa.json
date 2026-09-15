@@ -325,5 +325,12 @@
   "chat_mic_request": "ਮਾਈਕ੍ਰੋਫ਼ੋਨ ਦੀ ਪਹੁੰਚ ਦੀ ਇਜਾਜ਼ਤ ਦਿਓ…",
   "chat_voice_record_failed": "ਫ਼ੋਨ ਨੇ ਰਿਕਾਰਡਿੰਗ ਰੋਕ ਦਿੱਤੀ। ਮੁੜ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
   "chat_voice_stop_send": "ਰੋਕੋ ਅਤੇ ਭੇਜੋ",
-  "chat_voice_too_large": "ਰਿਕਾਰਡਿੰਗ ਬਹੁਤ ਲੰਬੀ ਹੈ — ਵੱਧ ਤੋਂ ਵੱਧ 2 ਮਿੰਟ"
+  "chat_voice_too_large": "ਰਿਕਾਰਡਿੰਗ ਬਹੁਤ ਲੰਬੀ ਹੈ — ਵੱਧ ਤੋਂ ਵੱਧ 2 ਮਿੰਟ",
+  "chat_video": "ਵੀਡੀਓ",
+  "chat_video_duration": "ਵੀਡੀਓ 3 ਮਿੰਟ ਤੋਂ ਵੱਧ ਲੰਬੀ ਨਹੀਂ ਹੋਣੀ ਚਾਹੀਦੀ",
+  "chat_video_fullscreen": "ਪੂਰੀ ਸਕ੍ਰੀਨ",
+  "chat_video_invalid": "ਵੀਡੀਓ: MP4/WebM, ਵੱਧ ਤੋਂ ਵੱਧ 40 MB",
+  "chat_video_pip": "ਛੋਟੀ ਵਿੰਡੋ",
+  "chat_video_playback_error": "ਵੀਡੀਓ ਨਹੀਂ ਚੱਲੀ · ਫ਼ਾਈਲ ਖੋਲ੍ਹੋ",
+  "chat_video_speed": "ਗਤੀ"
 }

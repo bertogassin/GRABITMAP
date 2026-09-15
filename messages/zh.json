@@ -325,5 +325,12 @@
   "chat_mic_request": "请允许访问麦克风…",
   "chat_voice_record_failed": "手机停止了录音。请重试。",
   "chat_voice_stop_send": "停止并发送",
-  "chat_voice_too_large": "录音时间过长 — 最长 2 分钟"
+  "chat_voice_too_large": "录音时间过长 — 最长 2 分钟",
+  "chat_video": "视频",
+  "chat_video_duration": "视频时长不能超过3分钟",
+  "chat_video_fullscreen": "全屏",
+  "chat_video_invalid": "视频：MP4/WebM，最大 40 MB",
+  "chat_video_pip": "小窗播放",
+  "chat_video_playback_error": "无法播放视频 · 打开文件",
+  "chat_video_speed": "速度"
 }

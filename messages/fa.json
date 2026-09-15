@@ -325,5 +325,12 @@
   "chat_mic_request": "اجازه دسترسی به میکروفون را بدهید…",
   "chat_voice_record_failed": "تلفن ضبط را متوقف کرد. دوباره تلاش کنید.",
   "chat_voice_stop_send": "توقف و ارسال",
-  "chat_voice_too_large": "ضبط بیش از حد طولانی است — حداکثر ۲ دقیقه"
+  "chat_voice_too_large": "ضبط بیش از حد طولانی است — حداکثر ۲ دقیقه",
+  "chat_video": "ویدیو",
+  "chat_video_duration": "ویدیو نباید بیشتر از ۳ دقیقه باشد",
+  "chat_video_fullscreen": "تمام‌صفحه",
+  "chat_video_invalid": "ویدیو: MP4/WebM، حداکثر ۴۰ مگابایت",
+  "chat_video_pip": "پنجره کوچک",
+  "chat_video_playback_error": "ویدیو پخش نشد · باز کردن فایل",
+  "chat_video_speed": "سرعت"
 }

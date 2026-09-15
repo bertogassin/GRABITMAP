@@ -325,5 +325,12 @@
   "chat_mic_request": "Povolte přístup k mikrofonu…",
   "chat_voice_record_failed": "Telefon zastavil nahrávání. Zkuste to znovu.",
   "chat_voice_stop_send": "Zastavit a odeslat",
-  "chat_voice_too_large": "Nahrávka je příliš dlouhá — maximálně 2 minuty"
+  "chat_voice_too_large": "Nahrávka je příliš dlouhá — maximálně 2 minuty",
+  "chat_video": "Video",
+  "chat_video_duration": "Video nesmí být delší než 3 minuty",
+  "chat_video_fullscreen": "Celá obrazovka",
+  "chat_video_invalid": "Video: MP4/WebM, maximálně 40 MB",
+  "chat_video_pip": "Malé okno",
+  "chat_video_playback_error": "Video se nepodařilo přehrát · Otevřít soubor",
+  "chat_video_speed": "Rychlost"
 }

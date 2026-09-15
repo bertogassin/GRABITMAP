@@ -325,5 +325,12 @@
   "chat_mic_request": "Benarkan akses mikrofon…",
   "chat_voice_record_failed": "Telefon menghentikan rakaman. Cuba lagi.",
   "chat_voice_stop_send": "Hentikan dan hantar",
-  "chat_voice_too_large": "Rakaman terlalu panjang — maksimum 2 minit"
+  "chat_voice_too_large": "Rakaman terlalu panjang — maksimum 2 minit",
+  "chat_video": "Video",
+  "chat_video_duration": "Video tidak boleh melebihi 3 minit",
+  "chat_video_fullscreen": "Skrin penuh",
+  "chat_video_invalid": "Video: MP4/WebM, maksimum 40 MB",
+  "chat_video_pip": "Tetingkap kecil",
+  "chat_video_playback_error": "Video tidak dapat dimainkan · Buka fail",
+  "chat_video_speed": "Kelajuan"
 }

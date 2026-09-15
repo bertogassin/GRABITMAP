@@ -325,5 +325,12 @@
   "chat_mic_request": "Cho phép truy cập micrô…",
   "chat_voice_record_failed": "Điện thoại đã dừng ghi âm. Hãy thử lại.",
   "chat_voice_stop_send": "Dừng và gửi",
-  "chat_voice_too_large": "Bản ghi quá dài — tối đa 2 phút"
+  "chat_voice_too_large": "Bản ghi quá dài — tối đa 2 phút",
+  "chat_video": "Video",
+  "chat_video_duration": "Video không được dài quá 3 phút",
+  "chat_video_fullscreen": "Toàn màn hình",
+  "chat_video_invalid": "Video: MP4/WebM, tối đa 40 MB",
+  "chat_video_pip": "Cửa sổ nhỏ",
+  "chat_video_playback_error": "Không thể phát video · Mở tệp",
+  "chat_video_speed": "Tốc độ"
 }

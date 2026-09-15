@@ -325,5 +325,12 @@
   "chat_mic_request": "마이크 접근을 허용하세요…",
   "chat_voice_record_failed": "휴대전화에서 녹음이 중지되었습니다. 다시 시도하세요.",
   "chat_voice_stop_send": "중지 후 보내기",
-  "chat_voice_too_large": "녹음이 너무 깁니다 — 최대 2분"
+  "chat_voice_too_large": "녹음이 너무 깁니다 — 최대 2분",
+  "chat_video": "동영상",
+  "chat_video_duration": "동영상은 3분 이하여야 합니다",
+  "chat_video_fullscreen": "전체 화면",
+  "chat_video_invalid": "동영상: MP4/WebM, 최대 40MB",
+  "chat_video_pip": "작은 화면",
+  "chat_video_playback_error": "동영상을 재생할 수 없음 · 파일 열기",
+  "chat_video_speed": "속도"
 }

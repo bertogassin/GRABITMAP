@@ -325,5 +325,12 @@
   "chat_mic_request": "माइक्रोफ़ोन की अनुमति दें…",
   "chat_voice_record_failed": "फ़ोन ने रिकॉर्डिंग रोक दी। फिर प्रयास करें।",
   "chat_voice_stop_send": "रोकें और भेजें",
-  "chat_voice_too_large": "रिकॉर्डिंग बहुत लंबी है — अधिकतम 2 मिनट"
+  "chat_voice_too_large": "रिकॉर्डिंग बहुत लंबी है — अधिकतम 2 मिनट",
+  "chat_video": "वीडियो",
+  "chat_video_duration": "वीडियो 3 मिनट से अधिक लंबा नहीं होना चाहिए",
+  "chat_video_fullscreen": "पूर्ण स्क्रीन",
+  "chat_video_invalid": "वीडियो: MP4/WebM, अधिकतम 40 MB",
+  "chat_video_pip": "छोटी विंडो",
+  "chat_video_playback_error": "वीडियो नहीं चल सका · फ़ाइल खोलें",
+  "chat_video_speed": "गति"
 }
