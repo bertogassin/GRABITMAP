@@ -321,5 +321,9 @@
   "chat_media_queue_full": "Hãy đợi gửi xong các tệp đính kèm hiện tại",
   "chat_sending_attachment": "Đang gửi tệp đính kèm…",
   "chat_upload_cancelled": "Đã hủy tải lên",
-  "chat_upload_progress": "Tải lên"
+  "chat_upload_progress": "Tải lên",
+  "chat_mic_request": "Cho phép truy cập micrô…",
+  "chat_voice_record_failed": "Điện thoại đã dừng ghi âm. Hãy thử lại.",
+  "chat_voice_stop_send": "Dừng và gửi",
+  "chat_voice_too_large": "Bản ghi quá dài — tối đa 2 phút"
 }

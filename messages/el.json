@@ -321,5 +321,9 @@
   "chat_media_queue_full": "Περιμένετε να ολοκληρωθεί η αποστολή των τρεχόντων συνημμένων",
   "chat_sending_attachment": "Αποστολή συνημμένου…",
   "chat_upload_cancelled": "Η μεταφόρτωση ακυρώθηκε",
-  "chat_upload_progress": "Μεταφόρτωση"
+  "chat_upload_progress": "Μεταφόρτωση",
+  "chat_mic_request": "Επιτρέψτε την πρόσβαση στο μικρόφωνο…",
+  "chat_voice_record_failed": "Το τηλέφωνο διέκοψε την εγγραφή. Δοκιμάστε ξανά.",
+  "chat_voice_stop_send": "Διακοπή και αποστολή",
+  "chat_voice_too_large": "Η εγγραφή είναι πολύ μεγάλη — έως 2 λεπτά"
 }

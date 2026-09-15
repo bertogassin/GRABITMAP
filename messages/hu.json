@@ -321,5 +321,9 @@
   "chat_media_queue_full": "Várja meg a jelenlegi mellékletek elküldését",
   "chat_sending_attachment": "Melléklet küldése…",
   "chat_upload_cancelled": "Feltöltés megszakítva",
-  "chat_upload_progress": "Feltöltés"
+  "chat_upload_progress": "Feltöltés",
+  "chat_mic_request": "Engedélyezze a mikrofonhoz való hozzáférést…",
+  "chat_voice_record_failed": "A telefon leállította a felvételt. Próbálja újra.",
+  "chat_voice_stop_send": "Leállítás és küldés",
+  "chat_voice_too_large": "A felvétel túl hosszú — legfeljebb 2 perc"
 }

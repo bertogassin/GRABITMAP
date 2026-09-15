@@ -321,5 +321,9 @@
   "chat_media_queue_full": "موجودہ منسلکات بھیجے جانے تک انتظار کریں",
   "chat_sending_attachment": "منسلکہ بھیجا جا رہا ہے…",
   "chat_upload_cancelled": "اپ لوڈ منسوخ کر دیا گیا",
-  "chat_upload_progress": "اپ لوڈ"
+  "chat_upload_progress": "اپ لوڈ",
+  "chat_mic_request": "مائیکروفون تک رسائی کی اجازت دیں…",
+  "chat_voice_record_failed": "فون نے ریکارڈنگ روک دی۔ دوبارہ کوشش کریں۔",
+  "chat_voice_stop_send": "روکیں اور بھیجیں",
+  "chat_voice_too_large": "ریکارڈنگ بہت طویل ہے — زیادہ سے زیادہ 2 منٹ"
 }

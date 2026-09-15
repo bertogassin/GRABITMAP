@@ -321,5 +321,9 @@
   "chat_media_queue_full": "Tunggu sehingga lampiran semasa selesai dihantar",
   "chat_sending_attachment": "Menghantar lampiran…",
   "chat_upload_cancelled": "Muat naik dibatalkan",
-  "chat_upload_progress": "Muat naik"
+  "chat_upload_progress": "Muat naik",
+  "chat_mic_request": "Benarkan akses mikrofon…",
+  "chat_voice_record_failed": "Telefon menghentikan rakaman. Cuba lagi.",
+  "chat_voice_stop_send": "Hentikan dan hantar",
+  "chat_voice_too_large": "Rakaman terlalu panjang — maksimum 2 minit"
 }

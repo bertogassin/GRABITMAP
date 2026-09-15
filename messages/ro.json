@@ -321,5 +321,9 @@
   "chat_media_queue_full": "Așteptați finalizarea trimiterii atașamentelor curente",
   "chat_sending_attachment": "Se trimite atașamentul…",
   "chat_upload_cancelled": "Încărcare anulată",
-  "chat_upload_progress": "Încărcare"
+  "chat_upload_progress": "Încărcare",
+  "chat_mic_request": "Permiteți accesul la microfon…",
+  "chat_voice_record_failed": "Telefonul a oprit înregistrarea. Încercați din nou.",
+  "chat_voice_stop_send": "Oprește și trimite",
+  "chat_voice_too_large": "Înregistrarea este prea lungă — maximum 2 minute"
 }

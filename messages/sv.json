@@ -321,5 +321,9 @@
   "chat_media_queue_full": "Vänta tills de aktuella bilagorna har skickats",
   "chat_sending_attachment": "Skickar bilaga…",
   "chat_upload_cancelled": "Uppladdningen avbröts",
-  "chat_upload_progress": "Uppladdning"
+  "chat_upload_progress": "Uppladdning",
+  "chat_mic_request": "Tillåt åtkomst till mikrofonen…",
+  "chat_voice_record_failed": "Telefonen stoppade inspelningen. Försök igen.",
+  "chat_voice_stop_send": "Stoppa och skicka",
+  "chat_voice_too_large": "Inspelningen är för lång — högst 2 minuter"
 }

@@ -321,5 +321,9 @@
   "chat_media_queue_full": "현재 첨부 파일 전송이 완료될 때까지 기다리세요",
   "chat_sending_attachment": "첨부 파일 전송 중…",
   "chat_upload_cancelled": "업로드 취소됨",
-  "chat_upload_progress": "업로드"
+  "chat_upload_progress": "업로드",
+  "chat_mic_request": "마이크 접근을 허용하세요…",
+  "chat_voice_record_failed": "휴대전화에서 녹음이 중지되었습니다. 다시 시도하세요.",
+  "chat_voice_stop_send": "중지 후 보내기",
+  "chat_voice_too_large": "녹음이 너무 깁니다 — 최대 2분"
 }

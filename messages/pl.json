@@ -321,5 +321,9 @@
   "chat_media_queue_full": "Poczekaj na zakończenie wysyłania bieżących załączników",
   "chat_sending_attachment": "Wysyłanie załącznika…",
   "chat_upload_cancelled": "Wysyłanie anulowane",
-  "chat_upload_progress": "Przesyłanie"
+  "chat_upload_progress": "Przesyłanie",
+  "chat_mic_request": "Zezwól na dostęp do mikrofonu…",
+  "chat_voice_record_failed": "Telefon zatrzymał nagrywanie. Spróbuj ponownie.",
+  "chat_voice_stop_send": "Zatrzymaj i wyślij",
+  "chat_voice_too_large": "Nagranie jest zbyt długie — maksymalnie 2 minuty"
 }

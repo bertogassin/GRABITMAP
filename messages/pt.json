@@ -321,5 +321,9 @@
   "chat_media_queue_full": "Aguarde o envio dos anexos atuais",
   "chat_sending_attachment": "Enviando anexo…",
   "chat_upload_cancelled": "Envio cancelado",
-  "chat_upload_progress": "Upload"
+  "chat_upload_progress": "Upload",
+  "chat_mic_request": "Permita o acesso ao microfone…",
+  "chat_voice_record_failed": "O telefone interrompeu a gravação. Tente novamente.",
+  "chat_voice_stop_send": "Parar e enviar",
+  "chat_voice_too_large": "A gravação é muito longa — máximo de 2 minutos"
 }

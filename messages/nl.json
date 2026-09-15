@@ -321,5 +321,9 @@
   "chat_media_queue_full": "Wacht tot de huidige bijlagen zijn verzonden",
   "chat_sending_attachment": "Bijlage verzenden…",
   "chat_upload_cancelled": "Upload geannuleerd",
-  "chat_upload_progress": "Upload"
+  "chat_upload_progress": "Upload",
+  "chat_mic_request": "Geef toegang tot de microfoon…",
+  "chat_voice_record_failed": "De telefoon heeft de opname gestopt. Probeer het opnieuw.",
+  "chat_voice_stop_send": "Stoppen en verzenden",
+  "chat_voice_too_large": "De opname is te lang — maximaal 2 minuten"
 }

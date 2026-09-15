@@ -321,5 +321,9 @@
   "chat_media_queue_full": "Дождитесь отправки текущих вложений",
   "chat_sending_attachment": "Отправка вложения…",
   "chat_upload_cancelled": "Отправка отменена",
-  "chat_upload_progress": "Загрузка"
+  "chat_upload_progress": "Загрузка",
+  "chat_mic_request": "Разрешите доступ к микрофону…",
+  "chat_voice_record_failed": "Телефон остановил запись. Попробуйте ещё раз.",
+  "chat_voice_stop_send": "Остановить и отправить",
+  "chat_voice_too_large": "Запись слишком длинная — максимум 2 минуты"
 }

@@ -321,5 +321,9 @@
   "chat_media_queue_full": "انتظر حتى يكتمل إرسال المرفقات الحالية",
   "chat_sending_attachment": "جارٍ إرسال المرفق…",
   "chat_upload_cancelled": "تم إلغاء الرفع",
-  "chat_upload_progress": "رفع"
+  "chat_upload_progress": "رفع",
+  "chat_mic_request": "اسمح بالوصول إلى الميكروفون…",
+  "chat_voice_record_failed": "أوقف الهاتف التسجيل. حاول مجددًا.",
+  "chat_voice_stop_send": "إيقاف وإرسال",
+  "chat_voice_too_large": "التسجيل طويل جدًا — الحد الأقصى دقيقتان"
 }

@@ -321,5 +321,9 @@
   "chat_media_queue_full": "मौजूदा अटैचमेंट भेजे जाने तक प्रतीक्षा करें",
   "chat_sending_attachment": "अटैचमेंट भेजा जा रहा है…",
   "chat_upload_cancelled": "अपलोड रद्द किया गया",
-  "chat_upload_progress": "अपलोड"
+  "chat_upload_progress": "अपलोड",
+  "chat_mic_request": "माइक्रोफ़ोन की अनुमति दें…",
+  "chat_voice_record_failed": "फ़ोन ने रिकॉर्डिंग रोक दी। फिर प्रयास करें।",
+  "chat_voice_stop_send": "रोकें और भेजें",
+  "chat_voice_too_large": "रिकॉर्डिंग बहुत लंबी है — अधिकतम 2 मिनट"
 }

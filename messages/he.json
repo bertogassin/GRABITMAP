@@ -321,5 +321,9 @@
   "chat_media_queue_full": "יש להמתין לסיום שליחת הקבצים המצורפים הנוכחיים",
   "chat_sending_attachment": "הקובץ המצורף נשלח…",
   "chat_upload_cancelled": "ההעלאה בוטלה",
-  "chat_upload_progress": "העלאה"
+  "chat_upload_progress": "העלאה",
+  "chat_mic_request": "יש לאפשר גישה למיקרופון…",
+  "chat_voice_record_failed": "הטלפון הפסיק את ההקלטה. נסו שוב.",
+  "chat_voice_stop_send": "עצירה ושליחה",
+  "chat_voice_too_large": "ההקלטה ארוכה מדי — עד 2 דקות"
 }
