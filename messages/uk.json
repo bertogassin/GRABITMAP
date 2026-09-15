@@ -332,5 +332,8 @@
   "chat_video_invalid": "Відео: MP4/WebM, максимум 40 МБ",
   "chat_video_pip": "Маленьке вікно",
   "chat_video_playback_error": "Не вдалося відтворити відео · Відкрити файл",
-  "chat_video_speed": "Швидкість"
+  "chat_video_speed": "Швидкість",
+  "chat_connecting_initial": "З’єднання…",
+  "chat_member_muted": "Адміністратор тимчасово обмежив надсилання",
+  "chat_reply_unavailable": "Повідомлення, на яке ви відповідаєте, більше недоступне"
 }

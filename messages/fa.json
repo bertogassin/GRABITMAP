@@ -332,5 +332,8 @@
   "chat_video_invalid": "ویدیو: MP4/WebM، حداکثر ۴۰ مگابایت",
   "chat_video_pip": "پنجره کوچک",
   "chat_video_playback_error": "ویدیو پخش نشد · باز کردن فایل",
-  "chat_video_speed": "سرعت"
+  "chat_video_speed": "سرعت",
+  "chat_connecting_initial": "در حال اتصال…",
+  "chat_member_muted": "ارسال به‌طور موقت توسط مدیر محدود شده است",
+  "chat_reply_unavailable": "پیامی که به آن پاسخ می‌دهید دیگر در دسترس نیست"
 }

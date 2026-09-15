@@ -332,5 +332,8 @@
   "chat_video_invalid": "वीडियो: MP4/WebM, अधिकतम 40 MB",
   "chat_video_pip": "छोटी विंडो",
   "chat_video_playback_error": "वीडियो नहीं चल सका · फ़ाइल खोलें",
-  "chat_video_speed": "गति"
+  "chat_video_speed": "गति",
+  "chat_connecting_initial": "कनेक्ट हो रहा है…",
+  "chat_member_muted": "एडमिन ने भेजने पर अस्थायी रोक लगाई है",
+  "chat_reply_unavailable": "जिस संदेश का जवाब दिया जा रहा है वह अब उपलब्ध नहीं है"
 }

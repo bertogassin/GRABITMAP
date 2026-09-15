@@ -332,5 +332,8 @@
   "chat_video_invalid": "動画：MP4/WebM、最大40 MB",
   "chat_video_pip": "ピクチャーインピクチャー",
   "chat_video_playback_error": "動画を再生できませんでした · ファイルを開く",
-  "chat_video_speed": "速度"
+  "chat_video_speed": "速度",
+  "chat_connecting_initial": "接続中…",
+  "chat_member_muted": "管理者により送信が一時的に制限されています",
+  "chat_reply_unavailable": "返信先のメッセージは利用できなくなりました"
 }

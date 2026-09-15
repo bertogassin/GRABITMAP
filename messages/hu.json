@@ -332,5 +332,8 @@
   "chat_video_invalid": "Videó: MP4/WebM, legfeljebb 40 MB",
   "chat_video_pip": "Kis ablak",
   "chat_video_playback_error": "A videó nem játszható le · Fájl megnyitása",
-  "chat_video_speed": "Sebesség"
+  "chat_video_speed": "Sebesség",
+  "chat_connecting_initial": "Csatlakozás…",
+  "chat_member_muted": "Egy adminisztrátor ideiglenesen korlátozta a küldést",
+  "chat_reply_unavailable": "A megválaszolt üzenet már nem érhető el"
 }

@@ -423,15 +423,53 @@ test("chat video labels are registered in every locale", async () => {
   });
 });
 
-test("browser translation calls cannot add unregistered locale keys", async () => {
-  const base = JSON.parse(
-    await readFile(new URL("messages/ru.json", root), "utf8"),
-  );
-  const knownLegacyDebt = [
+test("final chat state labels are registered in every locale", async () => {
+  const keys = [
     "chat_connecting_initial",
     "chat_member_muted",
     "chat_reply_unavailable",
   ];
+  const translations = {};
+
+  for (const locale of locales) {
+    const messages = JSON.parse(
+      await readFile(new URL("messages/" + locale + ".json", root), "utf8"),
+    );
+    translations[locale] = {};
+
+    for (const key of keys) {
+      assert.equal(typeof messages[key], "string");
+      assert.notEqual(messages[key].trim(), "");
+      translations[locale][key] = messages[key];
+    }
+  }
+
+  assert.deepEqual(translations.ru, {
+    chat_connecting_initial: "Соединение…",
+    chat_member_muted: "Отправка временно ограничена администратором",
+    chat_reply_unavailable: "Сообщение для ответа уже недоступно",
+  });
+  assert.deepEqual(translations.en, {
+    chat_connecting_initial: "Connecting…",
+    chat_member_muted: "Sending is temporarily restricted by an administrator",
+    chat_reply_unavailable: "The message you’re replying to is no longer available",
+  });
+  assert.deepEqual(translations.fr, {
+    chat_connecting_initial: "Connexion…",
+    chat_member_muted: "L’envoi est temporairement limité par un administrateur",
+    chat_reply_unavailable: "Le message auquel vous répondez n’est plus disponible",
+  });
+  assert.deepEqual(translations.ar, {
+    chat_connecting_initial: "جارٍ الاتصال…",
+    chat_member_muted: "قيّد أحد المشرفين الإرسال مؤقتًا",
+    chat_reply_unavailable: "الرسالة التي ترد عليها لم تعد متاحة",
+  });
+});
+
+test("browser translation calls cannot add unregistered locale keys", async () => {
+  const base = JSON.parse(
+    await readFile(new URL("messages/ru.json", root), "utf8"),
+  );
   const usedKeys = new Set();
   const staticFiles = (await readdir(new URL("static", root)))
     .filter((name) => name.endsWith(".js"));
@@ -454,7 +492,7 @@ test("browser translation calls cannot add unregistered locale keys", async () =
     .filter((key) => !(key in base))
     .sort();
 
-  assert.deepEqual(unregistered, knownLegacyDebt);
+  assert.deepEqual(unregistered, []);
 });
 
 test("RTL runtime and mobile PWA metadata are present", async () => {

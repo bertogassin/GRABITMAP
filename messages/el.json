@@ -332,5 +332,8 @@
   "chat_video_invalid": "Βίντεο: MP4/WebM, έως 40 MB",
   "chat_video_pip": "Μικρό παράθυρο",
   "chat_video_playback_error": "Δεν ήταν δυνατή η αναπαραγωγή του βίντεο · Άνοιγμα αρχείου",
-  "chat_video_speed": "Ταχύτητα"
+  "chat_video_speed": "Ταχύτητα",
+  "chat_connecting_initial": "Σύνδεση…",
+  "chat_member_muted": "Η αποστολή περιορίστηκε προσωρινά από διαχειριστή",
+  "chat_reply_unavailable": "Το μήνυμα στο οποίο απαντάτε δεν είναι πλέον διαθέσιμο"
 }

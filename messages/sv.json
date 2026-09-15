@@ -332,5 +332,8 @@
   "chat_video_invalid": "Video: MP4/WebM, högst 40 MB",
   "chat_video_pip": "Litet fönster",
   "chat_video_playback_error": "Videon kunde inte spelas upp · Öppna fil",
-  "chat_video_speed": "Hastighet"
+  "chat_video_speed": "Hastighet",
+  "chat_connecting_initial": "Ansluter…",
+  "chat_member_muted": "En administratör har tillfälligt begränsat sändning",
+  "chat_reply_unavailable": "Meddelandet du svarar på är inte längre tillgängligt"
 }

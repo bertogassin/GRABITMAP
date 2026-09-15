@@ -29,6 +29,7 @@
 /** @typedef {{}} Chat_Compressing_PhotoInputs */
 /** @typedef {{}} Chat_Conn_OkInputs */
 /** @typedef {{}} Chat_ConnectingInputs */
+/** @typedef {{}} Chat_Connecting_InitialInputs */
 /** @typedef {{}} Chat_CopyInputs */
 /** @typedef {{ n: NonNullable<unknown> }} Chat_Days_AgoInputs */
 /** @typedef {{}} Chat_DeleteInputs */
@@ -75,6 +76,7 @@
 /** @typedef {{}} Chat_LoadingInputs */
 /** @typedef {{}} Chat_Long_AgoInputs */
 /** @typedef {{}} Chat_Media_Queue_FullInputs */
+/** @typedef {{}} Chat_Member_MutedInputs */
 /** @typedef {{}} Chat_MembersInputs */
 /** @typedef {{}} Chat_MessageInputs */
 /** @typedef {{}} Chat_Mic_DeniedInputs */
@@ -103,6 +105,7 @@
 /** @typedef {{}} Chat_Recording_ReleaseInputs */
 /** @typedef {{}} Chat_ReplyInputs */
 /** @typedef {{}} Chat_Reply_LabelInputs */
+/** @typedef {{}} Chat_Reply_UnavailableInputs */
 /** @typedef {{ n: NonNullable<unknown> }} Chat_Retry_In_SecInputs */
 /** @typedef {{}} Chat_Retry_SoonInputs */
 /** @typedef {{}} Chat_SaveInputs */
@@ -452,6 +455,10 @@ export const chat_connecting = /** @type {(inputs: Chat_ConnectingInputs) => Loc
 	return /** @type {LocalizedString} */ (`পুনরায় সংযোগ…`)
 };
 
+export const chat_connecting_initial = /** @type {(inputs: Chat_Connecting_InitialInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`সংযোগ করা হচ্ছে…`)
+};
+
 export const chat_copy = /** @type {(inputs: Chat_CopyInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Copy`)
 };
@@ -636,6 +643,10 @@ export const chat_media_queue_full = /** @type {(inputs: Chat_Media_Queue_FullIn
 	return /** @type {LocalizedString} */ (`বর্তমান সংযুক্তিগুলো পাঠানো শেষ হওয়া পর্যন্ত অপেক্ষা করুন`)
 };
 
+export const chat_member_muted = /** @type {(inputs: Chat_Member_MutedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`অ্যাডমিন সাময়িকভাবে বার্তা পাঠানো সীমিত করেছেন`)
+};
+
 export const chat_members = /** @type {(inputs: Chat_MembersInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Members`)
 };
@@ -746,6 +757,10 @@ export const chat_reply = /** @type {(inputs: Chat_ReplyInputs) => LocalizedStri
 
 export const chat_reply_label = /** @type {(inputs: Chat_Reply_LabelInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`উত্তর`)
+};
+
+export const chat_reply_unavailable = /** @type {(inputs: Chat_Reply_UnavailableInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`যে বার্তার উত্তর দিচ্ছেন সেটি আর পাওয়া যাচ্ছে না`)
 };
 
 export const chat_retry_in_sec = /** @type {(inputs: Chat_Retry_In_SecInputs) => LocalizedString} */ (i) => {

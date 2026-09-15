@@ -332,5 +332,8 @@
   "chat_video_invalid": "影片：MP4/WebM，上限 40 MB",
   "chat_video_pip": "小視窗播放",
   "chat_video_playback_error": "無法播放影片 · 開啟檔案",
-  "chat_video_speed": "速度"
+  "chat_video_speed": "速度",
+  "chat_connecting_initial": "正在連線…",
+  "chat_member_muted": "管理員暫時限制了傳送訊息",
+  "chat_reply_unavailable": "要回覆的訊息已無法使用"
 }

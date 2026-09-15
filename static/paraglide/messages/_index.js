@@ -31,6 +31,7 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Chat_Compressing_PhotoInputs */
 /** @typedef {{}} Chat_Conn_OkInputs */
 /** @typedef {{}} Chat_ConnectingInputs */
+/** @typedef {{}} Chat_Connecting_InitialInputs */
 /** @typedef {{}} Chat_CopyInputs */
 /** @typedef {{ n: NonNullable<unknown> }} Chat_Days_AgoInputs */
 /** @typedef {{}} Chat_DeleteInputs */
@@ -77,6 +78,7 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Chat_LoadingInputs */
 /** @typedef {{}} Chat_Long_AgoInputs */
 /** @typedef {{}} Chat_Media_Queue_FullInputs */
+/** @typedef {{}} Chat_Member_MutedInputs */
 /** @typedef {{}} Chat_MembersInputs */
 /** @typedef {{}} Chat_MessageInputs */
 /** @typedef {{}} Chat_Mic_DeniedInputs */
@@ -105,6 +107,7 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Chat_Recording_ReleaseInputs */
 /** @typedef {{}} Chat_ReplyInputs */
 /** @typedef {{}} Chat_Reply_LabelInputs */
+/** @typedef {{}} Chat_Reply_UnavailableInputs */
 /** @typedef {{ n: NonNullable<unknown> }} Chat_Retry_In_SecInputs */
 /** @typedef {{}} Chat_Retry_SoonInputs */
 /** @typedef {{}} Chat_SaveInputs */
@@ -1643,6 +1646,50 @@ export const chat_connecting = /** @type {((inputs?: Chat_ConnectingInputs, opti
 	if (locale === "sv") return __sv.chat_connecting(inputs)
 	if (locale === "he") return __he.chat_connecting(inputs)
 	return __ru.chat_connecting(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Connecting…" |
+*
+* @param {Chat_Connecting_InitialInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_connecting_initial = /** @type {((inputs?: Chat_Connecting_InitialInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Connecting_InitialInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_connecting_initial(inputs)
+	if (locale === "fr") return __fr.chat_connecting_initial(inputs)
+	if (locale === "es") return __es.chat_connecting_initial(inputs)
+	if (locale === "zh") return __zh.chat_connecting_initial(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_connecting_initial(inputs)
+	if (locale === "hi") return __hi.chat_connecting_initial(inputs)
+	if (locale === "ar") return __ar.chat_connecting_initial(inputs)
+	if (locale === "pt") return __pt.chat_connecting_initial(inputs)
+	if (locale === "de") return __de.chat_connecting_initial(inputs)
+	if (locale === "ja") return __ja.chat_connecting_initial(inputs)
+	if (locale === "ko") return __ko.chat_connecting_initial(inputs)
+	if (locale === "it") return __it.chat_connecting_initial(inputs)
+	if (locale === "tr") return __tr.chat_connecting_initial(inputs)
+	if (locale === "pl") return __pl.chat_connecting_initial(inputs)
+	if (locale === "uk") return __uk.chat_connecting_initial(inputs)
+	if (locale === "nl") return __nl.chat_connecting_initial(inputs)
+	if (locale === "vi") return __vi.chat_connecting_initial(inputs)
+	if (locale === "id") return __id.chat_connecting_initial(inputs)
+	if (locale === "ms") return __ms.chat_connecting_initial(inputs)
+	if (locale === "th") return __th.chat_connecting_initial(inputs)
+	if (locale === "fa") return __fa.chat_connecting_initial(inputs)
+	if (locale === "ur") return __ur.chat_connecting_initial(inputs)
+	if (locale === "bn") return __bn.chat_connecting_initial(inputs)
+	if (locale === "pa") return __pa.chat_connecting_initial(inputs)
+	if (locale === "sw") return __sw.chat_connecting_initial(inputs)
+	if (locale === "el") return __el.chat_connecting_initial(inputs)
+	if (locale === "cs") return __cs.chat_connecting_initial(inputs)
+	if (locale === "ro") return __ro.chat_connecting_initial(inputs)
+	if (locale === "hu") return __hu.chat_connecting_initial(inputs)
+	if (locale === "sv") return __sv.chat_connecting_initial(inputs)
+	if (locale === "he") return __he.chat_connecting_initial(inputs)
+	return __ru.chat_connecting_initial(inputs)
 });
 /**
 * | output |
@@ -3671,6 +3718,50 @@ export const chat_media_queue_full = /** @type {((inputs?: Chat_Media_Queue_Full
 /**
 * | output |
 * | --- |
+* | "Sending is temporarily restricted by an administrator" |
+*
+* @param {Chat_Member_MutedInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_member_muted = /** @type {((inputs?: Chat_Member_MutedInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Member_MutedInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_member_muted(inputs)
+	if (locale === "fr") return __fr.chat_member_muted(inputs)
+	if (locale === "es") return __es.chat_member_muted(inputs)
+	if (locale === "zh") return __zh.chat_member_muted(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_member_muted(inputs)
+	if (locale === "hi") return __hi.chat_member_muted(inputs)
+	if (locale === "ar") return __ar.chat_member_muted(inputs)
+	if (locale === "pt") return __pt.chat_member_muted(inputs)
+	if (locale === "de") return __de.chat_member_muted(inputs)
+	if (locale === "ja") return __ja.chat_member_muted(inputs)
+	if (locale === "ko") return __ko.chat_member_muted(inputs)
+	if (locale === "it") return __it.chat_member_muted(inputs)
+	if (locale === "tr") return __tr.chat_member_muted(inputs)
+	if (locale === "pl") return __pl.chat_member_muted(inputs)
+	if (locale === "uk") return __uk.chat_member_muted(inputs)
+	if (locale === "nl") return __nl.chat_member_muted(inputs)
+	if (locale === "vi") return __vi.chat_member_muted(inputs)
+	if (locale === "id") return __id.chat_member_muted(inputs)
+	if (locale === "ms") return __ms.chat_member_muted(inputs)
+	if (locale === "th") return __th.chat_member_muted(inputs)
+	if (locale === "fa") return __fa.chat_member_muted(inputs)
+	if (locale === "ur") return __ur.chat_member_muted(inputs)
+	if (locale === "bn") return __bn.chat_member_muted(inputs)
+	if (locale === "pa") return __pa.chat_member_muted(inputs)
+	if (locale === "sw") return __sw.chat_member_muted(inputs)
+	if (locale === "el") return __el.chat_member_muted(inputs)
+	if (locale === "cs") return __cs.chat_member_muted(inputs)
+	if (locale === "ro") return __ro.chat_member_muted(inputs)
+	if (locale === "hu") return __hu.chat_member_muted(inputs)
+	if (locale === "sv") return __sv.chat_member_muted(inputs)
+	if (locale === "he") return __he.chat_member_muted(inputs)
+	return __ru.chat_member_muted(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "Members" |
 *
 * @param {Chat_MembersInputs} inputs
@@ -4899,6 +4990,50 @@ export const chat_reply_label = /** @type {((inputs?: Chat_Reply_LabelInputs, op
 	if (locale === "sv") return __sv.chat_reply_label(inputs)
 	if (locale === "he") return __he.chat_reply_label(inputs)
 	return __ru.chat_reply_label(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "The message you’re replying to is no longer available" |
+*
+* @param {Chat_Reply_UnavailableInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const chat_reply_unavailable = /** @type {((inputs?: Chat_Reply_UnavailableInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Chat_Reply_UnavailableInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.chat_reply_unavailable(inputs)
+	if (locale === "fr") return __fr.chat_reply_unavailable(inputs)
+	if (locale === "es") return __es.chat_reply_unavailable(inputs)
+	if (locale === "zh") return __zh.chat_reply_unavailable(inputs)
+	if (locale === "zh-TW") return __zh_tw2.chat_reply_unavailable(inputs)
+	if (locale === "hi") return __hi.chat_reply_unavailable(inputs)
+	if (locale === "ar") return __ar.chat_reply_unavailable(inputs)
+	if (locale === "pt") return __pt.chat_reply_unavailable(inputs)
+	if (locale === "de") return __de.chat_reply_unavailable(inputs)
+	if (locale === "ja") return __ja.chat_reply_unavailable(inputs)
+	if (locale === "ko") return __ko.chat_reply_unavailable(inputs)
+	if (locale === "it") return __it.chat_reply_unavailable(inputs)
+	if (locale === "tr") return __tr.chat_reply_unavailable(inputs)
+	if (locale === "pl") return __pl.chat_reply_unavailable(inputs)
+	if (locale === "uk") return __uk.chat_reply_unavailable(inputs)
+	if (locale === "nl") return __nl.chat_reply_unavailable(inputs)
+	if (locale === "vi") return __vi.chat_reply_unavailable(inputs)
+	if (locale === "id") return __id.chat_reply_unavailable(inputs)
+	if (locale === "ms") return __ms.chat_reply_unavailable(inputs)
+	if (locale === "th") return __th.chat_reply_unavailable(inputs)
+	if (locale === "fa") return __fa.chat_reply_unavailable(inputs)
+	if (locale === "ur") return __ur.chat_reply_unavailable(inputs)
+	if (locale === "bn") return __bn.chat_reply_unavailable(inputs)
+	if (locale === "pa") return __pa.chat_reply_unavailable(inputs)
+	if (locale === "sw") return __sw.chat_reply_unavailable(inputs)
+	if (locale === "el") return __el.chat_reply_unavailable(inputs)
+	if (locale === "cs") return __cs.chat_reply_unavailable(inputs)
+	if (locale === "ro") return __ro.chat_reply_unavailable(inputs)
+	if (locale === "hu") return __hu.chat_reply_unavailable(inputs)
+	if (locale === "sv") return __sv.chat_reply_unavailable(inputs)
+	if (locale === "he") return __he.chat_reply_unavailable(inputs)
+	return __ru.chat_reply_unavailable(inputs)
 });
 /**
 * | output |

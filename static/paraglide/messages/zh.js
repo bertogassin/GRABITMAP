@@ -29,6 +29,7 @@
 /** @typedef {{}} Chat_Compressing_PhotoInputs */
 /** @typedef {{}} Chat_Conn_OkInputs */
 /** @typedef {{}} Chat_ConnectingInputs */
+/** @typedef {{}} Chat_Connecting_InitialInputs */
 /** @typedef {{}} Chat_CopyInputs */
 /** @typedef {{ n: NonNullable<unknown> }} Chat_Days_AgoInputs */
 /** @typedef {{}} Chat_DeleteInputs */
@@ -75,6 +76,7 @@
 /** @typedef {{}} Chat_LoadingInputs */
 /** @typedef {{}} Chat_Long_AgoInputs */
 /** @typedef {{}} Chat_Media_Queue_FullInputs */
+/** @typedef {{}} Chat_Member_MutedInputs */
 /** @typedef {{}} Chat_MembersInputs */
 /** @typedef {{}} Chat_MessageInputs */
 /** @typedef {{}} Chat_Mic_DeniedInputs */
@@ -103,6 +105,7 @@
 /** @typedef {{}} Chat_Recording_ReleaseInputs */
 /** @typedef {{}} Chat_ReplyInputs */
 /** @typedef {{}} Chat_Reply_LabelInputs */
+/** @typedef {{}} Chat_Reply_UnavailableInputs */
 /** @typedef {{ n: NonNullable<unknown> }} Chat_Retry_In_SecInputs */
 /** @typedef {{}} Chat_Retry_SoonInputs */
 /** @typedef {{}} Chat_SaveInputs */
@@ -452,6 +455,10 @@ export const chat_connecting = /** @type {(inputs: Chat_ConnectingInputs) => Loc
 	return /** @type {LocalizedString} */ (`正在重新连接…`)
 };
 
+export const chat_connecting_initial = /** @type {(inputs: Chat_Connecting_InitialInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`正在连接…`)
+};
+
 export const chat_copy = /** @type {(inputs: Chat_CopyInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Copy`)
 };
@@ -636,6 +643,10 @@ export const chat_media_queue_full = /** @type {(inputs: Chat_Media_Queue_FullIn
 	return /** @type {LocalizedString} */ (`请等待当前附件发送完成`)
 };
 
+export const chat_member_muted = /** @type {(inputs: Chat_Member_MutedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`管理员暂时限制了发送消息`)
+};
+
 export const chat_members = /** @type {(inputs: Chat_MembersInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Members`)
 };
@@ -746,6 +757,10 @@ export const chat_reply = /** @type {(inputs: Chat_ReplyInputs) => LocalizedStri
 
 export const chat_reply_label = /** @type {(inputs: Chat_Reply_LabelInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`回复`)
+};
+
+export const chat_reply_unavailable = /** @type {(inputs: Chat_Reply_UnavailableInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`要回复的消息已不可用`)
 };
 
 export const chat_retry_in_sec = /** @type {(inputs: Chat_Retry_In_SecInputs) => LocalizedString} */ (i) => {

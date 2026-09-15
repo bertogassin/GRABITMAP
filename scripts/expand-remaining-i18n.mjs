@@ -236,6 +236,27 @@ const NEW = {
     id:"Kecepatan",ms:"Kelajuan",th:"ความเร็ว",fa:"سرعت",ur:"رفتار",bn:"গতি",
     pa:"ਗਤੀ",sw:"Kasi",el:"Ταχύτητα",cs:"Rychlost",ro:"Viteză",hu:"Sebesség",sv:"Hastighet",he:"מהירות",
   }),
+  chat_connecting_initial: L({
+    ru:"Соединение…",en:"Connecting…",fr:"Connexion…",es:"Conectando…",zh:"正在连接…","zh-TW":"正在連線…",
+    hi:"कनेक्ट हो रहा है…",ar:"جارٍ الاتصال…",pt:"Conectando…",de:"Verbindung wird hergestellt…",ja:"接続中…",ko:"연결 중…",
+    it:"Connessione…",tr:"Bağlanıyor…",pl:"Łączenie…",uk:"З’єднання…",nl:"Verbinden…",vi:"Đang kết nối…",
+    id:"Menghubungkan…",ms:"Menyambung…",th:"กำลังเชื่อมต่อ…",fa:"در حال اتصال…",ur:"منسلک ہو رہا ہے…",bn:"সংযোগ করা হচ্ছে…",
+    pa:"ਕਨੈਕਟ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ…",sw:"Inaunganisha…",el:"Σύνδεση…",cs:"Připojování…",ro:"Se conectează…",hu:"Csatlakozás…",sv:"Ansluter…",he:"מתחבר…",
+  }),
+  chat_member_muted: L({
+    ru:"Отправка временно ограничена администратором",en:"Sending is temporarily restricted by an administrator",fr:"L’envoi est temporairement limité par un administrateur",es:"Un administrador ha restringido temporalmente el envío",zh:"管理员暂时限制了发送消息","zh-TW":"管理員暫時限制了傳送訊息",
+    hi:"एडमिन ने भेजने पर अस्थायी रोक लगाई है",ar:"قيّد أحد المشرفين الإرسال مؤقتًا",pt:"O envio foi temporariamente restringido por um administrador",de:"Das Senden wurde vorübergehend von einem Administrator eingeschränkt",ja:"管理者により送信が一時的に制限されています",ko:"관리자가 전송을 일시적으로 제한했습니다",
+    it:"L’invio è temporaneamente limitato da un amministratore",tr:"Gönderme bir yönetici tarafından geçici olarak kısıtlandı",pl:"Wysyłanie zostało tymczasowo ograniczone przez administratora",uk:"Адміністратор тимчасово обмежив надсилання",nl:"Verzenden is tijdelijk beperkt door een beheerder",vi:"Quản trị viên đã tạm thời hạn chế gửi tin",
+    id:"Pengiriman dibatasi sementara oleh administrator",ms:"Penghantaran dihadkan sementara oleh pentadbir",th:"ผู้ดูแลระบบจำกัดการส่งชั่วคราว",fa:"ارسال به‌طور موقت توسط مدیر محدود شده است",ur:"منتظم نے بھیجنے پر عارضی پابندی لگائی ہے",bn:"অ্যাডমিন সাময়িকভাবে বার্তা পাঠানো সীমিত করেছেন",
+    pa:"ਐਡਮਿਨ ਨੇ ਭੇਜਣ ਉੱਤੇ ਅਸਥਾਈ ਪਾਬੰਦੀ ਲਗਾਈ ਹੈ",sw:"Kutuma kumezuiwa kwa muda na msimamizi",el:"Η αποστολή περιορίστηκε προσωρινά από διαχειριστή",cs:"Odesílání bylo dočasně omezeno správcem",ro:"Trimiterea a fost restricționată temporar de un administrator",hu:"Egy adminisztrátor ideiglenesen korlátozta a küldést",sv:"En administratör har tillfälligt begränsat sändning",he:"השליחה הוגבלה זמנית על ידי מנהל",
+  }),
+  chat_reply_unavailable: L({
+    ru:"Сообщение для ответа уже недоступно",en:"The message you’re replying to is no longer available",fr:"Le message auquel vous répondez n’est plus disponible",es:"El mensaje al que respondes ya no está disponible",zh:"要回复的消息已不可用","zh-TW":"要回覆的訊息已無法使用",
+    hi:"जिस संदेश का जवाब दिया जा रहा है वह अब उपलब्ध नहीं है",ar:"الرسالة التي ترد عليها لم تعد متاحة",pt:"A mensagem à qual você está respondendo não está mais disponível",de:"Die Nachricht, auf die Sie antworten, ist nicht mehr verfügbar",ja:"返信先のメッセージは利用できなくなりました",ko:"답장하려는 메시지를 더 이상 사용할 수 없습니다",
+    it:"Il messaggio a cui stai rispondendo non è più disponibile",tr:"Yanıtladığınız mesaj artık kullanılamıyor",pl:"Wiadomość, na którą odpowiadasz, nie jest już dostępna",uk:"Повідомлення, на яке ви відповідаєте, більше недоступне",nl:"Het bericht waarop je antwoordt is niet meer beschikbaar",vi:"Tin nhắn bạn đang trả lời không còn khả dụng",
+    id:"Pesan yang Anda balas tidak lagi tersedia",ms:"Mesej yang anda balas tidak lagi tersedia",th:"ข้อความที่คุณกำลังตอบกลับไม่พร้อมใช้งานแล้ว",fa:"پیامی که به آن پاسخ می‌دهید دیگر در دسترس نیست",ur:"جس پیغام کا جواب دیا جا رہا ہے وہ اب دستیاب نہیں",bn:"যে বার্তার উত্তর দিচ্ছেন সেটি আর পাওয়া যাচ্ছে না",
+    pa:"ਜਿਸ ਸੁਨੇਹੇ ਦਾ ਜਵਾਬ ਦਿੱਤਾ ਜਾ ਰਿਹਾ ਹੈ ਉਹ ਹੁਣ ਉਪਲਬਧ ਨਹੀਂ ਹੈ",sw:"Ujumbe unaoujibu haupatikani tena",el:"Το μήνυμα στο οποίο απαντάτε δεν είναι πλέον διαθέσιμο",cs:"Zpráva, na kterou odpovídáte, již není dostupná",ro:"Mesajul la care răspundeți nu mai este disponibil",hu:"A megválaszolt üzenet már nem érhető el",sv:"Meddelandet du svarar på är inte längre tillgängligt",he:"ההודעה שעליה מגיבים אינה זמינה עוד",
+  }),
   chat_offline: L({
     ru:"не в сети",en:"offline",fr:"hors ligne",es:"desconectado",zh:"离线","zh-TW":"離線",
     hi:"ऑफ़लाइन",ar:"غير متصل",pt:"offline",de:"offline",ja:"オフライン",ko:"오프라인",
