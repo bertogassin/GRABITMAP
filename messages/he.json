@@ -332,5 +332,8 @@
   "chat_video_invalid": "סרטון: MP4/WebM, עד 40 MB",
   "chat_video_pip": "חלון קטן",
   "chat_video_playback_error": "לא ניתן להפעיל את הסרטון · פתיחת הקובץ",
-  "chat_video_speed": "מהירות"
+  "chat_video_speed": "מהירות",
+  "chat_connecting_initial": "מתחבר…",
+  "chat_member_muted": "השליחה הוגבלה זמנית על ידי מנהל",
+  "chat_reply_unavailable": "ההודעה שעליה מגיבים אינה זמינה עוד"
 }

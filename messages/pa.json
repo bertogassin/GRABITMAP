@@ -332,5 +332,8 @@
   "chat_video_invalid": "ਵੀਡੀਓ: MP4/WebM, ਵੱਧ ਤੋਂ ਵੱਧ 40 MB",
   "chat_video_pip": "ਛੋਟੀ ਵਿੰਡੋ",
   "chat_video_playback_error": "ਵੀਡੀਓ ਨਹੀਂ ਚੱਲੀ · ਫ਼ਾਈਲ ਖੋਲ੍ਹੋ",
-  "chat_video_speed": "ਗਤੀ"
+  "chat_video_speed": "ਗਤੀ",
+  "chat_connecting_initial": "ਕਨੈਕਟ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ…",
+  "chat_member_muted": "ਐਡਮਿਨ ਨੇ ਭੇਜਣ ਉੱਤੇ ਅਸਥਾਈ ਪਾਬੰਦੀ ਲਗਾਈ ਹੈ",
+  "chat_reply_unavailable": "ਜਿਸ ਸੁਨੇਹੇ ਦਾ ਜਵਾਬ ਦਿੱਤਾ ਜਾ ਰਿਹਾ ਹੈ ਉਹ ਹੁਣ ਉਪਲਬਧ ਨਹੀਂ ਹੈ"
 }

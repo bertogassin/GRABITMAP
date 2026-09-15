@@ -332,5 +332,8 @@
   "chat_video_invalid": "Video: MP4/WebM, maximum 40 MB",
   "chat_video_pip": "Fereastră mică",
   "chat_video_playback_error": "Videoclipul nu a putut fi redat · Deschide fișierul",
-  "chat_video_speed": "Viteză"
+  "chat_video_speed": "Viteză",
+  "chat_connecting_initial": "Se conectează…",
+  "chat_member_muted": "Trimiterea a fost restricționată temporar de un administrator",
+  "chat_reply_unavailable": "Mesajul la care răspundeți nu mai este disponibil"
 }

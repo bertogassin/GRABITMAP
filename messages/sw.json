@@ -332,5 +332,8 @@
   "chat_video_invalid": "Video: MP4/WebM, upeo wa MB 40",
   "chat_video_pip": "Dirisha dogo",
   "chat_video_playback_error": "Video haikuweza kuchezwa · Fungua faili",
-  "chat_video_speed": "Kasi"
+  "chat_video_speed": "Kasi",
+  "chat_connecting_initial": "Inaunganisha…",
+  "chat_member_muted": "Kutuma kumezuiwa kwa muda na msimamizi",
+  "chat_reply_unavailable": "Ujumbe unaoujibu haupatikani tena"
 }

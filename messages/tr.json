@@ -332,5 +332,8 @@
   "chat_video_invalid": "Video: MP4/WebM, en fazla 40 MB",
   "chat_video_pip": "Küçük pencere",
   "chat_video_playback_error": "Video oynatılamadı · Dosyayı aç",
-  "chat_video_speed": "Hız"
+  "chat_video_speed": "Hız",
+  "chat_connecting_initial": "Bağlanıyor…",
+  "chat_member_muted": "Gönderme bir yönetici tarafından geçici olarak kısıtlandı",
+  "chat_reply_unavailable": "Yanıtladığınız mesaj artık kullanılamıyor"
 }

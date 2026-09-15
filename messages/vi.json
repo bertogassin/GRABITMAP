@@ -332,5 +332,8 @@
   "chat_video_invalid": "Video: MP4/WebM, tối đa 40 MB",
   "chat_video_pip": "Cửa sổ nhỏ",
   "chat_video_playback_error": "Không thể phát video · Mở tệp",
-  "chat_video_speed": "Tốc độ"
+  "chat_video_speed": "Tốc độ",
+  "chat_connecting_initial": "Đang kết nối…",
+  "chat_member_muted": "Quản trị viên đã tạm thời hạn chế gửi tin",
+  "chat_reply_unavailable": "Tin nhắn bạn đang trả lời không còn khả dụng"
 }

@@ -332,5 +332,8 @@
   "chat_video_invalid": "Video: MP4/WebM, maximaal 40 MB",
   "chat_video_pip": "Klein venster",
   "chat_video_playback_error": "Video kan niet worden afgespeeld · Bestand openen",
-  "chat_video_speed": "Snelheid"
+  "chat_video_speed": "Snelheid",
+  "chat_connecting_initial": "Verbinden…",
+  "chat_member_muted": "Verzenden is tijdelijk beperkt door een beheerder",
+  "chat_reply_unavailable": "Het bericht waarop je antwoordt is niet meer beschikbaar"
 }

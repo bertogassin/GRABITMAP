@@ -332,5 +332,8 @@
   "chat_video_invalid": "Wideo: MP4/WebM, maksymalnie 40 MB",
   "chat_video_pip": "Małe okno",
   "chat_video_playback_error": "Nie udało się odtworzyć filmu · Otwórz plik",
-  "chat_video_speed": "Prędkość"
+  "chat_video_speed": "Prędkość",
+  "chat_connecting_initial": "Łączenie…",
+  "chat_member_muted": "Wysyłanie zostało tymczasowo ograniczone przez administratora",
+  "chat_reply_unavailable": "Wiadomość, na którą odpowiadasz, nie jest już dostępna"
 }

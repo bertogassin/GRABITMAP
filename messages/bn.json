@@ -332,5 +332,8 @@
   "chat_video_invalid": "ভিডিও: MP4/WebM, সর্বোচ্চ ৪০ MB",
   "chat_video_pip": "ছোট উইন্ডো",
   "chat_video_playback_error": "ভিডিও চালানো যায়নি · ফাইল খুলুন",
-  "chat_video_speed": "গতি"
+  "chat_video_speed": "গতি",
+  "chat_connecting_initial": "সংযোগ করা হচ্ছে…",
+  "chat_member_muted": "অ্যাডমিন সাময়িকভাবে বার্তা পাঠানো সীমিত করেছেন",
+  "chat_reply_unavailable": "যে বার্তার উত্তর দিচ্ছেন সেটি আর পাওয়া যাচ্ছে না"
 }

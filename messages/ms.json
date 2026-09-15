@@ -332,5 +332,8 @@
   "chat_video_invalid": "Video: MP4/WebM, maksimum 40 MB",
   "chat_video_pip": "Tetingkap kecil",
   "chat_video_playback_error": "Video tidak dapat dimainkan · Buka fail",
-  "chat_video_speed": "Kelajuan"
+  "chat_video_speed": "Kelajuan",
+  "chat_connecting_initial": "Menyambung…",
+  "chat_member_muted": "Penghantaran dihadkan sementara oleh pentadbir",
+  "chat_reply_unavailable": "Mesej yang anda balas tidak lagi tersedia"
 }
