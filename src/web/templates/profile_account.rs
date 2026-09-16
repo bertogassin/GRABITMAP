@@ -1875,7 +1875,7 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
             ),
             content = main_html,
         ),
-        &bottom_nav("search"),
+        &bottom_nav("explore"),
         "",
     )
 }

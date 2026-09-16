@@ -310,6 +310,7 @@
 /** @typedef {{}} Menu_TitleInputs */
 /** @typedef {{}} Nav_ChatsInputs */
 /** @typedef {{}} Nav_CitiesInputs */
+/** @typedef {{}} Nav_ExploreInputs */
 /** @typedef {{}} Nav_MenuInputs */
 /** @typedef {{}} Nav_SearchInputs */
 /** @typedef {{}} Notifications_TitleInputs */
@@ -1577,6 +1578,10 @@ export const nav_chats = /** @type {(inputs: Nav_ChatsInputs) => LocalizedString
 
 export const nav_cities = /** @type {(inputs: Nav_CitiesInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Πόλεις`)
+};
+
+export const nav_explore = /** @type {(inputs: Nav_ExploreInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Εξερεύνηση`)
 };
 
 export const nav_menu = /** @type {(inputs: Nav_MenuInputs) => LocalizedString} */ () => {

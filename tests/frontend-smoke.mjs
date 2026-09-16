@@ -531,25 +531,35 @@ test("mobile product foundation preserves accessible zoom and contains narrow la
   assert.match(runtime, /button\.hidden = !matches/);
 });
 
-test("map home exposes global search before geographic drill-down", async () => {
-  const navigation = await readFile(
-    new URL("src/web/templates/navigation.rs", root),
-    "utf8",
-  );
+test("global search stays available while map and explore keep distinct jobs", async () => {
+  const [common, navigation, routes, globalSearch, memory, serviceWorker] = await Promise.all([
+    readFile(new URL("src/web/templates/common.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/navigation.rs", root), "utf8"),
+    readFile(new URL("src/web/routes/public.rs", root), "utf8"),
+    readFile(new URL("static/global-search.js", root), "utf8"),
+    readFile(new URL("static/place-memory.js", root), "utf8"),
+    readFile(new URL("static/resursmap-sw.js", root), "utf8"),
+  ]);
   const start = navigation.indexOf("pub fn render_geo_root(");
   const end = navigation.indexOf("pub fn render_geo_continent(", start);
   const home = navigation.slice(start, end);
 
   assert.ok(start >= 0);
   assert.ok(end > start);
-  assert.match(home, /action="\/app\/search"/);
-  assert.match(home, /class="search rm-map-global-search"/);
-  assert.match(home, /name="q"/);
-  assert.match(home, /enterkeyhint="search"/);
-  assert.match(home, /intent_kind_chips\(/);
-  assert.match(home, /"\/app\/search\?kind=work"/);
-  assert.match(home, /"\/app\/search\?kind=workers"/);
-  assert.match(home, /"\/app\/search\?kind=business"/);
+  assert.doesNotMatch(home, /rm-map-global-search/);
+  assert.match(common, /data-global-search-open/);
+  assert.match(common, /id="rm-global-search-dialog"/);
+  assert.match(common, /static_asset\("global-search\.js"\)/);
+  assert.match(common, /href="\/app\/explore" data-nav-explore-link/);
+  assert.doesNotMatch(common, /data-nav-search-link/);
+  assert.match(routes, /\.route\("\/app\/explore", get\(app_explore\)\)/);
+  assert.match(navigation, /pub fn render_explore\(\)/);
+  assert.match(globalSearch, /typeof dialog\.showModal !== "function"/);
+  assert.match(globalSearch, /event\.target === dialog/);
+  assert.match(globalSearch, /returnFocus\.focus\(\)/);
+  assert.doesNotMatch(memory, /data-nav-search-link/);
+  assert.match(serviceWorker, /v7\.21\.1-r6/);
+  assert.match(serviceWorker, /\/static\/global-search\.js/);
 });
 
 test("shared page shell keeps version footer styles in the global UI layer", async () => {
@@ -809,8 +819,8 @@ test("service worker keeps partial shell caches and caches static responses", as
   assert.match(serviceWorker, /Promise\.all\(STATIC_ASSETS\.map/);
   assert.match(serviceWorker, /cache\.put\(cacheKey\.toString\(\), response\.clone\(\)\)/);
   assert.match(serviceWorker, /const CACHE_PREFIX = "grabit-shell-"/);
-  assert.match(serviceWorker, /CACHE_PREFIX \+ "v7\.21\.1-r5"/);
-  assert.match(common, /env!\("CARGO_PKG_VERSION"\), "-r5"/);
+  assert.match(serviceWorker, /CACHE_PREFIX \+ "v7\.21\.1-r6"/);
+  assert.match(common, /env!\("CARGO_PKG_VERSION"\), "-r6"/);
   assert.match(serviceWorker, /key\.startsWith\(CACHE_PREFIX\)/);
   assert.match(serviceWorker, /internalNavigationTarget\(event\.notification\.data\.url, target\)/);
   assert.match(serviceWorker, /internalNavigationTarget\(nudge\.href, "\/app"\)/);

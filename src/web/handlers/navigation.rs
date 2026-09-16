@@ -14,6 +14,10 @@ pub async fn home() -> Redirect {
     Redirect::permanent("/app")
 }
 
+pub async fn app_explore() -> Html<String> {
+    Html(templates::render_explore())
+}
+
 pub async fn app_menu(State(state): State<AppState>, headers: HeaderMap) -> Html<String> {
     let (invite_public_id, admin_level) = verify_authenticated_user(&state, &headers)
         .and_then(|user| {
