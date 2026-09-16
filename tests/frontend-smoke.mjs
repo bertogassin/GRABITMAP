@@ -543,6 +543,12 @@ test("global search stays available while map and explore keep distinct jobs", a
   const start = navigation.indexOf("pub fn render_geo_root(");
   const end = navigation.indexOf("pub fn render_geo_continent(", start);
   const home = navigation.slice(start, end);
+  const exploreStart = navigation.indexOf("pub fn render_explore()");
+  const exploreEnd = navigation.indexOf("// SEARCH", exploreStart);
+  const explore = navigation.slice(exploreStart, exploreEnd);
+  const memoryHomeStart = memory.indexOf("function renderHomeLastCity()");
+  const memoryHomeEnd = memory.indexOf("function renderMenuContinue()", memoryHomeStart);
+  const memoryHome = memory.slice(memoryHomeStart, memoryHomeEnd);
 
   assert.ok(start >= 0);
   assert.ok(end > start);
@@ -551,14 +557,22 @@ test("global search stays available while map and explore keep distinct jobs", a
   assert.match(common, /id="rm-global-search-dialog"/);
   assert.match(common, /static_asset\("global-search\.js"\)/);
   assert.match(common, /href="\/app\/explore" data-nav-explore-link/);
+  assert.match(common, /<a class="\{map_class\}" href="\/app">/);
+  assert.match(common, /label_map = crate::i18n::t\("map_title"\)/);
   assert.doesNotMatch(common, /data-nav-search-link/);
+  assert.doesNotMatch(common, /data-nav-map-link/);
   assert.match(routes, /\.route\("\/app\/explore", get\(app_explore\)\)/);
   assert.match(navigation, /pub fn render_explore\(\)/);
+  assert.doesNotMatch(explore, /cities = navigation_card/);
+  assert.doesNotMatch(explore, /"map_cities"/);
   assert.match(globalSearch, /typeof dialog\.showModal !== "function"/);
   assert.match(globalSearch, /event\.target === dialog/);
   assert.match(globalSearch, /returnFocus\.focus\(\)/);
   assert.doesNotMatch(memory, /data-nav-search-link/);
-  assert.match(serviceWorker, /v7\.21\.1-r6/);
+  assert.doesNotMatch(memory, /applyNavMemory/);
+  assert.doesNotMatch(memory, /mapLink\.setAttribute\("href", place\.href\)/);
+  assert.doesNotMatch(memoryHome, /continueChips/);
+  assert.match(serviceWorker, /v7\.21\.1-r7/);
   assert.match(serviceWorker, /\/static\/global-search\.js/);
 });
 
@@ -819,8 +833,8 @@ test("service worker keeps partial shell caches and caches static responses", as
   assert.match(serviceWorker, /Promise\.all\(STATIC_ASSETS\.map/);
   assert.match(serviceWorker, /cache\.put\(cacheKey\.toString\(\), response\.clone\(\)\)/);
   assert.match(serviceWorker, /const CACHE_PREFIX = "grabit-shell-"/);
-  assert.match(serviceWorker, /CACHE_PREFIX \+ "v7\.21\.1-r6"/);
-  assert.match(common, /env!\("CARGO_PKG_VERSION"\), "-r6"/);
+  assert.match(serviceWorker, /CACHE_PREFIX \+ "v7\.21\.1-r7"/);
+  assert.match(common, /env!\("CARGO_PKG_VERSION"\), "-r7"/);
   assert.match(serviceWorker, /key\.startsWith\(CACHE_PREFIX\)/);
   assert.match(serviceWorker, /internalNavigationTarget\(event\.notification\.data\.url, target\)/);
   assert.match(serviceWorker, /internalNavigationTarget\(nudge\.href, "\/app"\)/);
