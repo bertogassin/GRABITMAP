@@ -1,5 +1,6 @@
 grabitmap.com, www.grabitmap.com {
 	encode gzip
+	header Strict-Transport-Security "max-age=31536000"
 	reverse_proxy grabit:3000 {
         flush_interval -1
 		lb_try_duration 15s
