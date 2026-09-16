@@ -48,6 +48,24 @@ docker compose up --build
 
 Перед продом задайте уникальный `ADMIN_KEY` длиной не менее 32 символов и `PUBLIC_BASE_URL=https://grabitmap.com`.
 
+## Проверяемый production backup
+
+На production-сервере полный backup базы, пользовательских файлов и конфигурации создаёт:
+
+```bash
+./scripts/backup_production.sh
+```
+
+Скрипт не останавливает сервис и ничего не удаляет. Завершённый backup содержит
+SQLite-копию с успешным `PRAGMA integrity_check`, архив файлов из production
+volume, `SHA256SUMS`, `MANIFEST` и маркер `COMPLETE`.
+
+Существующий backup можно повторно проверить без чтения или вывода секретов:
+
+```bash
+./scripts/verify_production_backup.sh /root/grabit-backups/manual-YYYYMMDDTHHMMSSZ
+```
+
 ## Переменные
 
 | Переменная | Зачем |

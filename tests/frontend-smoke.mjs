@@ -1629,10 +1629,11 @@ test("browser i18n fallback cannot recurse and generated bare imports are not lo
 });
 
 test("staged deploy keeps a ready backend during replacement", async () => {
-  const deploy = await readFile(
-    new URL("scripts/deploy_staged.sh", root),
-    "utf8",
-  );
+  const [deploy, backup, verifyBackup] = await Promise.all([
+    readFile(new URL("scripts/deploy_staged.sh", root), "utf8"),
+    readFile(new URL("scripts/backup_production.sh", root), "utf8"),
+    readFile(new URL("scripts/verify_production_backup.sh", root), "utf8"),
+  ]);
 
   const start = deploy.indexOf("=== START STAGED BACKEND ===");
   const switchToStaged = deploy.indexOf("=== SWITCH TRAFFIC TO STAGED BACKEND ===");
@@ -1645,13 +1646,31 @@ test("staged deploy keeps a ready backend during replacement", async () => {
   assert.ok(replacePrimary < switchToPrimary);
   assert.match(deploy, /test "\$STATUS" = "healthy"/);
   assert.match(deploy, /trap cleanup EXIT/);
-  assert.match(deploy, /\.backup '\$BACKUP_DIR\/votes\.db'/);
-  assert.match(deploy, /PRAGMA integrity_check/);
+  assert.match(deploy, /scripts\/backup_production\.sh/);
+  assert.match(deploy, /DATA_SOURCE="\$DATA_SOURCE"/);
   assert.match(deploy, /returning to staged backend/);
   assert.match(deploy, /\.Config\.Image/);
   assert.match(deploy, /docker image inspect "\$IMAGE_REF"/);
   assert.doesNotMatch(deploy, /images -q "\$APP_SERVICE"/);
   assert.doesNotMatch(deploy, /docker compose[^\n]* down/);
+
+  assert.match(backup, /\.backup '\$BACKUP_DIR\/votes\.db'/);
+  assert.match(backup, /PRAGMA integrity_check/);
+  assert.match(backup, /data-files\.tar/);
+  assert.match(backup, /--exclude='\.\/votes\.db'/);
+  assert.match(backup, /--exclude='\.\/chat-media\/\.quarantine'/);
+  assert.match(backup, /production\.env/);
+  assert.match(backup, /docker-compose\.prod\.yml/);
+  assert.match(backup, /SHA256SUMS/);
+  assert.match(backup, /verify_production_backup\.sh/);
+  assert.match(backup, /COMPLETE/);
+  assert.doesNotMatch(backup, /rm\s+-rf|docker\s+(?:system|image|volume)\s+prune/);
+
+  assert.match(verifyBackup, /sha256sum -c SHA256SUMS/);
+  assert.match(verifyBackup, /PRAGMA integrity_check/);
+  assert.match(verifyBackup, /tar -tf/);
+  assert.match(verifyBackup, /test -f "\$BACKUP_DIR\/COMPLETE"/);
+  assert.doesNotMatch(verifyBackup, /rm\s+-rf|docker\s+(?:system|image|volume)\s+prune/);
 });
 
 test("production monitor is independent and stateful", async () => {
