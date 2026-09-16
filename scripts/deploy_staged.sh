@@ -6,7 +6,8 @@ APP_SERVICE="${APP_SERVICE:-grabit}"
 CADDY_SERVICE="${CADDY_SERVICE:-caddy}"
 NEXT_NAME="grabit-next-$(date -u +%Y%m%d%H%M%S)"
 ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-TEMP_CADDY="$(mktemp)"
+TEMP_STAGED_CADDY="$(mktemp)"
+TEMP_PRIMARY_CADDY="$(mktemp)"
 BACKUP_ROOT="${BACKUP_ROOT:-/root/grabit-backups}"
 BACKUP_DIR="$BACKUP_ROOT/staged-$(date -u +%Y%m%dT%H%M%SZ)"
 SWITCHED=0
@@ -14,7 +15,7 @@ SWITCHED=0
 cd "$ROOT_DIR"
 
 cleanup() {
-    rm -f "$TEMP_CADDY"
+    rm -f "$TEMP_STAGED_CADDY" "$TEMP_PRIMARY_CADDY"
 
     if [ "$SWITCHED" -eq 0 ]; then
         docker rm -f "$NEXT_NAME" >/dev/null 2>&1 || true
@@ -112,15 +113,27 @@ test "$STATUS" = "healthy"
 
 sed \
     "s/reverse_proxy grabit:3000/reverse_proxy ${NEXT_NAME}:3000/" \
-    Caddyfile > "$TEMP_CADDY"
+    Caddyfile > "$TEMP_STAGED_CADDY"
 
-grep -F "reverse_proxy ${NEXT_NAME}:3000" "$TEMP_CADDY" >/dev/null
+# Git can replace a bind-mounted file's inode while the long-running Caddy
+# container keeps the old inode mounted at /etc/caddy/Caddyfile. Copy both
+# configs from the current worktree and reload only those explicit copies.
+cp Caddyfile "$TEMP_PRIMARY_CADDY"
 
-docker cp "$TEMP_CADDY" "$CADDY_ID:/tmp/Caddyfile.staged"
+grep -F "reverse_proxy ${NEXT_NAME}:3000" "$TEMP_STAGED_CADDY" >/dev/null
+grep -F "reverse_proxy grabit:3000" "$TEMP_PRIMARY_CADDY" >/dev/null
+
+docker cp "$TEMP_STAGED_CADDY" "$CADDY_ID:/tmp/Caddyfile.staged"
+docker cp "$TEMP_PRIMARY_CADDY" "$CADDY_ID:/tmp/Caddyfile.primary"
 
 docker compose -f "$COMPOSE_FILE" exec -T "$CADDY_SERVICE" \
     caddy validate \
     --config /tmp/Caddyfile.staged \
+    --adapter caddyfile
+
+docker compose -f "$COMPOSE_FILE" exec -T "$CADDY_SERVICE" \
+    caddy validate \
+    --config /tmp/Caddyfile.primary \
     --adapter caddyfile
 
 echo "=== SWITCH TRAFFIC TO STAGED BACKEND ==="
@@ -145,7 +158,7 @@ docker compose -f "$COMPOSE_FILE" up \
 echo "=== SWITCH TRAFFIC BACK TO PRIMARY ==="
 docker compose -f "$COMPOSE_FILE" exec -T "$CADDY_SERVICE" \
     caddy reload \
-    --config /etc/caddy/Caddyfile \
+    --config /tmp/Caddyfile.primary \
     --adapter caddyfile
 
 if ! curl --retry 10 --retry-delay 1 --retry-connrefused \
