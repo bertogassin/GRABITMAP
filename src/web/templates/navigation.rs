@@ -253,11 +253,45 @@ pub fn render_geo_root(
         crate::i18n::t("map_stat_listings")
     };
     let online_label = crate::i18n::t("common_online_short");
+    let search_aria = crate::i18n::t("map_explorer_aria");
+    let search_placeholder = crate::i18n::t("map_explorer_placeholder");
+    let search_title = crate::i18n::t("search_title");
+    let global_search = format!(
+        r#"<form method="get"
+              action="/app/search"
+              class="search rm-map-global-search"
+              role="search"
+              aria-label="{search_aria}">
+    <span aria-hidden="true">{search_icon}</span>
+    <input name="q"
+           type="search"
+           autocomplete="off"
+           enterkeyhint="search"
+           required
+           aria-label="{search_aria}"
+           placeholder="{search_placeholder}">
+    <button class="ui-button" type="submit">{search_title}</button>
+</form>
+{quick_filters}"#,
+        search_aria = escape_html(&search_aria),
+        search_icon = icon("search"),
+        search_placeholder = escape_html(&search_placeholder),
+        search_title = escape_html(&search_title),
+        quick_filters = intent_kind_chips(
+            "",
+            false,
+            "/app/search",
+            "/app/search?kind=work",
+            "/app/search?kind=workers",
+            "/app/search?kind=business",
+        ),
+    );
     let hero = format!(
         r#"<section class="hero rm-map-hero">
     <div class="eyebrow">{logo} GRABIT</div>
     <h1>{map_global_title}</h1>
     <p>{map_global_lead}</p>
+    {global_search}
     <button data-resursmap-install-pwa
             type="button"
             class="ui-button rm-pwa-home-btn">
@@ -274,6 +308,7 @@ pub fn render_geo_root(
         map_global_title = crate::i18n::t("map_global_title"),
         map_global_lead = crate::i18n::t("map_global_lead"),
         map_download_app = crate::i18n::t("map_download_app"),
+        global_search = global_search,
     );
     let content = format!(
         r#"<div id="rm-last-city-home" class="grid rm-continue-home" hidden></div>{head}<div class="grid rm-map-grid">{cards}</div>"#,
@@ -287,10 +322,15 @@ pub fn render_geo_root(
 .rm-map-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:20px}
 .rm-map-stats div{padding:12px 6px;border:1px solid rgba(232,204,150,.22);border-radius:15px;text-align:center;background:rgba(255,255,255,.025)}
 .rm-map-stats strong,.rm-map-stats span{display:block}.rm-map-stats strong{color:var(--gold-light);font-size:21px}.rm-map-stats span{margin-top:4px;color:var(--muted);font-size:9px;text-transform:uppercase}
+.rm-map-global-search{margin-top:18px;padding:10px 10px 10px 14px}
+.rm-map-global-search>span{display:inline-flex;flex:0 0 auto}
+.rm-map-global-search .ui-button{flex:0 0 auto;min-height:42px;padding-inline:14px}
+.rm-map-hero>.rm-kind-chips{margin-top:10px}
 .rm-map-grid{align-items:stretch}
 .rm-continue-home{margin-bottom:14px}
 .rm-continue-chips{margin-top:10px}
 .rm-continue-card{padding:16px;display:grid;gap:10px}
+@media(max-width:420px){.rm-map-global-search{gap:8px}.rm-map-global-search .ui-button{padding-inline:11px}}
 </style>"#;
     page_document(
         &format!("GRABIT · {}", crate::i18n::t("map_global_title")),
@@ -1930,6 +1970,13 @@ mod search_catalog_tests {
         let home = render_geo_root(1, 1, 1, vec![(1, "Европа".to_string(), 3)], false);
         assert!(home.contains("id=\"rm-last-city-home\""));
         assert!(home.contains("data-nav-map-link"));
+        assert!(home.contains("action=\"/app/search\""));
+        assert!(home.contains("class=\"search rm-map-global-search\""));
+        assert!(home.contains("name=\"q\""));
+        assert!(home.contains("enterkeyhint=\"search\""));
+        assert!(home.contains("/app/search?kind=work"));
+        assert!(home.contains("/app/search?kind=workers"));
+        assert!(home.contains("/app/search?kind=business"));
     }
 
     #[test]

@@ -531,6 +531,27 @@ test("mobile product foundation preserves accessible zoom and contains narrow la
   assert.match(runtime, /button\.hidden = !matches/);
 });
 
+test("map home exposes global search before geographic drill-down", async () => {
+  const navigation = await readFile(
+    new URL("src/web/templates/navigation.rs", root),
+    "utf8",
+  );
+  const start = navigation.indexOf("pub fn render_geo_root(");
+  const end = navigation.indexOf("pub fn render_geo_continent(", start);
+  const home = navigation.slice(start, end);
+
+  assert.ok(start >= 0);
+  assert.ok(end > start);
+  assert.match(home, /action="\/app\/search"/);
+  assert.match(home, /class="search rm-map-global-search"/);
+  assert.match(home, /name="q"/);
+  assert.match(home, /enterkeyhint="search"/);
+  assert.match(home, /intent_kind_chips\(/);
+  assert.match(home, /"\/app\/search\?kind=work"/);
+  assert.match(home, /"\/app\/search\?kind=workers"/);
+  assert.match(home, /"\/app\/search\?kind=business"/);
+});
+
 test("shared page shell keeps version footer styles in the global UI layer", async () => {
   const template = await readFile(
     new URL("src/web/templates/common.rs", root),
