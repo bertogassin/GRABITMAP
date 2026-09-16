@@ -9,6 +9,37 @@ use std::{
 };
 use tokio::sync::{broadcast, Mutex};
 
+const TYPING_RATE_MAX_KEYS: usize = 16_384;
+const TYPING_RATE_STALE_AFTER_SECONDS: i64 = 60;
+
+fn typing_rate_allows_at(
+    rate_limits: &mut HashMap<String, i64>,
+    rate_key: String,
+    now: i64,
+    max_keys: usize,
+    stale_after_seconds: i64,
+) -> bool {
+    if let Some(last_sent) = rate_limits.get(&rate_key) {
+        if now.saturating_sub(*last_sent) < 2 {
+            return false;
+        }
+
+        rate_limits.insert(rate_key, now);
+        return true;
+    }
+
+    if rate_limits.len() >= max_keys {
+        rate_limits.retain(|_, last_sent| now.saturating_sub(*last_sent) <= stale_after_seconds);
+    }
+
+    if rate_limits.len() >= max_keys {
+        return false;
+    }
+
+    rate_limits.insert(rate_key, now);
+    true
+}
+
 // Realtime cursors are persisted by browsers.  Starting the in-memory
 // counter at zero would let a process restart reuse old cursor values and
 // cause clients to suppress valid events as duplicates.
@@ -150,12 +181,13 @@ impl AppState {
             Ok(rate_limits) => rate_limits,
             Err(_) => return false,
         };
-        let last_sent = rate_limits.get(&rate_key).copied().unwrap_or(0);
-        if now.saturating_sub(last_sent) < 2 {
-            return false;
-        }
-        rate_limits.insert(rate_key, now);
-        true
+        typing_rate_allows_at(
+            &mut rate_limits,
+            rate_key,
+            now,
+            TYPING_RATE_MAX_KEYS,
+            TYPING_RATE_STALE_AFTER_SECONDS,
+        )
     }
 
     pub fn new(db_pool: DbPool, bot_token: Option<String>, admin_key: String) -> Self {
@@ -394,7 +426,73 @@ impl AppState {
 
 #[cfg(test)]
 mod tests {
-    use super::{initial_realtime_sequence, ChatRealtimeEvent, ChatTypingEvent};
+    use super::{
+        initial_realtime_sequence, typing_rate_allows_at, ChatRealtimeEvent, ChatTypingEvent,
+    };
+    use std::collections::HashMap;
+
+    #[test]
+    fn typing_rate_prunes_stale_keys_at_capacity() {
+        let now = 10_000;
+        let mut limits = HashMap::from([
+            ("old-a".to_string(), now - 100),
+            ("old-b".to_string(), now - 90),
+        ]);
+
+        assert!(typing_rate_allows_at(
+            &mut limits,
+            "new".to_string(),
+            now,
+            2,
+            60
+        ));
+        assert_eq!(limits, HashMap::from([("new".to_string(), now)]));
+    }
+
+    #[test]
+    fn typing_rate_rejects_new_keys_when_capacity_is_fresh() {
+        let now = 10_000;
+        let mut limits = HashMap::from([
+            ("fresh-a".to_string(), now - 1),
+            ("fresh-b".to_string(), now - 2),
+        ]);
+
+        assert!(!typing_rate_allows_at(
+            &mut limits,
+            "new".to_string(),
+            now,
+            2,
+            60
+        ));
+        assert_eq!(limits.len(), 2);
+    }
+
+    #[test]
+    fn typing_rate_preserves_existing_throttle_behavior() {
+        let mut limits = HashMap::new();
+
+        assert!(typing_rate_allows_at(
+            &mut limits,
+            "chat:1:2".to_string(),
+            100,
+            2,
+            60
+        ));
+        assert!(!typing_rate_allows_at(
+            &mut limits,
+            "chat:1:2".to_string(),
+            101,
+            2,
+            60
+        ));
+        assert!(typing_rate_allows_at(
+            &mut limits,
+            "chat:1:2".to_string(),
+            102,
+            2,
+            60
+        ));
+    }
 
     #[test]
     fn realtime_sequence_is_monotonic_and_javascript_safe() {

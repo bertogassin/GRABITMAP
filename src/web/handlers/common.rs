@@ -8,6 +8,31 @@ use axum::{
     Json,
 };
 use serde_json::json;
+use std::collections::{HashMap, VecDeque};
+
+const RATE_LIMIT_MAX_KEYS: usize = 16_384;
+// Keep this at least as large as the longest window passed below (currently
+// one hour), so cleanup never weakens an active limit.
+const RATE_LIMIT_STALE_AFTER_SECONDS: i64 = 60 * 60;
+
+fn reserve_rate_limit_key(
+    limits: &mut HashMap<String, VecDeque<i64>>,
+    key: &str,
+    now: i64,
+    max_keys: usize,
+    stale_after_seconds: i64,
+) -> bool {
+    if limits.contains_key(key) {
+        return true;
+    }
+
+    if limits.len() >= max_keys {
+        let cutoff = now.saturating_sub(stale_after_seconds);
+        limits.retain(|_, events| events.back().is_some_and(|timestamp| *timestamp > cutoff));
+    }
+
+    limits.len() < max_keys
+}
 
 /// Apply browser hardening headers to every response, including error responses.
 pub(crate) async fn security_headers(request: Request, next: Next) -> Response {
@@ -84,6 +109,18 @@ pub(super) async fn rate_limit_retry_after(
     let key = format!("{}:{}", action, user_id);
 
     let mut limits = state.rate_limits.lock().await;
+    if !reserve_rate_limit_key(
+        &mut limits,
+        &key,
+        now,
+        RATE_LIMIT_MAX_KEYS,
+        RATE_LIMIT_STALE_AFTER_SECONDS,
+    ) {
+        // Fail closed under cardinality abuse instead of allowing an
+        // attacker to grow the process-local map without a bound.
+        return Some(window_seconds.max(1) as u64);
+    }
+
     let events = limits.entry(key).or_default();
 
     // Sliding window:
@@ -203,6 +240,31 @@ pub(super) fn csrf_rejected_response() -> Response {
 #[cfg(test)]
 mod request_origin_tests {
     use super::*;
+
+    #[test]
+    fn rate_limit_keys_prune_stale_entries_at_capacity() {
+        let now = 10_000;
+        let mut limits = HashMap::from([
+            ("old-a".to_string(), VecDeque::from([100])),
+            ("old-b".to_string(), VecDeque::from([200])),
+        ]);
+
+        assert!(reserve_rate_limit_key(&mut limits, "new", now, 2, 60));
+        assert!(limits.is_empty());
+    }
+
+    #[test]
+    fn rate_limit_keys_fail_closed_when_capacity_is_fresh() {
+        let now = 10_000;
+        let mut limits = HashMap::from([
+            ("fresh-a".to_string(), VecDeque::from([now - 1])),
+            ("fresh-b".to_string(), VecDeque::from([now - 2])),
+        ]);
+
+        assert!(!reserve_rate_limit_key(&mut limits, "new", now, 2, 60));
+        assert_eq!(limits.len(), 2);
+        assert!(reserve_rate_limit_key(&mut limits, "fresh-a", now, 2, 60));
+    }
 
     #[test]
     fn opaque_origin_accepts_browser_confirmed_first_party_requests() {
