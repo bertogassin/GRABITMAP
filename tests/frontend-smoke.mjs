@@ -1647,18 +1647,30 @@ test("staged deploy keeps a ready backend during replacement", async () => {
   const switchToStaged = deploy.indexOf("=== SWITCH TRAFFIC TO STAGED BACKEND ===");
   const replacePrimary = deploy.indexOf("=== REPLACE PRIMARY BACKEND ===");
   const switchToPrimary = deploy.indexOf("=== SWITCH TRAFFIC BACK TO PRIMARY ===");
+  const verifyStaged = deploy.indexOf("if ! verify_public_deploy", switchToStaged);
+  const verifyPrimary = deploy.indexOf("if ! verify_public_deploy", switchToPrimary);
+  const markRestored = deploy.indexOf("SWITCHED=0", verifyPrimary);
 
   assert.ok(start >= 0);
   assert.ok(start < copyPrimary);
   assert.ok(copyPrimary < switchToStaged);
   assert.ok(start < switchToStaged);
+  assert.ok(switchToStaged < verifyStaged);
+  assert.ok(verifyStaged < replacePrimary);
   assert.ok(switchToStaged < replacePrimary);
   assert.ok(replacePrimary < switchToPrimary);
+  assert.ok(switchToPrimary < verifyPrimary);
+  assert.ok(verifyPrimary < markRestored);
   assert.match(deploy, /test "\$STATUS" = "healthy"/);
   assert.match(deploy, /trap cleanup EXIT/);
   assert.match(deploy, /scripts\/backup_production\.sh/);
   assert.match(deploy, /DATA_SOURCE="\$DATA_SOURCE"/);
   assert.match(deploy, /returning to staged backend/);
+  assert.match(deploy, /EXPECTED_HSTS="\$\{EXPECTED_HSTS:-max-age=31536000\}"/);
+  assert.match(deploy, /strict-transport-security/);
+  assert.match(deploy, /public_endpoint_ready \/health/);
+  assert.match(deploy, /public_endpoint_ready \/ready/);
+  assert.match(deploy, /PUBLIC_VERIFICATION=health,ready,hsts/);
   assert.match(deploy, /\.Config\.Image/);
   assert.match(deploy, /docker image inspect "\$IMAGE_REF"/);
   assert.match(
