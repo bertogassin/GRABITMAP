@@ -1641,11 +1641,16 @@ test("staged deploy keeps a ready backend during replacement", async () => {
   ]);
 
   const start = deploy.indexOf("=== START STAGED BACKEND ===");
+  const copyPrimary = deploy.indexOf(
+    'docker cp "$TEMP_PRIMARY_CADDY" "$CADDY_ID:/tmp/Caddyfile.primary"',
+  );
   const switchToStaged = deploy.indexOf("=== SWITCH TRAFFIC TO STAGED BACKEND ===");
   const replacePrimary = deploy.indexOf("=== REPLACE PRIMARY BACKEND ===");
   const switchToPrimary = deploy.indexOf("=== SWITCH TRAFFIC BACK TO PRIMARY ===");
 
   assert.ok(start >= 0);
+  assert.ok(start < copyPrimary);
+  assert.ok(copyPrimary < switchToStaged);
   assert.ok(start < switchToStaged);
   assert.ok(switchToStaged < replacePrimary);
   assert.ok(replacePrimary < switchToPrimary);
@@ -1656,6 +1661,15 @@ test("staged deploy keeps a ready backend during replacement", async () => {
   assert.match(deploy, /returning to staged backend/);
   assert.match(deploy, /\.Config\.Image/);
   assert.match(deploy, /docker image inspect "\$IMAGE_REF"/);
+  assert.match(
+    deploy,
+    /docker cp "\$TEMP_PRIMARY_CADDY" "\$CADDY_ID:\/tmp\/Caddyfile\.primary"/,
+  );
+  assert.equal(
+    (deploy.match(/--config \/tmp\/Caddyfile\.primary/g) || []).length,
+    2,
+  );
+  assert.doesNotMatch(deploy, /--config \/etc\/caddy\/Caddyfile/);
   assert.doesNotMatch(deploy, /images -q "\$APP_SERVICE"/);
   assert.doesNotMatch(deploy, /docker compose[^\n]* down/);
 
