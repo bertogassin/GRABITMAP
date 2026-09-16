@@ -29,7 +29,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = concat!(env!("CARGO_PKG_VERSION"), "-r7");
+pub const STATIC_ASSET_VERSION: &str = concat!(env!("CARGO_PKG_VERSION"), "-r8");
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -3130,9 +3130,116 @@ a.feature.rm-feature-add {
     font-size: 12px;
 }
 
-.rm-pwa-home-btn {
+.rm-pwa-prompt {
+    position: fixed;
+    z-index: 1200;
+    right: 16px;
+    bottom: calc(96px + env(safe-area-inset-bottom));
+    left: 16px;
+    width: auto;
+    max-width: 460px;
+    margin: 0 auto;
+    padding: 14px;
+    color: var(--text);
+    background: rgba(13, 17, 22, .96);
+    border: 1px solid rgba(214, 183, 122, .28);
+    border-radius: 22px;
+    box-shadow: 0 20px 54px rgba(0, 0, 0, .38);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.rm-pwa-prompt[hidden] {
+    display: none;
+}
+
+.rm-pwa-prompt-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.rm-pwa-prompt-icon {
+    flex: 0 0 auto;
+    width: 52px;
+    height: 52px;
+    border-radius: 15px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, .24);
+}
+
+.rm-pwa-prompt-copy {
+    display: grid;
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 4px;
+}
+
+.rm-pwa-prompt-title {
+    font-size: 15px;
+    line-height: 1.25;
+}
+
+.rm-pwa-prompt-description {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.rm-pwa-prompt-close {
+    display: grid;
+    flex: 0 0 auto;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    color: var(--muted);
+    font: inherit;
+    font-size: 25px;
+    line-height: 1;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    border-radius: 12px;
+    place-items: center;
+}
+
+.rm-pwa-prompt-close:hover,
+.rm-pwa-prompt-close:focus-visible {
+    color: var(--text);
+    background: rgba(255, 255, 255, .08);
+}
+
+.rm-pwa-prompt-action {
     width: 100%;
-    margin: 4px 0 2px;
+    min-height: 44px;
+    margin-top: 12px;
+}
+
+.light-theme .rm-pwa-prompt {
+    background: rgba(255, 255, 255, .97);
+    border-color: rgba(49, 42, 30, .16);
+    box-shadow: 0 20px 54px rgba(31, 27, 20, .2);
+}
+
+.light-theme .rm-pwa-prompt-close:hover,
+.light-theme .rm-pwa-prompt-close:focus-visible {
+    background: rgba(31, 27, 20, .08);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .rm-pwa-prompt:not([hidden]) {
+        animation: rm-pwa-prompt-in 180ms ease-out;
+    }
+}
+
+@keyframes rm-pwa-prompt-in {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .rm-home-start-card {

@@ -572,7 +572,7 @@ test("global search stays available while map and explore keep distinct jobs", a
   assert.doesNotMatch(memory, /applyNavMemory/);
   assert.doesNotMatch(memory, /mapLink\.setAttribute\("href", place\.href\)/);
   assert.doesNotMatch(memoryHome, /continueChips/);
-  assert.match(serviceWorker, /v7\.21\.1-r7/);
+  assert.match(serviceWorker, /v7\.21\.1-r8/);
   assert.match(serviceWorker, /\/static\/global-search\.js/);
 });
 
@@ -833,8 +833,8 @@ test("service worker keeps partial shell caches and caches static responses", as
   assert.match(serviceWorker, /Promise\.all\(STATIC_ASSETS\.map/);
   assert.match(serviceWorker, /cache\.put\(cacheKey\.toString\(\), response\.clone\(\)\)/);
   assert.match(serviceWorker, /const CACHE_PREFIX = "grabit-shell-"/);
-  assert.match(serviceWorker, /CACHE_PREFIX \+ "v7\.21\.1-r7"/);
-  assert.match(common, /env!\("CARGO_PKG_VERSION"\), "-r7"/);
+  assert.match(serviceWorker, /CACHE_PREFIX \+ "v7\.21\.1-r8"/);
+  assert.match(common, /env!\("CARGO_PKG_VERSION"\), "-r8"/);
   assert.match(serviceWorker, /key\.startsWith\(CACHE_PREFIX\)/);
   assert.match(serviceWorker, /internalNavigationTarget\(event\.notification\.data\.url, target\)/);
   assert.match(serviceWorker, /internalNavigationTarget\(nudge\.href, "\/app"\)/);
@@ -1627,6 +1627,16 @@ test("prelaunch UI removes debug hooks native popups duplicate ids and legacy sy
   assert.match(navigation, /data-resursmap-install-pwa/);
   assert.match(pwa, /\[data-resursmap-install-pwa\]/);
   assert.match(pwa, /data-resursmap-install-help/);
+  assert.match(pwa, /grabit-pwa-dismissed-until-v1/);
+  assert.match(pwa, /30 \* 24 \* 60 \* 60 \* 1000/);
+  assert.match(pwa, /map_download_app/);
+  assert.match(pwa, /pwa_installed/);
+  assert.match(pwa, /beforeinstallprompt/);
+  assert.match(pwa, /isIOSDevice\(\)/);
+  assert.match(common, /\.rm-pwa-prompt/);
+  assert.doesNotMatch(common, /\.rm-pwa-home-btn/);
+  assert.doesNotMatch(navigation, /rm-pwa-home-btn/);
+  assert.doesNotMatch(pwa, /Откройте меню|Как установить|Уже скачано/);
   assert.doesNotMatch(communication, /window\.confirm/);
   assert.match(communication, /rm-confirm-dialog/);
   assert.doesNotMatch(blocks, /window\.(?:alert|confirm)/);
