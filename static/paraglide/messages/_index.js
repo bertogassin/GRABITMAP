@@ -312,6 +312,7 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Menu_TitleInputs */
 /** @typedef {{}} Nav_ChatsInputs */
 /** @typedef {{}} Nav_CitiesInputs */
+/** @typedef {{}} Nav_ExploreInputs */
 /** @typedef {{}} Nav_MenuInputs */
 /** @typedef {{}} Nav_SearchInputs */
 /** @typedef {{}} Notifications_TitleInputs */
@@ -14011,6 +14012,50 @@ export const nav_cities = /** @type {((inputs?: Nav_CitiesInputs, options?: { lo
 	if (locale === "sv") return __sv.nav_cities(inputs)
 	if (locale === "he") return __he.nav_cities(inputs)
 	return __ru.nav_cities(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Explore" |
+*
+* @param {Nav_ExploreInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const nav_explore = /** @type {((inputs?: Nav_ExploreInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Nav_ExploreInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.nav_explore(inputs)
+	if (locale === "fr") return __fr.nav_explore(inputs)
+	if (locale === "es") return __es.nav_explore(inputs)
+	if (locale === "zh") return __zh.nav_explore(inputs)
+	if (locale === "zh-TW") return __zh_tw2.nav_explore(inputs)
+	if (locale === "hi") return __hi.nav_explore(inputs)
+	if (locale === "ar") return __ar.nav_explore(inputs)
+	if (locale === "pt") return __pt.nav_explore(inputs)
+	if (locale === "de") return __de.nav_explore(inputs)
+	if (locale === "ja") return __ja.nav_explore(inputs)
+	if (locale === "ko") return __ko.nav_explore(inputs)
+	if (locale === "it") return __it.nav_explore(inputs)
+	if (locale === "tr") return __tr.nav_explore(inputs)
+	if (locale === "pl") return __pl.nav_explore(inputs)
+	if (locale === "uk") return __uk.nav_explore(inputs)
+	if (locale === "nl") return __nl.nav_explore(inputs)
+	if (locale === "vi") return __vi.nav_explore(inputs)
+	if (locale === "id") return __id.nav_explore(inputs)
+	if (locale === "ms") return __ms.nav_explore(inputs)
+	if (locale === "th") return __th.nav_explore(inputs)
+	if (locale === "fa") return __fa.nav_explore(inputs)
+	if (locale === "ur") return __ur.nav_explore(inputs)
+	if (locale === "bn") return __bn.nav_explore(inputs)
+	if (locale === "pa") return __pa.nav_explore(inputs)
+	if (locale === "sw") return __sw.nav_explore(inputs)
+	if (locale === "el") return __el.nav_explore(inputs)
+	if (locale === "cs") return __cs.nav_explore(inputs)
+	if (locale === "ro") return __ro.nav_explore(inputs)
+	if (locale === "hu") return __hu.nav_explore(inputs)
+	if (locale === "sv") return __sv.nav_explore(inputs)
+	if (locale === "he") return __he.nav_explore(inputs)
+	return __ru.nav_explore(inputs)
 });
 /**
 * | output |

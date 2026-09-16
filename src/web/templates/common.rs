@@ -29,7 +29,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = concat!(env!("CARGO_PKG_VERSION"), "-r5");
+pub const STATIC_ASSET_VERSION: &str = concat!(env!("CARGO_PKG_VERSION"), "-r6");
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -83,6 +83,10 @@ pub(crate) fn icon(name: &str) -> &'static str {
 
         "map" => {
             r#"<svg class="icon" viewBox="0 0 24 24"><path d="M20 10c0 5.2-8 12-8 12s-8-6.8-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.6"/></svg>"#
+        }
+
+        "compass" => {
+            r#"<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2.1 4.9-4.9 2.1 2.1-4.9 4.9-2.1Z"/></svg>"#
         }
 
         "search" => {
@@ -527,6 +531,39 @@ body::before { display: none; }
     animation: fadeIn .4s ease both;
 }
 
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.topbar-search {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    color: var(--text);
+    background: var(--surface);
+    text-decoration: none;
+    transition: border-color .16s ease, background .16s ease, transform .16s ease;
+}
+
+.topbar-search:hover {
+    border-color: rgba(214,183,122,.48);
+    background: rgba(214,183,122,.12);
+}
+
+.topbar-search:active {
+    transform: scale(.97);
+}
+
+.topbar-search .icon {
+    width: 20px;
+    height: 20px;
+}
+
 .brand {
     display: flex;
     align-items: center;
@@ -746,6 +783,75 @@ body::before { display: none; }
     margin: -8px 4px 14px;
     color: var(--muted);
     font-size: 12px;
+}
+
+.rm-global-search-dialog {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: var(--text);
+    background: rgba(8, 10, 14, .92);
+}
+
+.rm-global-search-dialog::backdrop {
+    background: rgba(5, 7, 10, .72);
+    backdrop-filter: blur(8px);
+}
+
+.rm-global-search-sheet {
+    width: min(100% - 28px, 720px);
+    margin: max(18px, env(safe-area-inset-top, 0px)) auto;
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    background: var(--card);
+    box-shadow: 0 26px 70px rgba(0,0,0,.42);
+}
+
+.rm-global-search-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.rm-global-search-head h2 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.rm-global-search-close {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    color: var(--text);
+    background: var(--surface);
+    cursor: pointer;
+}
+
+.rm-global-search-form {
+    margin-top: 18px;
+    padding: 12px 12px 12px 15px;
+}
+
+.rm-global-search-form > span {
+    display: inline-flex;
+}
+
+.rm-global-search-form .ui-button {
+    flex: 0 0 auto;
+    min-height: 42px;
+}
+
+.rm-global-search-sheet > .rm-kind-chips {
+    margin-top: 12px;
 }
 
 /* -----------------------------------------------------------
@@ -4165,6 +4271,59 @@ body.light-theme .card:hover .card-icon {
 // MAIN APP
 // ============================================================
 
+fn global_search_dialog() -> String {
+    let search_aria = crate::i18n::t("map_explorer_aria");
+    let search_title = crate::i18n::t("search_title");
+    format!(
+        r#"<dialog class="rm-global-search-dialog"
+        id="rm-global-search-dialog"
+        aria-labelledby="rm-global-search-title">
+    <div class="rm-global-search-sheet">
+        <header class="rm-global-search-head">
+            <h2 id="rm-global-search-title">{search_title}</h2>
+            <button class="rm-global-search-close"
+                    type="button"
+                    data-global-search-close
+                    aria-label="{close_label}">
+                {close_icon}
+            </button>
+        </header>
+        <form method="get"
+              action="/app/search"
+              class="search rm-global-search-form"
+              role="search"
+              aria-label="{search_aria}">
+            <span aria-hidden="true">{search_icon}</span>
+            <input name="q"
+                   type="search"
+                   autocomplete="off"
+                   enterkeyhint="search"
+                   maxlength="100"
+                   required
+                   aria-label="{search_aria}"
+                   placeholder="{search_placeholder}">
+            <button class="ui-button" type="submit">{search_title}</button>
+        </form>
+        {quick_filters}
+    </div>
+</dialog>"#,
+        search_title = escape_html(&search_title),
+        close_label = crate::i18n::t("common_back"),
+        close_icon = icon("x"),
+        search_aria = escape_html(&search_aria),
+        search_icon = icon("search"),
+        search_placeholder = escape_html(&crate::i18n::t("map_explorer_placeholder")),
+        quick_filters = intent_kind_chips(
+            "",
+            true,
+            "/app/search",
+            "/app/search?kind=work",
+            "/app/search?kind=workers",
+            "/app/search?kind=business",
+        ),
+    )
+}
+
 pub(crate) fn page_document(
     title: &str,
     head_extra_html: &str,
@@ -4173,6 +4332,7 @@ pub(crate) fn page_document(
     bottom_nav_html: &str,
     body_after_html: &str,
 ) -> String {
+    let global_search = global_search_dialog();
     let i18n_boot = format!(
         "{{\"locale\":{locale},\"dir\":{dir},\"messages\":{messages}}}",
         locale = serde_json::to_string(crate::i18n::locale()).unwrap_or_else(|_| "\"ru\"".into()),
@@ -4220,6 +4380,8 @@ pub(crate) fn page_document(
 
 {bottom_nav}
 
+{global_search}
+
 <script src="{mobile_foundation_js}" defer></script>
 <script src="{app_reliability_js}" defer></script>
 
@@ -4231,6 +4393,7 @@ pub(crate) fn page_document(
 <script src="{nav_badge_js}" defer></script>
 <script src="{theme_toggle_js}" defer></script>
 <script src="{place_memory_js}" defer></script>
+<script src="{global_search_js}" defer></script>
 <script src="{share_js}" defer></script>
 <script src="{pwa_install_js}" defer></script>
 
@@ -4251,12 +4414,14 @@ pub(crate) fn page_document(
         body_before_main = body_before_main_html,
         main = main_html,
         bottom_nav = bottom_nav_html,
+        global_search = global_search,
         body_after = body_after_html,
         splash_js = static_asset("splash.js"),
         chat_sounds_js = static_asset("chat-sounds.js"),
         nav_badge_js = static_asset("nav-badge.js"),
         theme_toggle_js = static_asset("theme-toggle.js"),
         place_memory_js = static_asset("place-memory.js"),
+        global_search_js = static_asset("global-search.js"),
         share_js = static_asset("share.js"),
         pwa_install_js = static_asset("pwa-install.js"),
         mobile_foundation_css = static_asset("mobile-foundation.css"),
@@ -4380,9 +4545,9 @@ pub(crate) fn bottom_nav_with_badges(
         <span>{label_cities}</span>
     </a>
 
-    <a class="{search_class}" href="/app/search" data-nav-search-link>
-        {nav_search}
-        <span>{label_search}</span>
+    <a class="{explore_class}" href="/app/explore" data-nav-explore-link>
+        {nav_explore}
+        <span>{label_explore}</span>
     </a>
 
     <a class="{chats_class}" href="/app/messages" data-nav-chats-link>
@@ -4400,17 +4565,17 @@ pub(crate) fn bottom_nav_with_badges(
 </nav>
 "#,
         map_class = item_class("map"),
-        search_class = item_class("search"),
+        explore_class = item_class("explore"),
         chats_class = item_class("chats"),
         menu_class = item_class("menu"),
         nav_map = icon("map"),
-        nav_search = icon("search"),
+        nav_explore = icon("compass"),
         nav_chats = icon("message-circle"),
         nav_menu = icon("sliders"),
         unread_badge = nav_count_badge(unread_messages),
         menu_badge = nav_count_badge(menu_count),
         label_cities = crate::i18n::t("nav_cities"),
-        label_search = crate::i18n::t("nav_search"),
+        label_explore = crate::i18n::t("nav_explore"),
         label_chats = crate::i18n::t("nav_chats"),
         label_menu = crate::i18n::t("nav_menu"),
     )
@@ -4428,21 +4593,31 @@ pub(crate) fn topbar(subtitle: &str, _icon_name: &str) -> String {
         </div>
     </a>
 
-    <a class="topbar-account"
-       href="/app/me"
-       aria-label="{profile_aria}">
-        <span class="topbar-account-icon">
-            {user_icon}
-        </span>
-        <span class="topbar-account-label">
-            {profile_label}
-        </span>
-    </a>
+    <div class="topbar-actions">
+        <a class="topbar-search"
+           href="/app/search"
+           data-global-search-open
+           aria-label="{search_aria}">
+            {search_icon}
+        </a>
+        <a class="topbar-account"
+           href="/app/me"
+           aria-label="{profile_aria}">
+            <span class="topbar-account-icon">
+                {user_icon}
+            </span>
+            <span class="topbar-account-label">
+                {profile_label}
+            </span>
+        </a>
+    </div>
 </header>
 "#,
         logo_src = static_asset("grabit-mascot-v2.png"),
         user_icon = icon("user"),
+        search_icon = icon("search"),
         subtitle = escape_html(subtitle),
+        search_aria = crate::i18n::t("map_explorer_aria"),
         profile_aria = crate::i18n::t("common_open_profile"),
         profile_label = crate::i18n::t("common_profile"),
     )
@@ -6228,6 +6403,7 @@ mod public_entry_tests {
         let icons = [
             "globe",
             "map",
+            "compass",
             "search",
             "user",
             "star",
@@ -6272,6 +6448,8 @@ mod public_entry_tests {
 
         assert!(html.contains("href=\"/app\""));
         assert!(html.contains("href=\"/app/me\""));
+        assert!(html.contains("href=\"/app/search\""));
+        assert!(html.contains("data-global-search-open"));
         assert!(html.contains("Профиль"));
         assert!(html.contains("brand-logo-img"));
         assert!(html.contains("grabit-mascot-v2.png"));
@@ -6288,6 +6466,8 @@ mod public_entry_tests {
         assert!(html.contains("manifest.webmanifest"));
         let page = page_document("Тест", "", "", "<p>ok</p>", "", "");
         assert!(page.contains("/static/pwa-install.js"));
+        assert!(page.contains("/static/global-search.js"));
+        assert!(page.contains("id=\"rm-global-search-dialog\""));
         assert!(page.contains("apple-touch-icon.png"));
         assert!(page.contains("href=\"/rules\""));
         assert!(page.contains("href=\"/privacy\""));

@@ -2,7 +2,7 @@
 
 const CACHE_PREFIX = "grabit-shell-";
 const LEGACY_CACHE_PREFIX = "resursmap-shell-";
-const CACHE_VERSION = CACHE_PREFIX + "v7.21.1-r5";
+const CACHE_VERSION = CACHE_PREFIX + "v7.21.1-r6";
 
 const STATIC_ASSETS = [
     "/static/manifest.webmanifest",
@@ -13,6 +13,7 @@ const STATIC_ASSETS = [
     "/static/apple-touch-icon.png",
     "/static/grabit-mascot-v2.png",
     "/static/grabit-share-cover.png",
+    "/static/global-search.js",
     "/static/nav-badge.js",
     "/static/app-reliability.js",
     "/static/i18n-boot.js",

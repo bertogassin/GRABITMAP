@@ -365,11 +365,6 @@
             mapLink.setAttribute("href", place.href);
         }
 
-        var lastSearch = loadSearches()[0];
-        var searchLink = document.querySelector(".bottom-nav a[data-nav-search-link]");
-        if (searchLink && lastSearch && lastSearch.href && here !== "/app/search") {
-            searchLink.setAttribute("href", lastSearch.href);
-        }
     }
 
     function prefillSearch() {
