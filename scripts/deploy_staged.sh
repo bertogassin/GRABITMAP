@@ -10,6 +10,9 @@ TEMP_STAGED_CADDY="$(mktemp)"
 TEMP_PRIMARY_CADDY="$(mktemp)"
 BACKUP_ROOT="${BACKUP_ROOT:-/root/grabit-backups}"
 BACKUP_DIR="$BACKUP_ROOT/staged-$(date -u +%Y%m%dT%H%M%SZ)"
+PUBLIC_URL="${PUBLIC_URL:-https://grabitmap.com}"
+PUBLIC_URL="${PUBLIC_URL%/}"
+EXPECTED_HSTS="${EXPECTED_HSTS:-max-age=31536000}"
 SWITCHED=0
 
 cd "$ROOT_DIR"
@@ -25,6 +28,52 @@ cleanup() {
     fi
 }
 trap cleanup EXIT
+
+public_endpoint_ready() {
+    local path="$1"
+
+    curl --retry 10 --retry-delay 1 --retry-connrefused \
+        --max-time 15 \
+        -fsS "$PUBLIC_URL$path" >/dev/null
+}
+
+public_hsts_ready() {
+    local attempt
+    local hsts=""
+
+    for attempt in $(seq 1 10); do
+        hsts="$(
+            curl --max-time 15 -fsS -D - -o /dev/null \
+                "$PUBLIC_URL/health" 2>/dev/null |
+                tr -d '\r' |
+                awk -F': *' \
+                    'tolower($1) == "strict-transport-security" {print $2; exit}'
+        )" || true
+
+        if [ "$hsts" = "$EXPECTED_HSTS" ]; then
+            return 0
+        fi
+
+        sleep 1
+    done
+
+    echo "❌ Public HSTS header does not match expected value" >&2
+    return 1
+}
+
+verify_public_deploy() {
+    if ! public_endpoint_ready /health; then
+        echo "❌ Public health endpoint failed" >&2
+        return 1
+    fi
+
+    if ! public_endpoint_ready /ready; then
+        echo "❌ Public readiness endpoint failed" >&2
+        return 1
+    fi
+
+    public_hsts_ready
+}
 
 test -f "$COMPOSE_FILE"
 test -f Caddyfile
@@ -144,8 +193,10 @@ docker compose -f "$COMPOSE_FILE" exec -T "$CADDY_SERVICE" \
 
 SWITCHED=1
 
-curl --retry 10 --retry-delay 1 --retry-connrefused \
-    -fsS https://grabitmap.com/ready >/dev/null
+if ! verify_public_deploy; then
+    echo "❌ Staged backend failed public verification" >&2
+    exit 1
+fi
 
 echo "=== REPLACE PRIMARY BACKEND ==="
 docker compose -f "$COMPOSE_FILE" up \
@@ -161,10 +212,8 @@ docker compose -f "$COMPOSE_FILE" exec -T "$CADDY_SERVICE" \
     --config /tmp/Caddyfile.primary \
     --adapter caddyfile
 
-if ! curl --retry 10 --retry-delay 1 --retry-connrefused \
-    -fsS https://grabitmap.com/ready >/dev/null
-then
-    echo "❌ Primary backend failed public readiness; returning to staged backend"
+if ! verify_public_deploy; then
+    echo "❌ Primary backend failed public verification; returning to staged backend" >&2
 
     docker compose -f "$COMPOSE_FILE" exec -T "$CADDY_SERVICE" \
         caddy reload \
@@ -174,6 +223,7 @@ then
     exit 1
 fi
 
+echo "PUBLIC_VERIFICATION=health,ready,hsts"
 SWITCHED=0
 docker rm -f "$NEXT_NAME" >/dev/null
 
