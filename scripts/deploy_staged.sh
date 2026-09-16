@@ -59,20 +59,15 @@ test -n "$NETWORK"
 test -n "$DATA_VOLUME"
 test -n "$DATA_SOURCE"
 test -f "$DATA_SOURCE/votes.db"
-command -v sqlite3 >/dev/null
 
 echo "=== CREATE VERIFIED BACKUP ==="
-mkdir -p "$BACKUP_DIR"
-chmod 700 "$BACKUP_DIR"
-
-sqlite3 "$DATA_SOURCE/votes.db" ".backup '$BACKUP_DIR/votes.db'"
-test "$(sqlite3 "$BACKUP_DIR/votes.db" 'PRAGMA integrity_check;')" = "ok"
-
-cp -a .env "$BACKUP_DIR/production.env"
-cp -a Caddyfile "$BACKUP_DIR/Caddyfile"
-chmod 600 "$BACKUP_DIR"/*
-
-echo "BACKUP=$BACKUP_DIR"
+BACKUP_DIR="$BACKUP_DIR" \
+DATA_SOURCE="$DATA_SOURCE" \
+CURRENT_ID="$CURRENT_ID" \
+IMAGE_ID="$(docker inspect "$CURRENT_ID" --format '{{.Image}}')" \
+COMPOSE_FILE="$COMPOSE_FILE" \
+APP_SERVICE="$APP_SERVICE" \
+    "$ROOT_DIR/scripts/backup_production.sh"
 
 echo "=== BUILD NEW IMAGE ==="
 docker compose -f "$COMPOSE_FILE" build "$APP_SERVICE"
