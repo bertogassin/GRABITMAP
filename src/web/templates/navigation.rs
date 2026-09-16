@@ -258,11 +258,6 @@ pub fn render_geo_root(
     <div class="eyebrow">{logo} GRABIT</div>
     <h1>{map_global_title}</h1>
     <p>{map_global_lead}</p>
-    <button data-resursmap-install-pwa
-            type="button"
-            class="ui-button rm-pwa-home-btn">
-        {map_download_app}
-    </button>
     {guest_hint}
     <div class="rm-map-stats">
         <div><strong>{users_count}</strong><span>{users_word}</span></div>
@@ -273,7 +268,6 @@ pub fn render_geo_root(
         logo = icon("globe"),
         map_global_title = crate::i18n::t("map_global_title"),
         map_global_lead = crate::i18n::t("map_global_lead"),
-        map_download_app = crate::i18n::t("map_download_app"),
     );
     let content = format!(
         r#"<div id="rm-last-city-home" class="grid rm-continue-home" hidden></div>{head}<div class="grid rm-map-grid">{cards}</div>"#,
@@ -923,12 +917,6 @@ pub fn render_continents(
 
     <p>{map_home_lead}</p>
 
-    <button data-resursmap-install-pwa
-            type="button"
-            class="ui-button rm-pwa-home-btn">
-        {map_download_app}
-    </button>
-
     {guest_hint}
 
     <section class="rm-home-explorer card" id="rm-home-explorer">
@@ -985,7 +973,6 @@ pub fn render_continents(
         guest_hint = guest_hint,
         map_cities_professions = crate::i18n::t("map_cities_professions"),
         map_home_lead = crate::i18n::t("map_home_lead"),
-        map_download_app = crate::i18n::t("map_download_app"),
         search_icon = icon("search"),
         clear_icon = icon("x"),
         search_title = crate::i18n::t("search_title"),
