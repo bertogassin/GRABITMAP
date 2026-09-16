@@ -1160,6 +1160,11 @@ test("production compose keeps Caddy in front of the private app", async () => {
   assert.match(caddy, /reverse_proxy grabit:3000/);
   assert.match(caddy, /lb_try_duration 15s/);
   assert.match(caddy, /health_uri \/ready/);
+  assert.match(
+    caddy,
+    /header Strict-Transport-Security "max-age=31536000"/,
+  );
+  assert.doesNotMatch(caddy, /includeSubDomains|preload/i);
   assert.match(compose, /\nnetworks:\s*\n\s*app-net:/);
   assert.match(compose, /\n  caddy-data:/);
   assert.match(compose, /\n  caddy-config:/);
