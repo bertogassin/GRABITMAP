@@ -289,7 +289,6 @@ pub fn render_geo_root(
 .rm-map-stats strong,.rm-map-stats span{display:block}.rm-map-stats strong{color:var(--gold-light);font-size:21px}.rm-map-stats span{margin-top:4px;color:var(--muted);font-size:9px;text-transform:uppercase}
 .rm-map-grid{align-items:stretch}
 .rm-continue-home{margin-bottom:14px}
-.rm-continue-chips{margin-top:10px}
 .rm-continue-card{padding:16px;display:grid;gap:10px}
 </style>"#;
     page_document(
@@ -1236,7 +1235,7 @@ pub fn render_city(ci: usize, si: usize, zi: usize) -> String {
 
 pub fn render_explore() -> String {
     let content = format!(
-        r#"{head}<div class="grid rm-explore-grid">{work}{workers}{business}{cities}</div>"#,
+        r#"{head}<div class="grid rm-explore-grid">{work}{workers}{business}</div>"#,
         head = section_head(
             &crate::i18n::t("search_what"),
             &crate::i18n::t("map_home_lead"),
@@ -1259,12 +1258,6 @@ pub fn render_explore() -> String {
             "building",
             &crate::i18n::t("common_business"),
             &crate::i18n::t("search_what"),
-        ),
-        cities = navigation_card(
-            "/app",
-            "globe",
-            &crate::i18n::t("map_cities"),
-            &crate::i18n::t("map_home_lead"),
         ),
     );
 
@@ -1972,12 +1965,12 @@ mod search_catalog_tests {
         assert!(menu.contains("/app/join/abc123?to=chat"));
         assert!(menu.contains("/app/join/abc123?to=work"));
         assert!(menu.contains("theme-toggle-btn"));
-        assert!(menu.contains("data-nav-map-link"));
+        assert!(menu.contains("href=\"/app\""));
         assert!(menu.contains("data-nav-explore-link"));
 
         let home = render_geo_root(1, 1, 1, vec![(1, "Европа".to_string(), 3)], false);
         assert!(home.contains("id=\"rm-last-city-home\""));
-        assert!(home.contains("data-nav-map-link"));
+        assert!(home.contains("href=\"/app\""));
         assert!(!home.contains("rm-map-global-search"));
     }
 
@@ -1989,7 +1982,7 @@ mod search_catalog_tests {
         assert!(html.contains("/app/search?kind=work"));
         assert!(html.contains("/app/search?kind=workers"));
         assert!(html.contains("/app/search?kind=business"));
-        assert!(html.contains("href=\"/app\""));
+        assert!(!html.contains(">Города<"));
     }
 
     #[test]

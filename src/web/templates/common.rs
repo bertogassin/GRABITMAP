@@ -29,7 +29,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = concat!(env!("CARGO_PKG_VERSION"), "-r6");
+pub const STATIC_ASSET_VERSION: &str = concat!(env!("CARGO_PKG_VERSION"), "-r7");
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -4540,9 +4540,9 @@ pub(crate) fn bottom_nav_with_badges(
         r#"
 <nav class="bottom-nav">
 
-    <a class="{map_class}" href="/app" data-nav-map-link>
+    <a class="{map_class}" href="/app">
         {nav_map}
-        <span>{label_cities}</span>
+        <span>{label_map}</span>
     </a>
 
     <a class="{explore_class}" href="/app/explore" data-nav-explore-link>
@@ -4574,7 +4574,7 @@ pub(crate) fn bottom_nav_with_badges(
         nav_menu = icon("sliders"),
         unread_badge = nav_count_badge(unread_messages),
         menu_badge = nav_count_badge(menu_count),
-        label_cities = crate::i18n::t("nav_cities"),
+        label_map = crate::i18n::t("map_title"),
         label_explore = crate::i18n::t("nav_explore"),
         label_chats = crate::i18n::t("nav_chats"),
         label_menu = crate::i18n::t("nav_menu"),
@@ -6187,7 +6187,7 @@ pub(crate) fn guest_mode_panel(next_path: &str) -> String {
         map_card = navigation_card(
             "/app",
             "globe",
-            &crate::i18n::t("nav_cities"),
+            &crate::i18n::t("map_title"),
             &crate::i18n::t("nav_cities"),
         ),
         search_card = navigation_card(

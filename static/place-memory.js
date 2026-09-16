@@ -247,13 +247,13 @@
         return labels[label.toLowerCase()] || label;
     }
 
-    function continueChips(includePlace) {
+    function continueChips() {
         var html = "";
         var place = loadPlace();
         var listing = loadListing();
         var searches = loadSearches();
 
-        if (includePlace && place && place.href) {
+        if (place && place.href) {
             html += chip(
                 place.href,
                 (place.name && String(place.name).trim()) || "Последнее место"
@@ -283,7 +283,7 @@
             return;
         }
 
-        var html = continueChips(true);
+        var html = continueChips();
         host.innerHTML = html;
         host.hidden = !html;
     }
@@ -295,20 +295,9 @@
         }
 
         var place = loadPlace();
-        var chips = continueChips(false);
         if (!place || !place.href) {
-            if (!chips) {
-                host.hidden = true;
-                host.innerHTML = "";
-                return;
-            }
-            host.innerHTML =
-                '<section class="card rm-continue-card">' +
-                '<div class="card-title">Продолжить</div>' +
-                '<nav class="rm-kind-chips">' +
-                chips +
-                "</nav></section>";
-            host.hidden = false;
+            host.hidden = true;
+            host.innerHTML = "";
             return;
         }
 
@@ -327,10 +316,7 @@
             "</div>" +
             "</div>" +
             '<div class="card-arrow"><svg class="icon small-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></div>' +
-            "</a>" +
-            (chips
-                ? '<nav class="rm-kind-chips rm-continue-chips">' + chips + "</nav>"
-                : "");
+            "</a>";
         host.hidden = false;
     }
 
@@ -341,7 +327,7 @@
         }
 
         var place = loadPlace();
-        var chips = continueChips(true);
+        var chips = continueChips();
         if (!place && !chips) {
             host.hidden = true;
             host.innerHTML = "";
@@ -355,16 +341,6 @@
             (chips ? '<nav class="rm-kind-chips" aria-label="Недавние действия">' + chips + "</nav>" : "") +
             "</section>";
         host.hidden = false;
-    }
-
-    function applyNavMemory() {
-        var place = loadPlace();
-        var mapLink = document.querySelector(".bottom-nav a[data-nav-map-link]");
-        var here = String(window.location.pathname || "").replace(/\/$/, "") || "/";
-        if (mapLink && place && place.href && here !== "/app") {
-            mapLink.setAttribute("href", place.href);
-        }
-
     }
 
     function prefillSearch() {
@@ -481,7 +457,6 @@
 
         renderHomeLastCity();
         renderMenuContinue();
-        applyNavMemory();
         bindAddLinks();
         bindListingDraft();
     });
