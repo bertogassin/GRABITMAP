@@ -349,5 +349,21 @@
   "place_selector_denied": "定位已關閉。你可以手動選擇地點。",
   "place_selector_locating": "正在定位…",
   "place_selector_no_match": "最近地點沒有符合項目。請開啟完整地理。",
-  "place_continue": "繼續 {name}"
+  "place_continue": "繼續 {name}",
+  "nearby_scope_city": "{name} 的已發布卡片",
+  "nearby_scope_radius": "{name} 暫無卡片 · 100 公里內的地點",
+  "nearby_scope_country": "沒有更近的卡片 · 顯示 {name}",
+  "nearby_scope_world": "全球最新發布的卡片",
+  "nearby_official_group": "官方群組",
+  "nearby_empty_title": "還沒有已發布的卡片",
+  "nearby_empty_body": "成為這個區域第一個新增卡片的人。",
+  "nearby_add": "新增卡片",
+  "nearby_fresh": "最新卡片",
+  "nearby_choose_city": "選擇城市",
+  "nearby_lead": "查看所選地點附近已發布的卡片，然後在 GRABIT 中寫信。",
+  "nearby_unknown_place": "未指定地點",
+  "nearby_scope_none": "請先選擇城市。這裡不顯示全球卡片。",
+  "nearby_need_city_title": "請選擇城市",
+  "nearby_need_city_body": "未選擇城市時，「附近」為空。這不是全球列表。",
+  "nearby_location_unavailable": "無法安全判斷最近的城市。請自行選擇地點。"
 }

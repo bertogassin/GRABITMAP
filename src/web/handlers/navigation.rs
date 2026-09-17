@@ -48,9 +48,28 @@ pub async fn app_menu(State(state): State<AppState>, headers: HeaderMap) -> Html
     Html(templates::render_menu(&invite_public_id, admin_level))
 }
 
-pub async fn app_root(State(state): State<AppState>, headers: HeaderMap) -> Html<String> {
-    // Обновим last_seen_at для авторизованного пользователя
-    if let Some(user) = verify_authenticated_user(&state, &headers) {
+const NEARBY_FEED_LIMIT: i64 = 24;
+const NEARBY_RADIUS_KM: f64 = 100.0;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum NearbyScope {
+    None,
+    City,
+    Radius,
+    Country,
+}
+
+struct NearbyCity {
+    id: i64,
+    name: String,
+    country_id: i64,
+    country_name: String,
+    latitude: Option<f64>,
+    longitude: Option<f64>,
+}
+
+fn touch_last_seen(state: &AppState, headers: &HeaderMap) {
+    if let Some(user) = verify_authenticated_user(state, headers) {
         if let Ok(db) = crate::db::pool::get_connection(&state.db_pool) {
             let _ = db.execute(
                 "UPDATE profiles SET last_seen_at = strftime('%s','now') WHERE user_id = ?1",
@@ -58,6 +77,282 @@ pub async fn app_root(State(state): State<AppState>, headers: HeaderMap) -> Html
             );
         }
     }
+}
+
+fn parse_positive_id(raw: Option<&str>) -> Option<i64> {
+    raw.and_then(|value| value.parse::<i64>().ok())
+        .filter(|value| *value > 0)
+}
+
+fn load_nearby_city(db: &rusqlite::Connection, city_id: i64) -> Option<NearbyCity> {
+    db.query_row(
+        "SELECT city.name_ru,
+                country.id,
+                country.name_ru,
+                city.latitude,
+                city.longitude
+         FROM geo_cities AS city
+         JOIN geo_countries AS country
+           ON country.id = city.country_id
+         WHERE city.id = ?1
+           AND city.place_kind = 'city'
+           AND city.is_active = 1
+           AND country.is_active = 1",
+        [city_id],
+        |row| {
+            Ok(NearbyCity {
+                id: city_id,
+                name: row.get(0)?,
+                country_id: row.get(1)?,
+                country_name: row.get(2)?,
+                latitude: row.get(3)?,
+                longitude: row.get(4)?,
+            })
+        },
+    )
+    .ok()
+}
+
+fn official_group_exists(db: &rusqlite::Connection, city_id: i64) -> bool {
+    db.query_row(
+        "SELECT 1
+         FROM chat_group_scopes AS scope
+         JOIN chat_groups AS group_row
+           ON group_row.id = scope.group_id
+         WHERE scope.scope_type = 'city'
+           AND scope.scope_id = ?1
+           AND scope.group_id > 0
+         LIMIT 1",
+        [city_id],
+        |_| Ok(()),
+    )
+    .is_ok()
+}
+
+fn public_listing_select() -> &'static str {
+    "SELECT
+        r.id,
+        r.title,
+        r.category,
+        r.description,
+        r.address,
+        r.rating,
+        r.votes,
+        r.is_verified,
+        r.is_premium,
+        r.continent_index,
+        r.country_index,
+        r.city_index,
+        COALESCE(r.listing_type, 'general'),
+        COALESCE(r.rubric, ''),
+        COALESCE(p.public_id, ''),
+        COALESCE(p.user_id, 0)
+     FROM resources r
+     LEFT JOIN profiles p
+       ON p.client_id = r.client_id
+     WHERE r.is_active = 1
+       AND r.moderation_status = 'approved'"
+}
+
+fn load_public_listings(
+    db: &rusqlite::Connection,
+    extra_sql: &str,
+    params: impl rusqlite::Params,
+) -> Vec<crate::web::view_models::SearchResourceRow> {
+    let sql = format!(
+        "{}
+         {extra_sql}
+         ORDER BY
+            r.is_premium DESC,
+            r.is_verified DESC,
+            r.rating DESC,
+            r.votes DESC,
+            r.id DESC
+         LIMIT {NEARBY_FEED_LIMIT}",
+        public_listing_select()
+    );
+    db.prepare(&sql)
+        .and_then(|mut stmt| {
+            stmt.query_map(params, map_search_resource_row)?
+                .collect::<Result<Vec<_>, _>>()
+        })
+        .unwrap_or_default()
+}
+
+fn bounding_box(lat: f64, lon: f64, km: f64) -> (f64, f64, f64, f64) {
+    let lat_delta = km / 111.0;
+    let cos_lat = lat.to_radians().cos().abs().max(0.2);
+    let lon_delta = km / (111.0 * cos_lat);
+    (
+        (lat - lat_delta).clamp(-90.0, 90.0),
+        (lat + lat_delta).clamp(-90.0, 90.0),
+        (lon - lon_delta).clamp(-180.0, 180.0),
+        (lon + lon_delta).clamp(-180.0, 180.0),
+    )
+}
+
+fn haversine_km(lat1: f64, lon1: f64, lat2: f64, lon2: f64) -> f64 {
+    let earth_km = 6371.0;
+    let d_lat = (lat2 - lat1).to_radians();
+    let d_lon = (lon2 - lon1).to_radians();
+    let a = (d_lat / 2.0).sin().powi(2)
+        + lat1.to_radians().cos() * lat2.to_radians().cos() * (d_lon / 2.0).sin().powi(2);
+    2.0 * earth_km * a.sqrt().asin()
+}
+
+fn load_radius_listings(
+    db: &rusqlite::Connection,
+    city: &NearbyCity,
+) -> Vec<crate::web::view_models::SearchResourceRow> {
+    let (Some(lat), Some(lon)) = (city.latitude, city.longitude) else {
+        return Vec::new();
+    };
+    if lat.abs() > 90.0 || lon.abs() > 180.0 || (lat == 0.0 && lon == 0.0) {
+        return Vec::new();
+    }
+    let (min_lat, max_lat, min_lon, max_lon) = bounding_box(lat, lon, NEARBY_RADIUS_KM);
+    let sql = "SELECT
+        r.id,
+        r.title,
+        r.category,
+        r.description,
+        r.address,
+        r.rating,
+        r.votes,
+        r.is_verified,
+        r.is_premium,
+        r.continent_index,
+        r.country_index,
+        r.city_index,
+        COALESCE(r.listing_type, 'general'),
+        COALESCE(r.rubric, ''),
+        COALESCE(p.public_id, ''),
+        COALESCE(p.user_id, 0),
+        near_city.latitude,
+        near_city.longitude
+     FROM resources r
+     LEFT JOIN profiles p
+       ON p.client_id = r.client_id
+     JOIN geo_cities AS near_city
+       ON near_city.id = r.city_id
+     WHERE r.is_active = 1
+       AND r.moderation_status = 'approved'
+       AND r.city_id IS NOT NULL
+       AND r.city_id <> ?1
+       AND near_city.place_kind = 'city'
+       AND near_city.is_active = 1
+       AND near_city.latitude IS NOT NULL
+       AND near_city.longitude IS NOT NULL
+       AND near_city.latitude BETWEEN ?2 AND ?3
+       AND near_city.longitude BETWEEN ?4 AND ?5
+     ORDER BY
+        r.is_premium DESC,
+        r.is_verified DESC,
+        r.rating DESC,
+        r.votes DESC,
+        r.id DESC
+     LIMIT 80";
+    let rows = db
+        .prepare(sql)
+        .and_then(|mut stmt| {
+            stmt.query_map(
+                rusqlite::params![city.id, min_lat, max_lat, min_lon, max_lon],
+                |row| {
+                    let listing = map_search_resource_row(row)?;
+                    let city_lat = row.get::<_, f64>(16)?;
+                    let city_lon = row.get::<_, f64>(17)?;
+                    Ok((listing, city_lat, city_lon))
+                },
+            )?
+            .collect::<Result<Vec<_>, _>>()
+        })
+        .unwrap_or_default();
+    rows.into_iter()
+        .filter(|(_, city_lat, city_lon)| {
+            haversine_km(lat, lon, *city_lat, *city_lon) <= NEARBY_RADIUS_KM
+        })
+        .map(|(listing, _, _)| listing)
+        .take(NEARBY_FEED_LIMIT as usize)
+        .collect()
+}
+
+fn load_nearby_feed(
+    db: &rusqlite::Connection,
+    city: Option<&NearbyCity>,
+) -> (NearbyScope, Vec<crate::web::view_models::SearchResourceRow>) {
+    let Some(city) = city else {
+        return (NearbyScope::None, Vec::new());
+    };
+    let city_rows = load_public_listings(db, "AND r.city_id = ?1", [city.id]);
+    if !city_rows.is_empty() {
+        return (NearbyScope::City, city_rows);
+    }
+    let radius_rows = load_radius_listings(db, city);
+    if !radius_rows.is_empty() {
+        return (NearbyScope::Radius, radius_rows);
+    }
+    let country_rows = load_public_listings(
+        db,
+        "AND r.city_id IN (
+                SELECT near_city.id
+                FROM geo_cities AS near_city
+                WHERE near_city.country_id = ?1
+                  AND near_city.place_kind = 'city'
+                  AND near_city.is_active = 1
+             )",
+        [city.country_id],
+    );
+    if !country_rows.is_empty() {
+        return (NearbyScope::Country, country_rows);
+    }
+    (NearbyScope::City, Vec::new())
+}
+
+fn scope_label(scope: NearbyScope) -> &'static str {
+    match scope {
+        NearbyScope::None => "none",
+        NearbyScope::City => "city",
+        NearbyScope::Radius => "radius",
+        NearbyScope::Country => "country",
+    }
+}
+
+pub async fn app_root(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Query(params): Query<BTreeMap<String, String>>,
+) -> Html<String> {
+    touch_last_seen(&state, &headers);
+    let requested_city_id = parse_positive_id(params.get("city_id").map(String::as_str));
+    let guest_mode = verify_user_session(&state, &headers).is_none();
+    let db = crate::db::pool::get_connection(&state.db_pool).ok();
+    let city = db
+        .as_ref()
+        .and_then(|conn| requested_city_id.and_then(|id| load_nearby_city(conn, id)));
+    let selected_city_id = city.as_ref().map(|item| item.id);
+    let official_group_href = city.as_ref().and_then(|item| {
+        db.as_ref().and_then(|conn| {
+            official_group_exists(conn, item.id)
+                .then(|| format!("/app/official-groups?scope_type=city&scope_id={}", item.id))
+        })
+    });
+    let (scope, listings) = match db.as_ref() {
+        Some(conn) => load_nearby_feed(conn, city.as_ref()),
+        None => (NearbyScope::None, Vec::new()),
+    };
+    Html(templates::render_nearby(
+        selected_city_id,
+        city.as_ref().map(|item| item.name.as_str()),
+        city.as_ref().map(|item| item.country_name.as_str()),
+        scope_label(scope),
+        listings,
+        official_group_href.as_deref(),
+        guest_mode,
+    ))
+}
+
+pub async fn app_geo_world(State(state): State<AppState>, headers: HeaderMap) -> Html<String> {
+    touch_last_seen(&state, &headers);
     let users_count = state
         .db_pool
         .get()
@@ -1041,6 +1336,133 @@ pub async fn app_city(Path((ci, si, zi)): Path<(usize, usize, usize)>) -> Html<S
 #[cfg(test)]
 mod search_query_tests {
     use super::*;
+
+    #[test]
+    fn invalid_city_id_is_ignored() {
+        assert_eq!(parse_positive_id(Some("0")), None);
+        assert_eq!(parse_positive_id(Some("-3")), None);
+        assert_eq!(parse_positive_id(Some("abc")), None);
+        assert_eq!(parse_positive_id(Some("12")), Some(12));
+    }
+
+    fn nearby_fixture() -> rusqlite::Connection {
+        let db = rusqlite::Connection::open_in_memory().expect("memory");
+        db.execute_batch(
+            r#"
+            CREATE TABLE geo_countries (
+                id INTEGER PRIMARY KEY,
+                name_ru TEXT NOT NULL,
+                is_active INTEGER NOT NULL DEFAULT 1
+            );
+            CREATE TABLE geo_cities (
+                id INTEGER PRIMARY KEY,
+                country_id INTEGER NOT NULL,
+                name_ru TEXT NOT NULL,
+                place_kind TEXT NOT NULL DEFAULT 'city',
+                is_active INTEGER NOT NULL DEFAULT 1,
+                latitude REAL,
+                longitude REAL
+            );
+            CREATE TABLE resources (
+                id INTEGER PRIMARY KEY,
+                title TEXT NOT NULL DEFAULT '',
+                category TEXT NOT NULL DEFAULT '',
+                description TEXT NOT NULL DEFAULT '',
+                address TEXT NOT NULL DEFAULT '',
+                rating REAL NOT NULL DEFAULT 0,
+                votes INTEGER NOT NULL DEFAULT 0,
+                is_verified INTEGER NOT NULL DEFAULT 0,
+                is_premium INTEGER NOT NULL DEFAULT 0,
+                continent_index INTEGER NOT NULL DEFAULT 0,
+                country_index INTEGER NOT NULL DEFAULT 0,
+                city_index INTEGER NOT NULL DEFAULT 0,
+                listing_type TEXT,
+                rubric TEXT,
+                client_id TEXT,
+                city_id INTEGER,
+                is_active INTEGER NOT NULL DEFAULT 1,
+                moderation_status TEXT NOT NULL DEFAULT 'pending'
+            );
+            CREATE TABLE profiles (
+                user_id INTEGER PRIMARY KEY,
+                client_id TEXT,
+                public_id TEXT
+            );
+            INSERT INTO geo_countries (id, name_ru) VALUES (1, 'Франция'), (2, 'Япония');
+            INSERT INTO geo_cities (id, country_id, name_ru, latitude, longitude)
+            VALUES
+                (10, 1, 'Лион', 45.75, 4.85),
+                (11, 1, 'Вильфранш', 45.99, 4.72),
+                (12, 1, 'Марсель', 43.3, 5.4),
+                (20, 2, 'Токио', 35.68, 139.69);
+            INSERT INTO resources (id, title, city_id, is_active, moderation_status)
+            VALUES
+                (1, 'Lyon card', 10, 1, 'approved'),
+                (2, 'Villefranche card', 11, 1, 'approved'),
+                (3, 'Marseille card', 12, 1, 'approved'),
+                (4, 'Tokyo card', 20, 1, 'approved'),
+                (5, 'Hidden draft', 10, 1, 'pending'),
+                (6, 'Inactive', 10, 0, 'approved');
+            "#,
+        )
+        .expect("schema");
+        db
+    }
+
+    #[test]
+    fn nearby_feed_uses_city_listings_first() {
+        let db = nearby_fixture();
+        let city = load_nearby_city(&db, 10).expect("lyon");
+        let (scope, rows) = load_nearby_feed(&db, Some(&city));
+        assert_eq!(scope, NearbyScope::City);
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0].1, "Lyon card");
+    }
+
+    #[test]
+    fn nearby_feed_falls_back_to_country_not_world() {
+        let db = nearby_fixture();
+        db.execute("DELETE FROM resources WHERE city_id = 10", [])
+            .unwrap();
+        db.execute("DELETE FROM resources WHERE city_id = 11", [])
+            .unwrap();
+        let city = load_nearby_city(&db, 10).expect("lyon");
+        let (scope, rows) = load_nearby_feed(&db, Some(&city));
+        assert_eq!(scope, NearbyScope::Country);
+        assert!(rows.iter().any(|row| row.1 == "Marseille card"));
+        assert!(!rows.iter().any(|row| row.1 == "Tokyo card"));
+    }
+
+    #[test]
+    fn nearby_feed_without_city_is_empty_not_world() {
+        let db = nearby_fixture();
+        let (scope, rows) = load_nearby_feed(&db, None);
+        assert_eq!(scope, NearbyScope::None);
+        assert!(rows.is_empty());
+    }
+
+    #[test]
+    fn invalid_city_id_does_not_load_a_place() {
+        let db = nearby_fixture();
+        assert!(load_nearby_city(&db, 0).is_none());
+        assert!(load_nearby_city(&db, 999_999).is_none());
+        assert_eq!(parse_positive_id(Some("0")), None);
+    }
+
+    #[test]
+    fn radius_feed_keeps_only_places_within_100_km() {
+        let db = nearby_fixture();
+        db.execute("DELETE FROM resources WHERE city_id = 10", [])
+            .unwrap();
+        let city = load_nearby_city(&db, 10).expect("lyon");
+        let (scope, rows) = load_nearby_feed(&db, Some(&city));
+        assert_eq!(scope, NearbyScope::Radius);
+        assert!(rows.iter().any(|row| row.1 == "Villefranche card"));
+        assert!(!rows.iter().any(|row| row.1 == "Marseille card"));
+        assert!(!rows.iter().any(|row| row.1 == "Tokyo card"));
+        assert!(haversine_km(45.75, 4.85, 45.99, 4.72) <= NEARBY_RADIUS_KM);
+        assert!(haversine_km(45.75, 4.85, 43.3, 5.4) > NEARBY_RADIUS_KM);
+    }
 
     #[test]
     fn city_query_still_finds_nice() {

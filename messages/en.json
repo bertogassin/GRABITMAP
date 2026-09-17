@@ -349,5 +349,21 @@
   "place_selector_denied": "Location is off. You can choose a place manually.",
   "place_selector_locating": "Finding your place…",
   "place_selector_no_match": "No matching recent place. Open full geography.",
-  "place_continue": "Continue {name}"
+  "place_continue": "Continue {name}",
+  "nearby_scope_city": "Published cards in {name}",
+  "nearby_scope_radius": "No cards in {name} yet · showing places within 100 km",
+  "nearby_scope_country": "No closer cards yet · showing {name}",
+  "nearby_scope_world": "Latest published cards worldwide",
+  "nearby_official_group": "Official group",
+  "nearby_empty_title": "No published cards yet",
+  "nearby_empty_body": "Be the first to add a card in this area.",
+  "nearby_add": "Add a card",
+  "nearby_fresh": "Fresh cards",
+  "nearby_choose_city": "Choose a city",
+  "nearby_lead": "See published cards near the place you chose, then write inside GRABIT.",
+  "nearby_unknown_place": "Place not specified",
+  "nearby_scope_none": "Choose a city first. Worldwide cards are not shown here.",
+  "nearby_need_city_title": "Choose a city",
+  "nearby_need_city_body": "The Nearby feed stays empty until a city is chosen. This is not a worldwide feed.",
+  "nearby_location_unavailable": "A nearest city could not be determined safely. Choose a place yourself."
 }

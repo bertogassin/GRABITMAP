@@ -349,5 +349,21 @@
   "place_selector_denied": "Lokasi dimatikan. Anda boleh pilih tempat secara manual.",
   "place_selector_locating": "Mencari tempat…",
   "place_selector_no_match": "Tiada tempat terbaru yang sepadan. Buka geografi penuh.",
-  "place_continue": "Teruskan {name}"
+  "place_continue": "Teruskan {name}",
+  "nearby_scope_city": "Kad diterbitkan di {name}",
+  "nearby_scope_radius": "Belum ada kad di {name} · tempat dalam 100 km",
+  "nearby_scope_country": "Tiada kad lebih dekat · menunjukkan {name}",
+  "nearby_scope_world": "Kad diterbitkan terbaru di seluruh dunia",
+  "nearby_official_group": "Kumpulan rasmi",
+  "nearby_empty_title": "Belum ada kad diterbitkan",
+  "nearby_empty_body": "Jadilah yang pertama menambah kad di kawasan ini.",
+  "nearby_add": "Tambah kad",
+  "nearby_fresh": "Kad baharu",
+  "nearby_choose_city": "Pilih bandar",
+  "nearby_lead": "Lihat kad diterbitkan berhampiran tempat dipilih, kemudian tulis dalam GRABIT.",
+  "nearby_unknown_place": "Tempat tidak dinyatakan",
+  "nearby_scope_none": "Pilih bandar dahulu. Kad dunia tidak ditunjukkan di sini.",
+  "nearby_need_city_title": "Pilih bandar",
+  "nearby_need_city_body": "Tanpa bandar, Berdekatan kekal kosong. Ini bukan senarai dunia.",
+  "nearby_location_unavailable": "Bandar terdekat tidak dapat ditentukan dengan selamat. Pilih tempat sendiri."
 }

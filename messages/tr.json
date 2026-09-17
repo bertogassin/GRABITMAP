@@ -349,5 +349,21 @@
   "place_selector_denied": "Konum kapalı. Yeri elle seçebilirsiniz.",
   "place_selector_locating": "Konum bulunuyor…",
   "place_selector_no_match": "Eşleşen son yer yok. Tam coğrafyayı açın.",
-  "place_continue": "{name} ile devam et"
+  "place_continue": "{name} ile devam et",
+  "nearby_scope_city": "{name} içindeki yayınlanmış kartlar",
+  "nearby_scope_radius": "{name} içinde kart yok · 100 km içindeki yerler",
+  "nearby_scope_country": "Daha yakın kart yok · {name} gösteriliyor",
+  "nearby_scope_world": "Dünyadaki son yayınlanmış kartlar",
+  "nearby_official_group": "Resmi grup",
+  "nearby_empty_title": "Henüz yayınlanmış kart yok",
+  "nearby_empty_body": "Bu bölgede ilk kartı siz ekleyin.",
+  "nearby_add": "Kart ekle",
+  "nearby_fresh": "Yeni kartlar",
+  "nearby_choose_city": "Şehir seç",
+  "nearby_lead": "Seçtiğiniz yerin yakınındaki yayınlanmış kartları görün ve GRABIT içinde yazın.",
+  "nearby_unknown_place": "Yer belirtilmedi",
+  "nearby_scope_none": "Önce bir şehir seçin. Dünya kartları burada gösterilmez.",
+  "nearby_need_city_title": "Şehir seçin",
+  "nearby_need_city_body": "Şehir seçilmeden Yakında boş kalır. Bu dünya listesi değildir.",
+  "nearby_location_unavailable": "En yakın şehir güvenle belirlenemedi. Yeri kendiniz seçin."
 }

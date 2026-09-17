@@ -349,5 +349,21 @@
   "place_selector_denied": "A localização está desligada. Pode escolher um lugar manualmente.",
   "place_selector_locating": "A encontrar o lugar…",
   "place_selector_no_match": "Não há lugar recente correspondente. Abra a geografia completa.",
-  "place_continue": "Continuar {name}"
+  "place_continue": "Continuar {name}",
+  "nearby_scope_city": "Fichas publicadas em {name}",
+  "nearby_scope_radius": "Ainda sem fichas em {name} · lugares a 100 km",
+  "nearby_scope_country": "Não há fichas mais perto · a mostrar {name}",
+  "nearby_scope_world": "Últimas fichas publicadas no mundo",
+  "nearby_official_group": "Grupo oficial",
+  "nearby_empty_title": "Ainda não há fichas publicadas",
+  "nearby_empty_body": "Seja o primeiro a adicionar uma ficha nesta área.",
+  "nearby_add": "Adicionar ficha",
+  "nearby_fresh": "Fichas recentes",
+  "nearby_choose_city": "Escolher uma cidade",
+  "nearby_lead": "Veja as fichas publicadas perto do lugar escolhido e escreva no GRABIT.",
+  "nearby_unknown_place": "Lugar não indicado",
+  "nearby_scope_none": "Escolha primeiro uma cidade. Fichas mundiais não aparecem aqui.",
+  "nearby_need_city_title": "Escolha uma cidade",
+  "nearby_need_city_body": "Sem cidade, Perto fica vazio. Isto não é uma lista mundial.",
+  "nearby_location_unavailable": "Não foi possível determinar com segurança a cidade mais próxima. Escolha um lugar."
 }

@@ -316,10 +316,38 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Nav_MenuInputs */
 /** @typedef {{}} Nav_NearbyInputs */
 /** @typedef {{}} Nav_SearchInputs */
+/** @typedef {{}} Nearby_AddInputs */
+/** @typedef {{}} Nearby_Choose_CityInputs */
+/** @typedef {{}} Nearby_Empty_BodyInputs */
+/** @typedef {{}} Nearby_Empty_TitleInputs */
+/** @typedef {{}} Nearby_FreshInputs */
+/** @typedef {{}} Nearby_LeadInputs */
+/** @typedef {{}} Nearby_Location_UnavailableInputs */
+/** @typedef {{}} Nearby_Need_City_BodyInputs */
+/** @typedef {{}} Nearby_Need_City_TitleInputs */
+/** @typedef {{}} Nearby_Official_GroupInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Nearby_Scope_CityInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Nearby_Scope_CountryInputs */
+/** @typedef {{}} Nearby_Scope_NoneInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Nearby_Scope_RadiusInputs */
+/** @typedef {{}} Nearby_Scope_WorldInputs */
+/** @typedef {{}} Nearby_Unknown_PlaceInputs */
 /** @typedef {{}} Notifications_TitleInputs */
 /** @typedef {{}} Notify_GenericInputs */
 /** @typedef {{}} Notify_New_MessageInputs */
 /** @typedef {{}} Notify_Open_ChatInputs */
+/** @typedef {{}} Place_Chip_ChooseInputs */
+/** @typedef {{}} Place_Chip_NearbyInputs */
+/** @typedef {{}} Place_Chip_WorldInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Place_ContinueInputs */
+/** @typedef {{}} Place_Selector_CloseInputs */
+/** @typedef {{}} Place_Selector_DeniedInputs */
+/** @typedef {{}} Place_Selector_GeographyInputs */
+/** @typedef {{}} Place_Selector_LocatingInputs */
+/** @typedef {{}} Place_Selector_No_MatchInputs */
+/** @typedef {{}} Place_Selector_RecentInputs */
+/** @typedef {{}} Place_Selector_SearchInputs */
+/** @typedef {{}} Place_Selector_TitleInputs */
 /** @typedef {{}} Profile_Login_WriteInputs */
 /** @typedef {{}} Profile_SettingsInputs */
 /** @typedef {{}} Profile_Settings_SoundInputs */
@@ -14193,6 +14221,710 @@ export const nav_search = /** @type {((inputs?: Nav_SearchInputs, options?: { lo
 /**
 * | output |
 * | --- |
+* | "Add a card" |
+*
+* @param {Nearby_AddInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const nearby_add = /** @type {((inputs?: Nearby_AddInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Nearby_AddInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.nearby_add(inputs)
+	if (locale === "fr") return __fr.nearby_add(inputs)
+	if (locale === "es") return __es.nearby_add(inputs)
+	if (locale === "zh") return __zh.nearby_add(inputs)
+	if (locale === "zh-TW") return __zh_tw2.nearby_add(inputs)
+	if (locale === "hi") return __hi.nearby_add(inputs)
+	if (locale === "ar") return __ar.nearby_add(inputs)
+	if (locale === "pt") return __pt.nearby_add(inputs)
+	if (locale === "de") return __de.nearby_add(inputs)
+	if (locale === "ja") return __ja.nearby_add(inputs)
+	if (locale === "ko") return __ko.nearby_add(inputs)
+	if (locale === "it") return __it.nearby_add(inputs)
+	if (locale === "tr") return __tr.nearby_add(inputs)
+	if (locale === "pl") return __pl.nearby_add(inputs)
+	if (locale === "uk") return __uk.nearby_add(inputs)
+	if (locale === "nl") return __nl.nearby_add(inputs)
+	if (locale === "vi") return __vi.nearby_add(inputs)
+	if (locale === "id") return __id.nearby_add(inputs)
+	if (locale === "ms") return __ms.nearby_add(inputs)
+	if (locale === "th") return __th.nearby_add(inputs)
+	if (locale === "fa") return __fa.nearby_add(inputs)
+	if (locale === "ur") return __ur.nearby_add(inputs)
+	if (locale === "bn") return __bn.nearby_add(inputs)
+	if (locale === "pa") return __pa.nearby_add(inputs)
+	if (locale === "sw") return __sw.nearby_add(inputs)
+	if (locale === "el") return __el.nearby_add(inputs)
+	if (locale === "cs") return __cs.nearby_add(inputs)
+	if (locale === "ro") return __ro.nearby_add(inputs)
+	if (locale === "hu") return __hu.nearby_add(inputs)
+	if (locale === "sv") return __sv.nearby_add(inputs)
+	if (locale === "he") return __he.nearby_add(inputs)
+	return __ru.nearby_add(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Choose a city" |
+*
+* @param {Nearby_Choose_CityInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const nearby_choose_city = /** @type {((inputs?: Nearby_Choose_CityInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Nearby_Choose_CityInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.nearby_choose_city(inputs)
+	if (locale === "fr") return __fr.nearby_choose_city(inputs)
+	if (locale === "es") return __es.nearby_choose_city(inputs)
+	if (locale === "zh") return __zh.nearby_choose_city(inputs)
+	if (locale === "zh-TW") return __zh_tw2.nearby_choose_city(inputs)
+	if (locale === "hi") return __hi.nearby_choose_city(inputs)
+	if (locale === "ar") return __ar.nearby_choose_city(inputs)
+	if (locale === "pt") return __pt.nearby_choose_city(inputs)
+	if (locale === "de") return __de.nearby_choose_city(inputs)
+	if (locale === "ja") return __ja.nearby_choose_city(inputs)
+	if (locale === "ko") return __ko.nearby_choose_city(inputs)
+	if (locale === "it") return __it.nearby_choose_city(inputs)
+	if (locale === "tr") return __tr.nearby_choose_city(inputs)
+	if (locale === "pl") return __pl.nearby_choose_city(inputs)
+	if (locale === "uk") return __uk.nearby_choose_city(inputs)
+	if (locale === "nl") return __nl.nearby_choose_city(inputs)
+	if (locale === "vi") return __vi.nearby_choose_city(inputs)
+	if (locale === "id") return __id.nearby_choose_city(inputs)
+	if (locale === "ms") return __ms.nearby_choose_city(inputs)
+	if (locale === "th") return __th.nearby_choose_city(inputs)
+	if (locale === "fa") return __fa.nearby_choose_city(inputs)
+	if (locale === "ur") return __ur.nearby_choose_city(inputs)
+	if (locale === "bn") return __bn.nearby_choose_city(inputs)
+	if (locale === "pa") return __pa.nearby_choose_city(inputs)
+	if (locale === "sw") return __sw.nearby_choose_city(inputs)
+	if (locale === "el") return __el.nearby_choose_city(inputs)
+	if (locale === "cs") return __cs.nearby_choose_city(inputs)
+	if (locale === "ro") return __ro.nearby_choose_city(inputs)
+	if (locale === "hu") return __hu.nearby_choose_city(inputs)
+	if (locale === "sv") return __sv.nearby_choose_city(inputs)
+	if (locale === "he") return __he.nearby_choose_city(inputs)
+	return __ru.nearby_choose_city(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Be the first to add a card in this area." |
+*
+* @param {Nearby_Empty_BodyInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const nearby_empty_body = /** @type {((inputs?: Nearby_Empty_BodyInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Nearby_Empty_BodyInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.nearby_empty_body(inputs)
+	if (locale === "fr") return __fr.nearby_empty_body(inputs)
+	if (locale === "es") return __es.nearby_empty_body(inputs)
+	if (locale === "zh") return __zh.nearby_empty_body(inputs)
+	if (locale === "zh-TW") return __zh_tw2.nearby_empty_body(inputs)
+	if (locale === "hi") return __hi.nearby_empty_body(inputs)
+	if (locale === "ar") return __ar.nearby_empty_body(inputs)
+	if (locale === "pt") return __pt.nearby_empty_body(inputs)
+	if (locale === "de") return __de.nearby_empty_body(inputs)
+	if (locale === "ja") return __ja.nearby_empty_body(inputs)
+	if (locale === "ko") return __ko.nearby_empty_body(inputs)
+	if (locale === "it") return __it.nearby_empty_body(inputs)
+	if (locale === "tr") return __tr.nearby_empty_body(inputs)
+	if (locale === "pl") return __pl.nearby_empty_body(inputs)
+	if (locale === "uk") return __uk.nearby_empty_body(inputs)
+	if (locale === "nl") return __nl.nearby_empty_body(inputs)
+	if (locale === "vi") return __vi.nearby_empty_body(inputs)
+	if (locale === "id") return __id.nearby_empty_body(inputs)
+	if (locale === "ms") return __ms.nearby_empty_body(inputs)
+	if (locale === "th") return __th.nearby_empty_body(inputs)
+	if (locale === "fa") return __fa.nearby_empty_body(inputs)
+	if (locale === "ur") return __ur.nearby_empty_body(inputs)
+	if (locale === "bn") return __bn.nearby_empty_body(inputs)
+	if (locale === "pa") return __pa.nearby_empty_body(inputs)
+	if (locale === "sw") return __sw.nearby_empty_body(inputs)
+	if (locale === "el") return __el.nearby_empty_body(inputs)
+	if (locale === "cs") return __cs.nearby_empty_body(inputs)
+	if (locale === "ro") return __ro.nearby_empty_body(inputs)
+	if (locale === "hu") return __hu.nearby_empty_body(inputs)
+	if (locale === "sv") return __sv.nearby_empty_body(inputs)
+	if (locale === "he") return __he.nearby_empty_body(inputs)
+	return __ru.nearby_empty_body(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "No published cards yet" |
+*
+* @param {Nearby_Empty_TitleInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const nearby_empty_title = /** @type {((inputs?: Nearby_Empty_TitleInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Nearby_Empty_TitleInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.nearby_empty_title(inputs)
+	if (locale === "fr") return __fr.nearby_empty_title(inputs)
+	if (locale === "es") return __es.nearby_empty_title(inputs)
+	if (locale === "zh") return __zh.nearby_empty_title(inputs)
+	if (locale === "zh-TW") return __zh_tw2.nearby_empty_title(inputs)
+	if (locale === "hi") return __hi.nearby_empty_title(inputs)
+	if (locale === "ar") return __ar.nearby_empty_title(inputs)
+	if (locale === "pt") return __pt.nearby_empty_title(inputs)
+	if (locale === "de") return __de.nearby_empty_title(inputs)
+	if (locale === "ja") return __ja.nearby_empty_title(inputs)
+	if (locale === "ko") return __ko.nearby_empty_title(inputs)
+	if (locale === "it") return __it.nearby_empty_title(inputs)
+	if (locale === "tr") return __tr.nearby_empty_title(inputs)
+	if (locale === "pl") return __pl.nearby_empty_title(inputs)
+	if (locale === "uk") return __uk.nearby_empty_title(inputs)
+	if (locale === "nl") return __nl.nearby_empty_title(inputs)
+	if (locale === "vi") return __vi.nearby_empty_title(inputs)
+	if (locale === "id") return __id.nearby_empty_title(inputs)
+	if (locale === "ms") return __ms.nearby_empty_title(inputs)
+	if (locale === "th") return __th.nearby_empty_title(inputs)
+	if (locale === "fa") return __fa.nearby_empty_title(inputs)
+	if (locale === "ur") return __ur.nearby_empty_title(inputs)
+	if (locale === "bn") return __bn.nearby_empty_title(inputs)
+	if (locale === "pa") return __pa.nearby_empty_title(inputs)
+	if (locale === "sw") return __sw.nearby_empty_title(inputs)
+	if (locale === "el") return __el.nearby_empty_title(inputs)
+	if (locale === "cs") return __cs.nearby_empty_title(inputs)
+	if (locale === "ro") return __ro.nearby_empty_title(inputs)
+	if (locale === "hu") return __hu.nearby_empty_title(inputs)
+	if (locale === "sv") return __sv.nearby_empty_title(inputs)
+	if (locale === "he") return __he.nearby_empty_title(inputs)
+	return __ru.nearby_empty_title(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Fresh cards" |
+*
+* @param {Nearby_FreshInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const nearby_fresh = /** @type {((inputs?: Nearby_FreshInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Nearby_FreshInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.nearby_fresh(inputs)
+	if (locale === "fr") return __fr.nearby_fresh(inputs)
+	if (locale === "es") return __es.nearby_fresh(inputs)
+	if (locale === "zh") return __zh.nearby_fresh(inputs)
+	if (locale === "zh-TW") return __zh_tw2.nearby_fresh(inputs)
+	if (locale === "hi") return __hi.nearby_fresh(inputs)
+	if (locale === "ar") return __ar.nearby_fresh(inputs)
+	if (locale === "pt") return __pt.nearby_fresh(inputs)
+	if (locale === "de") return __de.nearby_fresh(inputs)
+	if (locale === "ja") return __ja.nearby_fresh(inputs)
+	if (locale === "ko") return __ko.nearby_fresh(inputs)
+	if (locale === "it") return __it.nearby_fresh(inputs)
+	if (locale === "tr") return __tr.nearby_fresh(inputs)
+	if (locale === "pl") return __pl.nearby_fresh(inputs)
+	if (locale === "uk") return __uk.nearby_fresh(inputs)
+	if (locale === "nl") return __nl.nearby_fresh(inputs)
+	if (locale === "vi") return __vi.nearby_fresh(inputs)
+	if (locale === "id") return __id.nearby_fresh(inputs)
+	if (locale === "ms") return __ms.nearby_fresh(inputs)
+	if (locale === "th") return __th.nearby_fresh(inputs)
+	if (locale === "fa") return __fa.nearby_fresh(inputs)
+	if (locale === "ur") return __ur.nearby_fresh(inputs)
+	if (locale === "bn") return __bn.nearby_fresh(inputs)
+	if (locale === "pa") return __pa.nearby_fresh(inputs)
+	if (locale === "sw") return __sw.nearby_fresh(inputs)
+	if (locale === "el") return __el.nearby_fresh(inputs)
+	if (locale === "cs") return __cs.nearby_fresh(inputs)
+	if (locale === "ro") return __ro.nearby_fresh(inputs)
+	if (locale === "hu") return __hu.nearby_fresh(inputs)
+	if (locale === "sv") return __sv.nearby_fresh(inputs)
+	if (locale === "he") return __he.nearby_fresh(inputs)
+	return __ru.nearby_fresh(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "See published cards near the place you chose, then write inside GRABIT." |
+*
+* @param {Nearby_LeadInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const nearby_lead = /** @type {((inputs?: Nearby_LeadInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Nearby_LeadInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.nearby_lead(inputs)
+	if (locale === "fr") return __fr.nearby_lead(inputs)
+	if (locale === "es") return __es.nearby_lead(inputs)
+	if (locale === "zh") return __zh.nearby_lead(inputs)
+	if (locale === "zh-TW") return __zh_tw2.nearby_lead(inputs)
+	if (locale === "hi") return __hi.nearby_lead(inputs)
+	if (locale === "ar") return __ar.nearby_lead(inputs)
+	if (locale === "pt") return __pt.nearby_lead(inputs)
+	if (locale === "de") return __de.nearby_lead(inputs)
+	if (locale === "ja") return __ja.nearby_lead(inputs)
+	if (locale === "ko") return __ko.nearby_lead(inputs)
+	if (locale === "it") return __it.nearby_lead(inputs)
+	if (locale === "tr") return __tr.nearby_lead(inputs)
+	if (locale === "pl") return __pl.nearby_lead(inputs)
+	if (locale === "uk") return __uk.nearby_lead(inputs)
+	if (locale === "nl") return __nl.nearby_lead(inputs)
+	if (locale === "vi") return __vi.nearby_lead(inputs)
+	if (locale === "id") return __id.nearby_lead(inputs)
+	if (locale === "ms") return __ms.nearby_lead(inputs)
+	if (locale === "th") return __th.nearby_lead(inputs)
+	if (locale === "fa") return __fa.nearby_lead(inputs)
+	if (locale === "ur") return __ur.nearby_lead(inputs)
+	if (locale === "bn") return __bn.nearby_lead(inputs)
+	if (locale === "pa") return __pa.nearby_lead(inputs)
+	if (locale === "sw") return __sw.nearby_lead(inputs)
+	if (locale === "el") return __el.nearby_lead(inputs)
+	if (locale === "cs") return __cs.nearby_lead(inputs)
+	if (locale === "ro") return __ro.nearby_lead(inputs)
+	if (locale === "hu") return __hu.nearby_lead(inputs)
+	if (locale === "sv") return __sv.nearby_lead(inputs)
+	if (locale === "he") return __he.nearby_lead(inputs)
+	return __ru.nearby_lead(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "A nearest city could not be determined safely. Choose a place yourself." |
+*
+* @param {Nearby_Location_UnavailableInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const nearby_location_unavailable = /** @type {((inputs?: Nearby_Location_UnavailableInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Nearby_Location_UnavailableInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.nearby_location_unavailable(inputs)
+	if (locale === "fr") return __fr.nearby_location_unavailable(inputs)
+	if (locale === "es") return __es.nearby_location_unavailable(inputs)
+	if (locale === "zh") return __zh.nearby_location_unavailable(inputs)
+	if (locale === "zh-TW") return __zh_tw2.nearby_location_unavailable(inputs)
+	if (locale === "hi") return __hi.nearby_location_unavailable(inputs)
+	if (locale === "ar") return __ar.nearby_location_unavailable(inputs)
+	if (locale === "pt") return __pt.nearby_location_unavailable(inputs)
+	if (locale === "de") return __de.nearby_location_unavailable(inputs)
+	if (locale === "ja") return __ja.nearby_location_unavailable(inputs)
+	if (locale === "ko") return __ko.nearby_location_unavailable(inputs)
+	if (locale === "it") return __it.nearby_location_unavailable(inputs)
+	if (locale === "tr") return __tr.nearby_location_unavailable(inputs)
+	if (locale === "pl") return __pl.nearby_location_unavailable(inputs)
+	if (locale === "uk") return __uk.nearby_location_unavailable(inputs)
+	if (locale === "nl") return __nl.nearby_location_unavailable(inputs)
+	if (locale === "vi") return __vi.nearby_location_unavailable(inputs)
+	if (locale === "id") return __id.nearby_location_unavailable(inputs)
+	if (locale === "ms") return __ms.nearby_location_unavailable(inputs)
+	if (locale === "th") return __th.nearby_location_unavailable(inputs)
+	if (locale === "fa") return __fa.nearby_location_unavailable(inputs)
+	if (locale === "ur") return __ur.nearby_location_unavailable(inputs)
+	if (locale === "bn") return __bn.nearby_location_unavailable(inputs)
+	if (locale === "pa") return __pa.nearby_location_unavailable(inputs)
+	if (locale === "sw") return __sw.nearby_location_unavailable(inputs)
+	if (locale === "el") return __el.nearby_location_unavailable(inputs)
+	if (locale === "cs") return __cs.nearby_location_unavailable(inputs)
+	if (locale === "ro") return __ro.nearby_location_unavailable(inputs)
+	if (locale === "hu") return __hu.nearby_location_unavailable(inputs)
+	if (locale === "sv") return __sv.nearby_location_unavailable(inputs)
+	if (locale === "he") return __he.nearby_location_unavailable(inputs)
+	return __ru.nearby_location_unavailable(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "The Nearby feed stays empty until a city is chosen. This is not a worldwide feed." |
+*
+* @param {Nearby_Need_City_BodyInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const nearby_need_city_body = /** @type {((inputs?: Nearby_Need_City_BodyInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Nearby_Need_City_BodyInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.nearby_need_city_body(inputs)
+	if (locale === "fr") return __fr.nearby_need_city_body(inputs)
+	if (locale === "es") return __es.nearby_need_city_body(inputs)
+	if (locale === "zh") return __zh.nearby_need_city_body(inputs)
+	if (locale === "zh-TW") return __zh_tw2.nearby_need_city_body(inputs)
+	if (locale === "hi") return __hi.nearby_need_city_body(inputs)
+	if (locale === "ar") return __ar.nearby_need_city_body(inputs)
+	if (locale === "pt") return __pt.nearby_need_city_body(inputs)
+	if (locale === "de") return __de.nearby_need_city_body(inputs)
+	if (locale === "ja") return __ja.nearby_need_city_body(inputs)
+	if (locale === "ko") return __ko.nearby_need_city_body(inputs)
+	if (locale === "it") return __it.nearby_need_city_body(inputs)
+	if (locale === "tr") return __tr.nearby_need_city_body(inputs)
+	if (locale === "pl") return __pl.nearby_need_city_body(inputs)
+	if (locale === "uk") return __uk.nearby_need_city_body(inputs)
+	if (locale === "nl") return __nl.nearby_need_city_body(inputs)
+	if (locale === "vi") return __vi.nearby_need_city_body(inputs)
+	if (locale === "id") return __id.nearby_need_city_body(inputs)
+	if (locale === "ms") return __ms.nearby_need_city_body(inputs)
+	if (locale === "th") return __th.nearby_need_city_body(inputs)
+	if (locale === "fa") return __fa.nearby_need_city_body(inputs)
+	if (locale === "ur") return __ur.nearby_need_city_body(inputs)
+	if (locale === "bn") return __bn.nearby_need_city_body(inputs)
+	if (locale === "pa") return __pa.nearby_need_city_body(inputs)
+	if (locale === "sw") return __sw.nearby_need_city_body(inputs)
+	if (locale === "el") return __el.nearby_need_city_body(inputs)
+	if (locale === "cs") return __cs.nearby_need_city_body(inputs)
+	if (locale === "ro") return __ro.nearby_need_city_body(inputs)
+	if (locale === "hu") return __hu.nearby_need_city_body(inputs)
+	if (locale === "sv") return __sv.nearby_need_city_body(inputs)
+	if (locale === "he") return __he.nearby_need_city_body(inputs)
+	return __ru.nearby_need_city_body(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Choose a city" |
+*
+* @param {Nearby_Need_City_TitleInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const nearby_need_city_title = /** @type {((inputs?: Nearby_Need_City_TitleInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Nearby_Need_City_TitleInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.nearby_need_city_title(inputs)
+	if (locale === "fr") return __fr.nearby_need_city_title(inputs)
+	if (locale === "es") return __es.nearby_need_city_title(inputs)
+	if (locale === "zh") return __zh.nearby_need_city_title(inputs)
+	if (locale === "zh-TW") return __zh_tw2.nearby_need_city_title(inputs)
+	if (locale === "hi") return __hi.nearby_need_city_title(inputs)
+	if (locale === "ar") return __ar.nearby_need_city_title(inputs)
+	if (locale === "pt") return __pt.nearby_need_city_title(inputs)
+	if (locale === "de") return __de.nearby_need_city_title(inputs)
+	if (locale === "ja") return __ja.nearby_need_city_title(inputs)
+	if (locale === "ko") return __ko.nearby_need_city_title(inputs)
+	if (locale === "it") return __it.nearby_need_city_title(inputs)
+	if (locale === "tr") return __tr.nearby_need_city_title(inputs)
+	if (locale === "pl") return __pl.nearby_need_city_title(inputs)
+	if (locale === "uk") return __uk.nearby_need_city_title(inputs)
+	if (locale === "nl") return __nl.nearby_need_city_title(inputs)
+	if (locale === "vi") return __vi.nearby_need_city_title(inputs)
+	if (locale === "id") return __id.nearby_need_city_title(inputs)
+	if (locale === "ms") return __ms.nearby_need_city_title(inputs)
+	if (locale === "th") return __th.nearby_need_city_title(inputs)
+	if (locale === "fa") return __fa.nearby_need_city_title(inputs)
+	if (locale === "ur") return __ur.nearby_need_city_title(inputs)
+	if (locale === "bn") return __bn.nearby_need_city_title(inputs)
+	if (locale === "pa") return __pa.nearby_need_city_title(inputs)
+	if (locale === "sw") return __sw.nearby_need_city_title(inputs)
+	if (locale === "el") return __el.nearby_need_city_title(inputs)
+	if (locale === "cs") return __cs.nearby_need_city_title(inputs)
+	if (locale === "ro") return __ro.nearby_need_city_title(inputs)
+	if (locale === "hu") return __hu.nearby_need_city_title(inputs)
+	if (locale === "sv") return __sv.nearby_need_city_title(inputs)
+	if (locale === "he") return __he.nearby_need_city_title(inputs)
+	return __ru.nearby_need_city_title(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Official group" |
+*
+* @param {Nearby_Official_GroupInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const nearby_official_group = /** @type {((inputs?: Nearby_Official_GroupInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Nearby_Official_GroupInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.nearby_official_group(inputs)
+	if (locale === "fr") return __fr.nearby_official_group(inputs)
+	if (locale === "es") return __es.nearby_official_group(inputs)
+	if (locale === "zh") return __zh.nearby_official_group(inputs)
+	if (locale === "zh-TW") return __zh_tw2.nearby_official_group(inputs)
+	if (locale === "hi") return __hi.nearby_official_group(inputs)
+	if (locale === "ar") return __ar.nearby_official_group(inputs)
+	if (locale === "pt") return __pt.nearby_official_group(inputs)
+	if (locale === "de") return __de.nearby_official_group(inputs)
+	if (locale === "ja") return __ja.nearby_official_group(inputs)
+	if (locale === "ko") return __ko.nearby_official_group(inputs)
+	if (locale === "it") return __it.nearby_official_group(inputs)
+	if (locale === "tr") return __tr.nearby_official_group(inputs)
+	if (locale === "pl") return __pl.nearby_official_group(inputs)
+	if (locale === "uk") return __uk.nearby_official_group(inputs)
+	if (locale === "nl") return __nl.nearby_official_group(inputs)
+	if (locale === "vi") return __vi.nearby_official_group(inputs)
+	if (locale === "id") return __id.nearby_official_group(inputs)
+	if (locale === "ms") return __ms.nearby_official_group(inputs)
+	if (locale === "th") return __th.nearby_official_group(inputs)
+	if (locale === "fa") return __fa.nearby_official_group(inputs)
+	if (locale === "ur") return __ur.nearby_official_group(inputs)
+	if (locale === "bn") return __bn.nearby_official_group(inputs)
+	if (locale === "pa") return __pa.nearby_official_group(inputs)
+	if (locale === "sw") return __sw.nearby_official_group(inputs)
+	if (locale === "el") return __el.nearby_official_group(inputs)
+	if (locale === "cs") return __cs.nearby_official_group(inputs)
+	if (locale === "ro") return __ro.nearby_official_group(inputs)
+	if (locale === "hu") return __hu.nearby_official_group(inputs)
+	if (locale === "sv") return __sv.nearby_official_group(inputs)
+	if (locale === "he") return __he.nearby_official_group(inputs)
+	return __ru.nearby_official_group(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Published cards in {name}" |
+*
+* @param {Nearby_Scope_CityInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const nearby_scope_city = /** @type {((inputs: Nearby_Scope_CityInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Nearby_Scope_CityInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.nearby_scope_city(inputs)
+	if (locale === "fr") return __fr.nearby_scope_city(inputs)
+	if (locale === "es") return __es.nearby_scope_city(inputs)
+	if (locale === "zh") return __zh.nearby_scope_city(inputs)
+	if (locale === "zh-TW") return __zh_tw2.nearby_scope_city(inputs)
+	if (locale === "hi") return __hi.nearby_scope_city(inputs)
+	if (locale === "ar") return __ar.nearby_scope_city(inputs)
+	if (locale === "pt") return __pt.nearby_scope_city(inputs)
+	if (locale === "de") return __de.nearby_scope_city(inputs)
+	if (locale === "ja") return __ja.nearby_scope_city(inputs)
+	if (locale === "ko") return __ko.nearby_scope_city(inputs)
+	if (locale === "it") return __it.nearby_scope_city(inputs)
+	if (locale === "tr") return __tr.nearby_scope_city(inputs)
+	if (locale === "pl") return __pl.nearby_scope_city(inputs)
+	if (locale === "uk") return __uk.nearby_scope_city(inputs)
+	if (locale === "nl") return __nl.nearby_scope_city(inputs)
+	if (locale === "vi") return __vi.nearby_scope_city(inputs)
+	if (locale === "id") return __id.nearby_scope_city(inputs)
+	if (locale === "ms") return __ms.nearby_scope_city(inputs)
+	if (locale === "th") return __th.nearby_scope_city(inputs)
+	if (locale === "fa") return __fa.nearby_scope_city(inputs)
+	if (locale === "ur") return __ur.nearby_scope_city(inputs)
+	if (locale === "bn") return __bn.nearby_scope_city(inputs)
+	if (locale === "pa") return __pa.nearby_scope_city(inputs)
+	if (locale === "sw") return __sw.nearby_scope_city(inputs)
+	if (locale === "el") return __el.nearby_scope_city(inputs)
+	if (locale === "cs") return __cs.nearby_scope_city(inputs)
+	if (locale === "ro") return __ro.nearby_scope_city(inputs)
+	if (locale === "hu") return __hu.nearby_scope_city(inputs)
+	if (locale === "sv") return __sv.nearby_scope_city(inputs)
+	if (locale === "he") return __he.nearby_scope_city(inputs)
+	return __ru.nearby_scope_city(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "No closer cards yet · showing {name}" |
+*
+* @param {Nearby_Scope_CountryInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const nearby_scope_country = /** @type {((inputs: Nearby_Scope_CountryInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Nearby_Scope_CountryInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.nearby_scope_country(inputs)
+	if (locale === "fr") return __fr.nearby_scope_country(inputs)
+	if (locale === "es") return __es.nearby_scope_country(inputs)
+	if (locale === "zh") return __zh.nearby_scope_country(inputs)
+	if (locale === "zh-TW") return __zh_tw2.nearby_scope_country(inputs)
+	if (locale === "hi") return __hi.nearby_scope_country(inputs)
+	if (locale === "ar") return __ar.nearby_scope_country(inputs)
+	if (locale === "pt") return __pt.nearby_scope_country(inputs)
+	if (locale === "de") return __de.nearby_scope_country(inputs)
+	if (locale === "ja") return __ja.nearby_scope_country(inputs)
+	if (locale === "ko") return __ko.nearby_scope_country(inputs)
+	if (locale === "it") return __it.nearby_scope_country(inputs)
+	if (locale === "tr") return __tr.nearby_scope_country(inputs)
+	if (locale === "pl") return __pl.nearby_scope_country(inputs)
+	if (locale === "uk") return __uk.nearby_scope_country(inputs)
+	if (locale === "nl") return __nl.nearby_scope_country(inputs)
+	if (locale === "vi") return __vi.nearby_scope_country(inputs)
+	if (locale === "id") return __id.nearby_scope_country(inputs)
+	if (locale === "ms") return __ms.nearby_scope_country(inputs)
+	if (locale === "th") return __th.nearby_scope_country(inputs)
+	if (locale === "fa") return __fa.nearby_scope_country(inputs)
+	if (locale === "ur") return __ur.nearby_scope_country(inputs)
+	if (locale === "bn") return __bn.nearby_scope_country(inputs)
+	if (locale === "pa") return __pa.nearby_scope_country(inputs)
+	if (locale === "sw") return __sw.nearby_scope_country(inputs)
+	if (locale === "el") return __el.nearby_scope_country(inputs)
+	if (locale === "cs") return __cs.nearby_scope_country(inputs)
+	if (locale === "ro") return __ro.nearby_scope_country(inputs)
+	if (locale === "hu") return __hu.nearby_scope_country(inputs)
+	if (locale === "sv") return __sv.nearby_scope_country(inputs)
+	if (locale === "he") return __he.nearby_scope_country(inputs)
+	return __ru.nearby_scope_country(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Choose a city first. Worldwide cards are not shown here." |
+*
+* @param {Nearby_Scope_NoneInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const nearby_scope_none = /** @type {((inputs?: Nearby_Scope_NoneInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Nearby_Scope_NoneInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.nearby_scope_none(inputs)
+	if (locale === "fr") return __fr.nearby_scope_none(inputs)
+	if (locale === "es") return __es.nearby_scope_none(inputs)
+	if (locale === "zh") return __zh.nearby_scope_none(inputs)
+	if (locale === "zh-TW") return __zh_tw2.nearby_scope_none(inputs)
+	if (locale === "hi") return __hi.nearby_scope_none(inputs)
+	if (locale === "ar") return __ar.nearby_scope_none(inputs)
+	if (locale === "pt") return __pt.nearby_scope_none(inputs)
+	if (locale === "de") return __de.nearby_scope_none(inputs)
+	if (locale === "ja") return __ja.nearby_scope_none(inputs)
+	if (locale === "ko") return __ko.nearby_scope_none(inputs)
+	if (locale === "it") return __it.nearby_scope_none(inputs)
+	if (locale === "tr") return __tr.nearby_scope_none(inputs)
+	if (locale === "pl") return __pl.nearby_scope_none(inputs)
+	if (locale === "uk") return __uk.nearby_scope_none(inputs)
+	if (locale === "nl") return __nl.nearby_scope_none(inputs)
+	if (locale === "vi") return __vi.nearby_scope_none(inputs)
+	if (locale === "id") return __id.nearby_scope_none(inputs)
+	if (locale === "ms") return __ms.nearby_scope_none(inputs)
+	if (locale === "th") return __th.nearby_scope_none(inputs)
+	if (locale === "fa") return __fa.nearby_scope_none(inputs)
+	if (locale === "ur") return __ur.nearby_scope_none(inputs)
+	if (locale === "bn") return __bn.nearby_scope_none(inputs)
+	if (locale === "pa") return __pa.nearby_scope_none(inputs)
+	if (locale === "sw") return __sw.nearby_scope_none(inputs)
+	if (locale === "el") return __el.nearby_scope_none(inputs)
+	if (locale === "cs") return __cs.nearby_scope_none(inputs)
+	if (locale === "ro") return __ro.nearby_scope_none(inputs)
+	if (locale === "hu") return __hu.nearby_scope_none(inputs)
+	if (locale === "sv") return __sv.nearby_scope_none(inputs)
+	if (locale === "he") return __he.nearby_scope_none(inputs)
+	return __ru.nearby_scope_none(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "No cards in {name} yet · showing places within 100 km" |
+*
+* @param {Nearby_Scope_RadiusInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const nearby_scope_radius = /** @type {((inputs: Nearby_Scope_RadiusInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Nearby_Scope_RadiusInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.nearby_scope_radius(inputs)
+	if (locale === "fr") return __fr.nearby_scope_radius(inputs)
+	if (locale === "es") return __es.nearby_scope_radius(inputs)
+	if (locale === "zh") return __zh.nearby_scope_radius(inputs)
+	if (locale === "zh-TW") return __zh_tw2.nearby_scope_radius(inputs)
+	if (locale === "hi") return __hi.nearby_scope_radius(inputs)
+	if (locale === "ar") return __ar.nearby_scope_radius(inputs)
+	if (locale === "pt") return __pt.nearby_scope_radius(inputs)
+	if (locale === "de") return __de.nearby_scope_radius(inputs)
+	if (locale === "ja") return __ja.nearby_scope_radius(inputs)
+	if (locale === "ko") return __ko.nearby_scope_radius(inputs)
+	if (locale === "it") return __it.nearby_scope_radius(inputs)
+	if (locale === "tr") return __tr.nearby_scope_radius(inputs)
+	if (locale === "pl") return __pl.nearby_scope_radius(inputs)
+	if (locale === "uk") return __uk.nearby_scope_radius(inputs)
+	if (locale === "nl") return __nl.nearby_scope_radius(inputs)
+	if (locale === "vi") return __vi.nearby_scope_radius(inputs)
+	if (locale === "id") return __id.nearby_scope_radius(inputs)
+	if (locale === "ms") return __ms.nearby_scope_radius(inputs)
+	if (locale === "th") return __th.nearby_scope_radius(inputs)
+	if (locale === "fa") return __fa.nearby_scope_radius(inputs)
+	if (locale === "ur") return __ur.nearby_scope_radius(inputs)
+	if (locale === "bn") return __bn.nearby_scope_radius(inputs)
+	if (locale === "pa") return __pa.nearby_scope_radius(inputs)
+	if (locale === "sw") return __sw.nearby_scope_radius(inputs)
+	if (locale === "el") return __el.nearby_scope_radius(inputs)
+	if (locale === "cs") return __cs.nearby_scope_radius(inputs)
+	if (locale === "ro") return __ro.nearby_scope_radius(inputs)
+	if (locale === "hu") return __hu.nearby_scope_radius(inputs)
+	if (locale === "sv") return __sv.nearby_scope_radius(inputs)
+	if (locale === "he") return __he.nearby_scope_radius(inputs)
+	return __ru.nearby_scope_radius(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Latest published cards worldwide" |
+*
+* @param {Nearby_Scope_WorldInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const nearby_scope_world = /** @type {((inputs?: Nearby_Scope_WorldInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Nearby_Scope_WorldInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.nearby_scope_world(inputs)
+	if (locale === "fr") return __fr.nearby_scope_world(inputs)
+	if (locale === "es") return __es.nearby_scope_world(inputs)
+	if (locale === "zh") return __zh.nearby_scope_world(inputs)
+	if (locale === "zh-TW") return __zh_tw2.nearby_scope_world(inputs)
+	if (locale === "hi") return __hi.nearby_scope_world(inputs)
+	if (locale === "ar") return __ar.nearby_scope_world(inputs)
+	if (locale === "pt") return __pt.nearby_scope_world(inputs)
+	if (locale === "de") return __de.nearby_scope_world(inputs)
+	if (locale === "ja") return __ja.nearby_scope_world(inputs)
+	if (locale === "ko") return __ko.nearby_scope_world(inputs)
+	if (locale === "it") return __it.nearby_scope_world(inputs)
+	if (locale === "tr") return __tr.nearby_scope_world(inputs)
+	if (locale === "pl") return __pl.nearby_scope_world(inputs)
+	if (locale === "uk") return __uk.nearby_scope_world(inputs)
+	if (locale === "nl") return __nl.nearby_scope_world(inputs)
+	if (locale === "vi") return __vi.nearby_scope_world(inputs)
+	if (locale === "id") return __id.nearby_scope_world(inputs)
+	if (locale === "ms") return __ms.nearby_scope_world(inputs)
+	if (locale === "th") return __th.nearby_scope_world(inputs)
+	if (locale === "fa") return __fa.nearby_scope_world(inputs)
+	if (locale === "ur") return __ur.nearby_scope_world(inputs)
+	if (locale === "bn") return __bn.nearby_scope_world(inputs)
+	if (locale === "pa") return __pa.nearby_scope_world(inputs)
+	if (locale === "sw") return __sw.nearby_scope_world(inputs)
+	if (locale === "el") return __el.nearby_scope_world(inputs)
+	if (locale === "cs") return __cs.nearby_scope_world(inputs)
+	if (locale === "ro") return __ro.nearby_scope_world(inputs)
+	if (locale === "hu") return __hu.nearby_scope_world(inputs)
+	if (locale === "sv") return __sv.nearby_scope_world(inputs)
+	if (locale === "he") return __he.nearby_scope_world(inputs)
+	return __ru.nearby_scope_world(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Place not specified" |
+*
+* @param {Nearby_Unknown_PlaceInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const nearby_unknown_place = /** @type {((inputs?: Nearby_Unknown_PlaceInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Nearby_Unknown_PlaceInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.nearby_unknown_place(inputs)
+	if (locale === "fr") return __fr.nearby_unknown_place(inputs)
+	if (locale === "es") return __es.nearby_unknown_place(inputs)
+	if (locale === "zh") return __zh.nearby_unknown_place(inputs)
+	if (locale === "zh-TW") return __zh_tw2.nearby_unknown_place(inputs)
+	if (locale === "hi") return __hi.nearby_unknown_place(inputs)
+	if (locale === "ar") return __ar.nearby_unknown_place(inputs)
+	if (locale === "pt") return __pt.nearby_unknown_place(inputs)
+	if (locale === "de") return __de.nearby_unknown_place(inputs)
+	if (locale === "ja") return __ja.nearby_unknown_place(inputs)
+	if (locale === "ko") return __ko.nearby_unknown_place(inputs)
+	if (locale === "it") return __it.nearby_unknown_place(inputs)
+	if (locale === "tr") return __tr.nearby_unknown_place(inputs)
+	if (locale === "pl") return __pl.nearby_unknown_place(inputs)
+	if (locale === "uk") return __uk.nearby_unknown_place(inputs)
+	if (locale === "nl") return __nl.nearby_unknown_place(inputs)
+	if (locale === "vi") return __vi.nearby_unknown_place(inputs)
+	if (locale === "id") return __id.nearby_unknown_place(inputs)
+	if (locale === "ms") return __ms.nearby_unknown_place(inputs)
+	if (locale === "th") return __th.nearby_unknown_place(inputs)
+	if (locale === "fa") return __fa.nearby_unknown_place(inputs)
+	if (locale === "ur") return __ur.nearby_unknown_place(inputs)
+	if (locale === "bn") return __bn.nearby_unknown_place(inputs)
+	if (locale === "pa") return __pa.nearby_unknown_place(inputs)
+	if (locale === "sw") return __sw.nearby_unknown_place(inputs)
+	if (locale === "el") return __el.nearby_unknown_place(inputs)
+	if (locale === "cs") return __cs.nearby_unknown_place(inputs)
+	if (locale === "ro") return __ro.nearby_unknown_place(inputs)
+	if (locale === "hu") return __hu.nearby_unknown_place(inputs)
+	if (locale === "sv") return __sv.nearby_unknown_place(inputs)
+	if (locale === "he") return __he.nearby_unknown_place(inputs)
+	return __ru.nearby_unknown_place(inputs)
+});
+/**
+* | output |
+* | --- |
 * | "Notifications" |
 *
 * @param {Notifications_TitleInputs} inputs
@@ -14365,6 +15097,534 @@ export const notify_open_chat = /** @type {((inputs?: Notify_Open_ChatInputs, op
 	if (locale === "sv") return __sv.notify_open_chat(inputs)
 	if (locale === "he") return __he.notify_open_chat(inputs)
 	return __ru.notify_open_chat(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Choose a place" |
+*
+* @param {Place_Chip_ChooseInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const place_chip_choose = /** @type {((inputs?: Place_Chip_ChooseInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Place_Chip_ChooseInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.place_chip_choose(inputs)
+	if (locale === "fr") return __fr.place_chip_choose(inputs)
+	if (locale === "es") return __es.place_chip_choose(inputs)
+	if (locale === "zh") return __zh.place_chip_choose(inputs)
+	if (locale === "zh-TW") return __zh_tw2.place_chip_choose(inputs)
+	if (locale === "hi") return __hi.place_chip_choose(inputs)
+	if (locale === "ar") return __ar.place_chip_choose(inputs)
+	if (locale === "pt") return __pt.place_chip_choose(inputs)
+	if (locale === "de") return __de.place_chip_choose(inputs)
+	if (locale === "ja") return __ja.place_chip_choose(inputs)
+	if (locale === "ko") return __ko.place_chip_choose(inputs)
+	if (locale === "it") return __it.place_chip_choose(inputs)
+	if (locale === "tr") return __tr.place_chip_choose(inputs)
+	if (locale === "pl") return __pl.place_chip_choose(inputs)
+	if (locale === "uk") return __uk.place_chip_choose(inputs)
+	if (locale === "nl") return __nl.place_chip_choose(inputs)
+	if (locale === "vi") return __vi.place_chip_choose(inputs)
+	if (locale === "id") return __id.place_chip_choose(inputs)
+	if (locale === "ms") return __ms.place_chip_choose(inputs)
+	if (locale === "th") return __th.place_chip_choose(inputs)
+	if (locale === "fa") return __fa.place_chip_choose(inputs)
+	if (locale === "ur") return __ur.place_chip_choose(inputs)
+	if (locale === "bn") return __bn.place_chip_choose(inputs)
+	if (locale === "pa") return __pa.place_chip_choose(inputs)
+	if (locale === "sw") return __sw.place_chip_choose(inputs)
+	if (locale === "el") return __el.place_chip_choose(inputs)
+	if (locale === "cs") return __cs.place_chip_choose(inputs)
+	if (locale === "ro") return __ro.place_chip_choose(inputs)
+	if (locale === "hu") return __hu.place_chip_choose(inputs)
+	if (locale === "sv") return __sv.place_chip_choose(inputs)
+	if (locale === "he") return __he.place_chip_choose(inputs)
+	return __ru.place_chip_choose(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Near me" |
+*
+* @param {Place_Chip_NearbyInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const place_chip_nearby = /** @type {((inputs?: Place_Chip_NearbyInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Place_Chip_NearbyInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.place_chip_nearby(inputs)
+	if (locale === "fr") return __fr.place_chip_nearby(inputs)
+	if (locale === "es") return __es.place_chip_nearby(inputs)
+	if (locale === "zh") return __zh.place_chip_nearby(inputs)
+	if (locale === "zh-TW") return __zh_tw2.place_chip_nearby(inputs)
+	if (locale === "hi") return __hi.place_chip_nearby(inputs)
+	if (locale === "ar") return __ar.place_chip_nearby(inputs)
+	if (locale === "pt") return __pt.place_chip_nearby(inputs)
+	if (locale === "de") return __de.place_chip_nearby(inputs)
+	if (locale === "ja") return __ja.place_chip_nearby(inputs)
+	if (locale === "ko") return __ko.place_chip_nearby(inputs)
+	if (locale === "it") return __it.place_chip_nearby(inputs)
+	if (locale === "tr") return __tr.place_chip_nearby(inputs)
+	if (locale === "pl") return __pl.place_chip_nearby(inputs)
+	if (locale === "uk") return __uk.place_chip_nearby(inputs)
+	if (locale === "nl") return __nl.place_chip_nearby(inputs)
+	if (locale === "vi") return __vi.place_chip_nearby(inputs)
+	if (locale === "id") return __id.place_chip_nearby(inputs)
+	if (locale === "ms") return __ms.place_chip_nearby(inputs)
+	if (locale === "th") return __th.place_chip_nearby(inputs)
+	if (locale === "fa") return __fa.place_chip_nearby(inputs)
+	if (locale === "ur") return __ur.place_chip_nearby(inputs)
+	if (locale === "bn") return __bn.place_chip_nearby(inputs)
+	if (locale === "pa") return __pa.place_chip_nearby(inputs)
+	if (locale === "sw") return __sw.place_chip_nearby(inputs)
+	if (locale === "el") return __el.place_chip_nearby(inputs)
+	if (locale === "cs") return __cs.place_chip_nearby(inputs)
+	if (locale === "ro") return __ro.place_chip_nearby(inputs)
+	if (locale === "hu") return __hu.place_chip_nearby(inputs)
+	if (locale === "sv") return __sv.place_chip_nearby(inputs)
+	if (locale === "he") return __he.place_chip_nearby(inputs)
+	return __ru.place_chip_nearby(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Worldwide" |
+*
+* @param {Place_Chip_WorldInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const place_chip_world = /** @type {((inputs?: Place_Chip_WorldInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Place_Chip_WorldInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.place_chip_world(inputs)
+	if (locale === "fr") return __fr.place_chip_world(inputs)
+	if (locale === "es") return __es.place_chip_world(inputs)
+	if (locale === "zh") return __zh.place_chip_world(inputs)
+	if (locale === "zh-TW") return __zh_tw2.place_chip_world(inputs)
+	if (locale === "hi") return __hi.place_chip_world(inputs)
+	if (locale === "ar") return __ar.place_chip_world(inputs)
+	if (locale === "pt") return __pt.place_chip_world(inputs)
+	if (locale === "de") return __de.place_chip_world(inputs)
+	if (locale === "ja") return __ja.place_chip_world(inputs)
+	if (locale === "ko") return __ko.place_chip_world(inputs)
+	if (locale === "it") return __it.place_chip_world(inputs)
+	if (locale === "tr") return __tr.place_chip_world(inputs)
+	if (locale === "pl") return __pl.place_chip_world(inputs)
+	if (locale === "uk") return __uk.place_chip_world(inputs)
+	if (locale === "nl") return __nl.place_chip_world(inputs)
+	if (locale === "vi") return __vi.place_chip_world(inputs)
+	if (locale === "id") return __id.place_chip_world(inputs)
+	if (locale === "ms") return __ms.place_chip_world(inputs)
+	if (locale === "th") return __th.place_chip_world(inputs)
+	if (locale === "fa") return __fa.place_chip_world(inputs)
+	if (locale === "ur") return __ur.place_chip_world(inputs)
+	if (locale === "bn") return __bn.place_chip_world(inputs)
+	if (locale === "pa") return __pa.place_chip_world(inputs)
+	if (locale === "sw") return __sw.place_chip_world(inputs)
+	if (locale === "el") return __el.place_chip_world(inputs)
+	if (locale === "cs") return __cs.place_chip_world(inputs)
+	if (locale === "ro") return __ro.place_chip_world(inputs)
+	if (locale === "hu") return __hu.place_chip_world(inputs)
+	if (locale === "sv") return __sv.place_chip_world(inputs)
+	if (locale === "he") return __he.place_chip_world(inputs)
+	return __ru.place_chip_world(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Continue {name}" |
+*
+* @param {Place_ContinueInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const place_continue = /** @type {((inputs: Place_ContinueInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Place_ContinueInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.place_continue(inputs)
+	if (locale === "fr") return __fr.place_continue(inputs)
+	if (locale === "es") return __es.place_continue(inputs)
+	if (locale === "zh") return __zh.place_continue(inputs)
+	if (locale === "zh-TW") return __zh_tw2.place_continue(inputs)
+	if (locale === "hi") return __hi.place_continue(inputs)
+	if (locale === "ar") return __ar.place_continue(inputs)
+	if (locale === "pt") return __pt.place_continue(inputs)
+	if (locale === "de") return __de.place_continue(inputs)
+	if (locale === "ja") return __ja.place_continue(inputs)
+	if (locale === "ko") return __ko.place_continue(inputs)
+	if (locale === "it") return __it.place_continue(inputs)
+	if (locale === "tr") return __tr.place_continue(inputs)
+	if (locale === "pl") return __pl.place_continue(inputs)
+	if (locale === "uk") return __uk.place_continue(inputs)
+	if (locale === "nl") return __nl.place_continue(inputs)
+	if (locale === "vi") return __vi.place_continue(inputs)
+	if (locale === "id") return __id.place_continue(inputs)
+	if (locale === "ms") return __ms.place_continue(inputs)
+	if (locale === "th") return __th.place_continue(inputs)
+	if (locale === "fa") return __fa.place_continue(inputs)
+	if (locale === "ur") return __ur.place_continue(inputs)
+	if (locale === "bn") return __bn.place_continue(inputs)
+	if (locale === "pa") return __pa.place_continue(inputs)
+	if (locale === "sw") return __sw.place_continue(inputs)
+	if (locale === "el") return __el.place_continue(inputs)
+	if (locale === "cs") return __cs.place_continue(inputs)
+	if (locale === "ro") return __ro.place_continue(inputs)
+	if (locale === "hu") return __hu.place_continue(inputs)
+	if (locale === "sv") return __sv.place_continue(inputs)
+	if (locale === "he") return __he.place_continue(inputs)
+	return __ru.place_continue(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Close" |
+*
+* @param {Place_Selector_CloseInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const place_selector_close = /** @type {((inputs?: Place_Selector_CloseInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Place_Selector_CloseInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.place_selector_close(inputs)
+	if (locale === "fr") return __fr.place_selector_close(inputs)
+	if (locale === "es") return __es.place_selector_close(inputs)
+	if (locale === "zh") return __zh.place_selector_close(inputs)
+	if (locale === "zh-TW") return __zh_tw2.place_selector_close(inputs)
+	if (locale === "hi") return __hi.place_selector_close(inputs)
+	if (locale === "ar") return __ar.place_selector_close(inputs)
+	if (locale === "pt") return __pt.place_selector_close(inputs)
+	if (locale === "de") return __de.place_selector_close(inputs)
+	if (locale === "ja") return __ja.place_selector_close(inputs)
+	if (locale === "ko") return __ko.place_selector_close(inputs)
+	if (locale === "it") return __it.place_selector_close(inputs)
+	if (locale === "tr") return __tr.place_selector_close(inputs)
+	if (locale === "pl") return __pl.place_selector_close(inputs)
+	if (locale === "uk") return __uk.place_selector_close(inputs)
+	if (locale === "nl") return __nl.place_selector_close(inputs)
+	if (locale === "vi") return __vi.place_selector_close(inputs)
+	if (locale === "id") return __id.place_selector_close(inputs)
+	if (locale === "ms") return __ms.place_selector_close(inputs)
+	if (locale === "th") return __th.place_selector_close(inputs)
+	if (locale === "fa") return __fa.place_selector_close(inputs)
+	if (locale === "ur") return __ur.place_selector_close(inputs)
+	if (locale === "bn") return __bn.place_selector_close(inputs)
+	if (locale === "pa") return __pa.place_selector_close(inputs)
+	if (locale === "sw") return __sw.place_selector_close(inputs)
+	if (locale === "el") return __el.place_selector_close(inputs)
+	if (locale === "cs") return __cs.place_selector_close(inputs)
+	if (locale === "ro") return __ro.place_selector_close(inputs)
+	if (locale === "hu") return __hu.place_selector_close(inputs)
+	if (locale === "sv") return __sv.place_selector_close(inputs)
+	if (locale === "he") return __he.place_selector_close(inputs)
+	return __ru.place_selector_close(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Location is off. You can choose a place manually." |
+*
+* @param {Place_Selector_DeniedInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const place_selector_denied = /** @type {((inputs?: Place_Selector_DeniedInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Place_Selector_DeniedInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.place_selector_denied(inputs)
+	if (locale === "fr") return __fr.place_selector_denied(inputs)
+	if (locale === "es") return __es.place_selector_denied(inputs)
+	if (locale === "zh") return __zh.place_selector_denied(inputs)
+	if (locale === "zh-TW") return __zh_tw2.place_selector_denied(inputs)
+	if (locale === "hi") return __hi.place_selector_denied(inputs)
+	if (locale === "ar") return __ar.place_selector_denied(inputs)
+	if (locale === "pt") return __pt.place_selector_denied(inputs)
+	if (locale === "de") return __de.place_selector_denied(inputs)
+	if (locale === "ja") return __ja.place_selector_denied(inputs)
+	if (locale === "ko") return __ko.place_selector_denied(inputs)
+	if (locale === "it") return __it.place_selector_denied(inputs)
+	if (locale === "tr") return __tr.place_selector_denied(inputs)
+	if (locale === "pl") return __pl.place_selector_denied(inputs)
+	if (locale === "uk") return __uk.place_selector_denied(inputs)
+	if (locale === "nl") return __nl.place_selector_denied(inputs)
+	if (locale === "vi") return __vi.place_selector_denied(inputs)
+	if (locale === "id") return __id.place_selector_denied(inputs)
+	if (locale === "ms") return __ms.place_selector_denied(inputs)
+	if (locale === "th") return __th.place_selector_denied(inputs)
+	if (locale === "fa") return __fa.place_selector_denied(inputs)
+	if (locale === "ur") return __ur.place_selector_denied(inputs)
+	if (locale === "bn") return __bn.place_selector_denied(inputs)
+	if (locale === "pa") return __pa.place_selector_denied(inputs)
+	if (locale === "sw") return __sw.place_selector_denied(inputs)
+	if (locale === "el") return __el.place_selector_denied(inputs)
+	if (locale === "cs") return __cs.place_selector_denied(inputs)
+	if (locale === "ro") return __ro.place_selector_denied(inputs)
+	if (locale === "hu") return __hu.place_selector_denied(inputs)
+	if (locale === "sv") return __sv.place_selector_denied(inputs)
+	if (locale === "he") return __he.place_selector_denied(inputs)
+	return __ru.place_selector_denied(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Open full geography" |
+*
+* @param {Place_Selector_GeographyInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const place_selector_geography = /** @type {((inputs?: Place_Selector_GeographyInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Place_Selector_GeographyInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.place_selector_geography(inputs)
+	if (locale === "fr") return __fr.place_selector_geography(inputs)
+	if (locale === "es") return __es.place_selector_geography(inputs)
+	if (locale === "zh") return __zh.place_selector_geography(inputs)
+	if (locale === "zh-TW") return __zh_tw2.place_selector_geography(inputs)
+	if (locale === "hi") return __hi.place_selector_geography(inputs)
+	if (locale === "ar") return __ar.place_selector_geography(inputs)
+	if (locale === "pt") return __pt.place_selector_geography(inputs)
+	if (locale === "de") return __de.place_selector_geography(inputs)
+	if (locale === "ja") return __ja.place_selector_geography(inputs)
+	if (locale === "ko") return __ko.place_selector_geography(inputs)
+	if (locale === "it") return __it.place_selector_geography(inputs)
+	if (locale === "tr") return __tr.place_selector_geography(inputs)
+	if (locale === "pl") return __pl.place_selector_geography(inputs)
+	if (locale === "uk") return __uk.place_selector_geography(inputs)
+	if (locale === "nl") return __nl.place_selector_geography(inputs)
+	if (locale === "vi") return __vi.place_selector_geography(inputs)
+	if (locale === "id") return __id.place_selector_geography(inputs)
+	if (locale === "ms") return __ms.place_selector_geography(inputs)
+	if (locale === "th") return __th.place_selector_geography(inputs)
+	if (locale === "fa") return __fa.place_selector_geography(inputs)
+	if (locale === "ur") return __ur.place_selector_geography(inputs)
+	if (locale === "bn") return __bn.place_selector_geography(inputs)
+	if (locale === "pa") return __pa.place_selector_geography(inputs)
+	if (locale === "sw") return __sw.place_selector_geography(inputs)
+	if (locale === "el") return __el.place_selector_geography(inputs)
+	if (locale === "cs") return __cs.place_selector_geography(inputs)
+	if (locale === "ro") return __ro.place_selector_geography(inputs)
+	if (locale === "hu") return __hu.place_selector_geography(inputs)
+	if (locale === "sv") return __sv.place_selector_geography(inputs)
+	if (locale === "he") return __he.place_selector_geography(inputs)
+	return __ru.place_selector_geography(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Finding your place…" |
+*
+* @param {Place_Selector_LocatingInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const place_selector_locating = /** @type {((inputs?: Place_Selector_LocatingInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Place_Selector_LocatingInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.place_selector_locating(inputs)
+	if (locale === "fr") return __fr.place_selector_locating(inputs)
+	if (locale === "es") return __es.place_selector_locating(inputs)
+	if (locale === "zh") return __zh.place_selector_locating(inputs)
+	if (locale === "zh-TW") return __zh_tw2.place_selector_locating(inputs)
+	if (locale === "hi") return __hi.place_selector_locating(inputs)
+	if (locale === "ar") return __ar.place_selector_locating(inputs)
+	if (locale === "pt") return __pt.place_selector_locating(inputs)
+	if (locale === "de") return __de.place_selector_locating(inputs)
+	if (locale === "ja") return __ja.place_selector_locating(inputs)
+	if (locale === "ko") return __ko.place_selector_locating(inputs)
+	if (locale === "it") return __it.place_selector_locating(inputs)
+	if (locale === "tr") return __tr.place_selector_locating(inputs)
+	if (locale === "pl") return __pl.place_selector_locating(inputs)
+	if (locale === "uk") return __uk.place_selector_locating(inputs)
+	if (locale === "nl") return __nl.place_selector_locating(inputs)
+	if (locale === "vi") return __vi.place_selector_locating(inputs)
+	if (locale === "id") return __id.place_selector_locating(inputs)
+	if (locale === "ms") return __ms.place_selector_locating(inputs)
+	if (locale === "th") return __th.place_selector_locating(inputs)
+	if (locale === "fa") return __fa.place_selector_locating(inputs)
+	if (locale === "ur") return __ur.place_selector_locating(inputs)
+	if (locale === "bn") return __bn.place_selector_locating(inputs)
+	if (locale === "pa") return __pa.place_selector_locating(inputs)
+	if (locale === "sw") return __sw.place_selector_locating(inputs)
+	if (locale === "el") return __el.place_selector_locating(inputs)
+	if (locale === "cs") return __cs.place_selector_locating(inputs)
+	if (locale === "ro") return __ro.place_selector_locating(inputs)
+	if (locale === "hu") return __hu.place_selector_locating(inputs)
+	if (locale === "sv") return __sv.place_selector_locating(inputs)
+	if (locale === "he") return __he.place_selector_locating(inputs)
+	return __ru.place_selector_locating(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "No matching recent place. Open full geography." |
+*
+* @param {Place_Selector_No_MatchInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const place_selector_no_match = /** @type {((inputs?: Place_Selector_No_MatchInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Place_Selector_No_MatchInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.place_selector_no_match(inputs)
+	if (locale === "fr") return __fr.place_selector_no_match(inputs)
+	if (locale === "es") return __es.place_selector_no_match(inputs)
+	if (locale === "zh") return __zh.place_selector_no_match(inputs)
+	if (locale === "zh-TW") return __zh_tw2.place_selector_no_match(inputs)
+	if (locale === "hi") return __hi.place_selector_no_match(inputs)
+	if (locale === "ar") return __ar.place_selector_no_match(inputs)
+	if (locale === "pt") return __pt.place_selector_no_match(inputs)
+	if (locale === "de") return __de.place_selector_no_match(inputs)
+	if (locale === "ja") return __ja.place_selector_no_match(inputs)
+	if (locale === "ko") return __ko.place_selector_no_match(inputs)
+	if (locale === "it") return __it.place_selector_no_match(inputs)
+	if (locale === "tr") return __tr.place_selector_no_match(inputs)
+	if (locale === "pl") return __pl.place_selector_no_match(inputs)
+	if (locale === "uk") return __uk.place_selector_no_match(inputs)
+	if (locale === "nl") return __nl.place_selector_no_match(inputs)
+	if (locale === "vi") return __vi.place_selector_no_match(inputs)
+	if (locale === "id") return __id.place_selector_no_match(inputs)
+	if (locale === "ms") return __ms.place_selector_no_match(inputs)
+	if (locale === "th") return __th.place_selector_no_match(inputs)
+	if (locale === "fa") return __fa.place_selector_no_match(inputs)
+	if (locale === "ur") return __ur.place_selector_no_match(inputs)
+	if (locale === "bn") return __bn.place_selector_no_match(inputs)
+	if (locale === "pa") return __pa.place_selector_no_match(inputs)
+	if (locale === "sw") return __sw.place_selector_no_match(inputs)
+	if (locale === "el") return __el.place_selector_no_match(inputs)
+	if (locale === "cs") return __cs.place_selector_no_match(inputs)
+	if (locale === "ro") return __ro.place_selector_no_match(inputs)
+	if (locale === "hu") return __hu.place_selector_no_match(inputs)
+	if (locale === "sv") return __sv.place_selector_no_match(inputs)
+	if (locale === "he") return __he.place_selector_no_match(inputs)
+	return __ru.place_selector_no_match(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Recent" |
+*
+* @param {Place_Selector_RecentInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const place_selector_recent = /** @type {((inputs?: Place_Selector_RecentInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Place_Selector_RecentInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.place_selector_recent(inputs)
+	if (locale === "fr") return __fr.place_selector_recent(inputs)
+	if (locale === "es") return __es.place_selector_recent(inputs)
+	if (locale === "zh") return __zh.place_selector_recent(inputs)
+	if (locale === "zh-TW") return __zh_tw2.place_selector_recent(inputs)
+	if (locale === "hi") return __hi.place_selector_recent(inputs)
+	if (locale === "ar") return __ar.place_selector_recent(inputs)
+	if (locale === "pt") return __pt.place_selector_recent(inputs)
+	if (locale === "de") return __de.place_selector_recent(inputs)
+	if (locale === "ja") return __ja.place_selector_recent(inputs)
+	if (locale === "ko") return __ko.place_selector_recent(inputs)
+	if (locale === "it") return __it.place_selector_recent(inputs)
+	if (locale === "tr") return __tr.place_selector_recent(inputs)
+	if (locale === "pl") return __pl.place_selector_recent(inputs)
+	if (locale === "uk") return __uk.place_selector_recent(inputs)
+	if (locale === "nl") return __nl.place_selector_recent(inputs)
+	if (locale === "vi") return __vi.place_selector_recent(inputs)
+	if (locale === "id") return __id.place_selector_recent(inputs)
+	if (locale === "ms") return __ms.place_selector_recent(inputs)
+	if (locale === "th") return __th.place_selector_recent(inputs)
+	if (locale === "fa") return __fa.place_selector_recent(inputs)
+	if (locale === "ur") return __ur.place_selector_recent(inputs)
+	if (locale === "bn") return __bn.place_selector_recent(inputs)
+	if (locale === "pa") return __pa.place_selector_recent(inputs)
+	if (locale === "sw") return __sw.place_selector_recent(inputs)
+	if (locale === "el") return __el.place_selector_recent(inputs)
+	if (locale === "cs") return __cs.place_selector_recent(inputs)
+	if (locale === "ro") return __ro.place_selector_recent(inputs)
+	if (locale === "hu") return __hu.place_selector_recent(inputs)
+	if (locale === "sv") return __sv.place_selector_recent(inputs)
+	if (locale === "he") return __he.place_selector_recent(inputs)
+	return __ru.place_selector_recent(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Search city or country" |
+*
+* @param {Place_Selector_SearchInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const place_selector_search = /** @type {((inputs?: Place_Selector_SearchInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Place_Selector_SearchInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.place_selector_search(inputs)
+	if (locale === "fr") return __fr.place_selector_search(inputs)
+	if (locale === "es") return __es.place_selector_search(inputs)
+	if (locale === "zh") return __zh.place_selector_search(inputs)
+	if (locale === "zh-TW") return __zh_tw2.place_selector_search(inputs)
+	if (locale === "hi") return __hi.place_selector_search(inputs)
+	if (locale === "ar") return __ar.place_selector_search(inputs)
+	if (locale === "pt") return __pt.place_selector_search(inputs)
+	if (locale === "de") return __de.place_selector_search(inputs)
+	if (locale === "ja") return __ja.place_selector_search(inputs)
+	if (locale === "ko") return __ko.place_selector_search(inputs)
+	if (locale === "it") return __it.place_selector_search(inputs)
+	if (locale === "tr") return __tr.place_selector_search(inputs)
+	if (locale === "pl") return __pl.place_selector_search(inputs)
+	if (locale === "uk") return __uk.place_selector_search(inputs)
+	if (locale === "nl") return __nl.place_selector_search(inputs)
+	if (locale === "vi") return __vi.place_selector_search(inputs)
+	if (locale === "id") return __id.place_selector_search(inputs)
+	if (locale === "ms") return __ms.place_selector_search(inputs)
+	if (locale === "th") return __th.place_selector_search(inputs)
+	if (locale === "fa") return __fa.place_selector_search(inputs)
+	if (locale === "ur") return __ur.place_selector_search(inputs)
+	if (locale === "bn") return __bn.place_selector_search(inputs)
+	if (locale === "pa") return __pa.place_selector_search(inputs)
+	if (locale === "sw") return __sw.place_selector_search(inputs)
+	if (locale === "el") return __el.place_selector_search(inputs)
+	if (locale === "cs") return __cs.place_selector_search(inputs)
+	if (locale === "ro") return __ro.place_selector_search(inputs)
+	if (locale === "hu") return __hu.place_selector_search(inputs)
+	if (locale === "sv") return __sv.place_selector_search(inputs)
+	if (locale === "he") return __he.place_selector_search(inputs)
+	return __ru.place_selector_search(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Place" |
+*
+* @param {Place_Selector_TitleInputs} inputs
+* @param {{ locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }} options
+* @returns {LocalizedString}
+*/
+export const place_selector_title = /** @type {((inputs?: Place_Selector_TitleInputs, options?: { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Place_Selector_TitleInputs, { locale?: "ru" | "en" | "fr" | "es" | "zh" | "zh-TW" | "hi" | "ar" | "pt" | "de" | "ja" | "ko" | "it" | "tr" | "pl" | "uk" | "nl" | "vi" | "id" | "ms" | "th" | "fa" | "ur" | "bn" | "pa" | "sw" | "el" | "cs" | "ro" | "hu" | "sv" | "he" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.place_selector_title(inputs)
+	if (locale === "fr") return __fr.place_selector_title(inputs)
+	if (locale === "es") return __es.place_selector_title(inputs)
+	if (locale === "zh") return __zh.place_selector_title(inputs)
+	if (locale === "zh-TW") return __zh_tw2.place_selector_title(inputs)
+	if (locale === "hi") return __hi.place_selector_title(inputs)
+	if (locale === "ar") return __ar.place_selector_title(inputs)
+	if (locale === "pt") return __pt.place_selector_title(inputs)
+	if (locale === "de") return __de.place_selector_title(inputs)
+	if (locale === "ja") return __ja.place_selector_title(inputs)
+	if (locale === "ko") return __ko.place_selector_title(inputs)
+	if (locale === "it") return __it.place_selector_title(inputs)
+	if (locale === "tr") return __tr.place_selector_title(inputs)
+	if (locale === "pl") return __pl.place_selector_title(inputs)
+	if (locale === "uk") return __uk.place_selector_title(inputs)
+	if (locale === "nl") return __nl.place_selector_title(inputs)
+	if (locale === "vi") return __vi.place_selector_title(inputs)
+	if (locale === "id") return __id.place_selector_title(inputs)
+	if (locale === "ms") return __ms.place_selector_title(inputs)
+	if (locale === "th") return __th.place_selector_title(inputs)
+	if (locale === "fa") return __fa.place_selector_title(inputs)
+	if (locale === "ur") return __ur.place_selector_title(inputs)
+	if (locale === "bn") return __bn.place_selector_title(inputs)
+	if (locale === "pa") return __pa.place_selector_title(inputs)
+	if (locale === "sw") return __sw.place_selector_title(inputs)
+	if (locale === "el") return __el.place_selector_title(inputs)
+	if (locale === "cs") return __cs.place_selector_title(inputs)
+	if (locale === "ro") return __ro.place_selector_title(inputs)
+	if (locale === "hu") return __hu.place_selector_title(inputs)
+	if (locale === "sv") return __sv.place_selector_title(inputs)
+	if (locale === "he") return __he.place_selector_title(inputs)
+	return __ru.place_selector_title(inputs)
 });
 /**
 * | output |

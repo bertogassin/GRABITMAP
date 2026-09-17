@@ -349,5 +349,21 @@
   "place_selector_denied": "위치 정보가 꺼져 있습니다. 장소를 직접 선택할 수 있습니다.",
   "place_selector_locating": "위치를 찾는 중…",
   "place_selector_no_match": "최근 장소에 일치 항목이 없습니다. 전체 지리를 여세요.",
-  "place_continue": "{name} 계속"
+  "place_continue": "{name} 계속",
+  "nearby_scope_city": "{name}의 게시된 카드",
+  "nearby_scope_radius": "{name}에 아직 카드 없음 · 100km 이내 장소",
+  "nearby_scope_country": "더 가까운 카드 없음 · {name} 표시",
+  "nearby_scope_world": "전 세계의 최신 게시 카드",
+  "nearby_official_group": "공식 그룹",
+  "nearby_empty_title": "아직 게시된 카드가 없습니다",
+  "nearby_empty_body": "이 지역에 첫 카드를 추가하세요.",
+  "nearby_add": "카드 추가",
+  "nearby_fresh": "새 카드",
+  "nearby_choose_city": "도시 선택",
+  "nearby_lead": "선택한 장소 근처의 게시 카드를 보고 GRABIT에서 대화하세요.",
+  "nearby_unknown_place": "장소 미지정",
+  "nearby_scope_none": "먼저 도시를 선택하세요. 전 세계 카드는 여기에 표시되지 않습니다.",
+  "nearby_need_city_title": "도시를 선택하세요",
+  "nearby_need_city_body": "도시를 고르지 않으면 «주변»은 비어 있습니다. 세계 목록이 아닙니다.",
+  "nearby_location_unavailable": "가장 가까운 도시를 안전하게 확인할 수 없습니다. 장소를 직접 선택하세요."
 }

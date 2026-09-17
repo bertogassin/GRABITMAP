@@ -349,5 +349,21 @@
   "place_selector_denied": "ਲੋਕੇਸ਼ਨ ਬੰਦ ਹੈ। ਥਾਂ ਖੁਦ ਚੁਣ ਸਕਦੇ ਹੋ।",
   "place_selector_locating": "ਥਾਂ ਲੱਭੀ ਜਾ ਰਹੀ ਹੈ…",
   "place_selector_no_match": "ਹਾਲੀਆ ਥਾਵਾਂ ਵਿੱਚ ਮੇਲ ਨਹੀਂ। ਪੂਰੀ ਭੂਗੋਲ ਖੋਲ੍ਹੋ।",
-  "place_continue": "{name} ਜारी ਰੱਖੋ"
+  "place_continue": "{name} ਜारी ਰੱਖੋ",
+  "nearby_scope_city": "{name} ਵਿੱਚ ਪ੍ਰਕਾਸ਼ਿਤ ਕਾਰਡ",
+  "nearby_scope_radius": "{name} ਵਿੱਚ ਹਾਲੇ ਕਾਰਡ ਨਹੀਂ · 100 ਕਿਮੀ ਦੀਆਂ ਥਾਵਾਂ",
+  "nearby_scope_country": "ਨੇੜਲੇ ਕਾਰਡ ਨਹੀਂ · {name} ਵਿਖਾਇਆ ਜਾ ਰਿਹਾ ਹੈ",
+  "nearby_scope_world": "ਸੰਸਾਰ ਭਰ ਦੇ ਨਵੇਂ ਪ੍ਰਕਾਸ਼ਿਤ ਕਾਰਡ",
+  "nearby_official_group": "ਅਧਿਕਾਰਤ ਗਰੁੱਪ",
+  "nearby_empty_title": "ਹਾਲੇ ਕੋਈ ਪ੍ਰਕਾਸ਼ਿਤ ਕਾਰਡ ਨਹੀਂ",
+  "nearby_empty_body": "ਇਸ ਇਲਾਕੇ ਵਿੱਚ ਪਹਿਲਾ ਕਾਰਡ ਤੁਸੀਂ ਜੋੜੋ।",
+  "nearby_add": "ਕਾਰਡ ਜੋੜੋ",
+  "nearby_fresh": "ਨਵੇਂ ਕਾਰਡ",
+  "nearby_choose_city": "ਸ਼ਹਿਰ ਚੁਣੋ",
+  "nearby_lead": "ਚੁਣੀ ਥਾਂ ਨੇੜੇ ਪ੍ਰਕਾਸ਼ਿਤ ਕਾਰਡ ਵੇਖੋ ਅਤੇ GRABIT ਵਿੱਚ ਲਿਖੋ।",
+  "nearby_unknown_place": "ਥਾਂ ਨਹੀਂ ਦੱਸੀ ਗਈ",
+  "nearby_scope_none": "ਪਹਿਲਾਂ ਸ਼ਹਿਰ ਚੁਣੋ। ਵਿਸ਼ਵ ਕਾਰਡ ਇੱਥੇ ਨਹੀਂ ਦਿਖਦੇ।",
+  "nearby_need_city_title": "ਸ਼ਹਿਰ ਚੁਣੋ",
+  "nearby_need_city_body": "ਸ਼ਹਿਰ ਤੋਂ ਬਿਨਾਂ «ਨੇੜੇ» ਖਾਲੀ ਰਹਿੰਦੀ ਹੈ। ਇਹ ਵਿਸ਼ਵ ਸੂਚੀ ਨਹੀਂ।",
+  "nearby_location_unavailable": "ਨਜ਼ਦੀਕੀ ਸ਼ਹਿਰ ਸੁਰੱਖਿਅਤ ਢੰਗ ਨਾਲ ਨਹੀਂ ਪਤਾ ਲੱਗਿਆ। ਥਾਂ ਖੁਦ ਚੁਣੋ।"
 }

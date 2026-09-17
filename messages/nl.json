@@ -349,5 +349,21 @@
   "place_selector_denied": "Locatie is uit. U kunt handmatig een plek kiezen.",
   "place_selector_locating": "Plek zoeken…",
   "place_selector_no_match": "Geen recente plek gevonden. Open de volledige geografie.",
-  "place_continue": "Doorgaan met {name}"
+  "place_continue": "Doorgaan met {name}",
+  "nearby_scope_city": "Gepubliceerde kaarten in {name}",
+  "nearby_scope_radius": "Nog geen kaarten in {name} · plaatsen binnen 100 km",
+  "nearby_scope_country": "Geen dichtere kaarten · {name} wordt getoond",
+  "nearby_scope_world": "Nieuwste gepubliceerde kaarten wereldwijd",
+  "nearby_official_group": "Officiële groep",
+  "nearby_empty_title": "Nog geen gepubliceerde kaarten",
+  "nearby_empty_body": "Wees de eerste die hier een kaart toevoegt.",
+  "nearby_add": "Kaart toevoegen",
+  "nearby_fresh": "Nieuwe kaarten",
+  "nearby_choose_city": "Kies een stad",
+  "nearby_lead": "Bekijk gepubliceerde kaarten bij de gekozen plek en schrijf in GRABIT.",
+  "nearby_unknown_place": "Plaats niet opgegeven",
+  "nearby_scope_none": "Kies eerst een stad. Wereldwijde kaarten worden hier niet getoond.",
+  "nearby_need_city_title": "Kies een stad",
+  "nearby_need_city_body": "Zonder stad blijft Dichtbij leeg. Dit is geen wereldwijde lijst.",
+  "nearby_location_unavailable": "De dichtstbijzijnde stad kon niet veilig worden bepaald. Kies zelf een plaats."
 }

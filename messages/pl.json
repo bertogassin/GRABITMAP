@@ -349,5 +349,21 @@
   "place_selector_denied": "Lokalizacja jest wyłączona. Możesz wybrać miejsce ręcznie.",
   "place_selector_locating": "Szukamy miejsca…",
   "place_selector_no_match": "Brak pasującego ostatniego miejsca. Otwórz pełną geografię.",
-  "place_continue": "Kontynuuj {name}"
+  "place_continue": "Kontynuuj {name}",
+  "nearby_scope_city": "Opublikowane karty w {name}",
+  "nearby_scope_radius": "Brak kart w {name} · miejsca w promieniu 100 km",
+  "nearby_scope_country": "Brak bliższych kart · pokazujemy {name}",
+  "nearby_scope_world": "Najnowsze opublikowane karty na świecie",
+  "nearby_official_group": "Grupa oficjalna",
+  "nearby_empty_title": "Brak opublikowanych kart",
+  "nearby_empty_body": "Bądź pierwszą osobą, która doda kartę w tej okolicy.",
+  "nearby_add": "Dodaj kartę",
+  "nearby_fresh": "Nowe karty",
+  "nearby_choose_city": "Wybierz miasto",
+  "nearby_lead": "Zobacz opublikowane karty przy wybranym miejscu i napisz w GRABIT.",
+  "nearby_unknown_place": "Miejsce niepodane",
+  "nearby_scope_none": "Najpierw wybierz miasto. Karty ze świata nie są tu pokazywane.",
+  "nearby_need_city_title": "Wybierz miasto",
+  "nearby_need_city_body": "Bez miasta lista «W pobliżu» jest pusta. To nie jest lista światowa.",
+  "nearby_location_unavailable": "Nie udało się bezpiecznie ustalić najbliższego miasta. Wybierz miejsce sam."
 }

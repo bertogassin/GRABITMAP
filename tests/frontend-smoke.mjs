@@ -2504,3 +2504,32 @@ test("geo search API is a bounded guest endpoint", async () => {
   assert.match(db, /geo_search_fts MATCH/);
   assert.match(db, /unicode61/);
 });
+
+test("nearby app is a server-rendered feed instead of continent-first", async () => {
+  const [navigationTpl, navigationHandler, publicRoutes, chip] = await Promise.all([
+    readFile(new URL("src/web/templates/navigation.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/navigation.rs", root), "utf8"),
+    readFile(new URL("src/web/routes/public.rs", root), "utf8"),
+    readFile(new URL("static/place-chip.js", root), "utf8"),
+  ]);
+
+  assert.match(navigationHandler, /Redirect::permanent\("\/app"\)/);
+  assert.match(publicRoutes, /\.route\("\/app", get\(app_root\)\)/);
+  assert.match(publicRoutes, /\.route\("\/app\/map", get\(app_geo_world\)\)/);
+  assert.match(navigationHandler, /fn load_nearby_feed/);
+  assert.match(navigationHandler, /NEARBY_RADIUS_KM/);
+  assert.match(navigationHandler, /moderation_status = 'approved'/);
+  assert.match(navigationTpl, /fn render_nearby/);
+  assert.match(navigationTpl, /rel=\\"canonical\\" href=\\"https:\/\/grabitmap.com\/app\\"/);
+  assert.match(navigationTpl, /data-nearby-scope/);
+  assert.match(navigationTpl, /href=\\"\/app\/map\\"/);
+  assert.doesNotMatch(navigationTpl, /ResursMap/);
+  assert.ok(chip.includes("function onNearbyPage()"));
+  assert.ok(chip.includes("nearbyPageHref"));
+  assert.ok(chip.includes("paintHomeContinue"));
+  assert.doesNotMatch(chip, /var name = "";[\s\S]{0,320}name = heroName\(\)/);
+  assert.match(chip, /cityIdFromPlace\(stored\) === cityId/);
+  assert.doesNotMatch(chip, /document\.cookie/);
+  assert.ok(chip.includes("function requestNearby()"));
+  assert.match(chip, /ready\(function \(\) \{\s*resolve\(\);\s*paintChip\(\);\s*paintContinue\(\);\s*bind\(\);/);
+});

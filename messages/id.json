@@ -349,5 +349,21 @@
   "place_selector_denied": "Lokasi nonaktif. Anda dapat memilih tempat secara manual.",
   "place_selector_locating": "Mencari tempat…",
   "place_selector_no_match": "Tidak ada tempat terbaru yang cocok. Buka geografi lengkap.",
-  "place_continue": "Lanjutkan {name}"
+  "place_continue": "Lanjutkan {name}",
+  "nearby_scope_city": "Kartu terbit di {name}",
+  "nearby_scope_radius": "Belum ada kartu di {name} · tempat dalam 100 km",
+  "nearby_scope_country": "Tidak ada kartu lebih dekat · menampilkan {name}",
+  "nearby_scope_world": "Kartu terbit terbaru di dunia",
+  "nearby_official_group": "Grup resmi",
+  "nearby_empty_title": "Belum ada kartu terbit",
+  "nearby_empty_body": "Jadilah yang pertama menambah kartu di area ini.",
+  "nearby_add": "Tambah kartu",
+  "nearby_fresh": "Kartu baru",
+  "nearby_choose_city": "Pilih kota",
+  "nearby_lead": "Lihat kartu terbit dekat tempat yang dipilih, lalu tulis di GRABIT.",
+  "nearby_unknown_place": "Tempat tidak disebutkan",
+  "nearby_scope_none": "Pilih kota dulu. Kartu dunia tidak ditampilkan di sini.",
+  "nearby_need_city_title": "Pilih kota",
+  "nearby_need_city_body": "Tanpa kota, Terdekat kosong. Ini bukan daftar dunia.",
+  "nearby_location_unavailable": "Kota terdekat tidak dapat ditentukan dengan aman. Pilih tempat sendiri."
 }

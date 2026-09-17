@@ -349,5 +349,21 @@
   "place_selector_denied": "Locația este dezactivată. Puteți alege un loc manual.",
   "place_selector_locating": "Căutăm locul…",
   "place_selector_no_match": "Nu există un loc recent potrivit. Deschideți geografia completă.",
-  "place_continue": "Continuați {name}"
+  "place_continue": "Continuați {name}",
+  "nearby_scope_city": "Fișe publicate în {name}",
+  "nearby_scope_radius": "Încă nu sunt fișe în {name} · locuri pe 100 km",
+  "nearby_scope_country": "Nu sunt fișe mai aproape · afișăm {name}",
+  "nearby_scope_world": "Ultimele fișe publicate în lume",
+  "nearby_official_group": "Grup oficial",
+  "nearby_empty_title": "Încă nu există fișe publicate",
+  "nearby_empty_body": "Fii primul care adaugă o fișă în această zonă.",
+  "nearby_add": "Adaugă o fișă",
+  "nearby_fresh": "Fișe noi",
+  "nearby_choose_city": "Alege un oraș",
+  "nearby_lead": "Vezi fișele publicate lângă locul ales și scrie în GRABIT.",
+  "nearby_unknown_place": "Loc neprecizat",
+  "nearby_scope_none": "Alegeți mai întâi un oraș. Fișele mondiale nu apar aici.",
+  "nearby_need_city_title": "Alegeți un oraș",
+  "nearby_need_city_body": "Fără oraș, În apropiere rămâne gol. Nu este o listă mondială.",
+  "nearby_location_unavailable": "Orașul cel mai apropiat nu a putut fi determinat în siguranță. Alegeți locul."
 }

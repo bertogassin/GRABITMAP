@@ -349,5 +349,21 @@
   "place_selector_denied": "ตำแหน่งปิดอยู่ คุณเลือกสถานที่เองได้",
   "place_selector_locating": "กำลังหาตำแหน่ง…",
   "place_selector_no_match": "ไม่มีสถานที่ล่าสุดที่ตรงกัน เปิดภูมิศาสตร์ทั้งหมด",
-  "place_continue": "ต่อที่ {name}"
+  "place_continue": "ต่อที่ {name}",
+  "nearby_scope_city": "การ์ดที่เผยแพร่ใน {name}",
+  "nearby_scope_radius": "ยังไม่มีการ์ดใน {name} · สถานที่ในรัศมี 100 กม.",
+  "nearby_scope_country": "ไม่มีการ์ดที่ใกล้กว่า · แสดง {name}",
+  "nearby_scope_world": "การ์ดที่เผยแพร่ล่าสุดทั่วโลก",
+  "nearby_official_group": "กลุ่มทางการ",
+  "nearby_empty_title": "ยังไม่มีการ์ดที่เผยแพร่",
+  "nearby_empty_body": "เป็นคนแรกที่เพิ่มการ์ดในพื้นที่นี้",
+  "nearby_add": "เพิ่มการ์ด",
+  "nearby_fresh": "การ์ดใหม่",
+  "nearby_choose_city": "เลือกเมือง",
+  "nearby_lead": "ดูการ์ดที่เผยแพร่ใกล้สถานที่ที่เลือก แล้วเขียนใน GRABIT",
+  "nearby_unknown_place": "ไม่ได้ระบุสถานที่",
+  "nearby_scope_none": "เลือกเมืองก่อน การ์ดทั่วโลกจะไม่แสดงที่นี่",
+  "nearby_need_city_title": "เลือกเมือง",
+  "nearby_need_city_body": "ถ้ายังไม่เลือกเมือง ฟีดใกล้ฉันจะว่าง ไม่ใช่รายการทั่วโลก",
+  "nearby_location_unavailable": "ไม่สามารถระบุเมืองที่ใกล้ที่สุดอย่างปลอดภัยได้ โปรดเลือกสถานที่เอง"
 }

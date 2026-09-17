@@ -349,5 +349,21 @@
   "place_selector_denied": "موقعیت مکانی خاموش است. می‌توانید مکان را دستی انتخاب کنید.",
   "place_selector_locating": "در حال یافتن مکان…",
   "place_selector_no_match": "مکان اخیری مطابق نیست. جغرافیای کامل را باز کنید.",
-  "place_continue": "ادامه {name}"
+  "place_continue": "ادامه {name}",
+  "nearby_scope_city": "کارت‌های منتشرشده در {name}",
+  "nearby_scope_radius": "در {name} کارتی نیست · مکان‌ها تا ۱۰۰ کیلومتر",
+  "nearby_scope_country": "کارت نزدیک‌تری نیست · نمایش {name}",
+  "nearby_scope_world": "تازه‌ترین کارت‌های منتشرشده در جهان",
+  "nearby_official_group": "گروه رسمی",
+  "nearby_empty_title": "هنوز کارت منتشرشده‌ای نیست",
+  "nearby_empty_body": "اولین کسی باشید که در این منطقه کارت می‌گذارد.",
+  "nearby_add": "افزودن کارت",
+  "nearby_fresh": "کارت‌های تازه",
+  "nearby_choose_city": "انتخاب شهر",
+  "nearby_lead": "کارت‌های منتشرشده نزدیک مکان انتخابی را ببینید و در GRABIT بنویسید.",
+  "nearby_unknown_place": "مکان مشخص نشده",
+  "nearby_scope_none": "ابتدا یک شهر انتخاب کنید. کارت‌های جهانی اینجا نشان داده نمی‌شوند.",
+  "nearby_need_city_title": "یک شهر انتخاب کنید",
+  "nearby_need_city_body": "بدون شهر، «نزدیک» خالی می‌ماند. این فهرست جهانی نیست.",
+  "nearby_location_unavailable": "نزدیک‌ترین شهر را نمی‌توان به‌طور ایمن تشخیص داد. مکان را خودتان انتخاب کنید."
 }
