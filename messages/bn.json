@@ -337,5 +337,17 @@
   "chat_video_speed": "গতি",
   "chat_connecting_initial": "সংযোগ করা হচ্ছে…",
   "chat_member_muted": "অ্যাডমিন সাময়িকভাবে বার্তা পাঠানো সীমিত করেছেন",
-  "chat_reply_unavailable": "যে বার্তার উত্তর দিচ্ছেন সেটি আর পাওয়া যাচ্ছে না"
+  "chat_reply_unavailable": "যে বার্তার উত্তর দিচ্ছেন সেটি আর পাওয়া যাচ্ছে না",
+  "place_chip_choose": "স্থান বেছে নিন",
+  "place_chip_world": "সারা বিশ্ব",
+  "place_chip_nearby": "আমার কাছে",
+  "place_selector_title": "স্থান",
+  "place_selector_search": "শহর বা দেশ খুঁজুন",
+  "place_selector_recent": "সাম্প্রতিক",
+  "place_selector_geography": "পূর্ণ ভূগোল খুলুন",
+  "place_selector_close": "বন্ধ করুন",
+  "place_selector_denied": "লোকেশন বন্ধ আছে। স্থান নিজে বেছে নিতে পারেন।",
+  "place_selector_locating": "স্থান খোঁজা হচ্ছে…",
+  "place_selector_no_match": "সাম্প্রতিক স্থানে মিল নেই। পূর্ণ ভূগোল খুলুন।",
+  "place_continue": "{name} চালিয়ে যান"
 }

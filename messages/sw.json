@@ -337,5 +337,17 @@
   "chat_video_speed": "Kasi",
   "chat_connecting_initial": "Inaunganisha…",
   "chat_member_muted": "Kutuma kumezuiwa kwa muda na msimamizi",
-  "chat_reply_unavailable": "Ujumbe unaoujibu haupatikani tena"
+  "chat_reply_unavailable": "Ujumbe unaoujibu haupatikani tena",
+  "place_chip_choose": "Chagua mahali",
+  "place_chip_world": "Dunia nzima",
+  "place_chip_nearby": "Karibu nami",
+  "place_selector_title": "Mahali",
+  "place_selector_search": "Tafuta mji au nchi",
+  "place_selector_recent": "Hivi karibuni",
+  "place_selector_geography": "Fungua jiografia kamili",
+  "place_selector_close": "Funga",
+  "place_selector_denied": "Mahali limezimwa. Unaweza kuchagua mahali mwenyewe.",
+  "place_selector_locating": "Inatafuta mahali…",
+  "place_selector_no_match": "Hakuna mahali ya hivi karibuni inayofanana. Fungua jiografia kamili.",
+  "place_continue": "Endelea {name}"
 }

@@ -337,5 +337,17 @@
   "chat_video_speed": "Speed",
   "chat_connecting_initial": "Connecting…",
   "chat_member_muted": "Sending is temporarily restricted by an administrator",
-  "chat_reply_unavailable": "The message you’re replying to is no longer available"
+  "chat_reply_unavailable": "The message you’re replying to is no longer available",
+  "place_chip_choose": "Choose a place",
+  "place_chip_world": "Worldwide",
+  "place_chip_nearby": "Near me",
+  "place_selector_title": "Place",
+  "place_selector_search": "Search city or country",
+  "place_selector_recent": "Recent",
+  "place_selector_geography": "Open full geography",
+  "place_selector_close": "Close",
+  "place_selector_denied": "Location is off. You can choose a place manually.",
+  "place_selector_locating": "Finding your place…",
+  "place_selector_no_match": "No matching recent place. Open full geography.",
+  "place_continue": "Continue {name}"
 }

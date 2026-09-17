@@ -337,5 +337,17 @@
   "chat_video_speed": "السرعة",
   "chat_connecting_initial": "جارٍ الاتصال…",
   "chat_member_muted": "قيّد أحد المشرفين الإرسال مؤقتًا",
-  "chat_reply_unavailable": "الرسالة التي ترد عليها لم تعد متاحة"
+  "chat_reply_unavailable": "الرسالة التي ترد عليها لم تعد متاحة",
+  "place_chip_choose": "اختر مكاناً",
+  "place_chip_world": "العالم كله",
+  "place_chip_nearby": "بالقرب مني",
+  "place_selector_title": "المكان",
+  "place_selector_search": "ابحث عن مدينة أو بلد",
+  "place_selector_recent": "الأخيرة",
+  "place_selector_geography": "فتح الجغرافيا الكاملة",
+  "place_selector_close": "إغلاق",
+  "place_selector_denied": "الموقع متوقف. يمكنك اختيار المكان يدوياً.",
+  "place_selector_locating": "جارٍ تحديد المكان…",
+  "place_selector_no_match": "لا يوجد مكان أخير مطابق. افتح الجغرافيا الكاملة.",
+  "place_continue": "متابعة {name}"
 }

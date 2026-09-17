@@ -337,5 +337,17 @@
   "chat_video_speed": "Скорость",
   "chat_connecting_initial": "Соединение…",
   "chat_member_muted": "Отправка временно ограничена администратором",
-  "chat_reply_unavailable": "Сообщение для ответа уже недоступно"
+  "chat_reply_unavailable": "Сообщение для ответа уже недоступно",
+  "place_chip_choose": "Выберите место",
+  "place_chip_world": "Весь мир",
+  "place_chip_nearby": "Рядом со мной",
+  "place_selector_title": "Место",
+  "place_selector_search": "Поиск города или страны",
+  "place_selector_recent": "Недавние",
+  "place_selector_geography": "Открыть полную географию",
+  "place_selector_close": "Закрыть",
+  "place_selector_denied": "Геолокация отключена. Можно выбрать место вручную.",
+  "place_selector_locating": "Определяем место…",
+  "place_selector_no_match": "В недавних местах нет такого города. Откройте полную географию.",
+  "place_continue": "Продолжить {name}"
 }

@@ -337,5 +337,17 @@
   "chat_video_speed": "ความเร็ว",
   "chat_connecting_initial": "กำลังเชื่อมต่อ…",
   "chat_member_muted": "ผู้ดูแลระบบจำกัดการส่งชั่วคราว",
-  "chat_reply_unavailable": "ข้อความที่คุณกำลังตอบกลับไม่พร้อมใช้งานแล้ว"
+  "chat_reply_unavailable": "ข้อความที่คุณกำลังตอบกลับไม่พร้อมใช้งานแล้ว",
+  "place_chip_choose": "เลือกสถานที่",
+  "place_chip_world": "ทั่วโลก",
+  "place_chip_nearby": "ใกล้ฉัน",
+  "place_selector_title": "สถานที่",
+  "place_selector_search": "ค้นหาเมืองหรือประเทศ",
+  "place_selector_recent": "ล่าสุด",
+  "place_selector_geography": "เปิดภูมิศาสตร์ทั้งหมด",
+  "place_selector_close": "ปิด",
+  "place_selector_denied": "ตำแหน่งปิดอยู่ คุณเลือกสถานที่เองได้",
+  "place_selector_locating": "กำลังหาตำแหน่ง…",
+  "place_selector_no_match": "ไม่มีสถานที่ล่าสุดที่ตรงกัน เปิดภูมิศาสตร์ทั้งหมด",
+  "place_continue": "ต่อที่ {name}"
 }

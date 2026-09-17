@@ -337,5 +337,17 @@
   "chat_video_speed": "Швидкість",
   "chat_connecting_initial": "З’єднання…",
   "chat_member_muted": "Адміністратор тимчасово обмежив надсилання",
-  "chat_reply_unavailable": "Повідомлення, на яке ви відповідаєте, більше недоступне"
+  "chat_reply_unavailable": "Повідомлення, на яке ви відповідаєте, більше недоступне",
+  "place_chip_choose": "Оберіть місце",
+  "place_chip_world": "Весь світ",
+  "place_chip_nearby": "Поруч зі мною",
+  "place_selector_title": "Місце",
+  "place_selector_search": "Пошук міста або країни",
+  "place_selector_recent": "Нещодавні",
+  "place_selector_geography": "Відкрити повну географію",
+  "place_selector_close": "Закрити",
+  "place_selector_denied": "Геолокація вимкнена. Можна вибрати місце вручну.",
+  "place_selector_locating": "Визначаємо місце…",
+  "place_selector_no_match": "У недавніх місцях немає збігу. Відкрийте повну географію.",
+  "place_continue": "Продовжити {name}"
 }

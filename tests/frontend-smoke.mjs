@@ -537,7 +537,7 @@ test("global search stays available while map and explore keep distinct jobs", a
     readFile(new URL("src/web/templates/navigation.rs", root), "utf8"),
     readFile(new URL("src/web/routes/public.rs", root), "utf8"),
     readFile(new URL("static/global-search.js", root), "utf8"),
-    readFile(new URL("static/place-memory.js", root), "utf8"),
+    readFile(new URL("static/place-chip.js", root), "utf8"),
     readFile(new URL("static/resursmap-sw.js", root), "utf8"),
   ]);
   const start = navigation.indexOf("pub fn render_geo_root(");
@@ -789,7 +789,7 @@ test("critical mobile layouts remain readable and listing links always become ca
 test("mobile experience removes retired invitations and uses the measured chat viewport", async () => {
   const [invite, memory, mobile, chat, communication] = await Promise.all([
     readFile(new URL("src/web/templates/invite.rs", root), "utf8"),
-    readFile(new URL("static/place-memory.js", root), "utf8"),
+    readFile(new URL("static/place-chip.js", root), "utf8"),
     readFile(new URL("static/mobile-foundation.css", root), "utf8"),
     readFile(new URL("static/chat-v2.js", root), "utf8"),
     readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
@@ -2396,7 +2396,7 @@ test("redesign inventory protects SEO and location compatibility without freezin
   const [resources, health, placeMemory, communication] = await Promise.all([
     readFile(new URL("src/web/templates/resources.rs", root), "utf8"),
     readFile(new URL("src/web/handlers/health.rs", root), "utf8"),
-    readFile(new URL("static/place-memory.js", root), "utf8"),
+    readFile(new URL("static/place-chip.js", root), "utf8"),
     readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
   ]);
 
@@ -2410,4 +2410,50 @@ test("redesign inventory protects SEO and location compatibility without freezin
 
   assert.match(communication, /href="\/app\/official-groups"/);
   assert.match(communication, /method="post" action="\/app\/official-groups/);
+});
+
+test("location chip stores tab place without a new cookie", async () => {
+  const [placeMemory, common] = await Promise.all([
+    readFile(new URL("static/place-chip.js", root), "utf8"),
+    readFile(new URL("src/web/templates/common.rs", root), "utf8"),
+  ]);
+
+  assert.ok(placeMemory.includes("grabit-active-place"));
+  assert.ok(placeMemory.includes("grabit-recent-places"));
+  assert.ok(placeMemory.includes("sessionStorage"));
+  assert.ok(placeMemory.includes("GEO_DENIED_KEY"));
+  assert.ok(placeMemory.includes("navigator.geolocation"));
+  assert.equal((placeMemory.match(/document\.cookie/g) || []).length, 0);
+  assert.ok(!placeMemory.includes("grabit-place="));
+
+  assert.match(common, /id="rm-place-chip"/);
+  assert.match(common, /id="rm-place-dialog"/);
+  assert.match(common, /data-place-pick="nearby"/);
+  assert.match(common, /href="\/app"/);
+});
+
+test("location chip strings exist in every locale", async () => {
+  const keys = [
+    "place_chip_choose",
+    "place_chip_world",
+    "place_chip_nearby",
+    "place_selector_title",
+    "place_selector_search",
+    "place_selector_recent",
+    "place_selector_geography",
+    "place_selector_close",
+    "place_selector_denied",
+    "place_selector_locating",
+    "place_selector_no_match",
+    "place_continue",
+  ];
+  for (const locale of locales) {
+    const messages = JSON.parse(
+      await readFile(new URL("messages/" + locale + ".json", root), "utf8"),
+    );
+    for (const key of keys) {
+      assert.equal(typeof messages[key], "string", locale + " " + key);
+      assert.notEqual(messages[key].trim(), "", locale + " " + key);
+    }
+  }
 });
