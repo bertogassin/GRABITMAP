@@ -1953,7 +1953,8 @@ mod search_catalog_tests {
         assert!(menu.contains("/app/join/abc123?to=work"));
         assert!(menu.contains("theme-toggle-btn"));
         assert!(menu.contains("href=\"/app\""));
-        assert!(menu.contains("data-nav-explore-link"));
+        assert!(menu.contains("data-nav-search-link"));
+        assert!(menu.contains("data-nav-profile-link"));
 
         let home = render_geo_root(1, 1, 1, vec![(1, "Европа".to_string(), 3)], false);
         assert!(home.contains("id=\"rm-last-city-home\""));
@@ -1964,7 +1965,7 @@ mod search_catalog_tests {
     #[test]
     fn explore_is_a_distinct_discovery_hub() {
         let html = render_explore();
-        assert!(html.contains("data-nav-explore-link"));
+        assert!(html.contains("data-nav-search-link"));
         assert!(html.contains("nav-item active"));
         assert!(html.contains("/app/search?kind=work"));
         assert!(html.contains("/app/search?kind=workers"));
