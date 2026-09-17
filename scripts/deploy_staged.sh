@@ -14,18 +14,41 @@ PUBLIC_URL="${PUBLIC_URL:-https://grabitmap.com}"
 PUBLIC_URL="${PUBLIC_URL%/}"
 EXPECTED_HSTS="${EXPECTED_HSTS:-max-age=31536000}"
 SWITCHED=0
+STAGED_VERIFIED=0
+PRIMARY_REPLACE_STARTED=0
+PREVIOUS_IMAGE_ID=""
 
 cd "$ROOT_DIR"
 
 cleanup() {
-    rm -f "$TEMP_STAGED_CADDY" "$TEMP_PRIMARY_CADDY"
+    local exit_code=$?
+
+    trap - EXIT
+
+    if [ "$SWITCHED" -eq 1 ]; then
+        echo "=== AUTOMATIC ROLLBACK TO PREVIOUS BACKEND ===" >&2
+
+        if restore_previous_backend; then
+            SWITCHED=0
+            echo "✅ Previous backend restored and verified" >&2
+        elif [ "$STAGED_VERIFIED" -eq 1 ]; then
+            echo "⚠️ Previous backend rollback failed; preserving verified staged backend" >&2
+
+            docker compose -f "$COMPOSE_FILE" exec -T "$CADDY_SERVICE" \
+                caddy reload \
+                --config /tmp/Caddyfile.staged \
+                --adapter caddyfile || true
+        else
+            echo "❌ Previous backend rollback failed and staged backend was not verified" >&2
+        fi
+    fi
 
     if [ "$SWITCHED" -eq 0 ]; then
         docker rm -f "$NEXT_NAME" >/dev/null 2>&1 || true
-    else
-        echo "⚠️ Основной backend не восстановлен."
-        echo "⚠️ Caddy оставлен на $NEXT_NAME; контейнер сохранён."
     fi
+
+    rm -f "$TEMP_STAGED_CADDY" "$TEMP_PRIMARY_CADDY"
+    exit "$exit_code"
 }
 trap cleanup EXIT
 
@@ -75,6 +98,29 @@ verify_public_deploy() {
     public_hsts_ready
 }
 
+restore_previous_backend() {
+    if [ "$PRIMARY_REPLACE_STARTED" -eq 1 ]; then
+        test -n "$PREVIOUS_IMAGE_ID" || return 1
+        test -n "$IMAGE_REF" || return 1
+
+        docker image tag "$PREVIOUS_IMAGE_ID" "$IMAGE_REF" || return 1
+        docker compose -f "$COMPOSE_FILE" up \
+            -d \
+            --no-deps \
+            --no-build \
+            --force-recreate \
+            --wait \
+            "$APP_SERVICE" || return 1
+    fi
+
+    docker compose -f "$COMPOSE_FILE" exec -T "$CADDY_SERVICE" \
+        caddy reload \
+        --config /tmp/Caddyfile.primary \
+        --adapter caddyfile || return 1
+
+    verify_public_deploy
+}
+
 test -f "$COMPOSE_FILE"
 test -f Caddyfile
 test -f .env
@@ -88,6 +134,9 @@ test -n "$CADDY_ID"
 
 IMAGE_REF="$(docker inspect "$CURRENT_ID" --format '{{.Config.Image}}')"
 test -n "$IMAGE_REF"
+
+PREVIOUS_IMAGE_ID="$(docker inspect "$CURRENT_ID" --format '{{.Image}}')"
+test -n "$PREVIOUS_IMAGE_ID"
 
 NETWORK="$(
     docker inspect "$CURRENT_ID" \
@@ -114,7 +163,7 @@ echo "=== CREATE VERIFIED BACKUP ==="
 BACKUP_DIR="$BACKUP_DIR" \
 DATA_SOURCE="$DATA_SOURCE" \
 CURRENT_ID="$CURRENT_ID" \
-IMAGE_ID="$(docker inspect "$CURRENT_ID" --format '{{.Image}}')" \
+IMAGE_ID="$PREVIOUS_IMAGE_ID" \
 COMPOSE_FILE="$COMPOSE_FILE" \
 APP_SERVICE="$APP_SERVICE" \
     "$ROOT_DIR/scripts/backup_production.sh"
@@ -198,7 +247,10 @@ if ! verify_public_deploy; then
     exit 1
 fi
 
+STAGED_VERIFIED=1
+
 echo "=== REPLACE PRIMARY BACKEND ==="
+PRIMARY_REPLACE_STARTED=1
 docker compose -f "$COMPOSE_FILE" up \
     -d \
     --no-deps \
@@ -213,13 +265,7 @@ docker compose -f "$COMPOSE_FILE" exec -T "$CADDY_SERVICE" \
     --adapter caddyfile
 
 if ! verify_public_deploy; then
-    echo "❌ Primary backend failed public verification; returning to staged backend" >&2
-
-    docker compose -f "$COMPOSE_FILE" exec -T "$CADDY_SERVICE" \
-        caddy reload \
-        --config /tmp/Caddyfile.staged \
-        --adapter caddyfile
-
+    echo "❌ Primary backend failed public verification; starting automatic rollback" >&2
     exit 1
 fi
 
