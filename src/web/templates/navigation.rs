@@ -1587,11 +1587,15 @@ pub fn render_search(
             r#"
 <section class="card rm-search-suggest">
     <div class="card-title">С чего начать</div>
-    <div class="card-meta">Выберите рубрику или откройте недавний поиск.</div>
+    <div class="card-meta">{search_what}</div>
+    <p id="rm-search-continue" hidden>
+        <a class="ui-button" id="rm-search-continue-link" href="/app/search"></a>
+    </p>
     {chips}
 </section>
 "#,
             chips = chips,
+            search_what = escape_html(&crate::i18n::t("search_what")),
         )
     } else {
         String::new()
@@ -1646,28 +1650,17 @@ pub fn render_search(
         "Поиск · GRABIT",
         &topbar("Поиск", "search"),
         &search_form_hero(
-            "Поиск",
-            match (kind, active_rubric) {
-                (_, Some(rubric)) => rubric.label,
-                ("work", _) => "Найти работу",
-                ("workers", _) => "Найти работников",
-                ("business", _) => "Найти бизнес",
-                _ => "Найти рядом",
+            &crate::i18n::t("search_title"),
+            &match (kind, active_rubric) {
+                (_, Some(rubric)) => rubric.label.to_string(),
+                ("work", _) => crate::i18n::t("common_work"),
+                ("workers", _) => crate::i18n::t("common_workers"),
+                ("business", _) => crate::i18n::t("common_business"),
+                _ => crate::i18n::t("search_title"),
             },
-            if let Some(rubric) = active_rubric {
-                match rubric.kind {
-                    crate::catalog::RubricKind::Work => {
-                        "Вакансии и специалисты из единого справочника."
-                    }
-                    crate::catalog::RubricKind::Business => {
-                        "Компании и предложения из единого справочника."
-                    }
-                }
-            } else {
-                "Работа, работники, бизнес, город или профессия."
-            },
+            &crate::i18n::t("search_what"),
             q,
-            "Например: электрик, город, вакансия...",
+            &crate::i18n::t("search_what"),
             kind,
             city_id,
             &hero_extra,
@@ -1890,6 +1883,11 @@ mod search_catalog_tests {
         );
 
         assert!(!html.contains("aria-label=\"Рубрика\""));
+        assert!(html.contains("id=\"rm-search-continue\""));
+        assert!(html.contains("id=\"rm-search-continue-link\""));
+        assert!(html.contains("name=\"q\""));
+        assert!(html.contains("action=\"/app/search\""));
+        assert!(!html.contains("name=\"place\""));
     }
 
     #[test]
