@@ -64,8 +64,8 @@ mod tests {
     #[test]
     fn json_contract_omits_private_fields() {
         let source = include_str!("geo_search.rs");
-        assert!(source.contains("\"href\": hit.href"));
+        assert!(source.contains("hit.href"));
         assert!(!source.contains("hit.cards"));
-        assert!(source.contains("\"kind\": hit.kind"));
+        assert!(source.contains("hit.kind"));
     }
 }

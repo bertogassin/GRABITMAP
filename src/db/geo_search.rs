@@ -268,6 +268,9 @@ mod tests {
                 PRAGMA foreign_keys = ON;
                 CREATE TABLE resources (
                     id INTEGER PRIMARY KEY,
+                    continent_index INTEGER NOT NULL DEFAULT 0,
+                    country_index INTEGER NOT NULL DEFAULT 0,
+                    city_index INTEGER NOT NULL DEFAULT 0,
                     city_id INTEGER,
                     moderation_status TEXT NOT NULL DEFAULT 'pending',
                     is_active INTEGER NOT NULL DEFAULT 1
