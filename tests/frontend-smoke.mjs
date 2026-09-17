@@ -537,7 +537,7 @@ test("global search stays available while map and explore keep distinct jobs", a
     readFile(new URL("src/web/templates/navigation.rs", root), "utf8"),
     readFile(new URL("src/web/routes/public.rs", root), "utf8"),
     readFile(new URL("static/global-search.js", root), "utf8"),
-    readFile(new URL("static/place-chip.js", root), "utf8"),
+    readFile(new URL("static/place-memory.js", root), "utf8"),
     readFile(new URL("static/resursmap-sw.js", root), "utf8"),
   ]);
   const start = navigation.indexOf("pub fn render_geo_root(");
@@ -789,7 +789,7 @@ test("critical mobile layouts remain readable and listing links always become ca
 test("mobile experience removes retired invitations and uses the measured chat viewport", async () => {
   const [invite, memory, mobile, chat, communication] = await Promise.all([
     readFile(new URL("src/web/templates/invite.rs", root), "utf8"),
-    readFile(new URL("static/place-chip.js", root), "utf8"),
+    readFile(new URL("static/place-memory.js", root), "utf8"),
     readFile(new URL("static/mobile-foundation.css", root), "utf8"),
     readFile(new URL("static/chat-v2.js", root), "utf8"),
     readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
@@ -2396,7 +2396,7 @@ test("redesign inventory protects SEO and location compatibility without freezin
   const [resources, health, placeMemory, communication] = await Promise.all([
     readFile(new URL("src/web/templates/resources.rs", root), "utf8"),
     readFile(new URL("src/web/handlers/health.rs", root), "utf8"),
-    readFile(new URL("static/place-chip.js", root), "utf8"),
+    readFile(new URL("static/place-memory.js", root), "utf8"),
     readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
   ]);
 

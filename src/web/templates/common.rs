@@ -6733,11 +6733,13 @@ mod public_entry_tests {
     #[test]
     fn page_document_includes_location_chip_and_selector() {
         let page = page_document("Тест", "", "", "<p>ok</p>", "", "");
-        assert!(page.contains("id=\"rm-place-chip\""));
+        let bar = topbar("Тест", "map");
+        assert!(bar.contains("id=\"rm-place-chip\""));
         assert!(page.contains("id=\"rm-place-dialog\""));
         assert!(page.contains("data-place-pick=\"nearby\""));
         assert!(page.contains("data-place-pick=\"world\""));
         assert!(page.contains("/app"));
+        assert!(bar.contains("/app"));
     }
 
     fn page_document_keeps_shared_footer_styles_in_the_head() {
