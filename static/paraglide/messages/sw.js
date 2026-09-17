@@ -314,10 +314,38 @@
 /** @typedef {{}} Nav_MenuInputs */
 /** @typedef {{}} Nav_NearbyInputs */
 /** @typedef {{}} Nav_SearchInputs */
+/** @typedef {{}} Nearby_AddInputs */
+/** @typedef {{}} Nearby_Choose_CityInputs */
+/** @typedef {{}} Nearby_Empty_BodyInputs */
+/** @typedef {{}} Nearby_Empty_TitleInputs */
+/** @typedef {{}} Nearby_FreshInputs */
+/** @typedef {{}} Nearby_LeadInputs */
+/** @typedef {{}} Nearby_Location_UnavailableInputs */
+/** @typedef {{}} Nearby_Need_City_BodyInputs */
+/** @typedef {{}} Nearby_Need_City_TitleInputs */
+/** @typedef {{}} Nearby_Official_GroupInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Nearby_Scope_CityInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Nearby_Scope_CountryInputs */
+/** @typedef {{}} Nearby_Scope_NoneInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Nearby_Scope_RadiusInputs */
+/** @typedef {{}} Nearby_Scope_WorldInputs */
+/** @typedef {{}} Nearby_Unknown_PlaceInputs */
 /** @typedef {{}} Notifications_TitleInputs */
 /** @typedef {{}} Notify_GenericInputs */
 /** @typedef {{}} Notify_New_MessageInputs */
 /** @typedef {{}} Notify_Open_ChatInputs */
+/** @typedef {{}} Place_Chip_ChooseInputs */
+/** @typedef {{}} Place_Chip_NearbyInputs */
+/** @typedef {{}} Place_Chip_WorldInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Place_ContinueInputs */
+/** @typedef {{}} Place_Selector_CloseInputs */
+/** @typedef {{}} Place_Selector_DeniedInputs */
+/** @typedef {{}} Place_Selector_GeographyInputs */
+/** @typedef {{}} Place_Selector_LocatingInputs */
+/** @typedef {{}} Place_Selector_No_MatchInputs */
+/** @typedef {{}} Place_Selector_RecentInputs */
+/** @typedef {{}} Place_Selector_SearchInputs */
+/** @typedef {{}} Place_Selector_TitleInputs */
 /** @typedef {{}} Profile_Login_WriteInputs */
 /** @typedef {{}} Profile_SettingsInputs */
 /** @typedef {{}} Profile_Settings_SoundInputs */
@@ -1597,6 +1625,70 @@ export const nav_search = /** @type {(inputs: Nav_SearchInputs) => LocalizedStri
 	return /** @type {LocalizedString} */ (`Tafuta`)
 };
 
+export const nearby_add = /** @type {(inputs: Nearby_AddInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ongeza kadi`)
+};
+
+export const nearby_choose_city = /** @type {(inputs: Nearby_Choose_CityInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Chagua mji`)
+};
+
+export const nearby_empty_body = /** @type {(inputs: Nearby_Empty_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Kuwa wa kwanza kuongeza kadi katika eneo hili.`)
+};
+
+export const nearby_empty_title = /** @type {(inputs: Nearby_Empty_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Bado hakuna kadi zilizochapishwa`)
+};
+
+export const nearby_fresh = /** @type {(inputs: Nearby_FreshInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Kadi mpya`)
+};
+
+export const nearby_lead = /** @type {(inputs: Nearby_LeadInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Tazama kadi zilizochapishwa karibu na mahali ulipochagua, kisha andika ndani ya GRABIT.`)
+};
+
+export const nearby_location_unavailable = /** @type {(inputs: Nearby_Location_UnavailableInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Mji wa karibu haukuweza kubainishwa kwa usalama. Chagua mahali mwenyewe.`)
+};
+
+export const nearby_need_city_body = /** @type {(inputs: Nearby_Need_City_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Bila mji, Karibu hubaki tupu. Hii si orodha ya dunia.`)
+};
+
+export const nearby_need_city_title = /** @type {(inputs: Nearby_Need_City_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Chagua mji`)
+};
+
+export const nearby_official_group = /** @type {(inputs: Nearby_Official_GroupInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Kundi rasmi`)
+};
+
+export const nearby_scope_city = /** @type {(inputs: Nearby_Scope_CityInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Kadi zilizochapishwa ${i?.name}`)
+};
+
+export const nearby_scope_country = /** @type {(inputs: Nearby_Scope_CountryInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Hakuna kadi zilizo karibu zaidi · tunaonyesha ${i?.name}`)
+};
+
+export const nearby_scope_none = /** @type {(inputs: Nearby_Scope_NoneInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Kwanza chagua mji. Kadi za dunia hazionyeshwi hapa.`)
+};
+
+export const nearby_scope_radius = /** @type {(inputs: Nearby_Scope_RadiusInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Bado hakuna kadi ${i?.name} · maeneo ndani ya km 100`)
+};
+
+export const nearby_scope_world = /** @type {(inputs: Nearby_Scope_WorldInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Kadi mpya zilizochapishwa duniani`)
+};
+
+export const nearby_unknown_place = /** @type {(inputs: Nearby_Unknown_PlaceInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Mahali hajaainishwa`)
+};
+
 export const notifications_title = /** @type {(inputs: Notifications_TitleInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Arifa`)
 };
@@ -1611,6 +1703,54 @@ export const notify_new_message = /** @type {(inputs: Notify_New_MessageInputs) 
 
 export const notify_open_chat = /** @type {(inputs: Notify_Open_ChatInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Fungua gumzo katika GRABIT.`)
+};
+
+export const place_chip_choose = /** @type {(inputs: Place_Chip_ChooseInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Chagua mahali`)
+};
+
+export const place_chip_nearby = /** @type {(inputs: Place_Chip_NearbyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Karibu nami`)
+};
+
+export const place_chip_world = /** @type {(inputs: Place_Chip_WorldInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Dunia nzima`)
+};
+
+export const place_continue = /** @type {(inputs: Place_ContinueInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Endelea ${i?.name}`)
+};
+
+export const place_selector_close = /** @type {(inputs: Place_Selector_CloseInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Funga`)
+};
+
+export const place_selector_denied = /** @type {(inputs: Place_Selector_DeniedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Mahali limezimwa. Unaweza kuchagua mahali mwenyewe.`)
+};
+
+export const place_selector_geography = /** @type {(inputs: Place_Selector_GeographyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Fungua jiografia kamili`)
+};
+
+export const place_selector_locating = /** @type {(inputs: Place_Selector_LocatingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Inatafuta mahali…`)
+};
+
+export const place_selector_no_match = /** @type {(inputs: Place_Selector_No_MatchInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Hakuna mahali ya hivi karibuni inayofanana. Fungua jiografia kamili.`)
+};
+
+export const place_selector_recent = /** @type {(inputs: Place_Selector_RecentInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Hivi karibuni`)
+};
+
+export const place_selector_search = /** @type {(inputs: Place_Selector_SearchInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Tafuta mji au nchi`)
+};
+
+export const place_selector_title = /** @type {(inputs: Place_Selector_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Mahali`)
 };
 
 export const profile_login_write = /** @type {(inputs: Profile_Login_WriteInputs) => LocalizedString} */ () => {

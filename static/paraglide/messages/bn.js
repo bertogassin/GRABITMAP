@@ -314,10 +314,38 @@
 /** @typedef {{}} Nav_MenuInputs */
 /** @typedef {{}} Nav_NearbyInputs */
 /** @typedef {{}} Nav_SearchInputs */
+/** @typedef {{}} Nearby_AddInputs */
+/** @typedef {{}} Nearby_Choose_CityInputs */
+/** @typedef {{}} Nearby_Empty_BodyInputs */
+/** @typedef {{}} Nearby_Empty_TitleInputs */
+/** @typedef {{}} Nearby_FreshInputs */
+/** @typedef {{}} Nearby_LeadInputs */
+/** @typedef {{}} Nearby_Location_UnavailableInputs */
+/** @typedef {{}} Nearby_Need_City_BodyInputs */
+/** @typedef {{}} Nearby_Need_City_TitleInputs */
+/** @typedef {{}} Nearby_Official_GroupInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Nearby_Scope_CityInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Nearby_Scope_CountryInputs */
+/** @typedef {{}} Nearby_Scope_NoneInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Nearby_Scope_RadiusInputs */
+/** @typedef {{}} Nearby_Scope_WorldInputs */
+/** @typedef {{}} Nearby_Unknown_PlaceInputs */
 /** @typedef {{}} Notifications_TitleInputs */
 /** @typedef {{}} Notify_GenericInputs */
 /** @typedef {{}} Notify_New_MessageInputs */
 /** @typedef {{}} Notify_Open_ChatInputs */
+/** @typedef {{}} Place_Chip_ChooseInputs */
+/** @typedef {{}} Place_Chip_NearbyInputs */
+/** @typedef {{}} Place_Chip_WorldInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Place_ContinueInputs */
+/** @typedef {{}} Place_Selector_CloseInputs */
+/** @typedef {{}} Place_Selector_DeniedInputs */
+/** @typedef {{}} Place_Selector_GeographyInputs */
+/** @typedef {{}} Place_Selector_LocatingInputs */
+/** @typedef {{}} Place_Selector_No_MatchInputs */
+/** @typedef {{}} Place_Selector_RecentInputs */
+/** @typedef {{}} Place_Selector_SearchInputs */
+/** @typedef {{}} Place_Selector_TitleInputs */
 /** @typedef {{}} Profile_Login_WriteInputs */
 /** @typedef {{}} Profile_SettingsInputs */
 /** @typedef {{}} Profile_Settings_SoundInputs */
@@ -1597,6 +1625,70 @@ export const nav_search = /** @type {(inputs: Nav_SearchInputs) => LocalizedStri
 	return /** @type {LocalizedString} */ (`অনুসন্ধান`)
 };
 
+export const nearby_add = /** @type {(inputs: Nearby_AddInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`কার্ড যোগ করুন`)
+};
+
+export const nearby_choose_city = /** @type {(inputs: Nearby_Choose_CityInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`শহর বেছে নিন`)
+};
+
+export const nearby_empty_body = /** @type {(inputs: Nearby_Empty_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`এই এলাকায় প্রথম কার্ড আপনি যোগ করুন।`)
+};
+
+export const nearby_empty_title = /** @type {(inputs: Nearby_Empty_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`এখনও কোনো প্রকাশিত কার্ড নেই`)
+};
+
+export const nearby_fresh = /** @type {(inputs: Nearby_FreshInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`নতুন কার্ড`)
+};
+
+export const nearby_lead = /** @type {(inputs: Nearby_LeadInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`বাছাই করা স্থানের কাছে প্রকাশিত কার্ড দেখুন এবং GRABIT-এ লিখুন।`)
+};
+
+export const nearby_location_unavailable = /** @type {(inputs: Nearby_Location_UnavailableInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`নিকটতম শহর নিরাপদে নির্ধারণ করা যায়নি। স্থান নিজে বেছে নিন।`)
+};
+
+export const nearby_need_city_body = /** @type {(inputs: Nearby_Need_City_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`শহর ছাড়া «কাছাকাছি» খালি থাকে। এটি বিশ্ব তালিকা নয়।`)
+};
+
+export const nearby_need_city_title = /** @type {(inputs: Nearby_Need_City_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`একটি শহর বেছে নিন`)
+};
+
+export const nearby_official_group = /** @type {(inputs: Nearby_Official_GroupInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`অফিসিয়াল গ্রুপ`)
+};
+
+export const nearby_scope_city = /** @type {(inputs: Nearby_Scope_CityInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`${i?.name}-এ প্রকাশিত কার্ড`)
+};
+
+export const nearby_scope_country = /** @type {(inputs: Nearby_Scope_CountryInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`কাছাকাছি কার্ড নেই · ${i?.name} দেখানো হচ্ছে`)
+};
+
+export const nearby_scope_none = /** @type {(inputs: Nearby_Scope_NoneInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`আগে একটি শহর বেছে নিন। বিশ্বব্যাপী কার্ড এখানে দেখানো হয় না।`)
+};
+
+export const nearby_scope_radius = /** @type {(inputs: Nearby_Scope_RadiusInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`${i?.name}-এ এখনও কার্ড নেই · ১০০ কিমির স্থান`)
+};
+
+export const nearby_scope_world = /** @type {(inputs: Nearby_Scope_WorldInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`বিশ্বের সর্বশেষ প্রকাশিত কার্ড`)
+};
+
+export const nearby_unknown_place = /** @type {(inputs: Nearby_Unknown_PlaceInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`স্থান উল্লেখ নেই`)
+};
+
 export const notifications_title = /** @type {(inputs: Notifications_TitleInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`বিজ্ঞপ্তি`)
 };
@@ -1611,6 +1703,54 @@ export const notify_new_message = /** @type {(inputs: Notify_New_MessageInputs) 
 
 export const notify_open_chat = /** @type {(inputs: Notify_Open_ChatInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`GRABIT-এ চ্যাট খুলুন।`)
+};
+
+export const place_chip_choose = /** @type {(inputs: Place_Chip_ChooseInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`স্থান বেছে নিন`)
+};
+
+export const place_chip_nearby = /** @type {(inputs: Place_Chip_NearbyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`আমার কাছে`)
+};
+
+export const place_chip_world = /** @type {(inputs: Place_Chip_WorldInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`সারা বিশ্ব`)
+};
+
+export const place_continue = /** @type {(inputs: Place_ContinueInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`${i?.name} চালিয়ে যান`)
+};
+
+export const place_selector_close = /** @type {(inputs: Place_Selector_CloseInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`বন্ধ করুন`)
+};
+
+export const place_selector_denied = /** @type {(inputs: Place_Selector_DeniedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`লোকেশন বন্ধ আছে। স্থান নিজে বেছে নিতে পারেন।`)
+};
+
+export const place_selector_geography = /** @type {(inputs: Place_Selector_GeographyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`পূর্ণ ভূগোল খুলুন`)
+};
+
+export const place_selector_locating = /** @type {(inputs: Place_Selector_LocatingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`স্থান খোঁজা হচ্ছে…`)
+};
+
+export const place_selector_no_match = /** @type {(inputs: Place_Selector_No_MatchInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`সাম্প্রতিক স্থানে মিল নেই। পূর্ণ ভূগোল খুলুন।`)
+};
+
+export const place_selector_recent = /** @type {(inputs: Place_Selector_RecentInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`সাম্প্রতিক`)
+};
+
+export const place_selector_search = /** @type {(inputs: Place_Selector_SearchInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`শহর বা দেশ খুঁজুন`)
+};
+
+export const place_selector_title = /** @type {(inputs: Place_Selector_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`স্থান`)
 };
 
 export const profile_login_write = /** @type {(inputs: Profile_Login_WriteInputs) => LocalizedString} */ () => {

@@ -314,10 +314,38 @@
 /** @typedef {{}} Nav_MenuInputs */
 /** @typedef {{}} Nav_NearbyInputs */
 /** @typedef {{}} Nav_SearchInputs */
+/** @typedef {{}} Nearby_AddInputs */
+/** @typedef {{}} Nearby_Choose_CityInputs */
+/** @typedef {{}} Nearby_Empty_BodyInputs */
+/** @typedef {{}} Nearby_Empty_TitleInputs */
+/** @typedef {{}} Nearby_FreshInputs */
+/** @typedef {{}} Nearby_LeadInputs */
+/** @typedef {{}} Nearby_Location_UnavailableInputs */
+/** @typedef {{}} Nearby_Need_City_BodyInputs */
+/** @typedef {{}} Nearby_Need_City_TitleInputs */
+/** @typedef {{}} Nearby_Official_GroupInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Nearby_Scope_CityInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Nearby_Scope_CountryInputs */
+/** @typedef {{}} Nearby_Scope_NoneInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Nearby_Scope_RadiusInputs */
+/** @typedef {{}} Nearby_Scope_WorldInputs */
+/** @typedef {{}} Nearby_Unknown_PlaceInputs */
 /** @typedef {{}} Notifications_TitleInputs */
 /** @typedef {{}} Notify_GenericInputs */
 /** @typedef {{}} Notify_New_MessageInputs */
 /** @typedef {{}} Notify_Open_ChatInputs */
+/** @typedef {{}} Place_Chip_ChooseInputs */
+/** @typedef {{}} Place_Chip_NearbyInputs */
+/** @typedef {{}} Place_Chip_WorldInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Place_ContinueInputs */
+/** @typedef {{}} Place_Selector_CloseInputs */
+/** @typedef {{}} Place_Selector_DeniedInputs */
+/** @typedef {{}} Place_Selector_GeographyInputs */
+/** @typedef {{}} Place_Selector_LocatingInputs */
+/** @typedef {{}} Place_Selector_No_MatchInputs */
+/** @typedef {{}} Place_Selector_RecentInputs */
+/** @typedef {{}} Place_Selector_SearchInputs */
+/** @typedef {{}} Place_Selector_TitleInputs */
 /** @typedef {{}} Profile_Login_WriteInputs */
 /** @typedef {{}} Profile_SettingsInputs */
 /** @typedef {{}} Profile_Settings_SoundInputs */
@@ -1597,6 +1625,70 @@ export const nav_search = /** @type {(inputs: Nav_SearchInputs) => LocalizedStri
 	return /** @type {LocalizedString} */ (`Zoeken`)
 };
 
+export const nearby_add = /** @type {(inputs: Nearby_AddInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Kaart toevoegen`)
+};
+
+export const nearby_choose_city = /** @type {(inputs: Nearby_Choose_CityInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Kies een stad`)
+};
+
+export const nearby_empty_body = /** @type {(inputs: Nearby_Empty_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Wees de eerste die hier een kaart toevoegt.`)
+};
+
+export const nearby_empty_title = /** @type {(inputs: Nearby_Empty_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Nog geen gepubliceerde kaarten`)
+};
+
+export const nearby_fresh = /** @type {(inputs: Nearby_FreshInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Nieuwe kaarten`)
+};
+
+export const nearby_lead = /** @type {(inputs: Nearby_LeadInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Bekijk gepubliceerde kaarten bij de gekozen plek en schrijf in GRABIT.`)
+};
+
+export const nearby_location_unavailable = /** @type {(inputs: Nearby_Location_UnavailableInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`De dichtstbijzijnde stad kon niet veilig worden bepaald. Kies zelf een plaats.`)
+};
+
+export const nearby_need_city_body = /** @type {(inputs: Nearby_Need_City_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Zonder stad blijft Dichtbij leeg. Dit is geen wereldwijde lijst.`)
+};
+
+export const nearby_need_city_title = /** @type {(inputs: Nearby_Need_City_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Kies een stad`)
+};
+
+export const nearby_official_group = /** @type {(inputs: Nearby_Official_GroupInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Officiële groep`)
+};
+
+export const nearby_scope_city = /** @type {(inputs: Nearby_Scope_CityInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Gepubliceerde kaarten in ${i?.name}`)
+};
+
+export const nearby_scope_country = /** @type {(inputs: Nearby_Scope_CountryInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Geen dichtere kaarten · ${i?.name} wordt getoond`)
+};
+
+export const nearby_scope_none = /** @type {(inputs: Nearby_Scope_NoneInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Kies eerst een stad. Wereldwijde kaarten worden hier niet getoond.`)
+};
+
+export const nearby_scope_radius = /** @type {(inputs: Nearby_Scope_RadiusInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Nog geen kaarten in ${i?.name} · plaatsen binnen 100 km`)
+};
+
+export const nearby_scope_world = /** @type {(inputs: Nearby_Scope_WorldInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Nieuwste gepubliceerde kaarten wereldwijd`)
+};
+
+export const nearby_unknown_place = /** @type {(inputs: Nearby_Unknown_PlaceInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Plaats niet opgegeven`)
+};
+
 export const notifications_title = /** @type {(inputs: Notifications_TitleInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Meldingen`)
 };
@@ -1611,6 +1703,54 @@ export const notify_new_message = /** @type {(inputs: Notify_New_MessageInputs) 
 
 export const notify_open_chat = /** @type {(inputs: Notify_Open_ChatInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Open de chat in GRABIT.`)
+};
+
+export const place_chip_choose = /** @type {(inputs: Place_Chip_ChooseInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Kies een plek`)
+};
+
+export const place_chip_nearby = /** @type {(inputs: Place_Chip_NearbyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Dichtbij mij`)
+};
+
+export const place_chip_world = /** @type {(inputs: Place_Chip_WorldInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Hele wereld`)
+};
+
+export const place_continue = /** @type {(inputs: Place_ContinueInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Doorgaan met ${i?.name}`)
+};
+
+export const place_selector_close = /** @type {(inputs: Place_Selector_CloseInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Sluiten`)
+};
+
+export const place_selector_denied = /** @type {(inputs: Place_Selector_DeniedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Locatie is uit. U kunt handmatig een plek kiezen.`)
+};
+
+export const place_selector_geography = /** @type {(inputs: Place_Selector_GeographyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Volledige geografie openen`)
+};
+
+export const place_selector_locating = /** @type {(inputs: Place_Selector_LocatingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Plek zoeken…`)
+};
+
+export const place_selector_no_match = /** @type {(inputs: Place_Selector_No_MatchInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Geen recente plek gevonden. Open de volledige geografie.`)
+};
+
+export const place_selector_recent = /** @type {(inputs: Place_Selector_RecentInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Recent`)
+};
+
+export const place_selector_search = /** @type {(inputs: Place_Selector_SearchInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Zoek stad of land`)
+};
+
+export const place_selector_title = /** @type {(inputs: Place_Selector_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Plek`)
 };
 
 export const profile_login_write = /** @type {(inputs: Profile_Login_WriteInputs) => LocalizedString} */ () => {

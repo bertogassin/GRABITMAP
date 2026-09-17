@@ -349,5 +349,21 @@
   "place_selector_denied": "لوکیشن بند ہے۔ جگہ خود منتخب کر سکتے ہیں۔",
   "place_selector_locating": "جگہ معلوم کی جا رہی ہے…",
   "place_selector_no_match": "حالیہ جگہوں میں مشابہ نہیں۔ مکمل جغرافیہ کھولیں۔",
-  "place_continue": "{name} جاری رکھیں"
+  "place_continue": "{name} جاری رکھیں",
+  "nearby_scope_city": "{name} میں شائع شدہ کارڈز",
+  "nearby_scope_radius": "{name} میں ابھی کارڈ نہیں · 100 کلومیٹر کے اندر مقامات",
+  "nearby_scope_country": "قریب تر کارڈ نہیں · {name} دکھایا جا رہا ہے",
+  "nearby_scope_world": "دنیا بھر کے تازہ شائع شدہ کارڈز",
+  "nearby_official_group": "سرکاری گروپ",
+  "nearby_empty_title": "ابھی کوئی شائع شدہ کارڈ نہیں",
+  "nearby_empty_body": "اس علاقے میں پہلا کارڈ آپ شامل کریں۔",
+  "nearby_add": "کارڈ شامل کریں",
+  "nearby_fresh": "تازہ کارڈز",
+  "nearby_choose_city": "شہر منتخب کریں",
+  "nearby_lead": "منتخب مقام کے قریب شائع کارڈ دیکھیں اور GRABIT میں لکھیں۔",
+  "nearby_unknown_place": "مقام درج نہیں",
+  "nearby_scope_none": "پہلے شہر منتخب کریں۔ عالمی کارڈ یہاں نہیں دکھاتے۔",
+  "nearby_need_city_title": "شہر منتخب کریں",
+  "nearby_need_city_body": "شہر کے بغیر «قریب» خالی رہتی ہے۔ یہ عالمی فہرست نہیں۔",
+  "nearby_location_unavailable": "قریب ترین شہر محفوظ طریقے سے معلوم نہیں ہو سکا۔ مقام خود منتخب کریں۔"
 }

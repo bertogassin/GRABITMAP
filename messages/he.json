@@ -349,5 +349,21 @@
   "place_selector_denied": "המיקום כבוי. אפשר לבחור מקום ידנית.",
   "place_selector_locating": "מחפשים מיקום…",
   "place_selector_no_match": "אין מקום אחרון תואם. פתחו את כל הגיאוגרפיה.",
-  "place_continue": "המשיכו ב-{name}"
+  "place_continue": "המשיכו ב-{name}",
+  "nearby_scope_city": "כרטיסים מפורסמים ב{name}",
+  "nearby_scope_radius": "אין כרטיסים ב{name} · מקומות בטווח 100 ק״מ",
+  "nearby_scope_country": "אין כרטיסים קרובים יותר · מוצג {name}",
+  "nearby_scope_world": "הכרטיסים האחרונים שפורסמו בעולם",
+  "nearby_official_group": "קבוצה רשמית",
+  "nearby_empty_title": "עדיין אין כרטיסים מפורסמים",
+  "nearby_empty_body": "היו הראשונים להוסיף כרטיס באזור הזה.",
+  "nearby_add": "הוסף כרטיס",
+  "nearby_fresh": "כרטיסים חדשים",
+  "nearby_choose_city": "בחר עיר",
+  "nearby_lead": "ראו כרטיסים מפורסמים ליד המקום שנבחר וכתבו ב-GRABIT.",
+  "nearby_unknown_place": "המקום לא צוין",
+  "nearby_scope_none": "בחרו תחילה עיר. כרטיסים עולמיים לא מוצגים כאן.",
+  "nearby_need_city_title": "בחרו עיר",
+  "nearby_need_city_body": "בלי עיר הזנה «בקרבת מקום» נשארת ריקה. זו לא רשימה עולמית.",
+  "nearby_location_unavailable": "לא ניתן לקבוע בבטחה את העיר הקרובה. בחרו מקום בעצמכם."
 }

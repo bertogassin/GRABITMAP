@@ -314,10 +314,38 @@
 /** @typedef {{}} Nav_MenuInputs */
 /** @typedef {{}} Nav_NearbyInputs */
 /** @typedef {{}} Nav_SearchInputs */
+/** @typedef {{}} Nearby_AddInputs */
+/** @typedef {{}} Nearby_Choose_CityInputs */
+/** @typedef {{}} Nearby_Empty_BodyInputs */
+/** @typedef {{}} Nearby_Empty_TitleInputs */
+/** @typedef {{}} Nearby_FreshInputs */
+/** @typedef {{}} Nearby_LeadInputs */
+/** @typedef {{}} Nearby_Location_UnavailableInputs */
+/** @typedef {{}} Nearby_Need_City_BodyInputs */
+/** @typedef {{}} Nearby_Need_City_TitleInputs */
+/** @typedef {{}} Nearby_Official_GroupInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Nearby_Scope_CityInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Nearby_Scope_CountryInputs */
+/** @typedef {{}} Nearby_Scope_NoneInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Nearby_Scope_RadiusInputs */
+/** @typedef {{}} Nearby_Scope_WorldInputs */
+/** @typedef {{}} Nearby_Unknown_PlaceInputs */
 /** @typedef {{}} Notifications_TitleInputs */
 /** @typedef {{}} Notify_GenericInputs */
 /** @typedef {{}} Notify_New_MessageInputs */
 /** @typedef {{}} Notify_Open_ChatInputs */
+/** @typedef {{}} Place_Chip_ChooseInputs */
+/** @typedef {{}} Place_Chip_NearbyInputs */
+/** @typedef {{}} Place_Chip_WorldInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Place_ContinueInputs */
+/** @typedef {{}} Place_Selector_CloseInputs */
+/** @typedef {{}} Place_Selector_DeniedInputs */
+/** @typedef {{}} Place_Selector_GeographyInputs */
+/** @typedef {{}} Place_Selector_LocatingInputs */
+/** @typedef {{}} Place_Selector_No_MatchInputs */
+/** @typedef {{}} Place_Selector_RecentInputs */
+/** @typedef {{}} Place_Selector_SearchInputs */
+/** @typedef {{}} Place_Selector_TitleInputs */
 /** @typedef {{}} Profile_Login_WriteInputs */
 /** @typedef {{}} Profile_SettingsInputs */
 /** @typedef {{}} Profile_Settings_SoundInputs */
@@ -1597,6 +1625,70 @@ export const nav_search = /** @type {(inputs: Nav_SearchInputs) => LocalizedStri
 	return /** @type {LocalizedString} */ (`Search`)
 };
 
+export const nearby_add = /** @type {(inputs: Nearby_AddInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Add a card`)
+};
+
+export const nearby_choose_city = /** @type {(inputs: Nearby_Choose_CityInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Choose a city`)
+};
+
+export const nearby_empty_body = /** @type {(inputs: Nearby_Empty_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Be the first to add a card in this area.`)
+};
+
+export const nearby_empty_title = /** @type {(inputs: Nearby_Empty_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`No published cards yet`)
+};
+
+export const nearby_fresh = /** @type {(inputs: Nearby_FreshInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Fresh cards`)
+};
+
+export const nearby_lead = /** @type {(inputs: Nearby_LeadInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`See published cards near the place you chose, then write inside GRABIT.`)
+};
+
+export const nearby_location_unavailable = /** @type {(inputs: Nearby_Location_UnavailableInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`A nearest city could not be determined safely. Choose a place yourself.`)
+};
+
+export const nearby_need_city_body = /** @type {(inputs: Nearby_Need_City_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`The Nearby feed stays empty until a city is chosen. This is not a worldwide feed.`)
+};
+
+export const nearby_need_city_title = /** @type {(inputs: Nearby_Need_City_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Choose a city`)
+};
+
+export const nearby_official_group = /** @type {(inputs: Nearby_Official_GroupInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Official group`)
+};
+
+export const nearby_scope_city = /** @type {(inputs: Nearby_Scope_CityInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Published cards in ${i?.name}`)
+};
+
+export const nearby_scope_country = /** @type {(inputs: Nearby_Scope_CountryInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`No closer cards yet · showing ${i?.name}`)
+};
+
+export const nearby_scope_none = /** @type {(inputs: Nearby_Scope_NoneInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Choose a city first. Worldwide cards are not shown here.`)
+};
+
+export const nearby_scope_radius = /** @type {(inputs: Nearby_Scope_RadiusInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`No cards in ${i?.name} yet · showing places within 100 km`)
+};
+
+export const nearby_scope_world = /** @type {(inputs: Nearby_Scope_WorldInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Latest published cards worldwide`)
+};
+
+export const nearby_unknown_place = /** @type {(inputs: Nearby_Unknown_PlaceInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Place not specified`)
+};
+
 export const notifications_title = /** @type {(inputs: Notifications_TitleInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Notifications`)
 };
@@ -1611,6 +1703,54 @@ export const notify_new_message = /** @type {(inputs: Notify_New_MessageInputs) 
 
 export const notify_open_chat = /** @type {(inputs: Notify_Open_ChatInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Open the chat in GRABIT.`)
+};
+
+export const place_chip_choose = /** @type {(inputs: Place_Chip_ChooseInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Choose a place`)
+};
+
+export const place_chip_nearby = /** @type {(inputs: Place_Chip_NearbyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Near me`)
+};
+
+export const place_chip_world = /** @type {(inputs: Place_Chip_WorldInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Worldwide`)
+};
+
+export const place_continue = /** @type {(inputs: Place_ContinueInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Continue ${i?.name}`)
+};
+
+export const place_selector_close = /** @type {(inputs: Place_Selector_CloseInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Close`)
+};
+
+export const place_selector_denied = /** @type {(inputs: Place_Selector_DeniedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Location is off. You can choose a place manually.`)
+};
+
+export const place_selector_geography = /** @type {(inputs: Place_Selector_GeographyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Open full geography`)
+};
+
+export const place_selector_locating = /** @type {(inputs: Place_Selector_LocatingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Finding your place…`)
+};
+
+export const place_selector_no_match = /** @type {(inputs: Place_Selector_No_MatchInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`No matching recent place. Open full geography.`)
+};
+
+export const place_selector_recent = /** @type {(inputs: Place_Selector_RecentInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Recent`)
+};
+
+export const place_selector_search = /** @type {(inputs: Place_Selector_SearchInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Search city or country`)
+};
+
+export const place_selector_title = /** @type {(inputs: Place_Selector_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Place`)
 };
 
 export const profile_login_write = /** @type {(inputs: Profile_Login_WriteInputs) => LocalizedString} */ () => {

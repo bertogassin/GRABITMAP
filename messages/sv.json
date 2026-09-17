@@ -349,5 +349,21 @@
   "place_selector_denied": "Plats är av. Du kan välja plats manuellt.",
   "place_selector_locating": "Letar plats…",
   "place_selector_no_match": "Ingen matchande senaste plats. Öppna hela geografins.",
-  "place_continue": "Fortsätt {name}"
+  "place_continue": "Fortsätt {name}",
+  "nearby_scope_city": "Publicerade kort i {name}",
+  "nearby_scope_radius": "Inga kort i {name} ännu · platser inom 100 km",
+  "nearby_scope_country": "Inga närmare kort · visar {name}",
+  "nearby_scope_world": "Senaste publicerade korten i världen",
+  "nearby_official_group": "Officiell grupp",
+  "nearby_empty_title": "Inga publicerade kort ännu",
+  "nearby_empty_body": "Bli först med att lägga till ett kort här.",
+  "nearby_add": "Lägg till kort",
+  "nearby_fresh": "Nya kort",
+  "nearby_choose_city": "Välj en stad",
+  "nearby_lead": "Se publicerade kort nära den valda platsen och skriv i GRABIT.",
+  "nearby_unknown_place": "Plats inte angiven",
+  "nearby_scope_none": "Välj en stad först. Världskort visas inte här.",
+  "nearby_need_city_title": "Välj en stad",
+  "nearby_need_city_body": "Utan stad förblir I närheten tomt. Detta är inte en världslista.",
+  "nearby_location_unavailable": "Närmaste stad kunde inte fastställas säkert. Välj en plats själv."
 }

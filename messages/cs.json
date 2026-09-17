@@ -349,5 +349,21 @@
   "place_selector_denied": "Poloha je vypnutá. Místo můžete vybrat ručně.",
   "place_selector_locating": "Hledáme místo…",
   "place_selector_no_match": "V nedávných místech nic není. Otevřete celou geografii.",
-  "place_continue": "Pokračovat {name}"
+  "place_continue": "Pokračovat {name}",
+  "nearby_scope_city": "Zveřejněné karty v {name}",
+  "nearby_scope_radius": "V {name} zatím nejsou karty · místa do 100 km",
+  "nearby_scope_country": "Žádné bližší karty · zobrazujeme {name}",
+  "nearby_scope_world": "Nejnovější zveřejněné karty ve světě",
+  "nearby_official_group": "Oficiální skupina",
+  "nearby_empty_title": "Zatím žádné zveřejněné karty",
+  "nearby_empty_body": "Buďte první, kdo sem přidá kartu.",
+  "nearby_add": "Přidat kartu",
+  "nearby_fresh": "Nové karty",
+  "nearby_choose_city": "Vybrat město",
+  "nearby_lead": "Prohlédněte si zveřejněné karty u zvoleného místa a pište v GRABIT.",
+  "nearby_unknown_place": "Místo neuvedeno",
+  "nearby_scope_none": "Nejprve vyberte město. Světové karty se zde nezobrazují.",
+  "nearby_need_city_title": "Vyberte město",
+  "nearby_need_city_body": "Bez města zůstane V okolí prázdné. Toto není světový výpis.",
+  "nearby_location_unavailable": "Nejbližší město nelze bezpečně určit. Vyberte místo sami."
 }

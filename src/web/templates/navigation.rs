@@ -214,6 +214,249 @@ fn build_home_explore_index(
 // LUCIDE SVG
 // ============================================================
 
+pub fn render_nearby(
+    city_id: Option<i64>,
+    city_name: Option<&str>,
+    country_name: Option<&str>,
+    scope: &str,
+    resources: Vec<crate::web::view_models::SearchResourceRow>,
+    official_group_href: Option<&str>,
+    guest_mode: bool,
+) -> String {
+    let guest_hint = if guest_mode {
+        guest_mode_hint("/app")
+    } else {
+        String::new()
+    };
+    let place_label = city_name
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+        .unwrap_or("");
+    let title = if place_label.is_empty() {
+        crate::i18n::t("nav_nearby")
+    } else {
+        place_label.to_string()
+    };
+    let scope_copy = match scope {
+        "city" => crate::i18n::tf("nearby_scope_city", &[("name", place_label)]),
+        "radius" => crate::i18n::tf("nearby_scope_radius", &[("name", place_label)]),
+        "country" => crate::i18n::tf(
+            "nearby_scope_country",
+            &[("name", country_name.unwrap_or(place_label))],
+        ),
+        _ => crate::i18n::t("nearby_scope_none"),
+    };
+    let official = official_group_href
+        .filter(|href| href.starts_with("/app/official-groups?"))
+        .map(|href| {
+            navigation_card(
+                href,
+                "users",
+                &crate::i18n::t("nearby_official_group"),
+                place_label,
+            )
+        })
+        .unwrap_or_default();
+    let cards = render_resource_cards(&resources);
+    let listing_block = if resources.is_empty() {
+        let (empty_title, empty_body) = if place_label.is_empty() {
+            (
+                crate::i18n::t("nearby_need_city_title"),
+                crate::i18n::t("nearby_need_city_body"),
+            )
+        } else {
+            (
+                crate::i18n::t("nearby_empty_title"),
+                crate::i18n::t("nearby_empty_body"),
+            )
+        };
+        empty_state_card_with_actions(
+            &empty_title,
+            &empty_body,
+            &format!(
+                "{}{}",
+                empty_state_action("/app/search", &crate::i18n::t("nav_search")),
+                empty_state_action(
+                    &city_id
+                        .map(|id| format!("/app/add/city/{id}"))
+                        .unwrap_or_else(|| "/app/add".to_string()),
+                    &crate::i18n::t("nearby_add"),
+                ),
+            ),
+        )
+    } else {
+        let caption = if resources.len() < 20 {
+            crate::i18n::t("nearby_fresh")
+        } else {
+            crate::i18n::tf("map_n_listings", &[("n", &resources.len().to_string())])
+        };
+        format!(
+            "{head}<section>{cards}</section>",
+            head = section_head(&crate::i18n::t("nearby_fresh"), &caption, Some(24)),
+            cards = cards,
+        )
+    };
+    let actions = format!(
+        r#"<div class="grid">
+    {choose}
+    {geography}
+</div>
+<div id="rm-last-city-home" class="grid rm-continue-home" hidden></div>"#,
+        choose = navigation_card(
+            "#",
+            "map-pin",
+            &crate::i18n::t("nearby_choose_city"),
+            &crate::i18n::t("place_chip_choose"),
+        )
+        .replace("href=\"#\"", "href=\"#\" data-place-open"),
+        geography = navigation_card(
+            "/app/map",
+            "globe",
+            &crate::i18n::t("place_selector_geography"),
+            &crate::i18n::t("map_continents"),
+        ),
+    );
+    let hero = format!(
+        r#"<section class="hero">
+    <div class="eyebrow">{icon} {eyebrow}</div>
+    <h1>{title}</h1>
+    <p>{lead}</p>
+    <p class="card-meta" data-nearby-scope="{scope}">{scope_copy}</p>
+    {guest_hint}
+</section>"#,
+        icon = icon("map"),
+        eyebrow = crate::i18n::t("nav_nearby"),
+        title = escape_html(&title),
+        lead = crate::i18n::t("nearby_lead"),
+        scope = escape_html(scope),
+        scope_copy = escape_html(&scope_copy),
+        guest_hint = guest_hint,
+    );
+    let canonical = r#"<link rel="canonical" href="https://grabitmap.com/app">"#;
+    let choose_label = crate::i18n::t("place_chip_choose");
+    let mut chrome = topbar(&crate::i18n::t("nav_nearby"), "map");
+    if !place_label.is_empty() {
+        let city_token = city_id.unwrap_or(0);
+        let name = escape_html(place_label);
+        chrome = chrome.replace(
+            &format!(
+                "id=\"rm-place-chip-label\" class=\"rm-place-chip-label\">{choose}</span>",
+                choose = escape_html(&choose_label)
+            ),
+            &format!(
+                "id=\"rm-place-chip-label\" class=\"rm-place-chip-label\" data-place-city-id=\"{city_token}\" data-place-city-name=\"{name}\">{name}</span>"
+            ),
+        );
+    }
+    let selected = format!(
+        r#"<div id="rm-nearby-selected-place" hidden data-city-id="{city_id}" data-city-name="{city_name}"></div>"#,
+        city_id = city_id.unwrap_or(0),
+        city_name = escape_html(place_label),
+    );
+    page_document(
+        &format!("GRABIT · {}", crate::i18n::t("nav_nearby")),
+        canonical,
+        "",
+        &format!(
+            "{}{}{}{}{}{}",
+            chrome, selected, hero, official, listing_block, actions,
+        ),
+        &bottom_nav("map"),
+        "",
+    )
+}
+
+fn render_resource_cards(resources: &[crate::web::view_models::SearchResourceRow]) -> String {
+    let world_data = world();
+    resources
+        .iter()
+        .map(
+            |(
+                id,
+                title,
+                category,
+                description,
+                address,
+                rating,
+                votes,
+                verified,
+                premium,
+                ci,
+                si,
+                zi,
+                listing_type,
+                rubric,
+                owner_public_id,
+                owner_user_id,
+            )| {
+                let location = world_data
+                    .iter()
+                    .nth(*ci)
+                    .and_then(|(_, countries)| {
+                        countries.iter().nth(*si).and_then(|(country, cities)| {
+                            cities
+                                .get(*zi)
+                                .map(|city| format!("{} · {}", city, country))
+                        })
+                    })
+                    .unwrap_or_else(|| crate::i18n::t("nearby_unknown_place"));
+                let category_line = {
+                    let base = if is_generic_profession_key(rubric) {
+                        profession_label(category)
+                    } else {
+                        profession_label(rubric)
+                    };
+                    match listing_type.as_str() {
+                        "seeker" | "offer" => {
+                            format!("{} · {}", base, resource_listing_label(listing_type))
+                        }
+                        _ => base,
+                    }
+                };
+                let description_preview = {
+                    let trimmed = description.trim();
+                    let mut chars = trimmed.chars();
+                    let preview: String = chars.by_ref().take(140).collect();
+                    if chars.next().is_some() {
+                        format!("{preview}…")
+                    } else {
+                        preview
+                    }
+                };
+                let premium_badge = if *premium != 0 {
+                    premium_badge_html("default")
+                } else {
+                    String::new()
+                };
+                let verified_badge = if *verified != 0 {
+                    verified_badge_html(true)
+                } else {
+                    String::new()
+                };
+                let write_href = if *owner_user_id > 0 && !owner_public_id.is_empty() {
+                    format!("/app/chat/{}", urlencoding::encode(owner_public_id))
+                } else {
+                    String::new()
+                };
+                resource_result_card(crate::web::templates::common::ResourceResultCardParams {
+                    href: &format!("/app/listing/{id}"),
+                    title_html: &escape_html(title),
+                    category_html: &escape_html(&category_line),
+                    description_html: &escape_html(&description_preview),
+                    rating: *rating,
+                    votes: *votes,
+                    location_html: &escape_html(&location),
+                    address_html: &escape_html(address),
+                    premium_badge_html: &premium_badge,
+                    verified_badge_html: &verified_badge,
+                    write_href: &write_href,
+                })
+            },
+        )
+        .collect::<Vec<_>>()
+        .join("")
+}
+
 pub fn render_geo_root(
     users_count: i64,
     online_count: i64,
@@ -336,7 +579,7 @@ pub fn render_geo_continent(
     let content = format!(
         r#"{back}{head}{search}<div class="grid" id="rm-map-country-grid">{cards}</div><div class="rm-catalog-search-status" id="rm-map-country-status" aria-live="polite"></div><script src="{script}" defer></script>"#,
         back = back_navigation_card(
-            "/app",
+            "/app/map",
             &crate::i18n::t("map_all_continents"),
             &crate::i18n::t("map_back_to_map"),
         ),
@@ -1969,6 +2212,39 @@ mod search_catalog_tests {
         assert!(html.contains("/app/search?kind=workers"));
         assert!(html.contains("/app/search?kind=business"));
         assert!(!html.contains(">Города<"));
+    }
+
+    #[test]
+    fn nearby_app_is_not_continent_first() {
+        let empty = render_nearby(None, None, None, "none", Vec::new(), None, true);
+        assert!(empty.contains("rel=\"canonical\" href=\"https://grabitmap.com/app\""));
+        assert!(empty.contains("data-nearby-scope=\"none\""));
+        assert!(empty.contains("id=\"rm-place-chip\""));
+        assert!(empty.contains("id=\"rm-last-city-home\""));
+        assert!(empty.contains("href=\"/app/map\""));
+        assert!(!empty.contains("aria-label=\"Континенты\"") && !empty.contains("rm-map-grid"));
+        assert!(empty.contains("data-nav-nearby-link"));
+        assert!(empty.contains("rm-guest-hint"));
+
+        let city = render_nearby(
+            Some(7),
+            Some("Лион"),
+            Some("Франция"),
+            "city",
+            Vec::new(),
+            Some("/app/official-groups?scope_type=city&scope_id=7"),
+            false,
+        );
+        assert!(city.contains("data-nearby-scope=\"city\""));
+        assert!(city.contains("Лион"));
+        assert!(city.contains("data-place-city-id=\"7\""));
+        assert!(city.contains("data-place-city-name=\"Лион\""));
+        assert!(
+            city.contains("/app/official-groups?scope_type=city&amp;scope_id=7")
+                || city.contains("/app/official-groups?scope_type=city&scope_id=7")
+        );
+        assert!(city.contains("/app/add/city/7"));
+        assert!(!city.contains("user_id="));
     }
 
     #[test]

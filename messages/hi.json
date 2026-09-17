@@ -349,5 +349,21 @@
   "place_selector_denied": "लोकेशन बंद है। जगह खुद चुन सकते हैं।",
   "place_selector_locating": "जगह खोजी जा रही है…",
   "place_selector_no_match": "हाल की जगहों में मेल नहीं मिला। पूरी भूगोल खोलें।",
-  "place_continue": "{name} जारी रखें"
+  "place_continue": "{name} जारी रखें",
+  "nearby_scope_city": "{name} में प्रकाशित कार्ड",
+  "nearby_scope_radius": "{name} में अभी कार्ड नहीं · 100 किमी के स्थान",
+  "nearby_scope_country": "कोई नज़दीकी कार्ड नहीं · {name} दिखा रहे हैं",
+  "nearby_scope_world": "दुनिया के ताज़ा प्रकाशित कार्ड",
+  "nearby_official_group": "आधिकारिक समूह",
+  "nearby_empty_title": "अभी कोई प्रकाशित कार्ड नहीं",
+  "nearby_empty_body": "इस क्षेत्र में पहला कार्ड आप जोड़ें।",
+  "nearby_add": "कार्ड जोड़ें",
+  "nearby_fresh": "नए कार्ड",
+  "nearby_choose_city": "शहर चुनें",
+  "nearby_lead": "चुने हुए स्थान के पास प्रकाशित कार्ड देखें और GRABIT में लिखें।",
+  "nearby_unknown_place": "स्थान नहीं बताया गया",
+  "nearby_scope_none": "पहले शहर चुनें। विश्व कार्ड यहाँ नहीं दिखते।",
+  "nearby_need_city_title": "शहर चुनें",
+  "nearby_need_city_body": "शहर के बिना «आस-पास» खाली रहता है। यह विश्व सूची नहीं है।",
+  "nearby_location_unavailable": "निकटतम शहर सुरक्षित रूप से तय नहीं हो सका। स्थान स्वयं चुनें।"
 }

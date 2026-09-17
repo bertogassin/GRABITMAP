@@ -349,5 +349,21 @@
   "place_selector_denied": "La localisation est désactivée. Vous pouvez choisir un lieu manuellement.",
   "place_selector_locating": "Recherche du lieu…",
   "place_selector_no_match": "Aucun lieu récent correspondant. Ouvrez toute la géographie.",
-  "place_continue": "Continuer {name}"
+  "place_continue": "Continuer {name}",
+  "nearby_scope_city": "Fiches publiées à {name}",
+  "nearby_scope_radius": "Pas encore de fiches à {name} · lieux dans un rayon de 100 km",
+  "nearby_scope_country": "Pas de fiches plus proches · affichage de {name}",
+  "nearby_scope_world": "Dernières fiches publiées dans le monde",
+  "nearby_official_group": "Groupe officiel",
+  "nearby_empty_title": "Pas encore de fiches publiées",
+  "nearby_empty_body": "Soyez le premier à ajouter une fiche dans cette zone.",
+  "nearby_add": "Ajouter une fiche",
+  "nearby_fresh": "Fiches récentes",
+  "nearby_choose_city": "Choisir une ville",
+  "nearby_lead": "Voyez les fiches publiées près du lieu choisi, puis écrivez dans GRABIT.",
+  "nearby_unknown_place": "Lieu non précisé",
+  "nearby_scope_none": "Choisissez d’abord une ville. Les fiches mondiales ne s’affichent pas ici.",
+  "nearby_need_city_title": "Choisissez une ville",
+  "nearby_need_city_body": "Sans ville, le fil « À proximité » reste vide. Ce n’est pas un fil mondial.",
+  "nearby_location_unavailable": "Impossible de déterminer la ville la plus proche en toute sécurité. Choisissez un lieu vous-même."
 }

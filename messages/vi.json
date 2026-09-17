@@ -349,5 +349,21 @@
   "place_selector_denied": "Vị trí đang tắt. Bạn có thể chọn nơi thủ công.",
   "place_selector_locating": "Đang tìm vị trí…",
   "place_selector_no_match": "Không có nơi gần đây phù hợp. Mở địa lý đầy đủ.",
-  "place_continue": "Tiếp tục {name}"
+  "place_continue": "Tiếp tục {name}",
+  "nearby_scope_city": "Thẻ đã đăng tại {name}",
+  "nearby_scope_radius": "Chưa có thẻ tại {name} · địa điểm trong 100 km",
+  "nearby_scope_country": "Không có thẻ gần hơn · đang hiện {name}",
+  "nearby_scope_world": "Thẻ mới đăng trên toàn thế giới",
+  "nearby_official_group": "Nhóm chính thức",
+  "nearby_empty_title": "Chưa có thẻ đã đăng",
+  "nearby_empty_body": "Hãy là người đầu tiên thêm thẻ tại khu vực này.",
+  "nearby_add": "Thêm thẻ",
+  "nearby_fresh": "Thẻ mới",
+  "nearby_choose_city": "Chọn thành phố",
+  "nearby_lead": "Xem các thẻ đã đăng gần nơi đã chọn rồi nhắn trong GRABIT.",
+  "nearby_unknown_place": "Chưa nêu địa điểm",
+  "nearby_scope_none": "Hãy chọn thành phố trước. Thẻ toàn cầu không hiện ở đây.",
+  "nearby_need_city_title": "Chọn thành phố",
+  "nearby_need_city_body": "Chưa chọn thành phố thì Gần đây để trống. Đây không phải danh sách toàn cầu.",
+  "nearby_location_unavailable": "Không xác định an toàn được thành phố gần nhất. Hãy tự chọn nơi."
 }

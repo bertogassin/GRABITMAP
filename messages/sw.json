@@ -349,5 +349,21 @@
   "place_selector_denied": "Mahali limezimwa. Unaweza kuchagua mahali mwenyewe.",
   "place_selector_locating": "Inatafuta mahali…",
   "place_selector_no_match": "Hakuna mahali ya hivi karibuni inayofanana. Fungua jiografia kamili.",
-  "place_continue": "Endelea {name}"
+  "place_continue": "Endelea {name}",
+  "nearby_scope_city": "Kadi zilizochapishwa {name}",
+  "nearby_scope_radius": "Bado hakuna kadi {name} · maeneo ndani ya km 100",
+  "nearby_scope_country": "Hakuna kadi zilizo karibu zaidi · tunaonyesha {name}",
+  "nearby_scope_world": "Kadi mpya zilizochapishwa duniani",
+  "nearby_official_group": "Kundi rasmi",
+  "nearby_empty_title": "Bado hakuna kadi zilizochapishwa",
+  "nearby_empty_body": "Kuwa wa kwanza kuongeza kadi katika eneo hili.",
+  "nearby_add": "Ongeza kadi",
+  "nearby_fresh": "Kadi mpya",
+  "nearby_choose_city": "Chagua mji",
+  "nearby_lead": "Tazama kadi zilizochapishwa karibu na mahali ulipochagua, kisha andika ndani ya GRABIT.",
+  "nearby_unknown_place": "Mahali hajaainishwa",
+  "nearby_scope_none": "Kwanza chagua mji. Kadi za dunia hazionyeshwi hapa.",
+  "nearby_need_city_title": "Chagua mji",
+  "nearby_need_city_body": "Bila mji, Karibu hubaki tupu. Hii si orodha ya dunia.",
+  "nearby_location_unavailable": "Mji wa karibu haukuweza kubainishwa kwa usalama. Chagua mahali mwenyewe."
 }

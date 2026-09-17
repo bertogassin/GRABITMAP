@@ -314,10 +314,38 @@
 /** @typedef {{}} Nav_MenuInputs */
 /** @typedef {{}} Nav_NearbyInputs */
 /** @typedef {{}} Nav_SearchInputs */
+/** @typedef {{}} Nearby_AddInputs */
+/** @typedef {{}} Nearby_Choose_CityInputs */
+/** @typedef {{}} Nearby_Empty_BodyInputs */
+/** @typedef {{}} Nearby_Empty_TitleInputs */
+/** @typedef {{}} Nearby_FreshInputs */
+/** @typedef {{}} Nearby_LeadInputs */
+/** @typedef {{}} Nearby_Location_UnavailableInputs */
+/** @typedef {{}} Nearby_Need_City_BodyInputs */
+/** @typedef {{}} Nearby_Need_City_TitleInputs */
+/** @typedef {{}} Nearby_Official_GroupInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Nearby_Scope_CityInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Nearby_Scope_CountryInputs */
+/** @typedef {{}} Nearby_Scope_NoneInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Nearby_Scope_RadiusInputs */
+/** @typedef {{}} Nearby_Scope_WorldInputs */
+/** @typedef {{}} Nearby_Unknown_PlaceInputs */
 /** @typedef {{}} Notifications_TitleInputs */
 /** @typedef {{}} Notify_GenericInputs */
 /** @typedef {{}} Notify_New_MessageInputs */
 /** @typedef {{}} Notify_Open_ChatInputs */
+/** @typedef {{}} Place_Chip_ChooseInputs */
+/** @typedef {{}} Place_Chip_NearbyInputs */
+/** @typedef {{}} Place_Chip_WorldInputs */
+/** @typedef {{ name: NonNullable<unknown> }} Place_ContinueInputs */
+/** @typedef {{}} Place_Selector_CloseInputs */
+/** @typedef {{}} Place_Selector_DeniedInputs */
+/** @typedef {{}} Place_Selector_GeographyInputs */
+/** @typedef {{}} Place_Selector_LocatingInputs */
+/** @typedef {{}} Place_Selector_No_MatchInputs */
+/** @typedef {{}} Place_Selector_RecentInputs */
+/** @typedef {{}} Place_Selector_SearchInputs */
+/** @typedef {{}} Place_Selector_TitleInputs */
 /** @typedef {{}} Profile_Login_WriteInputs */
 /** @typedef {{}} Profile_SettingsInputs */
 /** @typedef {{}} Profile_Settings_SoundInputs */
@@ -1597,6 +1625,70 @@ export const nav_search = /** @type {(inputs: Nav_SearchInputs) => LocalizedStri
 	return /** @type {LocalizedString} */ (`Căutare`)
 };
 
+export const nearby_add = /** @type {(inputs: Nearby_AddInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Adaugă o fișă`)
+};
+
+export const nearby_choose_city = /** @type {(inputs: Nearby_Choose_CityInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Alege un oraș`)
+};
+
+export const nearby_empty_body = /** @type {(inputs: Nearby_Empty_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Fii primul care adaugă o fișă în această zonă.`)
+};
+
+export const nearby_empty_title = /** @type {(inputs: Nearby_Empty_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Încă nu există fișe publicate`)
+};
+
+export const nearby_fresh = /** @type {(inputs: Nearby_FreshInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Fișe noi`)
+};
+
+export const nearby_lead = /** @type {(inputs: Nearby_LeadInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Vezi fișele publicate lângă locul ales și scrie în GRABIT.`)
+};
+
+export const nearby_location_unavailable = /** @type {(inputs: Nearby_Location_UnavailableInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Orașul cel mai apropiat nu a putut fi determinat în siguranță. Alegeți locul.`)
+};
+
+export const nearby_need_city_body = /** @type {(inputs: Nearby_Need_City_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Fără oraș, În apropiere rămâne gol. Nu este o listă mondială.`)
+};
+
+export const nearby_need_city_title = /** @type {(inputs: Nearby_Need_City_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Alegeți un oraș`)
+};
+
+export const nearby_official_group = /** @type {(inputs: Nearby_Official_GroupInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Grup oficial`)
+};
+
+export const nearby_scope_city = /** @type {(inputs: Nearby_Scope_CityInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Fișe publicate în ${i?.name}`)
+};
+
+export const nearby_scope_country = /** @type {(inputs: Nearby_Scope_CountryInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Nu sunt fișe mai aproape · afișăm ${i?.name}`)
+};
+
+export const nearby_scope_none = /** @type {(inputs: Nearby_Scope_NoneInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Alegeți mai întâi un oraș. Fișele mondiale nu apar aici.`)
+};
+
+export const nearby_scope_radius = /** @type {(inputs: Nearby_Scope_RadiusInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Încă nu sunt fișe în ${i?.name} · locuri pe 100 km`)
+};
+
+export const nearby_scope_world = /** @type {(inputs: Nearby_Scope_WorldInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ultimele fișe publicate în lume`)
+};
+
+export const nearby_unknown_place = /** @type {(inputs: Nearby_Unknown_PlaceInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Loc neprecizat`)
+};
+
 export const notifications_title = /** @type {(inputs: Notifications_TitleInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Notificări`)
 };
@@ -1611,6 +1703,54 @@ export const notify_new_message = /** @type {(inputs: Notify_New_MessageInputs) 
 
 export const notify_open_chat = /** @type {(inputs: Notify_Open_ChatInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Deschideți chatul în GRABIT.`)
+};
+
+export const place_chip_choose = /** @type {(inputs: Place_Chip_ChooseInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Alegeți un loc`)
+};
+
+export const place_chip_nearby = /** @type {(inputs: Place_Chip_NearbyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Lângă mine`)
+};
+
+export const place_chip_world = /** @type {(inputs: Place_Chip_WorldInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Întreaga lume`)
+};
+
+export const place_continue = /** @type {(inputs: Place_ContinueInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Continuați ${i?.name}`)
+};
+
+export const place_selector_close = /** @type {(inputs: Place_Selector_CloseInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Închide`)
+};
+
+export const place_selector_denied = /** @type {(inputs: Place_Selector_DeniedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Locația este dezactivată. Puteți alege un loc manual.`)
+};
+
+export const place_selector_geography = /** @type {(inputs: Place_Selector_GeographyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Deschide geografia completă`)
+};
+
+export const place_selector_locating = /** @type {(inputs: Place_Selector_LocatingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Căutăm locul…`)
+};
+
+export const place_selector_no_match = /** @type {(inputs: Place_Selector_No_MatchInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Nu există un loc recent potrivit. Deschideți geografia completă.`)
+};
+
+export const place_selector_recent = /** @type {(inputs: Place_Selector_RecentInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Recente`)
+};
+
+export const place_selector_search = /** @type {(inputs: Place_Selector_SearchInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Căutați oraș sau țară`)
+};
+
+export const place_selector_title = /** @type {(inputs: Place_Selector_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Loc`)
 };
 
 export const profile_login_write = /** @type {(inputs: Profile_Login_WriteInputs) => LocalizedString} */ () => {

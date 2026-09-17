@@ -349,5 +349,21 @@
   "place_selector_denied": "লোকেশন বন্ধ আছে। স্থান নিজে বেছে নিতে পারেন।",
   "place_selector_locating": "স্থান খোঁজা হচ্ছে…",
   "place_selector_no_match": "সাম্প্রতিক স্থানে মিল নেই। পূর্ণ ভূগোল খুলুন।",
-  "place_continue": "{name} চালিয়ে যান"
+  "place_continue": "{name} চালিয়ে যান",
+  "nearby_scope_city": "{name}-এ প্রকাশিত কার্ড",
+  "nearby_scope_radius": "{name}-এ এখনও কার্ড নেই · ১০০ কিমির স্থান",
+  "nearby_scope_country": "কাছাকাছি কার্ড নেই · {name} দেখানো হচ্ছে",
+  "nearby_scope_world": "বিশ্বের সর্বশেষ প্রকাশিত কার্ড",
+  "nearby_official_group": "অফিসিয়াল গ্রুপ",
+  "nearby_empty_title": "এখনও কোনো প্রকাশিত কার্ড নেই",
+  "nearby_empty_body": "এই এলাকায় প্রথম কার্ড আপনি যোগ করুন।",
+  "nearby_add": "কার্ড যোগ করুন",
+  "nearby_fresh": "নতুন কার্ড",
+  "nearby_choose_city": "শহর বেছে নিন",
+  "nearby_lead": "বাছাই করা স্থানের কাছে প্রকাশিত কার্ড দেখুন এবং GRABIT-এ লিখুন।",
+  "nearby_unknown_place": "স্থান উল্লেখ নেই",
+  "nearby_scope_none": "আগে একটি শহর বেছে নিন। বিশ্বব্যাপী কার্ড এখানে দেখানো হয় না।",
+  "nearby_need_city_title": "একটি শহর বেছে নিন",
+  "nearby_need_city_body": "শহর ছাড়া «কাছাকাছি» খালি থাকে। এটি বিশ্ব তালিকা নয়।",
+  "nearby_location_unavailable": "নিকটতম শহর নিরাপদে নির্ধারণ করা যায়নি। স্থান নিজে বেছে নিন।"
 }

@@ -349,5 +349,21 @@
   "place_selector_denied": "Геолокація вимкнена. Можна вибрати місце вручну.",
   "place_selector_locating": "Визначаємо місце…",
   "place_selector_no_match": "У недавніх місцях немає збігу. Відкрийте повну географію.",
-  "place_continue": "Продовжити {name}"
+  "place_continue": "Продовжити {name}",
+  "nearby_scope_city": "Опубліковані картки в місті {name}",
+  "nearby_scope_radius": "У місті {name} карток немає · місця в радіусі 100 км",
+  "nearby_scope_country": "Ближчих карток немає · показуємо {name}",
+  "nearby_scope_world": "Свіжі опубліковані картки в усьому світі",
+  "nearby_official_group": "Офіційна група",
+  "nearby_empty_title": "Поки немає опублікованих карток",
+  "nearby_empty_body": "Станьте першим, хто додасть картку в цій місцевості.",
+  "nearby_add": "Додати картку",
+  "nearby_fresh": "Свіжі картки",
+  "nearby_choose_city": "Обрати місто",
+  "nearby_lead": "Дивіться опубліковані картки біля обраного місця і пишіть у GRABIT.",
+  "nearby_unknown_place": "Місце не вказано",
+  "nearby_scope_none": "Спочатку оберіть місто. Світові картки тут не показуємо.",
+  "nearby_need_city_title": "Оберіть місто",
+  "nearby_need_city_body": "Поки місто не обрано, стрічка «Поруч» порожня. Це не світова видача.",
+  "nearby_location_unavailable": "Не вдалося безпечно визначити найближче місто. Оберіть місце самостійно."
 }

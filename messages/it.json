@@ -349,5 +349,21 @@
   "place_selector_denied": "La posizione è disattivata. Puoi scegliere un luogo manualmente.",
   "place_selector_locating": "Ricerca del luogo…",
   "place_selector_no_match": "Nessun luogo recente corrispondente. Apri la geografia completa.",
-  "place_continue": "Continua {name}"
+  "place_continue": "Continua {name}",
+  "nearby_scope_city": "Schede pubblicate a {name}",
+  "nearby_scope_radius": "Ancora nessuna scheda a {name} · luoghi entro 100 km",
+  "nearby_scope_country": "Nessuna scheda più vicina · mostriamo {name}",
+  "nearby_scope_world": "Ultime schede pubblicate nel mondo",
+  "nearby_official_group": "Gruppo ufficiale",
+  "nearby_empty_title": "Ancora nessuna scheda pubblicata",
+  "nearby_empty_body": "Sii il primo ad aggiungere una scheda in quest’area.",
+  "nearby_add": "Aggiungi scheda",
+  "nearby_fresh": "Schede recenti",
+  "nearby_choose_city": "Scegli una città",
+  "nearby_lead": "Vedi le schede pubblicate vicino al luogo scelto e scrivi in GRABIT.",
+  "nearby_unknown_place": "Luogo non indicato",
+  "nearby_scope_none": "Scegli prima una città. Qui non mostriamo schede mondiali.",
+  "nearby_need_city_title": "Scegli una città",
+  "nearby_need_city_body": "Senza città, Vicino resta vuoto. Non è un elenco mondiale.",
+  "nearby_location_unavailable": "Impossibile determinare in sicurezza la città più vicina. Scegli un luogo tu."
 }

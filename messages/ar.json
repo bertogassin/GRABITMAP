@@ -349,5 +349,21 @@
   "place_selector_denied": "الموقع متوقف. يمكنك اختيار المكان يدوياً.",
   "place_selector_locating": "جارٍ تحديد المكان…",
   "place_selector_no_match": "لا يوجد مكان أخير مطابق. افتح الجغرافيا الكاملة.",
-  "place_continue": "متابعة {name}"
+  "place_continue": "متابعة {name}",
+  "nearby_scope_city": "بطاقات منشورة في {name}",
+  "nearby_scope_radius": "لا بطاقات في {name} بعد · أماكن ضمن 100 كم",
+  "nearby_scope_country": "لا بطاقات أقرب · نعرض {name}",
+  "nearby_scope_world": "أحدث البطاقات المنشورة في العالم",
+  "nearby_official_group": "المجموعة الرسمية",
+  "nearby_empty_title": "لا توجد بطاقات منشورة بعد",
+  "nearby_empty_body": "كن أول من يضيف بطاقة في هذه المنطقة.",
+  "nearby_add": "أضف بطاقة",
+  "nearby_fresh": "بطاقات جديدة",
+  "nearby_choose_city": "اختر مدينة",
+  "nearby_lead": "شاهد البطاقات المنشورة قرب المكان الذي اخترته ثم اكتب داخل GRABIT.",
+  "nearby_unknown_place": "المكان غير محدد",
+  "nearby_scope_none": "اختر مدينة أولاً. لا نعرض البطاقات العالمية هنا.",
+  "nearby_need_city_title": "اختر مدينة",
+  "nearby_need_city_body": "من دون مدينة تبقى قائمة «بالقرب» فارغة. هذه ليست قائمة عالمية.",
+  "nearby_location_unavailable": "تعذّر تحديد أقرب مدينة بأمان. اختر المكان بنفسك."
 }

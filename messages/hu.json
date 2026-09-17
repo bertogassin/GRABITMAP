@@ -349,5 +349,21 @@
   "place_selector_denied": "A helymeghatározás ki van kapcsolva. A helyet kézzel is kiválaszthatja.",
   "place_selector_locating": "Hely keresése…",
   "place_selector_no_match": "Nincs illeszkedő nemrégi hely. Nyissa meg a teljes földrajzot.",
-  "place_continue": "{name} folytatása"
+  "place_continue": "{name} folytatása",
+  "nearby_scope_city": "Közzétett kártyák itt: {name}",
+  "nearby_scope_radius": "{name} városában még nincs kártya · 100 km-es körzet",
+  "nearby_scope_country": "Nincs közelebbi kártya · {name} látható",
+  "nearby_scope_world": "A világon közzétett legújabb kártyák",
+  "nearby_official_group": "Hivatalos csoport",
+  "nearby_empty_title": "Még nincs közzétett kártya",
+  "nearby_empty_body": "Legyen az első, aki kártyát ad hozzá itt.",
+  "nearby_add": "Kártya hozzáadása",
+  "nearby_fresh": "Új kártyák",
+  "nearby_choose_city": "Város választása",
+  "nearby_lead": "Nézze meg a választott hely közelében közzétett kártyákat, és írjon a GRABIT-ben.",
+  "nearby_unknown_place": "Hely nincs megadva",
+  "nearby_scope_none": "Először válasszon várost. Világméretű kártyák itt nincsenek.",
+  "nearby_need_city_title": "Válasszon várost",
+  "nearby_need_city_body": "Város nélkül a Közelben üres. Ez nem világszintű lista.",
+  "nearby_location_unavailable": "A legközelebbi várost nem lehetett biztonságosan meghatározni. Válasszon helyet."
 }
