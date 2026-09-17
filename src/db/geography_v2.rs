@@ -555,6 +555,8 @@ pub fn initialize_connection(connection: &mut Connection) -> Result<()> {
         "#,
     )?;
 
+    crate::db::geo_search::ensure_geo_search(connection)?;
+
     Ok(())
 }
 

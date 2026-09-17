@@ -4411,7 +4411,8 @@ body.light-theme .card:hover .card-icon {
 }
 
 .rm-place-actions,
-.rm-place-recent ul {
+.rm-place-recent ul,
+.rm-place-results ul {
     display: grid;
     gap: 8px;
     margin: 0;
@@ -4547,6 +4548,7 @@ fn place_selector_dialog() -> String {
             <button type="button" data-place-pick="world">{world}</button>
         </div>
         <section id="rm-place-recent" hidden></section>
+        <section id="rm-place-results" hidden></section>
         <p id="rm-place-status" class="rm-place-status" hidden></p>
         <a class="rm-place-geography" href="/app">{geography}</a>
     </div>
@@ -6736,6 +6738,7 @@ mod public_entry_tests {
         let bar = topbar("Тест", "map");
         assert!(bar.contains("id=\"rm-place-chip\""));
         assert!(page.contains("id=\"rm-place-dialog\""));
+        assert!(page.contains("id=\"rm-place-results\""));
         assert!(page.contains("data-place-pick=\"nearby\""));
         assert!(page.contains("data-place-pick=\"world\""));
         assert!(page.contains("/app"));

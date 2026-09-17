@@ -88,6 +88,9 @@ pub use group_helper::{group_helper_panel, group_helper_report_action};
 mod navigation;
 pub use navigation::*;
 
+mod geo_search;
+pub use geo_search::api_geo_search;
+
 mod types;
 
 mod health;

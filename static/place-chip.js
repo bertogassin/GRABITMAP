@@ -5,6 +5,7 @@
     var RECENT_KEY = "grabit-recent-places";
     var GEO_DENIED_KEY = "grabit-geo-denied";
     var LEGACY_KEY = "resursmap-last-city";
+    var searchTimer = 0;
 
     function ready(fn) {
         if (document.readyState === "loading") {
@@ -168,49 +169,6 @@
         node.hidden = !text;
     }
 
-    function renderRecent(filter) {
-        var host = document.getElementById("rm-place-recent");
-        if (!host) {
-            return 0;
-        }
-        var query = String(filter || "").trim().toLowerCase();
-        var rows = recents().filter(function (row) {
-            if (!query) {
-                return row.kind !== "nearby";
-            }
-            return String(row.name || "").toLowerCase().indexOf(query) !== -1;
-        });
-        if (!rows.length) {
-            host.hidden = true;
-            host.innerHTML = "";
-            return 0;
-        }
-        host.hidden = false;
-        host.innerHTML = "<h3>" + escapeHtml(t("place_selector_recent")) + "</h3><ul>" + rows.map(function (row) {
-            return '<li><button type="button" class="rm-place-option" data-place-href="' +
-                escapeHtml(row.href) + '" data-place-kind="' + escapeHtml(row.kind || "city") +
-                '" data-place-name="' + escapeHtml(row.name || "") + '">' +
-                escapeHtml(row.name || row.href) + "</button></li>";
-        }).join("") + "</ul>";
-        return rows.length;
-    }
-
-    function openDialog() {
-        var box = dialog();
-        if (!box || typeof box.showModal !== "function") {
-            window.location.href = "/app";
-            return;
-        }
-        setStatus("");
-        renderRecent("");
-        box.showModal();
-        var input = document.getElementById("rm-place-query");
-        if (input) {
-            input.value = "";
-            input.focus();
-        }
-    }
-
     function closeDialog() {
         var box = dialog();
         if (box && box.open) {
@@ -221,6 +179,88 @@
     function selectPlace(place) {
         setActive(place);
         closeDialog();
+        if (place && place.href && place.href !== window.location.pathname) {
+            window.location.href = place.href;
+        }
+    }
+
+    function renderList(hostId, heading, rows) {
+        var host = document.getElementById(hostId);
+        if (!host) {
+            return 0;
+        }
+        if (!rows.length) {
+            host.hidden = true;
+            host.innerHTML = "";
+            return 0;
+        }
+        host.hidden = false;
+        host.innerHTML = "<h3>" + escapeHtml(heading) + "</h3><ul>" + rows.map(function (row) {
+            var labelText = row.name || row.href;
+            if (row.subtitle) {
+                labelText = labelText + " · " + row.subtitle;
+            }
+            return '<li><button type="button" class="rm-place-option" data-place-href="' +
+                escapeHtml(row.href) + '" data-place-kind="' + escapeHtml(row.kind || "city") +
+                '" data-place-name="' + escapeHtml(row.name || "") + '">' +
+                escapeHtml(labelText) + "</button></li>";
+        }).join("") + "</ul>";
+        return rows.length;
+    }
+
+    function renderRecent(filter) {
+        var query = String(filter || "").trim().toLowerCase();
+        var rows = recents().filter(function (row) {
+            if (!query) {
+                return row.kind !== "nearby";
+            }
+            return String(row.name || "").toLowerCase().indexOf(query) !== -1;
+        });
+        return renderList("rm-place-recent", t("place_selector_recent"), rows);
+    }
+
+    function renderResults(rows) {
+        return renderList("rm-place-results", t("place_selector_search"), rows);
+    }
+
+    function fetchPlaces(query) {
+        if (!query || query.length < 2) {
+            renderResults([]);
+            return;
+        }
+        setStatus(t("place_selector_locating"));
+        fetch("/api/geo/search?q=" + encodeURIComponent(query) + "&limit=8", {
+            credentials: "same-origin",
+            headers: { "Accept": "application/json" }
+        }).then(function (response) {
+            return response.json();
+        }).then(function (body) {
+            var rows = body && body.ok && Array.isArray(body.items) ? body.items : [];
+            var count = renderResults(rows);
+            var recentCount = renderRecent(query);
+            setStatus(!count && !recentCount ? t("place_selector_no_match") : "");
+        }).catch(function () {
+            renderResults([]);
+            var recentCount = renderRecent(query);
+            setStatus(!recentCount ? t("place_selector_no_match") : "");
+        });
+    }
+
+    function openDialog() {
+        var box = dialog();
+        if (!box || typeof box.showModal !== "function") {
+            window.location.href = "/app";
+            return;
+        }
+        setStatus("");
+        renderRecent("");
+        renderResults([]);
+        box.showModal();
+        var input = document.getElementById("rm-place-query");
+        if (input) {
+            input.value = "";
+            input.focus();
+        }
     }
 
     function requestNearby() {
@@ -277,8 +317,17 @@
         var query = document.getElementById("rm-place-query");
         if (query) {
             query.addEventListener("input", function () {
-                var count = renderRecent(query.value);
-                setStatus(String(query.value || "").trim() && count === 0 ? t("place_selector_no_match") : "");
+                var value = String(query.value || "").trim();
+                renderRecent(query.value);
+                window.clearTimeout(searchTimer);
+                if (value.length < 2) {
+                    renderResults([]);
+                    setStatus(value ? t("place_selector_no_match") : "");
+                    return;
+                }
+                searchTimer = window.setTimeout(function () {
+                    fetchPlaces(value);
+                }, 180);
             });
         }
     }

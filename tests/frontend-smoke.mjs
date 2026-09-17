@@ -2385,6 +2385,7 @@ test("redesign keeps canonical destinations and public URL compatibility", async
   assert.match(publicRoutes, /\/app\/map\/continent\/\{continent_id\}/);
   assert.match(publicRoutes, /\/app\/map\/country\/\{country_id\}/);
   assert.match(publicRoutes, /\/app\/map\/city\/\{city_id\}/);
+  assert.match(publicRoutes, /\/api\/geo\/search/);
   assert.match(publicRoutes, /\/app\/\{ci\}\/\{si\}\/\{zi\}/);
 
   assert.match(resourceRoutes, /\/app\/listing\/\{id\}/);
@@ -2428,8 +2429,11 @@ test("location chip stores tab place without a new cookie", async () => {
 
   assert.match(common, /id="rm-place-chip"/);
   assert.match(common, /id="rm-place-dialog"/);
+  assert.match(common, /id="rm-place-results"/);
   assert.match(common, /data-place-pick="nearby"/);
   assert.match(common, /href="\/app"/);
+  assert.ok(placeMemory.includes("/api/geo/search"));
+  assert.ok(placeMemory.includes("encodeURIComponent"));
 });
 
 test("location chip strings exist in every locale", async () => {
@@ -2456,4 +2460,20 @@ test("location chip strings exist in every locale", async () => {
       assert.notEqual(messages[key].trim(), "", locale + " " + key);
     }
   }
+});
+
+test("geo search API is a bounded guest endpoint", async () => {
+  const [publicRoutes, handler, db] = await Promise.all([
+    readFile(new URL("src/web/routes/public.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/geo_search.rs", root), "utf8"),
+    readFile(new URL("src/db/geo_search.rs", root), "utf8"),
+  ]);
+
+  assert.match(publicRoutes, /\/api\/geo\/search/);
+  assert.match(handler, /limit = query\.limit\.unwrap_or\(10\)\.clamp\(1, 20\)/);
+  assert.match(handler, /QUERY_MAX_CHARS/);
+  assert.doesNotMatch(handler, /"user_id"/);
+  assert.match(db, /EXPLAIN QUERY PLAN/);
+  assert.match(db, /geo_search_fts MATCH/);
+  assert.match(db, /unicode61/);
 });

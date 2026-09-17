@@ -5,6 +5,7 @@ pub mod chat_pins;
 pub mod chat_preferences;
 pub mod geography_countries;
 pub mod geography_v2;
+pub mod geo_search;
 pub mod group_geography;
 pub mod group_member_search;
 pub mod group_moderation;
