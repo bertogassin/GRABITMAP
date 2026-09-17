@@ -556,11 +556,13 @@ test("global search stays available while map and explore keep distinct jobs", a
   assert.match(common, /data-global-search-open/);
   assert.match(common, /id="rm-global-search-dialog"/);
   assert.match(common, /static_asset\("global-search\.js"\)/);
-  assert.match(common, /href="\/app\/explore" data-nav-explore-link/);
-  assert.match(common, /<a class="\{map_class\}" href="\/app">/);
-  assert.match(common, /label_map = crate::i18n::t\("map_title"\)/);
-  assert.doesNotMatch(common, /data-nav-search-link/);
-  assert.doesNotMatch(common, /data-nav-map-link/);
+  assert.match(common, /href="\/app\/search" data-nav-search-link/);
+  assert.match(common, /href="\/app" data-nav-nearby-link/);
+  assert.match(common, /href="\/app\/messages" data-nav-chats-link/);
+  assert.match(common, /href="\/app\/me" data-nav-profile-link/);
+  assert.match(common, /label_nearby = crate::i18n::t\("nav_nearby"\)/);
+  assert.doesNotMatch(common, /data-nav-explore-link/);
+  assert.doesNotMatch(common, /data-nav-menu-link/);
   assert.match(routes, /\.route\("\/app\/explore", get\(app_explore\)\)/);
   assert.match(navigation, /pub fn render_explore\(\)/);
   assert.doesNotMatch(explore, /cities = navigation_card/);
@@ -572,7 +574,7 @@ test("global search stays available while map and explore keep distinct jobs", a
   assert.doesNotMatch(memory, /applyNavMemory/);
   assert.doesNotMatch(memory, /mapLink\.setAttribute\("href", place\.href\)/);
   assert.doesNotMatch(memoryHome, /continueChips/);
-  assert.match(serviceWorker, /v7\.21\.1-r8/);
+  assert.match(serviceWorker, /v7\.21\.1-r9/);
   assert.match(serviceWorker, /\/static\/global-search\.js/);
 });
 
@@ -833,8 +835,8 @@ test("service worker keeps partial shell caches and caches static responses", as
   assert.match(serviceWorker, /Promise\.all\(STATIC_ASSETS\.map/);
   assert.match(serviceWorker, /cache\.put\(cacheKey\.toString\(\), response\.clone\(\)\)/);
   assert.match(serviceWorker, /const CACHE_PREFIX = "grabit-shell-"/);
-  assert.match(serviceWorker, /CACHE_PREFIX \+ "v7\.21\.1-r8"/);
-  assert.match(common, /env!\("CARGO_PKG_VERSION"\), "-r8"/);
+  assert.match(serviceWorker, /CACHE_PREFIX \+ "v7\.21\.1-r9"/);
+  assert.match(common, /env!\("CARGO_PKG_VERSION"\), "-r9"/);
   assert.match(serviceWorker, /key\.startsWith\(CACHE_PREFIX\)/);
   assert.match(serviceWorker, /internalNavigationTarget\(event\.notification\.data\.url, target\)/);
   assert.match(serviceWorker, /internalNavigationTarget\(nudge\.href, "\/app"\)/);

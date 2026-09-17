@@ -3,7 +3,7 @@
 
     if (
         !document.querySelector("[data-nav-chats-link]") &&
-        !document.querySelector("[data-nav-menu-link]")
+        !document.querySelector("[data-nav-profile-link]")
     ) {
         return;
     }
@@ -185,7 +185,7 @@
                 lastNotifications = notifications;
                 lastMessages = messages;
                 setBadge(document.querySelector("[data-nav-chats-link]"), messages);
-                setBadge(document.querySelector("[data-nav-menu-link]"), menuCount);
+                setBadge(document.querySelector("[data-nav-profile-link]"), menuCount);
                 showNudgeNotifications(data.nudges);
 
                 if (typeof window.resursmapOnAttentionCount === "function") {

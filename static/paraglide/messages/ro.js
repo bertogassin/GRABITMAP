@@ -312,6 +312,7 @@
 /** @typedef {{}} Nav_CitiesInputs */
 /** @typedef {{}} Nav_ExploreInputs */
 /** @typedef {{}} Nav_MenuInputs */
+/** @typedef {{}} Nav_NearbyInputs */
 /** @typedef {{}} Nav_SearchInputs */
 /** @typedef {{}} Notifications_TitleInputs */
 /** @typedef {{}} Notify_GenericInputs */
@@ -1586,6 +1587,10 @@ export const nav_explore = /** @type {(inputs: Nav_ExploreInputs) => LocalizedSt
 
 export const nav_menu = /** @type {(inputs: Nav_MenuInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Meniu`)
+};
+
+export const nav_nearby = /** @type {(inputs: Nav_NearbyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`În apropiere`)
 };
 
 export const nav_search = /** @type {(inputs: Nav_SearchInputs) => LocalizedString} */ () => {

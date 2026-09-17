@@ -29,7 +29,7 @@ pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'sta
     format!("{n} {}", ru_plural(n, one, few, many))
 }
 
-pub const STATIC_ASSET_VERSION: &str = concat!(env!("CARGO_PKG_VERSION"), "-r8");
+pub const STATIC_ASSET_VERSION: &str = concat!(env!("CARGO_PKG_VERSION"), "-r9");
 
 pub fn profession_label(raw: &str) -> String {
     if crate::catalog::resolve(raw).is_some() {
@@ -4633,10 +4633,10 @@ pub(crate) fn bottom_nav_with_badge(active: &str, unread_count: i64) -> String {
 pub(crate) fn bottom_nav_with_badges(
     active: &str,
     unread_messages: i64,
-    menu_count: i64,
+    profile_count: i64,
 ) -> String {
-    let item_class = |name: &str| {
-        if active == name {
+    let item_class = |names: &[&str]| {
+        if names.contains(&active) {
             "nav-item active"
         } else {
             "nav-item"
@@ -4647,14 +4647,14 @@ pub(crate) fn bottom_nav_with_badges(
         r#"
 <nav class="bottom-nav">
 
-    <a class="{map_class}" href="/app">
-        {nav_map}
-        <span>{label_map}</span>
+    <a class="{search_class}" href="/app/search" data-nav-search-link>
+        {nav_search}
+        <span>{label_search}</span>
     </a>
 
-    <a class="{explore_class}" href="/app/explore" data-nav-explore-link>
-        {nav_explore}
-        <span>{label_explore}</span>
+    <a class="{nearby_class}" href="/app" data-nav-nearby-link>
+        {nav_nearby}
+        <span>{label_nearby}</span>
     </a>
 
     <a class="{chats_class}" href="/app/messages" data-nav-chats-link>
@@ -4663,28 +4663,28 @@ pub(crate) fn bottom_nav_with_badges(
         <span>{label_chats}</span>
     </a>
 
-    <a class="{menu_class}" href="/app/menu" data-nav-menu-link>
-        {nav_menu}
-        {menu_badge}
-        <span>{label_menu}</span>
+    <a class="{profile_class}" href="/app/me" data-nav-profile-link>
+        {nav_profile}
+        {profile_badge}
+        <span>{label_profile}</span>
     </a>
 
 </nav>
 "#,
-        map_class = item_class("map"),
-        explore_class = item_class("explore"),
-        chats_class = item_class("chats"),
-        menu_class = item_class("menu"),
-        nav_map = icon("map"),
-        nav_explore = icon("compass"),
+        search_class = item_class(&["search", "explore"]),
+        nearby_class = item_class(&["nearby", "map"]),
+        chats_class = item_class(&["chats"]),
+        profile_class = item_class(&["profile", "menu"]),
+        nav_search = icon("search"),
+        nav_nearby = icon("map"),
         nav_chats = icon("message-circle"),
-        nav_menu = icon("sliders"),
+        nav_profile = icon("user"),
         unread_badge = nav_count_badge(unread_messages),
-        menu_badge = nav_count_badge(menu_count),
-        label_map = crate::i18n::t("map_title"),
-        label_explore = crate::i18n::t("nav_explore"),
+        profile_badge = nav_count_badge(profile_count),
+        label_search = crate::i18n::t("nav_search"),
+        label_nearby = crate::i18n::t("nav_nearby"),
         label_chats = crate::i18n::t("nav_chats"),
-        label_menu = crate::i18n::t("nav_menu"),
+        label_profile = crate::i18n::t("common_profile"),
     )
 }
 
