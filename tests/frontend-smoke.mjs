@@ -1722,7 +1722,13 @@ test("staged deploy keeps a ready backend during replacement", async () => {
   assert.match(deploy, /trap cleanup EXIT/);
   assert.match(deploy, /scripts\/backup_production\.sh/);
   assert.match(deploy, /DATA_SOURCE="\$DATA_SOURCE"/);
-  assert.match(deploy, /returning to staged backend/);
+  assert.match(deploy, /AUTOMATIC ROLLBACK TO PREVIOUS BACKEND/);
+  assert.match(deploy, /restore_previous_backend/);
+  assert.match(deploy, /PREVIOUS_IMAGE_ID/);
+  assert.match(deploy, /docker image tag "\$PREVIOUS_IMAGE_ID" "\$IMAGE_REF"/);
+  assert.match(deploy, /--force-recreate/);
+  assert.match(deploy, /STAGED_VERIFIED=1/);
+  assert.match(deploy, /preserving verified staged backend/);
   assert.match(deploy, /EXPECTED_HSTS="\$\{EXPECTED_HSTS:-max-age=31536000\}"/);
   assert.match(deploy, /strict-transport-security/);
   assert.match(deploy, /public_endpoint_ready \/health/);
@@ -1736,7 +1742,7 @@ test("staged deploy keeps a ready backend during replacement", async () => {
   );
   assert.equal(
     (deploy.match(/--config \/tmp\/Caddyfile\.primary/g) || []).length,
-    2,
+    3,
   );
   assert.doesNotMatch(deploy, /--config \/etc\/caddy\/Caddyfile/);
   assert.doesNotMatch(deploy, /images -q "\$APP_SERVICE"/);
