@@ -2361,3 +2361,51 @@ test("official group member privacy hides bulk directory and internal identifier
     /profile_avatar = if has_avatar && profile_user_id > 0/
   );
 });
+
+test("redesign keeps canonical destinations and public URL compatibility", async () => {
+  const [publicRoutes, accountRoutes, communicationRoutes, resourceRoutes, navigation] =
+    await Promise.all([
+      readFile(new URL("src/web/routes/public.rs", root), "utf8"),
+      readFile(new URL("src/web/routes/account.rs", root), "utf8"),
+      readFile(new URL("src/web/routes/communication.rs", root), "utf8"),
+      readFile(new URL("src/web/routes/resources.rs", root), "utf8"),
+      readFile(new URL("src/web/handlers/navigation.rs", root), "utf8"),
+    ]);
+
+  assert.match(publicRoutes, /\.route\("\/", get\(home\)\)/);
+  assert.match(navigation, /Redirect::permanent\("\/app"\)/);
+  assert.match(publicRoutes, /\.route\("\/app", get\(app_root\)\)/);
+  assert.match(publicRoutes, /\.route\("\/app\/search", get\(app_search\)\)/);
+  assert.match(accountRoutes, /\.route\("\/app\/me", get\(app_me\)\)/);
+  assert.match(communicationRoutes, /\.route\("\/app\/messages", get\(messages_page\)\)/);
+  assert.match(communicationRoutes, /Redirect::to\("\/app\/messages"\)/);
+
+  assert.match(publicRoutes, /\/app\/map\/continent\/\{continent_id\}/);
+  assert.match(publicRoutes, /\/app\/map\/country\/\{country_id\}/);
+  assert.match(publicRoutes, /\/app\/map\/city\/\{city_id\}/);
+  assert.match(publicRoutes, /\/app\/\{ci\}\/\{si\}\/\{zi\}/);
+
+  assert.match(resourceRoutes, /\/app\/listing\/\{id\}/);
+  assert.match(resourceRoutes, /\/app\/resource\/\{id\}/);
+  assert.match(communicationRoutes, /\/app\/official-groups/);
+});
+
+test("redesign inventory protects SEO and location compatibility without freezing gaps", async () => {
+  const [resources, health, placeMemory, communication] = await Promise.all([
+    readFile(new URL("src/web/templates/resources.rs", root), "utf8"),
+    readFile(new URL("src/web/handlers/health.rs", root), "utf8"),
+    readFile(new URL("static/place-memory.js", root), "utf8"),
+    readFile(new URL("src/web/templates/communication.rs", root), "utf8"),
+  ]);
+
+  assert.match(resources, /rel="canonical"/);
+  assert.match(health, /Allow: \/rules/);
+  assert.match(health, /Allow: \/privacy/);
+
+  assert.ok(placeMemory.includes('href: "/app/map/city/"'));
+  assert.ok(placeMemory.includes("var legacyCity = path.match"));
+  assert.ok(placeMemory.includes("(?:listing|resource)"));
+
+  assert.match(communication, /href="\/app\/official-groups"/);
+  assert.match(communication, /method="post" action="\/app\/official-groups/);
+});
