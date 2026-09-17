@@ -337,5 +337,17 @@
   "chat_video_speed": "سرعت",
   "chat_connecting_initial": "در حال اتصال…",
   "chat_member_muted": "ارسال به‌طور موقت توسط مدیر محدود شده است",
-  "chat_reply_unavailable": "پیامی که به آن پاسخ می‌دهید دیگر در دسترس نیست"
+  "chat_reply_unavailable": "پیامی که به آن پاسخ می‌دهید دیگر در دسترس نیست",
+  "place_chip_choose": "مکان را انتخاب کنید",
+  "place_chip_world": "تمام جهان",
+  "place_chip_nearby": "نزدیک من",
+  "place_selector_title": "مکان",
+  "place_selector_search": "جستجوی شهر یا کشور",
+  "place_selector_recent": "اخیر",
+  "place_selector_geography": "باز کردن جغرافیای کامل",
+  "place_selector_close": "بستن",
+  "place_selector_denied": "موقعیت مکانی خاموش است. می‌توانید مکان را دستی انتخاب کنید.",
+  "place_selector_locating": "در حال یافتن مکان…",
+  "place_selector_no_match": "مکان اخیری مطابق نیست. جغرافیای کامل را باز کنید.",
+  "place_continue": "ادامه {name}"
 }

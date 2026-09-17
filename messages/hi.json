@@ -337,5 +337,17 @@
   "chat_video_speed": "गति",
   "chat_connecting_initial": "कनेक्ट हो रहा है…",
   "chat_member_muted": "एडमिन ने भेजने पर अस्थायी रोक लगाई है",
-  "chat_reply_unavailable": "जिस संदेश का जवाब दिया जा रहा है वह अब उपलब्ध नहीं है"
+  "chat_reply_unavailable": "जिस संदेश का जवाब दिया जा रहा है वह अब उपलब्ध नहीं है",
+  "place_chip_choose": "जगह चुनें",
+  "place_chip_world": "पूरी दुनिया",
+  "place_chip_nearby": "मेरे पास",
+  "place_selector_title": "स्थान",
+  "place_selector_search": "शहर या देश खोजें",
+  "place_selector_recent": "हालिया",
+  "place_selector_geography": "पूरी भूगोल खोलें",
+  "place_selector_close": "बंद करें",
+  "place_selector_denied": "लोकेशन बंद है। जगह खुद चुन सकते हैं।",
+  "place_selector_locating": "जगह खोजी जा रही है…",
+  "place_selector_no_match": "हाल की जगहों में मेल नहीं मिला। पूरी भूगोल खोलें।",
+  "place_continue": "{name} जारी रखें"
 }

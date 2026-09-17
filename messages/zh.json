@@ -337,5 +337,17 @@
   "chat_video_speed": "速度",
   "chat_connecting_initial": "正在连接…",
   "chat_member_muted": "管理员暂时限制了发送消息",
-  "chat_reply_unavailable": "要回复的消息已不可用"
+  "chat_reply_unavailable": "要回复的消息已不可用",
+  "place_chip_choose": "选择地点",
+  "place_chip_world": "全世界",
+  "place_chip_nearby": "我附近",
+  "place_selector_title": "地点",
+  "place_selector_search": "搜索城市或国家",
+  "place_selector_recent": "最近",
+  "place_selector_geography": "打开完整地理",
+  "place_selector_close": "关闭",
+  "place_selector_denied": "定位已关闭。你可以手动选择地点。",
+  "place_selector_locating": "正在定位…",
+  "place_selector_no_match": "最近地点中没有匹配项。请打开完整地理。",
+  "place_continue": "继续 {name}"
 }

@@ -337,5 +337,17 @@
   "chat_video_speed": "Kecepatan",
   "chat_connecting_initial": "Menghubungkan…",
   "chat_member_muted": "Pengiriman dibatasi sementara oleh administrator",
-  "chat_reply_unavailable": "Pesan yang Anda balas tidak lagi tersedia"
+  "chat_reply_unavailable": "Pesan yang Anda balas tidak lagi tersedia",
+  "place_chip_choose": "Pilih tempat",
+  "place_chip_world": "Seluruh dunia",
+  "place_chip_nearby": "Dekat saya",
+  "place_selector_title": "Tempat",
+  "place_selector_search": "Cari kota atau negara",
+  "place_selector_recent": "Terbaru",
+  "place_selector_geography": "Buka geografi lengkap",
+  "place_selector_close": "Tutup",
+  "place_selector_denied": "Lokasi nonaktif. Anda dapat memilih tempat secara manual.",
+  "place_selector_locating": "Mencari tempat…",
+  "place_selector_no_match": "Tidak ada tempat terbaru yang cocok. Buka geografi lengkap.",
+  "place_continue": "Lanjutkan {name}"
 }

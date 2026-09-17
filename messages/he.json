@@ -337,5 +337,17 @@
   "chat_video_speed": "מהירות",
   "chat_connecting_initial": "מתחבר…",
   "chat_member_muted": "השליחה הוגבלה זמנית על ידי מנהל",
-  "chat_reply_unavailable": "ההודעה שעליה מגיבים אינה זמינה עוד"
+  "chat_reply_unavailable": "ההודעה שעליה מגיבים אינה זמינה עוד",
+  "place_chip_choose": "בחרו מקום",
+  "place_chip_world": "כל העולם",
+  "place_chip_nearby": "לידי",
+  "place_selector_title": "מקום",
+  "place_selector_search": "חיפוש עיר או מדינה",
+  "place_selector_recent": "לאחרונה",
+  "place_selector_geography": "פתחו את כל הגיאוגרפיה",
+  "place_selector_close": "סגירה",
+  "place_selector_denied": "המיקום כבוי. אפשר לבחור מקום ידנית.",
+  "place_selector_locating": "מחפשים מיקום…",
+  "place_selector_no_match": "אין מקום אחרון תואם. פתחו את כל הגיאוגרפיה.",
+  "place_continue": "המשיכו ב-{name}"
 }

@@ -337,5 +337,17 @@
   "chat_video_speed": "Sebesség",
   "chat_connecting_initial": "Csatlakozás…",
   "chat_member_muted": "Egy adminisztrátor ideiglenesen korlátozta a küldést",
-  "chat_reply_unavailable": "A megválaszolt üzenet már nem érhető el"
+  "chat_reply_unavailable": "A megválaszolt üzenet már nem érhető el",
+  "place_chip_choose": "Válasszon helyet",
+  "place_chip_world": "Egész világ",
+  "place_chip_nearby": "Közelemben",
+  "place_selector_title": "Hely",
+  "place_selector_search": "Város vagy ország keresése",
+  "place_selector_recent": "Nemrégiek",
+  "place_selector_geography": "Teljes földrajz megnyitása",
+  "place_selector_close": "Bezárás",
+  "place_selector_denied": "A helymeghatározás ki van kapcsolva. A helyet kézzel is kiválaszthatja.",
+  "place_selector_locating": "Hely keresése…",
+  "place_selector_no_match": "Nincs illeszkedő nemrégi hely. Nyissa meg a teljes földrajzot.",
+  "place_continue": "{name} folytatása"
 }

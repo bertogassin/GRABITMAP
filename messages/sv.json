@@ -337,5 +337,17 @@
   "chat_video_speed": "Hastighet",
   "chat_connecting_initial": "Ansluter…",
   "chat_member_muted": "En administratör har tillfälligt begränsat sändning",
-  "chat_reply_unavailable": "Meddelandet du svarar på är inte längre tillgängligt"
+  "chat_reply_unavailable": "Meddelandet du svarar på är inte längre tillgängligt",
+  "place_chip_choose": "Välj plats",
+  "place_chip_world": "Hela världen",
+  "place_chip_nearby": "Nära mig",
+  "place_selector_title": "Plats",
+  "place_selector_search": "Sök stad eller land",
+  "place_selector_recent": "Senaste",
+  "place_selector_geography": "Öppna hela geografins",
+  "place_selector_close": "Stäng",
+  "place_selector_denied": "Plats är av. Du kan välja plats manuellt.",
+  "place_selector_locating": "Letar plats…",
+  "place_selector_no_match": "Ingen matchande senaste plats. Öppna hela geografins.",
+  "place_continue": "Fortsätt {name}"
 }

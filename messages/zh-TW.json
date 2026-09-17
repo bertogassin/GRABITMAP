@@ -337,5 +337,17 @@
   "chat_video_speed": "速度",
   "chat_connecting_initial": "正在連線…",
   "chat_member_muted": "管理員暫時限制了傳送訊息",
-  "chat_reply_unavailable": "要回覆的訊息已無法使用"
+  "chat_reply_unavailable": "要回覆的訊息已無法使用",
+  "place_chip_choose": "選擇地點",
+  "place_chip_world": "全世界",
+  "place_chip_nearby": "我附近",
+  "place_selector_title": "地點",
+  "place_selector_search": "搜尋城市或國家",
+  "place_selector_recent": "最近",
+  "place_selector_geography": "開啟完整地理",
+  "place_selector_close": "關閉",
+  "place_selector_denied": "定位已關閉。你可以手動選擇地點。",
+  "place_selector_locating": "正在定位…",
+  "place_selector_no_match": "最近地點沒有符合項目。請開啟完整地理。",
+  "place_continue": "繼續 {name}"
 }

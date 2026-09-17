@@ -337,5 +337,17 @@
   "chat_video_speed": "Rychlost",
   "chat_connecting_initial": "Připojování…",
   "chat_member_muted": "Odesílání bylo dočasně omezeno správcem",
-  "chat_reply_unavailable": "Zpráva, na kterou odpovídáte, již není dostupná"
+  "chat_reply_unavailable": "Zpráva, na kterou odpovídáte, již není dostupná",
+  "place_chip_choose": "Vyberte místo",
+  "place_chip_world": "Celý svět",
+  "place_chip_nearby": "Poblíž mě",
+  "place_selector_title": "Místo",
+  "place_selector_search": "Hledat město nebo zemi",
+  "place_selector_recent": "Nedávné",
+  "place_selector_geography": "Otevřít celou geografii",
+  "place_selector_close": "Zavřít",
+  "place_selector_denied": "Poloha je vypnutá. Místo můžete vybrat ručně.",
+  "place_selector_locating": "Hledáme místo…",
+  "place_selector_no_match": "V nedávných místech nic není. Otevřete celou geografii.",
+  "place_continue": "Pokračovat {name}"
 }

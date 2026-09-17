@@ -337,5 +337,17 @@
   "chat_video_speed": "Viteză",
   "chat_connecting_initial": "Se conectează…",
   "chat_member_muted": "Trimiterea a fost restricționată temporar de un administrator",
-  "chat_reply_unavailable": "Mesajul la care răspundeți nu mai este disponibil"
+  "chat_reply_unavailable": "Mesajul la care răspundeți nu mai este disponibil",
+  "place_chip_choose": "Alegeți un loc",
+  "place_chip_world": "Întreaga lume",
+  "place_chip_nearby": "Lângă mine",
+  "place_selector_title": "Loc",
+  "place_selector_search": "Căutați oraș sau țară",
+  "place_selector_recent": "Recente",
+  "place_selector_geography": "Deschide geografia completă",
+  "place_selector_close": "Închide",
+  "place_selector_denied": "Locația este dezactivată. Puteți alege un loc manual.",
+  "place_selector_locating": "Căutăm locul…",
+  "place_selector_no_match": "Nu există un loc recent potrivit. Deschideți geografia completă.",
+  "place_continue": "Continuați {name}"
 }

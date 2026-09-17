@@ -337,5 +337,17 @@
   "chat_video_speed": "رفتار",
   "chat_connecting_initial": "منسلک ہو رہا ہے…",
   "chat_member_muted": "منتظم نے بھیجنے پر عارضی پابندی لگائی ہے",
-  "chat_reply_unavailable": "جس پیغام کا جواب دیا جا رہا ہے وہ اب دستیاب نہیں"
+  "chat_reply_unavailable": "جس پیغام کا جواب دیا جا رہا ہے وہ اب دستیاب نہیں",
+  "place_chip_choose": "جگہ منتخب کریں",
+  "place_chip_world": "ساری دنیا",
+  "place_chip_nearby": "میرے قریب",
+  "place_selector_title": "جگہ",
+  "place_selector_search": "شہر یا ملک تلاش کریں",
+  "place_selector_recent": "حال ہی میں",
+  "place_selector_geography": "مکمل جغرافیہ کھولیں",
+  "place_selector_close": "بند کریں",
+  "place_selector_denied": "لوکیشن بند ہے۔ جگہ خود منتخب کر سکتے ہیں۔",
+  "place_selector_locating": "جگہ معلوم کی جا رہی ہے…",
+  "place_selector_no_match": "حالیہ جگہوں میں مشابہ نہیں۔ مکمل جغرافیہ کھولیں۔",
+  "place_continue": "{name} جاری رکھیں"
 }

@@ -337,5 +337,17 @@
   "chat_video_speed": "速度",
   "chat_connecting_initial": "接続中…",
   "chat_member_muted": "管理者により送信が一時的に制限されています",
-  "chat_reply_unavailable": "返信先のメッセージは利用できなくなりました"
+  "chat_reply_unavailable": "返信先のメッセージは利用できなくなりました",
+  "place_chip_choose": "場所を選ぶ",
+  "place_chip_world": "世界全体",
+  "place_chip_nearby": "近く",
+  "place_selector_title": "場所",
+  "place_selector_search": "都市や国を検索",
+  "place_selector_recent": "最近",
+  "place_selector_geography": "すべての地域を開く",
+  "place_selector_close": "閉じる",
+  "place_selector_denied": "位置情報はオフです。場所は手動で選べます。",
+  "place_selector_locating": "場所を確認しています…",
+  "place_selector_no_match": "最近の場所に一致がありません。すべての地域を開いてください。",
+  "place_continue": "{name} を続ける"
 }

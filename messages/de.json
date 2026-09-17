@@ -337,5 +337,17 @@
   "chat_video_speed": "Geschwindigkeit",
   "chat_connecting_initial": "Verbindung wird hergestellt…",
   "chat_member_muted": "Das Senden wurde vorübergehend von einem Administrator eingeschränkt",
-  "chat_reply_unavailable": "Die Nachricht, auf die Sie antworten, ist nicht mehr verfügbar"
+  "chat_reply_unavailable": "Die Nachricht, auf die Sie antworten, ist nicht mehr verfügbar",
+  "place_chip_choose": "Ort wählen",
+  "place_chip_world": "Weltweit",
+  "place_chip_nearby": "In meiner Nähe",
+  "place_selector_title": "Ort",
+  "place_selector_search": "Stadt oder Land suchen",
+  "place_selector_recent": "Zuletzt",
+  "place_selector_geography": "Vollständige Geografie öffnen",
+  "place_selector_close": "Schließen",
+  "place_selector_denied": "Standort ist aus. Sie können einen Ort manuell wählen.",
+  "place_selector_locating": "Ort wird ermittelt…",
+  "place_selector_no_match": "Kein passender letzter Ort. Öffnen Sie die vollständige Geografie.",
+  "place_continue": "{name} fortsetzen"
 }

@@ -337,5 +337,17 @@
   "chat_video_speed": "Ταχύτητα",
   "chat_connecting_initial": "Σύνδεση…",
   "chat_member_muted": "Η αποστολή περιορίστηκε προσωρινά από διαχειριστή",
-  "chat_reply_unavailable": "Το μήνυμα στο οποίο απαντάτε δεν είναι πλέον διαθέσιμο"
+  "chat_reply_unavailable": "Το μήνυμα στο οποίο απαντάτε δεν είναι πλέον διαθέσιμο",
+  "place_chip_choose": "Επιλέξτε μέρος",
+  "place_chip_world": "Όλος ο κόσμος",
+  "place_chip_nearby": "Κοντά μου",
+  "place_selector_title": "Μέρος",
+  "place_selector_search": "Αναζήτηση πόλης ή χώρας",
+  "place_selector_recent": "Πρόσφατα",
+  "place_selector_geography": "Άνοιγμα πλήρους γεωγραφίας",
+  "place_selector_close": "Κλείσιμο",
+  "place_selector_denied": "Η τοποθεσία είναι απενεργοποιημένη. Μπορείτε να επιλέξετε μέρος χειροκίνητα.",
+  "place_selector_locating": "Εύρεση τοποθεσίας…",
+  "place_selector_no_match": "Δεν υπάρχει αντίστοιχο πρόσφατο μέρος. Ανοίξτε την πλήρη γεωγραφία.",
+  "place_continue": "Συνέχεια {name}"
 }

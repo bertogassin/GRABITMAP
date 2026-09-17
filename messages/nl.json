@@ -337,5 +337,17 @@
   "chat_video_speed": "Snelheid",
   "chat_connecting_initial": "Verbinden…",
   "chat_member_muted": "Verzenden is tijdelijk beperkt door een beheerder",
-  "chat_reply_unavailable": "Het bericht waarop je antwoordt is niet meer beschikbaar"
+  "chat_reply_unavailable": "Het bericht waarop je antwoordt is niet meer beschikbaar",
+  "place_chip_choose": "Kies een plek",
+  "place_chip_world": "Hele wereld",
+  "place_chip_nearby": "Dichtbij mij",
+  "place_selector_title": "Plek",
+  "place_selector_search": "Zoek stad of land",
+  "place_selector_recent": "Recent",
+  "place_selector_geography": "Volledige geografie openen",
+  "place_selector_close": "Sluiten",
+  "place_selector_denied": "Locatie is uit. U kunt handmatig een plek kiezen.",
+  "place_selector_locating": "Plek zoeken…",
+  "place_selector_no_match": "Geen recente plek gevonden. Open de volledige geografie.",
+  "place_continue": "Doorgaan met {name}"
 }

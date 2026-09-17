@@ -337,5 +337,17 @@
   "chat_video_speed": "Velocidad",
   "chat_connecting_initial": "Conectando…",
   "chat_member_muted": "Un administrador ha restringido temporalmente el envío",
-  "chat_reply_unavailable": "El mensaje al que respondes ya no está disponible"
+  "chat_reply_unavailable": "El mensaje al que respondes ya no está disponible",
+  "place_chip_choose": "Elegir un lugar",
+  "place_chip_world": "Todo el mundo",
+  "place_chip_nearby": "Cerca de mí",
+  "place_selector_title": "Lugar",
+  "place_selector_search": "Buscar ciudad o país",
+  "place_selector_recent": "Recientes",
+  "place_selector_geography": "Abrir geografía completa",
+  "place_selector_close": "Cerrar",
+  "place_selector_denied": "La ubicación está desactivada. Puede elegir un lugar manualmente.",
+  "place_selector_locating": "Buscando tu lugar…",
+  "place_selector_no_match": "No hay un lugar reciente coincidente. Abra la geografía completa.",
+  "place_continue": "Continuar {name}"
 }

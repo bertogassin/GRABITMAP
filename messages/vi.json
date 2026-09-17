@@ -337,5 +337,17 @@
   "chat_video_speed": "Tốc độ",
   "chat_connecting_initial": "Đang kết nối…",
   "chat_member_muted": "Quản trị viên đã tạm thời hạn chế gửi tin",
-  "chat_reply_unavailable": "Tin nhắn bạn đang trả lời không còn khả dụng"
+  "chat_reply_unavailable": "Tin nhắn bạn đang trả lời không còn khả dụng",
+  "place_chip_choose": "Chọn nơi",
+  "place_chip_world": "Toàn thế giới",
+  "place_chip_nearby": "Gần tôi",
+  "place_selector_title": "Nơi",
+  "place_selector_search": "Tìm thành phố hoặc quốc gia",
+  "place_selector_recent": "Gần đây",
+  "place_selector_geography": "Mở địa lý đầy đủ",
+  "place_selector_close": "Đóng",
+  "place_selector_denied": "Vị trí đang tắt. Bạn có thể chọn nơi thủ công.",
+  "place_selector_locating": "Đang tìm vị trí…",
+  "place_selector_no_match": "Không có nơi gần đây phù hợp. Mở địa lý đầy đủ.",
+  "place_continue": "Tiếp tục {name}"
 }

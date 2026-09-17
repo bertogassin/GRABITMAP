@@ -2411,3 +2411,49 @@ test("redesign inventory protects SEO and location compatibility without freezin
   assert.match(communication, /href="\/app\/official-groups"/);
   assert.match(communication, /method="post" action="\/app\/official-groups/);
 });
+
+test("location chip stores tab place without a new cookie", async () => {
+  const [placeMemory, common] = await Promise.all([
+    readFile(new URL("static/place-chip.js", root), "utf8"),
+    readFile(new URL("src/web/templates/common.rs", root), "utf8"),
+  ]);
+
+  assert.ok(placeMemory.includes("grabit-active-place"));
+  assert.ok(placeMemory.includes("grabit-recent-places"));
+  assert.ok(placeMemory.includes("sessionStorage"));
+  assert.ok(placeMemory.includes("GEO_DENIED_KEY"));
+  assert.ok(placeMemory.includes("navigator.geolocation"));
+  assert.equal((placeMemory.match(/document\.cookie/g) || []).length, 0);
+  assert.ok(!placeMemory.includes("grabit-place="));
+
+  assert.match(common, /id="rm-place-chip"/);
+  assert.match(common, /id="rm-place-dialog"/);
+  assert.match(common, /data-place-pick="nearby"/);
+  assert.match(common, /href="\/app"/);
+});
+
+test("location chip strings exist in every locale", async () => {
+  const keys = [
+    "place_chip_choose",
+    "place_chip_world",
+    "place_chip_nearby",
+    "place_selector_title",
+    "place_selector_search",
+    "place_selector_recent",
+    "place_selector_geography",
+    "place_selector_close",
+    "place_selector_denied",
+    "place_selector_locating",
+    "place_selector_no_match",
+    "place_continue",
+  ];
+  for (const locale of locales) {
+    const messages = JSON.parse(
+      await readFile(new URL("messages/" + locale + ".json", root), "utf8"),
+    );
+    for (const key of keys) {
+      assert.equal(typeof messages[key], "string", locale + " " + key);
+      assert.notEqual(messages[key].trim(), "", locale + " " + key);
+    }
+  }
+});

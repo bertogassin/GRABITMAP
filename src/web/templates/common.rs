@@ -4355,6 +4355,92 @@ body.light-theme .card:hover .card-icon {
     filter: none;
 }
 
+.rm-place-chip {
+    display: inline-flex;
+    align-items: center;
+    max-width: 42vw;
+    min-height: 36px;
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--text);
+    background: rgba(255,255,255,.04);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.rm-place-chip-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rm-place-dialog {
+    width: min(100% - 24px, 420px);
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
+.rm-place-dialog::backdrop {
+    background: rgba(0,0,0,.55);
+}
+
+.rm-place-sheet {
+    display: grid;
+    gap: 12px;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    background: var(--surface);
+    color: var(--text);
+}
+
+.rm-place-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.rm-place-head h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.rm-place-actions,
+.rm-place-recent ul {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.rm-place-actions button,
+.rm-place-option,
+.rm-place-geography {
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(255,255,255,.03);
+    color: inherit;
+    text-align: start;
+    text-decoration: none;
+    font: inherit;
+}
+
+.rm-place-status {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
 @media (max-width: 620px) {
     .hero {
         padding: 22px 18px;
@@ -4431,6 +4517,51 @@ fn global_search_dialog() -> String {
     )
 }
 
+fn place_selector_dialog() -> String {
+    format!(
+        r#"<dialog class="rm-place-dialog"
+        id="rm-place-dialog"
+        aria-labelledby="rm-place-dialog-title">
+    <div class="rm-place-sheet">
+        <header class="rm-place-head">
+            <h2 id="rm-place-dialog-title">{title}</h2>
+            <button class="rm-global-search-close"
+                    type="button"
+                    data-place-close
+                    aria-label="{close}">
+                {close_icon}
+            </button>
+        </header>
+        <div class="search rm-catalog-search">
+            <span aria-hidden="true">{search_icon}</span>
+            <input id="rm-place-query"
+                   type="search"
+                   autocomplete="off"
+                   enterkeyhint="search"
+                   maxlength="80"
+                   aria-label="{search_label}"
+                   placeholder="{search_label}">
+        </div>
+        <div class="rm-place-actions">
+            <button type="button" data-place-pick="nearby">{nearby}</button>
+            <button type="button" data-place-pick="world">{world}</button>
+        </div>
+        <section id="rm-place-recent" hidden></section>
+        <p id="rm-place-status" class="rm-place-status" hidden></p>
+        <a class="rm-place-geography" href="/app">{geography}</a>
+    </div>
+</dialog>"#,
+        title = crate::i18n::t("place_selector_title"),
+        close = crate::i18n::t("place_selector_close"),
+        close_icon = icon("x"),
+        search_icon = icon("search"),
+        search_label = crate::i18n::t("place_selector_search"),
+        nearby = crate::i18n::t("place_chip_nearby"),
+        world = crate::i18n::t("place_chip_world"),
+        geography = crate::i18n::t("place_selector_geography"),
+    )
+}
+
 pub(crate) fn page_document(
     title: &str,
     head_extra_html: &str,
@@ -4440,6 +4571,7 @@ pub(crate) fn page_document(
     body_after_html: &str,
 ) -> String {
     let global_search = global_search_dialog();
+    let place_dialog = place_selector_dialog();
     let i18n_boot = format!(
         "{{\"locale\":{locale},\"dir\":{dir},\"messages\":{messages}}}",
         locale = serde_json::to_string(crate::i18n::locale()).unwrap_or_else(|_| "\"ru\"".into()),
@@ -4489,6 +4621,8 @@ pub(crate) fn page_document(
 
 {global_search}
 
+{place_dialog}
+
 <script src="{mobile_foundation_js}" defer></script>
 <script src="{app_reliability_js}" defer></script>
 
@@ -4500,6 +4634,7 @@ pub(crate) fn page_document(
 <script src="{nav_badge_js}" defer></script>
 <script src="{theme_toggle_js}" defer></script>
 <script src="{place_memory_js}" defer></script>
+<script src="{place_chip_js}" defer></script>
 <script src="{global_search_js}" defer></script>
 <script src="{share_js}" defer></script>
 <script src="{pwa_install_js}" defer></script>
@@ -4522,12 +4657,14 @@ pub(crate) fn page_document(
         main = main_html,
         bottom_nav = bottom_nav_html,
         global_search = global_search,
+        place_dialog = place_dialog,
         body_after = body_after_html,
         splash_js = static_asset("splash.js"),
         chat_sounds_js = static_asset("chat-sounds.js"),
         nav_badge_js = static_asset("nav-badge.js"),
         theme_toggle_js = static_asset("theme-toggle.js"),
         place_memory_js = static_asset("place-memory.js"),
+        place_chip_js = static_asset("place-chip.js"),
         global_search_js = static_asset("global-search.js"),
         share_js = static_asset("share.js"),
         pwa_install_js = static_asset("pwa-install.js"),
@@ -4701,6 +4838,15 @@ pub(crate) fn topbar(subtitle: &str, _icon_name: &str) -> String {
     </a>
 
     <div class="topbar-actions">
+        <a class="rm-place-chip"
+           id="rm-place-chip"
+           href="/app"
+           data-place-chip
+           aria-haspopup="dialog"
+           aria-controls="rm-place-dialog"
+           aria-label="{place_aria}">
+            <span id="rm-place-chip-label" class="rm-place-chip-label">{place_label}</span>
+        </a>
         <a class="topbar-search"
            href="/app/search"
            data-global-search-open
@@ -4725,6 +4871,8 @@ pub(crate) fn topbar(subtitle: &str, _icon_name: &str) -> String {
         search_icon = icon("search"),
         subtitle = escape_html(subtitle),
         search_aria = crate::i18n::t("map_explorer_aria"),
+        place_aria = crate::i18n::t("place_selector_title"),
+        place_label = crate::i18n::t("place_chip_choose"),
         profile_aria = crate::i18n::t("common_open_profile"),
         profile_label = crate::i18n::t("common_profile"),
     )
@@ -6580,6 +6728,18 @@ mod public_entry_tests {
         assert!(page.contains("href=\"/privacy\""));
         assert!(page.contains("Правила"));
         assert!(page.contains("Политика"));
+    }
+
+    #[test]
+    fn page_document_includes_location_chip_and_selector() {
+        let page = page_document("Тест", "", "", "<p>ok</p>", "", "");
+        let bar = topbar("Тест", "map");
+        assert!(bar.contains("id=\"rm-place-chip\""));
+        assert!(page.contains("id=\"rm-place-dialog\""));
+        assert!(page.contains("data-place-pick=\"nearby\""));
+        assert!(page.contains("data-place-pick=\"world\""));
+        assert!(page.contains("/app"));
+        assert!(bar.contains("/app"));
     }
 
     #[test]

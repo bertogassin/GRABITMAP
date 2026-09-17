@@ -337,5 +337,17 @@
   "chat_video_speed": "Hız",
   "chat_connecting_initial": "Bağlanıyor…",
   "chat_member_muted": "Gönderme bir yönetici tarafından geçici olarak kısıtlandı",
-  "chat_reply_unavailable": "Yanıtladığınız mesaj artık kullanılamıyor"
+  "chat_reply_unavailable": "Yanıtladığınız mesaj artık kullanılamıyor",
+  "place_chip_choose": "Yer seçin",
+  "place_chip_world": "Tüm dünya",
+  "place_chip_nearby": "Yakınımda",
+  "place_selector_title": "Yer",
+  "place_selector_search": "Şehir veya ülke ara",
+  "place_selector_recent": "Son kullanılanlar",
+  "place_selector_geography": "Tam coğrafyayı aç",
+  "place_selector_close": "Kapat",
+  "place_selector_denied": "Konum kapalı. Yeri elle seçebilirsiniz.",
+  "place_selector_locating": "Konum bulunuyor…",
+  "place_selector_no_match": "Eşleşen son yer yok. Tam coğrafyayı açın.",
+  "place_continue": "{name} ile devam et"
 }
