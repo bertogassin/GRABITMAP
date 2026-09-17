@@ -176,12 +176,86 @@
         }
     }
 
+    function onSearchPage() {
+        return window.location.pathname === "/app/search";
+    }
+
+    function cityIdFromPlace(place) {
+        if (!place) {
+            return 0;
+        }
+        if (place.cityId) {
+            return Number(place.cityId) || 0;
+        }
+        var match = String(place.href || "").match(/\/app\/map\/city\/(\d+)/);
+        return match ? Number(match[1]) : 0;
+    }
+
+    function searchPageHref(place) {
+        var params = new URLSearchParams(window.location.search);
+        var cityId = cityIdFromPlace(place);
+        if (place && place.kind === "city" && cityId > 0) {
+            params.set("city_id", String(cityId));
+        } else {
+            params.delete("city_id");
+        }
+        var query = params.toString();
+        return "/app/search" + (query ? "?" + query : "");
+    }
+
     function selectPlace(place) {
+        if (place && place.kind === "city") {
+            var id = cityIdFromPlace(place);
+            if (id > 0) {
+                place.cityId = id;
+            }
+        }
         setActive(place);
         closeDialog();
+        if (onSearchPage()) {
+            if (place && place.kind !== "city" && place.kind !== "world" && place.href) {
+                window.location.href = place.href;
+                return;
+            }
+            if (place && place.kind === "city" && cityIdFromPlace(place) < 1 && place.href) {
+                window.location.href = place.href;
+                return;
+            }
+            var next = searchPageHref(place);
+            if (next !== window.location.pathname + window.location.search) {
+                window.location.href = next;
+            }
+            return;
+        }
         if (place && place.href && place.href !== window.location.pathname) {
             window.location.href = place.href;
         }
+    }
+
+    function paintContinue() {
+        var host = document.getElementById("rm-search-continue");
+        var link = document.getElementById("rm-search-continue-link");
+        if (!host || !link || !onSearchPage()) {
+            return;
+        }
+        var params = new URLSearchParams(window.location.search);
+        if (params.get("city_id") || params.get("q") || params.get("kind") || params.get("rubric")) {
+            host.hidden = true;
+            return;
+        }
+        var place = active();
+        if (!place || place.kind !== "city" || cityIdFromPlace(place) < 1) {
+            place = recents().filter(function (row) {
+                return row && row.kind === "city" && cityIdFromPlace(row) > 0;
+            })[0];
+        }
+        if (!place) {
+            host.hidden = true;
+            return;
+        }
+        link.textContent = t("place_continue", { name: place.name || t("place_chip_choose") });
+        link.href = "/app/search?city_id=" + cityIdFromPlace(place);
+        host.hidden = false;
     }
 
     function renderList(hostId, heading, rows) {
@@ -307,11 +381,17 @@
             }
             var option = event.target.closest("[data-place-href]");
             if (option) {
-                selectPlace({
+                var href = option.getAttribute("data-place-href") || "";
+                var picked = {
                     kind: option.getAttribute("data-place-kind") || "city",
-                    href: option.getAttribute("data-place-href"),
+                    href: href,
                     name: option.getAttribute("data-place-name") || ""
-                });
+                };
+                var cityMatch = href.match(/\/app\/map\/city\/(\d+)/);
+                if (cityMatch) {
+                    picked.cityId = Number(cityMatch[1]);
+                }
+                selectPlace(picked);
             }
         });
         var query = document.getElementById("rm-place-query");
@@ -335,6 +415,7 @@
     ready(function () {
         resolve();
         paintChip();
+        paintContinue();
         bind();
     });
 })();

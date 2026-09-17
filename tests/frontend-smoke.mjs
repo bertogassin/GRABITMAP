@@ -2468,6 +2468,27 @@ test("location chip strings exist in every locale", async () => {
   }
 });
 
+test("unified search keeps one query field and place in the URL", async () => {
+  const [navigation, common, chip] = await Promise.all([
+    readFile(new URL("src/web/templates/navigation.rs", root), "utf8"),
+    readFile(new URL("src/web/templates/common.rs", root), "utf8"),
+    readFile(new URL("static/place-chip.js", root), "utf8"),
+  ]);
+
+  assert.match(common, /action="\/app\/search"/);
+  assert.match(common, /name="q"/);
+  assert.match(common, /name="city_id"/);
+  assert.match(navigation, /id="rm-search-continue"/);
+  assert.match(navigation, /search_page_href/);
+  assert.match(navigation, /crate::i18n::t\("search_what"\)/);
+  assert.doesNotMatch(navigation, /Одно поле для запроса/);
+  assert.ok(chip.includes('pathname === "/app/search"'));
+  assert.ok(chip.includes('params.set("city_id"'));
+  assert.ok(chip.includes('place.kind !== "city"'));
+  assert.ok(chip.includes("paintContinue"));
+  assert.doesNotMatch(chip, /document\.cookie/);
+});
+
 test("geo search API is a bounded guest endpoint", async () => {
   const [publicRoutes, handler, db] = await Promise.all([
     readFile(new URL("src/web/routes/public.rs", root), "utf8"),
