@@ -241,6 +241,7 @@ fn hydrate_hit(conn: &Connection, kind: &str, id: i64) -> Result<Option<GeoSearc
     }
 }
 
+#[cfg(test)]
 pub fn explain_search_plan(conn: &Connection, query: &str) -> Result<Vec<String>> {
     let Some(match_query) = fts_match_query(query) else {
         return Ok(Vec::new());
