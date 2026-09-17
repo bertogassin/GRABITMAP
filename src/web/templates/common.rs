@@ -6742,6 +6742,7 @@ mod public_entry_tests {
         assert!(bar.contains("/app"));
     }
 
+    #[test]
     fn page_document_keeps_shared_footer_styles_in_the_head() {
         let page = page_document("Тест", "", "", "<p>ok</p>", "", "");
         let (_, body) = page.split_once("<body>").expect("page body");
