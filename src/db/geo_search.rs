@@ -128,22 +128,24 @@ pub fn search_places(conn: &Connection, query: &str, limit: i64) -> Result<Vec<G
     let limit = limit.clamp(1, 20);
     ensure_geo_search(conn)?;
 
-    let mut statement = conn.prepare(
-        "SELECT kind, place_id
-         FROM geo_search_fts
-         WHERE geo_search_fts MATCH ?1
-         LIMIT ?2",
-    )?;
-    let candidates = statement
-        .query_map(params![match_query, MAX_SCAN_CANDIDATES], |row| {
-            Ok((row.get::<_, String>(0)?, row.get::<_, i64>(1)?))
-        })?
-        .collect::<Result<Vec<_>, _>>()?;
-
     let mut hits = Vec::new();
-    for (kind, id) in candidates {
-        if let Some(hit) = hydrate_hit(conn, &kind, id)? {
-            hits.push(hit);
+    for (kind, cap) in [("country", 8_i64), ("city", MAX_SCAN_CANDIDATES)] {
+        let mut statement = conn.prepare(
+            "SELECT kind, place_id
+             FROM geo_search_fts
+             WHERE geo_search_fts MATCH ?1
+               AND kind = ?2
+             LIMIT ?3",
+        )?;
+        let candidates = statement
+            .query_map(params![match_query, kind, cap], |row| {
+                Ok((row.get::<_, String>(0)?, row.get::<_, i64>(1)?))
+            })?
+            .collect::<Result<Vec<_>, _>>()?;
+        for (kind, id) in candidates {
+            if let Some(hit) = hydrate_hit(conn, &kind, id)? {
+                hits.push(hit);
+            }
         }
     }
 
