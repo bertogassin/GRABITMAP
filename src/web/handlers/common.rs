@@ -285,6 +285,20 @@ pub(super) async fn send_transactional_email(
     Ok(())
 }
 
+/// Constant-time equality for comparing secret hashes (confirmation codes,
+/// tokens). A plain `==`/`!=` on the hash strings short-circuits on the
+/// first differing byte, which leaks timing information about how many
+/// leading bytes matched.
+pub(super) fn constant_time_eq(a: &str, b: &str) -> bool {
+    let (a, b) = (a.as_bytes(), b.as_bytes());
+
+    if a.len() != b.len() {
+        return false;
+    }
+
+    a.iter().zip(b).fold(0u8, |acc, (x, y)| acc | (x ^ y)) == 0
+}
+
 pub(super) fn csrf_rejected_response() -> Response {
     (
         StatusCode::FORBIDDEN,

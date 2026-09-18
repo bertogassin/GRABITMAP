@@ -1,15 +1,16 @@
 use super::auth::{
-    cookie_security_flags, email_rate_limit_id, normalize_email, verify_authenticated_user,
+    cookie_security_flags, email_rate_limit_id, ip_rate_limit_id, normalize_email,
+    verify_authenticated_user,
 };
 use super::auth_email::verify_password;
 use super::common::{
-    csrf_rejected_response, rate_limit_retry_after, request_is_cross_site,
+    constant_time_eq, csrf_rejected_response, rate_limit_retry_after, request_is_cross_site,
     send_transactional_email, unix_now,
 };
 use crate::state::app_state::AppState;
 use crate::web::templates;
 use axum::{
-    extract::{Form, State},
+    extract::{Form, Query, State},
     http::{header, HeaderMap, HeaderValue, StatusCode},
     response::{Html, IntoResponse, Response},
     Json,
@@ -19,8 +20,9 @@ use serde::Deserialize;
 use serde_json::json;
 use sha2::Sha256;
 
-const DELETION_CODE_TTL_SECONDS: i64 = 600;
+const DELETION_CODE_TTL_SECONDS: i64 = 900;
 const DELETION_CODE_MAX_ATTEMPTS: i64 = 5;
+const DELETION_CANCEL_TOKEN_TTL_SECONDS: i64 = crate::account_deletion::GRACE_PERIOD_SECONDS;
 
 fn generate_deletion_code() -> String {
     let mut bytes = [0u8; 4];
@@ -46,11 +48,70 @@ async fn send_deletion_code_email(email: &str, code: &str) -> Result<(), String>
             "GRABIT",
             "Код для удаления аккаунта:",
             code,
-            "Код действует 10 минут. После подтверждения аккаунт будет скрыт сразу, а данные удалены безвозвратно через 7 дней.",
+            "Код действует 15 минут. После подтверждения аккаунт будет скрыт сразу, а данные удалены безвозвратно через 30 дней.",
             "Если вы не запрашивали удаление, проигнорируйте письмо — код никого не пустит в аккаунт.",
         ),
     )
     .await
+}
+
+fn generate_cancel_token() -> String {
+    let mut bytes = [0u8; 32];
+    getrandom::getrandom(&mut bytes).expect("secure random");
+    hex::encode(bytes)
+}
+
+fn hash_cancel_token(state: &AppState, email: &str, token: &str, expires_at: i64) -> String {
+    type HmacSha256 = Hmac<Sha256>;
+
+    let payload = format!("account-deletion-cancel:{email}:{token}:{expires_at}");
+    let mut mac = HmacSha256::new_from_slice(state.admin_key.as_bytes()).expect("HMAC key");
+    mac.update(payload.as_bytes());
+    hex::encode(mac.finalize().into_bytes())
+}
+
+/// Issues a one-time cancellation link, valid for the same 30-day window as
+/// the grace period itself, and emails it. Best-effort: a failure here
+/// doesn't undo the deletion that was already recorded — logging back in
+/// within the window still cancels it regardless of this email.
+async fn send_deletion_cancel_link(state: &AppState, email: &str) {
+    let now = unix_now();
+    let expires_at = now + DELETION_CANCEL_TOKEN_TTL_SECONDS;
+    let token = generate_cancel_token();
+    let token_hash = hash_cancel_token(state, email, &token, expires_at);
+
+    let stored = crate::db::pool::get_connection(&state.db_pool).ok().and_then(|db| {
+        db.execute(
+            "INSERT INTO email_login_codes (
+                email, code_hash, expires_at, attempts, consumed_at, created_at, purpose
+             ) VALUES (?1, ?2, ?3, 0, 0, ?4, 'account_deletion_cancel')",
+            rusqlite::params![email, &token_hash, expires_at, now],
+        )
+        .ok()
+    });
+
+    if stored.is_none() {
+        return;
+    }
+
+    let cancel_url = format!(
+        "https://grabitmap.com/account/delete/cancel?email={}&token={}",
+        urlencoding::encode(email),
+        token
+    );
+
+    let _ = send_transactional_email(
+        email,
+        "Удаление аккаунта GRABIT запланировано",
+        format!(
+            "<p>Аккаунт скрыт и будет удалён безвозвратно через 30 дней.</p>\
+             <p>Чтобы отменить: войдите в аккаунт как обычно, либо перейдите по ссылке ниже \
+             (действует 30 дней, можно использовать один раз):</p>\
+             <p><a href=\"{cancel_url}\">Отменить удаление</a></p>\
+             <p>Если вы не запрашивали удаление — срочно смените пароль.</p>"
+        ),
+    )
+    .await;
 }
 
 fn deletion_scheduled_response(document_title: &str, purge_at: i64) -> String {
@@ -168,6 +229,18 @@ pub async fn account_delete_request(
             }
         };
 
+    let owner_email: Option<String> = db
+        .query_row(
+            "SELECT email FROM auth_identities WHERE user_id = ?1 AND provider = 'email' LIMIT 1",
+            rusqlite::params![authenticated.user_id],
+            |row| row.get(0),
+        )
+        .ok();
+
+    if let Some(owner_email) = owner_email {
+        send_deletion_cancel_link(&state, &owner_email).await;
+    }
+
     let mut response = Html(deletion_scheduled_response(
         "Аккаунт удаляется · GRABIT",
         purge_at,
@@ -196,7 +269,7 @@ pub async fn public_account_delete_page() -> Html<String> {
         <button id="request-button" type="button" class="ui-button rm-auth-button rm-auth-button--compact">Отправить код</button>
 
         <div id="confirm-section" hidden class="rm-auth-step">
-            <p class="card-meta">Аккаунт будет скрыт сразу. Данные удаляются безвозвратно через 7 дней — вход в аккаунт в течение этого времени отменяет удаление.</p>
+            <p class="card-meta">Аккаунт будет скрыт сразу. Данные удаляются безвозвратно через 30 дней — вход в аккаунт в течение этого времени отменяет удаление.</p>
 
             <label class="rm-auth-label" for="code-input">Код из письма</label>
             <input id="code-input" class="ui-input rm-auth-input rm-auth-input--code" type="text" inputmode="numeric" maxlength="6" placeholder="000000">
@@ -302,7 +375,7 @@ pub async fn public_account_delete_page() -> Html<String> {
 
             document.querySelector(".rm-auth-card").innerHTML =
                 '<h1>Аккаунт скрыт</h1><p>Данные будут удалены безвозвратно ' +
-                'через 7 дней. Войдите в аккаунт в течение этого времени, ' +
+                'через 30 дней. Войдите в аккаунт в течение этого времени, ' +
                 'чтобы отменить удаление.</p>' +
                 '<p><a class="ui-button" href="/login">Вернуться ко входу</a></p>';
         } catch (error) {
@@ -350,9 +423,21 @@ pub async fn public_account_delete_request(
     };
 
     let rate_id = email_rate_limit_id(&state, &email);
+    let ip_rate_id = ip_rate_limit_id(&state, &headers);
+
+    if rate_limit_retry_after(&state, ip_rate_id, "account_deletion_public_request_ip", 20, 3_600)
+        .await
+        .is_some()
+    {
+        return (
+            StatusCode::TOO_MANY_REQUESTS,
+            Json(json!({ "ok": false, "error": "rate_limited" })),
+        )
+            .into_response();
+    }
 
     if let Some(retry_after) =
-        rate_limit_retry_after(&state, rate_id, "account_deletion_public_request", 5, 600).await
+        rate_limit_retry_after(&state, rate_id, "account_deletion_public_request", 5, 3_600).await
     {
         return (
             StatusCode::TOO_MANY_REQUESTS,
@@ -549,7 +634,7 @@ pub async fn public_account_delete_confirm(
             .into_response();
     }
 
-    if hash_deletion_code(&state, &email, code, expires_at) != expected_hash {
+    if !constant_time_eq(&hash_deletion_code(&state, &email, code, expires_at), &expected_hash) {
         let _ = db.execute(
             "UPDATE email_login_codes SET attempts = attempts + 1 WHERE id = ?1",
             rusqlite::params![code_id],
@@ -597,15 +682,114 @@ pub async fn public_account_delete_confirm(
     };
 
     match crate::account_deletion::request_deletion(&mut db, user_id, unix_now()) {
-        Ok(purge_at) => (
-            StatusCode::OK,
-            Json(json!({ "ok": true, "purge_at": purge_at })),
-        )
-            .into_response(),
+        Ok(purge_at) => {
+            send_deletion_cancel_link(&state, &email).await;
+
+            (
+                StatusCode::OK,
+                Json(json!({ "ok": true, "purge_at": purge_at })),
+            )
+                .into_response()
+        }
         Err(_) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(json!({ "ok": false, "error": "deletion_request_failed" })),
         )
             .into_response(),
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CancelDeletionQuery {
+    pub email: String,
+    pub token: String,
+}
+
+fn cancel_link_failed_page() -> Response {
+    Html(templates::status_page(
+        "Отмена удаления · GRABIT",
+        "⚠ GRABIT",
+        "Ссылка недействительна",
+        "Она уже использована, устарела или скопирована не полностью. Можно отменить удаление, просто войдя в аккаунт.",
+        r#"<a class="ui-button" href="/login">Войти</a>"#,
+    ))
+    .into_response()
+}
+
+/// One-time link from the deletion-scheduled email. Second way to cancel a
+/// pending deletion besides logging back in.
+pub async fn account_delete_cancel(
+    State(state): State<AppState>,
+    Query(query): Query<CancelDeletionQuery>,
+) -> Response {
+    let Some(email) = normalize_email(&query.email) else {
+        return cancel_link_failed_page();
+    };
+
+    let token = query.token.trim();
+
+    if token.is_empty() {
+        return cancel_link_failed_page();
+    }
+
+    let mut db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => return (StatusCode::SERVICE_UNAVAILABLE, "Сервис недоступен").into_response(),
+    };
+
+    let row: Option<(i64, String, i64, i64)> = db
+        .query_row(
+            "SELECT id, code_hash, expires_at, consumed_at
+             FROM email_login_codes
+             WHERE email = ?1
+               AND purpose = 'account_deletion_cancel'
+             ORDER BY id DESC
+             LIMIT 1",
+            rusqlite::params![&email],
+            |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
+        )
+        .ok();
+
+    let Some((token_id, expected_hash, expires_at, consumed_at)) = row else {
+        return cancel_link_failed_page();
+    };
+
+    if consumed_at != 0 || expires_at < unix_now() {
+        return cancel_link_failed_page();
+    }
+
+    let computed_hash = hash_cancel_token(&state, &email, token, expires_at);
+
+    if !constant_time_eq(&computed_hash, &expected_hash) {
+        return cancel_link_failed_page();
+    }
+
+    let user_id: Option<i64> = db
+        .query_row(
+            "SELECT user_id FROM auth_identities WHERE provider = 'email' AND email = ?1 LIMIT 1",
+            rusqlite::params![&email],
+            |row| row.get(0),
+        )
+        .ok();
+
+    let Some(user_id) = user_id else {
+        return cancel_link_failed_page();
+    };
+
+    let _ = db.execute(
+        "UPDATE email_login_codes SET consumed_at = ?2 WHERE id = ?1",
+        rusqlite::params![token_id, unix_now()],
+    );
+
+    match crate::account_deletion::restore_if_pending(&mut db, user_id) {
+        Ok(true) => Html(templates::status_page(
+            "Удаление отменено · GRABIT",
+            "GRABIT",
+            "Удаление отменено",
+            "Аккаунт восстановлен. Можно войти как обычно.",
+            r#"<a class="ui-button" href="/login">Войти</a>"#,
+        ))
+        .into_response(),
+        _ => cancel_link_failed_page(),
     }
 }

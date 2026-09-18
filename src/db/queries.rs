@@ -78,7 +78,8 @@ pub fn init_db() -> Result<Connection> {
         conn.execute("ALTER TABLE users ADD COLUMN telegram_id INTEGER", [])?;
     }
 
-    // Account deletion (soft-delete with a 7-day grace period).
+    // Account deletion (soft-delete with a grace period, see
+    // account_deletion::GRACE_PERIOD_SECONDS for the current length).
     //
     // deletion_requested_at: 0 = не запрашивалось; иначе момент запроса.
     //   Пока не 0, аккаунт скрыт (is_active=0), но данные ещё не стёрты —

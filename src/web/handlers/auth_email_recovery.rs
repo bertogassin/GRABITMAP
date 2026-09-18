@@ -1,10 +1,10 @@
-use super::auth::{auth_redirect_target, email_rate_limit_id, normalize_email};
+use super::auth::{auth_redirect_target, email_rate_limit_id, ip_rate_limit_id, normalize_email};
 use super::auth_email::{
     auth_related_href, email_delivery_configured, email_password_auth_response, hash_password,
     validate_password, AuthNextQuery,
 };
 use super::common::{
-    csrf_rejected_response, rate_limit_retry_after, request_is_cross_site,
+    constant_time_eq, csrf_rejected_response, rate_limit_retry_after, request_is_cross_site,
     send_transactional_email, unix_now,
 };
 use crate::state::app_state::AppState;
@@ -34,7 +34,7 @@ pub struct EmailResetConfirmRequest {
     pub password_confirm: String,
 }
 
-const EMAIL_CODE_TTL_SECONDS: i64 = 600;
+const EMAIL_CODE_TTL_SECONDS: i64 = 900;
 const EMAIL_CODE_MAX_ATTEMPTS: i64 = 5;
 
 fn generate_email_code() -> String {
@@ -93,9 +93,21 @@ pub async fn forgot_password_request(
     };
 
     let rate_id = email_rate_limit_id(&state, &email);
+    let ip_rate_id = ip_rate_limit_id(&state, &headers);
+
+    if rate_limit_retry_after(&state, ip_rate_id, "password_reset_request_ip", 20, 3_600)
+        .await
+        .is_some()
+    {
+        return (
+            StatusCode::TOO_MANY_REQUESTS,
+            Json(json!({ "ok": false, "error": "rate_limited" })),
+        )
+            .into_response();
+    }
 
     if let Some(retry_after) =
-        rate_limit_retry_after(&state, rate_id, "password_reset_request", 5, 600).await
+        rate_limit_retry_after(&state, rate_id, "password_reset_request", 5, 3_600).await
     {
         return (
             StatusCode::TOO_MANY_REQUESTS,
@@ -327,7 +339,7 @@ pub async fn reset_password(
             .into_response();
     }
 
-    if hash_reset_code(&state, &email, code, expires_at) != expected_hash {
+    if !constant_time_eq(&hash_reset_code(&state, &email, code, expires_at), &expected_hash) {
         let _ = db.execute(
             "UPDATE email_login_codes SET attempts = attempts + 1 WHERE id = ?1",
             rusqlite::params![code_id],
@@ -754,7 +766,7 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
             }}
 
             resetSection.hidden = false;
-            setStatus("Если аккаунт существует, код отправлен на email.", false);
+            setStatus("Если аккаунт с такой почтой существует, код отправлен.", false);
             codeInput.focus();
         }} catch (_) {{
             setStatus("Ошибка соединения.", true);

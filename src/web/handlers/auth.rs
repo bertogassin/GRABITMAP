@@ -91,6 +91,27 @@ pub(super) fn email_rate_limit_id(state: &AppState, email: &str) -> i64 {
     i64::from_be_bytes(bytes) & i64::MAX
 }
 
+/// Same idea as `email_rate_limit_id`, keyed by the request's IP instead —
+/// a second, independent limit so one address can't route around the
+/// per-email cap by rotating emails.
+pub(super) fn ip_rate_limit_id(state: &AppState, headers: &HeaderMap) -> i64 {
+    type HmacSha256 = Hmac<Sha256>;
+
+    let (ip_address, _) = super::common::request_metadata(headers);
+
+    let mut mac = HmacSha256::new_from_slice(state.admin_key.as_bytes()).expect("HMAC key");
+
+    mac.update(b"ip-rate-limit:");
+    mac.update(ip_address.as_bytes());
+
+    let digest = mac.finalize().into_bytes();
+
+    let mut bytes = [0u8; 8];
+    bytes.copy_from_slice(&digest[..8]);
+
+    i64::from_be_bytes(bytes) & i64::MAX
+}
+
 fn generate_email_code() -> String {
     let mut bytes = [0u8; 4];
     getrandom::getrandom(&mut bytes).expect("secure random");

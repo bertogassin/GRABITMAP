@@ -119,8 +119,8 @@ pub use auth_email_recovery::{
 
 mod account_deletion;
 pub use account_deletion::{
-    account_delete_request, public_account_delete_confirm, public_account_delete_page,
-    public_account_delete_request,
+    account_delete_cancel, account_delete_request, public_account_delete_confirm,
+    public_account_delete_page, public_account_delete_request,
 };
 
 mod account_password;

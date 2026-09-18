@@ -196,7 +196,7 @@ fn render_account_danger_zone() -> String {
     <div class="rm-danger-zone-body">
         <p class="card-meta">
             Аккаунт и объявления будут скрыты сразу. Все данные будут
-            безвозвратно удалены через 7 дней. Чтобы отменить — просто
+            безвозвратно удалены через 30 дней. Чтобы отменить — просто
             войдите в аккаунт снова в течение этого времени.
         </p>
         <form method="post" action="/app/account/delete" class="rm-danger-zone-form">

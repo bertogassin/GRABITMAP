@@ -3,8 +3,9 @@ use rusqlite::{params, Connection, TransactionBehavior};
 use std::time::Duration;
 
 /// How long a requested deletion stays reversible. Logging back in during
-/// this window restores the account instead of requiring a fresh signup.
-pub const GRACE_PERIOD_SECONDS: i64 = 7 * 24 * 60 * 60;
+/// this window restores the account instead of requiring a fresh signup —
+/// the same window a one-time email cancellation link is valid for.
+pub const GRACE_PERIOD_SECONDS: i64 = 30 * 24 * 60 * 60;
 
 fn avatar_root() -> std::path::PathBuf {
     std::path::PathBuf::from("data/avatars")

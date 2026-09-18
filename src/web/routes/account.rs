@@ -1,5 +1,6 @@
 use super::super::handlers::{
-    account_delete_request, api_attention_count, api_open_count, api_profile_avatar_set,
+    account_delete_cancel, account_delete_request, api_attention_count, api_open_count,
+    api_profile_avatar_set,
     api_profile_get, api_profile_set, api_public_profile_avatar_get, app_logout, app_me,
     app_revoke_other_sessions, app_revoke_session, change_password, email_auth_request,
     email_auth_verify, favorites_page, forgot_password_page, forgot_password_request,
@@ -27,6 +28,7 @@ pub(super) fn routes() -> Router<AppState> {
             "/account/delete/confirm",
             post(public_account_delete_confirm),
         )
+        .route("/account/delete/cancel", get(account_delete_cancel))
         .route("/register", get(register_page))
         .route("/auth/register-email", post(register_email))
         .route("/auth/login-email", post(login_email))
