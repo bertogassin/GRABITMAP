@@ -1,3 +1,5 @@
+use super::common::escape_html;
+
 #[derive(Debug)]
 pub struct AdminAdministratorRow {
     pub assignment_id: i64,
@@ -37,15 +39,6 @@ pub struct AdminAdministratorsData {
     pub sessions: Vec<AdminSessionRow>,
     pub active_assignments: usize,
     pub expiring_assignments: usize,
-}
-
-fn escape_html(value: &str) -> String {
-    value
-        .replace('&', "&amp;")
-        .replace('<', "&lt;")
-        .replace('>', "&gt;")
-        .replace('"', "&quot;")
-        .replace('\'', "&#39;")
 }
 
 fn level_title(level: i64) -> &'static str {

@@ -177,6 +177,31 @@ fn trusted_request_referer(referer: &str) -> bool {
     })
 }
 
+/// Best-effort client IP (first hop of `X-Forwarded-For`, spoofable by the
+/// client — fine for display/audit, not for authorization) and user agent,
+/// both length-capped for storage.
+pub(super) fn request_metadata(headers: &HeaderMap) -> (String, String) {
+    let ip_address = headers
+        .get("x-forwarded-for")
+        .and_then(|value| value.to_str().ok())
+        .and_then(|value| value.split(',').next())
+        .map(str::trim)
+        .unwrap_or("")
+        .chars()
+        .take(64)
+        .collect::<String>();
+
+    let user_agent = headers
+        .get(header::USER_AGENT)
+        .and_then(|value| value.to_str().ok())
+        .unwrap_or("")
+        .chars()
+        .take(255)
+        .collect::<String>();
+
+    (ip_address, user_agent)
+}
+
 pub(super) fn request_is_cross_site(headers: &HeaderMap) -> bool {
     let origin = headers
         .get(header::ORIGIN)

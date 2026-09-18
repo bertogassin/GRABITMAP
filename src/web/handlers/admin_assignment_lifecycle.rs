@@ -3,7 +3,7 @@ use super::admin_access::{
     AdminPermission,
 };
 use super::auth::verify_authenticated_user;
-use super::common::request_is_cross_site;
+use super::common::{request_is_cross_site, request_metadata};
 use crate::state::app_state::AppState;
 use axum::{
     extract::{Form, Path, State},
@@ -114,28 +114,6 @@ fn transition_is_valid(action: LifecycleAction, current_status: &str) -> bool {
             current_status == "active" || current_status == "suspended"
         }
     }
-}
-
-fn request_metadata(headers: &HeaderMap) -> (String, String) {
-    let ip_address = headers
-        .get("x-forwarded-for")
-        .and_then(|value| value.to_str().ok())
-        .and_then(|value| value.split(',').next())
-        .map(str::trim)
-        .unwrap_or("")
-        .chars()
-        .take(64)
-        .collect::<String>();
-
-    let user_agent = headers
-        .get(header::USER_AGENT)
-        .and_then(|value| value.to_str().ok())
-        .unwrap_or("")
-        .chars()
-        .take(255)
-        .collect::<String>();
-
-    (ip_address, user_agent)
 }
 
 fn owner_context_and_session(

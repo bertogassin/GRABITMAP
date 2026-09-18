@@ -3,9 +3,9 @@ use super::admin_access::{
     AdminPermission,
 };
 use super::auth::verify_authenticated_user;
-use super::common::request_is_cross_site;
+use super::common::{request_is_cross_site, request_metadata};
 use crate::state::app_state::AppState;
-use crate::web::templates::admin_ops_page_themed;
+use crate::web::templates::{admin_ops_page_themed, escape_html};
 use axum::{
     extract::{Form, State},
     http::{header, HeaderMap, HeaderValue, StatusCode},
@@ -90,37 +90,6 @@ fn reason_is_valid(reason: &str) -> bool {
 
 fn duration_is_valid(days: i64) -> bool {
     (MIN_DURATION_DAYS..=MAX_DURATION_DAYS).contains(&days)
-}
-
-fn escape_html(value: &str) -> String {
-    value
-        .replace('&', "&amp;")
-        .replace('<', "&lt;")
-        .replace('>', "&gt;")
-        .replace('"', "&quot;")
-        .replace('\'', "&#39;")
-}
-
-fn request_metadata(headers: &HeaderMap) -> (String, String) {
-    let ip_address = headers
-        .get("x-forwarded-for")
-        .and_then(|value| value.to_str().ok())
-        .and_then(|value| value.split(',').next())
-        .map(str::trim)
-        .unwrap_or("")
-        .chars()
-        .take(64)
-        .collect::<String>();
-
-    let user_agent = headers
-        .get(header::USER_AGENT)
-        .and_then(|value| value.to_str().ok())
-        .unwrap_or("")
-        .chars()
-        .take(255)
-        .collect::<String>();
-
-    (ip_address, user_agent)
 }
 
 fn owner_context_and_session(

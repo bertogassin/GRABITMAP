@@ -1,17 +1,10 @@
+use super::common::escape_html;
+
 pub struct AdminSecurityData {
     pub masked_email: String,
     pub verified: bool,
     pub remaining_seconds: i64,
     pub message: String,
-}
-
-fn escape_html(value: &str) -> String {
-    value
-        .replace('&', "&amp;")
-        .replace('<', "&lt;")
-        .replace('>', "&gt;")
-        .replace('"', "&quot;")
-        .replace('\'', "&#39;")
 }
 
 pub fn render_admin_security(data: AdminSecurityData) -> String {

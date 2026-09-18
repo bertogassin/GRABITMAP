@@ -2,7 +2,7 @@ use super::admin_access::{
     load_admin_context, record_denied_access, valid_admin_session_public_id, AdminPermission,
 };
 use super::auth::verify_authenticated_user;
-use super::common::request_is_cross_site;
+use super::common::{request_is_cross_site, request_metadata};
 use crate::state::app_state::AppState;
 use axum::{
     extract::{Form, Path, State},
@@ -36,28 +36,6 @@ fn revoke_reason_is_valid(reason: &str) -> bool {
 
 fn session_id_is_valid(public_id: &str) -> bool {
     public_id.len() == 32 && public_id.bytes().all(|byte| byte.is_ascii_hexdigit())
-}
-
-fn request_metadata(headers: &HeaderMap) -> (String, String) {
-    let ip_address = headers
-        .get("x-forwarded-for")
-        .and_then(|value| value.to_str().ok())
-        .and_then(|value| value.split(',').next())
-        .map(str::trim)
-        .unwrap_or("")
-        .chars()
-        .take(64)
-        .collect::<String>();
-
-    let user_agent = headers
-        .get(header::USER_AGENT)
-        .and_then(|value| value.to_str().ok())
-        .unwrap_or("")
-        .chars()
-        .take(255)
-        .collect::<String>();
-
-    (ip_address, user_agent)
 }
 
 pub async fn revoke_admin_session(

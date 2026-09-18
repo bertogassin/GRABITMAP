@@ -438,23 +438,7 @@ pub(super) fn create_admin_session(
     let session_hash = hash_admin_session_token(&token);
     let expires_at = now + ADMIN_SESSION_TTL_SECONDS;
 
-    let ip_address = headers
-        .get("x-forwarded-for")
-        .and_then(|value| value.to_str().ok())
-        .and_then(|value| value.split(',').next())
-        .map(str::trim)
-        .unwrap_or("")
-        .chars()
-        .take(64)
-        .collect::<String>();
-
-    let user_agent = headers
-        .get(header::USER_AGENT)
-        .and_then(|value| value.to_str().ok())
-        .unwrap_or("")
-        .chars()
-        .take(255)
-        .collect::<String>();
+    let (ip_address, user_agent) = super::common::request_metadata(headers);
 
     let connection = state
         .db_pool
