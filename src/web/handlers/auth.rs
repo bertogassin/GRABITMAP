@@ -1,5 +1,6 @@
 use super::common::{
-    csrf_rejected_response, rate_limit_retry_after, request_is_cross_site, unix_now,
+    csrf_rejected_response, rate_limit_retry_after, request_is_cross_site,
+    send_transactional_email, unix_now,
 };
 use crate::state::app_state::AppState;
 use crate::web::templates::transactional_code_email_html;
@@ -156,38 +157,18 @@ fn hash_email_code(state: &AppState, email: &str, code: &str, expires_at: i64) -
 }
 
 async fn send_email_code(email: &str, code: &str) -> Result<(), String> {
-    let api_key = std::env::var("RESEND_API_KEY")
-        .map_err(|_| "RESEND_API_KEY is not configured".to_string())?;
-
-    let from = env_first(&["GRABIT_MAIL_FROM", "RESURSMAP_MAIL_FROM"])
-        .unwrap_or_else(|_| "GRABIT <noreply@grabitmap.com>".to_string());
-
-    let client = reqwest::Client::new();
-
-    let response = client
-        .post("https://api.resend.com/emails")
-        .bearer_auth(api_key)
-        .json(&json!({
-            "from": from,
-            "to": [email],
-            "subject": "Код входа в GRABIT",
-            "html": transactional_code_email_html(
-                "GRABIT",
-                "Ваш код входа:",
-                code,
-                "Код действует 10 минут.",
-                "Если вы не запрашивали вход, просто проигнорируйте это письмо.",
-            )
-        }))
-        .send()
-        .await
-        .map_err(|_| "mail_transport_error".to_string())?;
-
-    if !response.status().is_success() {
-        return Err(format!("mail_provider_status_{}", response.status()));
-    }
-
-    Ok(())
+    send_transactional_email(
+        email,
+        "Код входа в GRABIT",
+        transactional_code_email_html(
+            "GRABIT",
+            "Ваш код входа:",
+            code,
+            "Код действует 10 минут.",
+            "Если вы не запрашивали вход, просто проигнорируйте это письмо.",
+        ),
+    )
+    .await
 }
 
 fn store_login_code(state: &AppState, email: &str, code: &str) -> Result<(), &'static str> {

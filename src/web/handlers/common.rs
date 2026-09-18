@@ -251,6 +251,40 @@ pub(super) fn request_is_cross_site(headers: &HeaderMap) -> bool {
     fetch_is_cross_site
 }
 
+/// Shared Resend transactional-email sender used by every code-delivery
+/// flow (login code, password reset, account deletion, owner step-up).
+pub(super) async fn send_transactional_email(
+    to: &str,
+    subject: &str,
+    html: String,
+) -> Result<(), String> {
+    let api_key = std::env::var("RESEND_API_KEY")
+        .map_err(|_| "RESEND_API_KEY is not configured".to_string())?;
+
+    let from = std::env::var("GRABIT_MAIL_FROM")
+        .or_else(|_| std::env::var("RESURSMAP_MAIL_FROM"))
+        .unwrap_or_else(|_| "GRABIT <noreply@grabitmap.com>".to_string());
+
+    let response = reqwest::Client::new()
+        .post("https://api.resend.com/emails")
+        .bearer_auth(api_key)
+        .json(&json!({
+            "from": from,
+            "to": [to],
+            "subject": subject,
+            "html": html,
+        }))
+        .send()
+        .await
+        .map_err(|_| "mail_transport_error".to_string())?;
+
+    if !response.status().is_success() {
+        return Err(format!("mail_provider_status_{}", response.status()));
+    }
+
+    Ok(())
+}
+
 pub(super) fn csrf_rejected_response() -> Response {
     (
         StatusCode::FORBIDDEN,

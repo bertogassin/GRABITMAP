@@ -3,7 +3,7 @@ use super::admin_access::{
 };
 use super::auth::verify_authenticated_user;
 use super::auth_email::email_delivery_configured;
-use super::common::request_is_cross_site;
+use super::common::{request_is_cross_site, send_transactional_email};
 use crate::state::app_state::AppState;
 use crate::web::templates::{
     render_admin_security, transactional_code_email_html, AdminSecurityData,
@@ -179,36 +179,18 @@ fn destination_hash(state: &AppState, email: &str) -> String {
 }
 
 async fn send_code(email: &str, code: &str) -> Result<(), String> {
-    let api_key = std::env::var("RESEND_API_KEY").map_err(|_| "missing_resend_key".to_string())?;
-
-    let from = std::env::var("GRABIT_MAIL_FROM")
-        .or_else(|_| std::env::var("RESURSMAP_MAIL_FROM"))
-        .unwrap_or_else(|_| "GRABIT <noreply@grabitmap.com>".to_string());
-
-    let response = reqwest::Client::new()
-        .post("https://api.resend.com/emails")
-        .bearer_auth(api_key)
-        .json(&serde_json::json!({
-            "from": from,
-            "to": [email],
-            "subject": "Защищённая сессия владельца · GRABIT",
-            "html": transactional_code_email_html(
-                "GRABIT · Владелец",
-                "Код подтверждения административной сессии:",
-                code,
-                "Код действует 10 минут и только в текущей сессии.",
-                "Если вы не запрашивали код, проверьте безопасность аккаунта.",
-            )
-        }))
-        .send()
-        .await
-        .map_err(|_| "mail_transport_error".to_string())?;
-
-    if !response.status().is_success() {
-        return Err(format!("mail_provider_status_{}", response.status()));
-    }
-
-    Ok(())
+    send_transactional_email(
+        email,
+        "Защищённая сессия владельца · GRABIT",
+        transactional_code_email_html(
+            "GRABIT · Владелец",
+            "Код подтверждения административной сессии:",
+            code,
+            "Код действует 10 минут и только в текущей сессии.",
+            "Если вы не запрашивали код, проверьте безопасность аккаунта.",
+        ),
+    )
+    .await
 }
 
 fn secure_response(html: String) -> Response {
