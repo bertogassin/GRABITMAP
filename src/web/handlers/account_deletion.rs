@@ -263,36 +263,74 @@ pub async fn account_delete_request(
 
 pub async fn public_account_delete_page() -> Html<String> {
     let body_html = r##"
-        <label class="rm-auth-label" for="email-input">Почта</label>
-        <input id="email-input" class="ui-input rm-auth-input" type="email" autocomplete="email" maxlength="254" placeholder="pochta@mail.ru">
+        <div class="rm-auth-warn">
+            <strong>Необратимо</strong>
+            Аккаунт будет скрыт сразу и удалён навсегда через 30 дней.
+        </div>
 
-        <button id="request-button" type="button" class="ui-button rm-auth-button rm-auth-button--compact">Отправить код</button>
+        <div class="rm-auth-field">
+            <label class="rm-auth-label" for="email-input">Почта</label>
+            <input id="email-input" class="rm-auth-input" type="email" inputmode="email" autocomplete="email" maxlength="254" placeholder="pochta@mail.ru">
+            <span id="email-error" class="rm-auth-field-error"></span>
+        </div>
+
+        <button id="request-button" type="button" class="rm-auth-button rm-auth-button--compact">
+            <span class="rm-auth-spinner" aria-hidden="true"></span>
+            <span class="rm-auth-button-label">Отправить</span>
+        </button>
 
         <div id="confirm-section" hidden class="rm-auth-step">
-            <p class="card-meta">Аккаунт будет скрыт сразу. Данные удаляются безвозвратно через 30 дней — вход в аккаунт в течение этого времени отменяет удаление.</p>
+            <div class="rm-auth-field">
+                <label class="rm-auth-label" for="code-input">Код из письма</label>
+                <input id="code-input" class="rm-auth-input rm-auth-input--code" type="text" inputmode="numeric" maxlength="6" placeholder="000000">
+                <span id="code-error" class="rm-auth-field-error"></span>
+            </div>
 
-            <label class="rm-auth-label" for="code-input">Код из письма</label>
-            <input id="code-input" class="ui-input rm-auth-input rm-auth-input--code" type="text" inputmode="numeric" maxlength="6" placeholder="000000">
+            <div id="step-two" hidden>
+                <p class="rm-auth-subtitle">Будет удалено безвозвратно:</p>
+                <ul class="rm-auth-delete-list">
+                    <li>Профиль и фото</li>
+                    <li>Объявления</li>
+                    <li>Переписка</li>
+                </ul>
 
-            <button id="confirm-button" type="button" class="ui-button rm-auth-button rm-auth-button--compact rm-session-revoke-btn">Удалить аккаунт</button>
+                <div class="rm-auth-field">
+                    <label class="rm-auth-label" for="confirm-word-input">Введите «УДАЛИТЬ», чтобы подтвердить</label>
+                    <input id="confirm-word-input" class="rm-auth-input" type="text" autocomplete="off" placeholder="УДАЛИТЬ">
+                </div>
+            </div>
+
+            <button id="confirm-button" type="button" class="rm-auth-button rm-auth-button--compact rm-auth-button--danger" disabled>
+                <span class="rm-auth-spinner" aria-hidden="true"></span>
+                <span class="rm-auth-button-label">Удалить аккаунт</span>
+            </button>
         </div>
 "##;
 
-    let footer_html = r##"<p class="rm-auth-footer"><a href="/login">Вернуться ко входу</a></p>"##;
+    let footer_html = r##"<p class="rm-auth-footer"><a href="/login">Вход</a></p>"##;
 
     let body_after = r##"
 <script>
 (function () {
     const emailInput = document.getElementById("email-input");
+    const emailError = document.getElementById("email-error");
     const codeInput = document.getElementById("code-input");
+    const codeError = document.getElementById("code-error");
     const confirmSection = document.getElementById("confirm-section");
+    const stepTwo = document.getElementById("step-two");
+    const confirmWordInput = document.getElementById("confirm-word-input");
     const requestButton = document.getElementById("request-button");
     const confirmButton = document.getElementById("confirm-button");
     const authStatus = document.getElementById("auth-status");
 
-    function setStatus(message, isError) {
-        authStatus.textContent = message;
-        authStatus.classList.toggle("is-error", isError);
+    function setStatus(message, kind) {
+        authStatus.textContent = message || "";
+        authStatus.className = "rm-auth-status" + (kind ? " is-" + kind : "");
+    }
+
+    function setLoading(button, loading) {
+        button.disabled = loading;
+        button.dataset.loading = loading ? "true" : "false";
     }
 
     function deletionError(error) {
@@ -302,28 +340,58 @@ pub async fn public_account_delete_page() -> Html<String> {
             code_store_failed: "Не удалось сохранить код. Попробуйте ещё раз.",
             code_not_found: "Сначала запросите код.",
             code_used: "Этот код уже использован.",
-            code_expired: "Срок действия кода истёк.",
-            wrong_code: "Код введён неверно.",
+            code_expired: "Код истёк. Запросите новый.",
+            wrong_code: "Код неверный.",
             too_many_attempts: "Слишком много попыток. Запросите код заново.",
-            rate_limited: "Слишком много попыток.",
-            mail_unavailable: "Почта не настроена. Обратитесь к администратору."
+            rate_limited: "Слишком много попыток. Попробуйте позже.",
+            mail_unavailable: "Почта не настроена. Обратитесь к администратору.",
+            database_unavailable: "Сервис временно недоступен."
         };
         return messages[error] || "Не удалось выполнить запрос.";
     }
 
+    const CODE_FIELD_ERRORS = new Set([
+        "invalid_code", "code_not_found", "code_used", "code_expired",
+        "wrong_code", "too_many_attempts"
+    ]);
+
+    function showError(error) {
+        const message = deletionError(error);
+        emailError.textContent = "";
+        codeError.textContent = "";
+
+        if (error === "invalid_email") {
+            emailError.textContent = message;
+        } else if (CODE_FIELD_ERRORS.has(error)) {
+            codeError.textContent = message;
+        } else {
+            setStatus(message, "error");
+        }
+    }
+
+    function updateConfirmButton() {
+        const codeReady = codeInput.value.trim().length === 6;
+        stepTwo.hidden = !codeReady;
+
+        const wordMatches = confirmWordInput.value.trim().toUpperCase() === "УДАЛИТЬ";
+        confirmButton.disabled = !(codeReady && wordMatches);
+    }
+
     async function requestCode() {
         const email = emailInput.value.trim();
+        emailError.textContent = "";
+        setStatus("", null);
+
         if (!email) {
-            setStatus("Введите почту.", true);
+            emailError.textContent = "Введите почту.";
             emailInput.focus();
             return;
         }
 
-        requestButton.disabled = true;
-        setStatus("Отправляем код...", false);
+        setLoading(requestButton, true);
 
         try {
-            const response = await fetch("/account/delete/request", {
+            const response = await fetch("/account/delete", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email })
@@ -331,18 +399,17 @@ pub async fn public_account_delete_page() -> Html<String> {
             const data = await response.json().catch(function () { return {}; });
 
             if (!response.ok || !data.ok) {
-                setStatus(deletionError(data.error), true);
-                requestButton.disabled = false;
+                showError(data.error);
                 return;
             }
 
             confirmSection.hidden = false;
-            setStatus("Если аккаунт с такой почтой существует, код отправлен.", false);
+            setStatus("Если аккаунт с такой почтой существует, код отправлен.", "success");
             codeInput.focus();
         } catch (error) {
-            setStatus("Не удалось отправить запрос. Проверьте соединение.", true);
+            setStatus("Нет соединения. Проверьте интернет и попробуйте снова.", "error");
         } finally {
-            requestButton.disabled = false;
+            setLoading(requestButton, false);
         }
     }
 
@@ -351,13 +418,14 @@ pub async fn public_account_delete_page() -> Html<String> {
         const code = codeInput.value.trim();
 
         if (!code || code.length !== 6) {
-            setStatus("Введите шестизначный код.", true);
+            codeError.textContent = "Введите шестизначный код.";
             codeInput.focus();
             return;
         }
 
-        confirmButton.disabled = true;
-        setStatus("Проверяем код...", false);
+        codeError.textContent = "";
+        setStatus("", null);
+        setLoading(confirmButton, true);
 
         try {
             const response = await fetch("/account/delete/confirm", {
@@ -368,32 +436,40 @@ pub async fn public_account_delete_page() -> Html<String> {
             const data = await response.json().catch(function () { return {}; });
 
             if (!response.ok || !data.ok) {
-                setStatus(deletionError(data.error), true);
-                confirmButton.disabled = false;
+                showError(data.error);
+                updateConfirmButton();
                 return;
             }
 
             document.querySelector(".rm-auth-card").innerHTML =
-                '<h1>Аккаунт скрыт</h1><p>Данные будут удалены безвозвратно ' +
-                'через 30 дней. Войдите в аккаунт в течение этого времени, ' +
+                '<h1 class="rm-auth-title">Аккаунт скрыт</h1>' +
+                '<p class="rm-auth-subtitle">Данные будут удалены безвозвратно через 30 дней. ' +
+                'Войдите в аккаунт в течение этого времени или перейдите по ссылке из письма, ' +
                 'чтобы отменить удаление.</p>' +
-                '<p><a class="ui-button" href="/login">Вернуться ко входу</a></p>';
+                '<a class="rm-auth-button" href="/login"><span class="rm-auth-button-label">Вход</span></a>';
         } catch (error) {
-            setStatus("Не удалось отправить запрос. Проверьте соединение.", true);
+            setStatus("Нет соединения. Проверьте интернет и попробуйте снова.", "error");
             confirmButton.disabled = false;
+        } finally {
+            confirmButton.dataset.loading = "false";
         }
     }
 
     requestButton.addEventListener("click", requestCode);
     confirmButton.addEventListener("click", confirmDeletion);
+    codeInput.addEventListener("input", function () {
+        codeInput.value = codeInput.value.replace(/[^0-9]/g, "").slice(0, 6);
+        updateConfirmButton();
+    });
+    confirmWordInput.addEventListener("input", updateConfirmButton);
 })();
 </script>
 "##;
 
     Html(templates::render_auth_page(templates::AuthPageParams {
         document_title: "Удаление аккаунта · GRABIT",
-        heading: "Удаление аккаунта",
-        subtitle: "Без входа в аккаунт: подтвердите почту кодом.",
+        heading: "Удалить аккаунт",
+        subtitle: "Без входа: код на почту.",
         body_html,
         footer_html,
         script_html: body_after,

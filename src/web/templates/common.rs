@@ -1657,37 +1657,56 @@ html[data-page="chat"] .rm-version-footer {
 }
 
 .rm-auth-wrap {
-    width: min(100%, 520px);
+    /* Monochrome auth family (login/register/forgot/delete) — scoped
+       locally so it never leaks into the rest of the site's --gold
+       system. Color appears only for error/success status. */
+    --auth-white: #ffffff;
+    --auth-gray-1: #a0a0a0;
+    --auth-gray-2: #7a7a7a;
+    --auth-gray-3: #2a2a2a;
+
+    width: min(100%, 420px);
     margin: 0 auto;
     padding: var(--space-5);
 }
 
-.rm-auth-card {
+.rm-auth-card,
+.rm-auth-card:hover {
     display: block;
-    padding: var(--space-6);
-    border-color: var(--line);
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+    border-radius: 0;
+    transform: none;
 }
 
 .rm-auth-title {
     margin: 0 0 var(--space-2);
-    color: var(--text);
-    font-size: clamp(26px, 7vw, 36px);
+    color: var(--auth-white);
+    font-size: 40px;
+    font-weight: 900;
+    line-height: 1.05;
     letter-spacing: -.03em;
 }
 
 .rm-auth-subtitle {
-    margin: 0 0 var(--space-5);
-    color: var(--muted);
-    font-size: var(--text-base);
-    line-height: var(--line-relaxed);
+    margin: 0 0 var(--space-6);
+    color: var(--auth-gray-2);
+    font-size: 13px;
+    line-height: 1.55;
 }
 
 .rm-auth-label {
     display: block;
     margin-bottom: var(--space-2);
-    color: var(--text);
-    font-size: var(--text-sm);
-    font-weight: 750;
+    color: var(--auth-gray-1);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.rm-auth-field {
+    margin-bottom: var(--space-3);
 }
 
 .rm-auth-label + .rm-auth-input + .rm-auth-label,
@@ -1696,10 +1715,26 @@ html[data-page="chat"] .rm-version-footer {
 }
 
 .rm-auth-input {
+    display: block;
     width: 100%;
-    min-height: 52px;
-    padding: 0 var(--space-4);
-    border-radius: 14px;
+    padding: 0 0 10px;
+    border: 0;
+    border-bottom: 1px solid var(--auth-gray-3);
+    border-radius: 0;
+    background: transparent;
+    color: var(--auth-white);
+    font-size: 16px;
+    transition: border-color 150ms ease;
+}
+
+.rm-auth-input:focus {
+    outline: none;
+    border-bottom-color: var(--auth-white);
+}
+
+.rm-auth-input::placeholder {
+    /* #5c5c5c on #000 is ~4.6:1 — meets WCAG AA for placeholder-sized text */
+    color: #5c5c5c;
 }
 
 .rm-auth-input--code {
@@ -1712,19 +1747,25 @@ html[data-page="chat"] .rm-version-footer {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     gap: var(--space-3);
-    align-items: center;
+    align-items: flex-end;
 }
 
 .rm-auth-password-toggle {
-    min-height: 52px;
-    padding: 0 var(--space-4);
-    border-radius: 14px;
-    border: 1px solid var(--line);
-    background: rgba(255, 255, 255, .03);
-    color: var(--text);
-    font-size: var(--text-sm);
-    font-weight: 650;
+    flex: 0 0 auto;
+    padding: 0 0 8px;
+    border: 0;
+    background: transparent;
+    color: var(--auth-gray-2);
     cursor: pointer;
+}
+
+.rm-auth-password-toggle .slash {
+    opacity: 1;
+    transition: opacity 120ms ease;
+}
+
+.rm-auth-password-toggle[aria-pressed="true"] .slash {
+    opacity: 0;
 }
 
 .rm-auth-links {
@@ -1732,40 +1773,84 @@ html[data-page="chat"] .rm-version-footer {
     justify-content: space-between;
     gap: var(--space-3);
     margin-top: var(--space-3);
-    font-size: var(--text-sm);
+    font-size: 13px;
 }
 
 .rm-auth-links a {
     text-decoration: none;
-}
-
-.rm-auth-links a:first-child {
-    color: var(--gold-light);
-}
-
-.rm-auth-links a:last-child {
-    color: var(--muted);
+    color: var(--auth-gray-2);
 }
 
 .rm-auth-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
     width: 100%;
     min-height: 52px;
-    margin-top: var(--space-4);
-    border-radius: 14px;
-    font-size: var(--text-base);
-    font-weight: 850;
+    margin-top: var(--space-6);
+    padding: 0 var(--space-4);
+    border: 0;
+    border-radius: 8px;
+    background: var(--auth-white);
+    color: #000000;
+    font-size: 15px;
+    font-weight: 700;
     cursor: pointer;
+    transition: background-color 120ms ease, transform 120ms ease, opacity 120ms ease;
+}
+
+.rm-auth-button:active {
+    background: #e0e0e0;
+    transform: translateY(1px);
+}
+
+.rm-auth-button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .rm-auth-button--compact {
-    margin-top: var(--space-3);
+    margin-top: var(--space-5);
+}
+
+.rm-auth-button--danger {
+    background: var(--danger);
+    color: #1a0506;
+}
+
+.rm-auth-button--danger:active {
+    background: #e8536b;
+}
+
+.rm-auth-spinner {
+    display: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    animation: rm-auth-spin .6s linear infinite;
+}
+
+.rm-auth-button[data-loading="true"] .rm-auth-spinner {
+    display: inline-block;
+}
+
+.rm-auth-button[data-loading="true"] .rm-auth-button-label {
+    opacity: .7;
+}
+
+@keyframes rm-auth-spin {
+    to { transform: rotate(360deg); }
 }
 
 .rm-auth-status {
-    min-height: 22px;
+    min-height: 18px;
     margin: var(--space-4) 0 0;
-    color: var(--muted);
-    font-size: var(--text-sm);
+    color: var(--auth-gray-2);
+    font-size: 13px;
 }
 
 .rm-auth-status.is-error,
@@ -1773,32 +1858,119 @@ html[data-page="chat"] .rm-version-footer {
     color: var(--danger);
 }
 
+.rm-auth-status.is-success {
+    color: var(--success);
+}
+
+.rm-auth-field-error {
+    display: block;
+    min-height: 16px;
+    margin-top: 6px;
+    color: var(--danger);
+    font-size: 12px;
+}
+
 .rm-auth-footer {
-    margin: var(--space-5) 0 0;
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--auth-gray-3);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2) var(--space-4);
     text-align: center;
-    color: var(--muted);
-    font-size: var(--text-sm);
+    color: var(--auth-gray-2);
+    font-size: 13px;
 }
 
 .rm-auth-footer a {
-    color: var(--gold-light);
+    color: var(--auth-gray-2);
+    text-decoration: none;
 }
 
 .rm-auth-back {
-    margin-top: 18px;
+    margin-top: 0;
     text-align: center;
 }
 
 .rm-auth-back a {
-    color: var(--muted);
+    color: var(--auth-gray-2);
     text-decoration: none;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .rm-auth-step {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid rgba(255, 255, 255, .08);
+    margin-top: var(--space-6);
+    padding-top: 0;
+    border-top: 0;
+}
+
+.rm-auth-warn {
+    margin: 0 0 var(--space-5);
+    padding: var(--space-4);
+    border: 1px solid var(--danger);
+    border-radius: 8px;
+    color: var(--auth-white);
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.rm-auth-warn strong {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--danger);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.rm-auth-delete-list {
+    margin: 0 0 var(--space-5);
+    padding-left: 18px;
+    color: var(--auth-gray-1);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.rm-auth-strength {
+    display: flex;
+    gap: 4px;
+    margin: 8px 0 0;
+}
+
+.rm-auth-strength i {
+    flex: 1;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--auth-gray-3);
+}
+
+.rm-auth-strength[data-level="1"] i:nth-child(1) { background: var(--danger); }
+.rm-auth-strength[data-level="2"] i:nth-child(-n+2) { background: var(--danger); }
+.rm-auth-strength[data-level="3"] i:nth-child(-n+3) { background: var(--auth-white); }
+.rm-auth-strength[data-level="4"] i { background: var(--success); }
+
+.rm-auth-consent {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--auth-gray-2);
+}
+
+.rm-auth-consent input {
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    accent-color: var(--auth-white);
+}
+
+.rm-auth-consent a {
+    color: var(--auth-gray-1);
 }
 
 .rm-premium-badge {
