@@ -14,6 +14,35 @@ cd "$ROOT_DIR"
 mkdir -p "$STATE_DIR"
 chmod 700 "$STATE_DIR"
 
+env_value() {
+    grep -m1 "^$1=" "$ROOT_DIR/.env" 2>/dev/null | cut -d= -f2-
+}
+
+json_escape() {
+    printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' | tr -d '\n\r'
+}
+
+send_alert_email() {
+    local subject="$1"
+    local body="$2"
+    local api_key mail_from alert_to
+
+    api_key="${MONITOR_RESEND_API_KEY:-$(env_value RESEND_API_KEY)}"
+    mail_from="${MONITOR_MAIL_FROM:-$(env_value GRABIT_MAIL_FROM)}"
+    alert_to="${MONITOR_ALERT_EMAIL:-$(env_value OWNER_BOOTSTRAP_EMAIL)}"
+
+    [ -n "$api_key" ] || return 0
+    [ -n "$alert_to" ] || return 0
+    [ -n "$mail_from" ] || mail_from="GRABIT <noreply@grabitmap.com>"
+
+    curl --max-time "$TIMEOUT" -sS -o /dev/null \
+        -X POST "https://api.resend.com/emails" \
+        -H "Authorization: Bearer $api_key" \
+        -H "Content-Type: application/json" \
+        -d "{\"from\":\"$(json_escape "$mail_from")\",\"to\":[\"$(json_escape "$alert_to")\"],\"subject\":\"$(json_escape "$subject")\",\"html\":\"<p>$(json_escape "$body")</p>\"}" \
+        || true
+}
+
 exec 9>"$LOCK_FILE"
 flock -n 9 || exit 0
 
@@ -98,4 +127,8 @@ echo "$timestamp status=$status details=$details"
 if [ "$status" != "$previous" ]; then
     logger -t grabit-monitor \
         "state_change previous=$previous current=$status details=$details"
+
+    send_alert_email \
+        "GRABIT monitor: $previous -> $status" \
+        "previous=$previous current=$status details=$details checked_at=$timestamp"
 fi
