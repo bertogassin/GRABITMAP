@@ -385,7 +385,7 @@ impl OwnerResolution {
 
 fn resolve_owner_user_id(connection: &Connection) -> rusqlite::Result<OwnerResolution> {
     let Some(raw_email) = std::env::var("OWNER_BOOTSTRAP_EMAIL").ok() else {
-        return Ok(OwnerResolution::Default(INITIAL_OWNER_USER_ID));
+        return resolve_default_owner(connection);
     };
 
     let email = raw_email.trim().to_ascii_lowercase();
@@ -417,6 +417,30 @@ fn resolve_owner_user_id(connection: &Connection) -> rusqlite::Result<OwnerResol
             Ok(OwnerResolution::Unresolved)
         }
     }
+}
+
+/// No `OWNER_BOOTSTRAP_EMAIL` override configured. If an owner is already
+/// active, this must be a no-op — otherwise removing the override (or
+/// simply never setting it after the real owner was already established)
+/// silently hands ownership to the hardcoded placeholder and revokes
+/// whoever actually holds it. Only seed the placeholder when nothing is
+/// assigned yet, i.e. a genuinely fresh install.
+fn resolve_default_owner(connection: &Connection) -> rusqlite::Result<OwnerResolution> {
+    let has_active_owner: i64 = connection.query_row(
+        "SELECT COUNT(*)
+         FROM admin_assignments
+         WHERE role_level = 5
+           AND scope_type = 'world'
+           AND status = 'active'",
+        [],
+        |row| row.get(0),
+    )?;
+
+    if has_active_owner > 0 {
+        return Ok(OwnerResolution::Unresolved);
+    }
+
+    Ok(OwnerResolution::Default(INITIAL_OWNER_USER_ID))
 }
 
 fn verified_owner_user_id_for_email(
@@ -1075,6 +1099,33 @@ mod tests {
 
         assert_eq!(active_owner, INITIAL_OWNER_USER_ID);
         assert_eq!(status, "active");
+    }
+
+    #[test]
+    fn default_resolution_leaves_existing_owner_untouched() {
+        let mut connection = test_connection();
+        // Owner already established by a previous run with the email
+        // override configured — simulates the exact regression: override
+        // later removed from the environment.
+        initialize_connection(&mut connection, OwnerResolution::Configured(999))
+            .expect("seed owner 999");
+
+        let resolution = resolve_default_owner(&connection).expect("resolve default");
+        assert!(matches!(resolution, OwnerResolution::Unresolved));
+    }
+
+    #[test]
+    fn default_resolution_seeds_placeholder_on_fresh_install() {
+        let mut connection = test_connection();
+        // Schema created, nobody seeded yet — genuinely fresh install.
+        initialize_connection(&mut connection, OwnerResolution::Unresolved)
+            .expect("schema only, no owner seeded");
+
+        let resolution = resolve_default_owner(&connection).expect("resolve default");
+        assert!(matches!(
+            resolution,
+            OwnerResolution::Default(id) if id == INITIAL_OWNER_USER_ID
+        ));
     }
 
     #[test]
