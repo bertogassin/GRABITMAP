@@ -793,29 +793,6 @@ pub async fn group_helper_report_action(
     }
 
     let _ = transaction.execute(
-        "INSERT INTO moderation_actions (
-             moderator_id,
-             action_type,
-             target_type,
-             target_id,
-             details
-         )
-         VALUES (
-             ?1,
-             ?2,
-             'resource_report',
-             ?3,
-             ?4
-         )",
-        params![
-            context.user_id,
-            format!("GROUP_HELPER_{}", form.action.to_uppercase()),
-            report_id,
-            format!("city={stable_key}; resource_id={resource_id}; reason={reason}"),
-        ],
-    );
-
-    let _ = transaction.execute(
         "INSERT INTO admin_security_events (
              user_id,
              assignment_id,

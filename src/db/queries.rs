@@ -806,7 +806,11 @@ pub fn init_db() -> Result<Connection> {
     // BOT B3.5A — additive persistent security storage.
     crate::db::security::init_security_schema(&conn)?;
 
-    crate::db::moderation_legacy::init_moderation_legacy_schema(&conn)?;
+    // Legacy moderator panel/audit log, superseded by admin_v2 — the only
+    // admin/moderation entry point now. Confirmed empty in production
+    // before removal.
+    conn.execute("DROP TABLE IF EXISTS moderation_actions", [])?;
+    conn.execute("DROP TABLE IF EXISTS moderator_roles", [])?;
 
     crate::db::promotions::init_promotion_schema(&conn)?;
 
