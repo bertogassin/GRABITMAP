@@ -123,6 +123,9 @@ pub use account_deletion::{
     public_account_delete_request,
 };
 
+mod account_password;
+pub use account_password::change_password;
+
 pub use admin_administrators::administrators_panel;
 
 pub use admin_assignment_actions::{create_admin_assignment, new_admin_assignment_page};

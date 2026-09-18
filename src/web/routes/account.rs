@@ -1,11 +1,12 @@
 use super::super::handlers::{
     account_delete_request, api_attention_count, api_open_count, api_profile_avatar_set,
     api_profile_get, api_profile_set, api_public_profile_avatar_get, app_logout, app_me,
-    app_revoke_other_sessions, app_revoke_session, email_auth_request, email_auth_verify,
-    favorites_page, forgot_password_page, forgot_password_request, join_invite, login_code_page,
-    login_email, login_page, mark_all_notifications_read, notifications_page, open_notification,
-    public_account_delete_confirm, public_account_delete_page, public_account_delete_request,
-    public_user_profile, register_email, register_page, reset_password, unread_count,
+    app_revoke_other_sessions, app_revoke_session, change_password, email_auth_request,
+    email_auth_verify, favorites_page, forgot_password_page, forgot_password_request,
+    join_invite, login_code_page, login_email, login_page, mark_all_notifications_read,
+    notifications_page, open_notification, public_account_delete_confirm,
+    public_account_delete_page, public_account_delete_request, public_user_profile,
+    register_email, register_page, reset_password, unread_count,
 };
 use crate::state::app_state::AppState;
 use axum::{
@@ -40,6 +41,7 @@ pub(super) fn routes() -> Router<AppState> {
         )
         .route("/app/sessions/revoke", post(app_revoke_session))
         .route("/app/account/delete", post(account_delete_request))
+        .route("/app/account/password", post(change_password))
         .route("/app/auth/email/request", post(email_auth_request))
         .route("/app/auth/email/verify", post(email_auth_verify))
         .route("/app/locale", post(crate::i18n::set_locale))

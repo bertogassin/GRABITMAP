@@ -166,6 +166,30 @@ fn render_user_sessions_panel(sessions: &[crate::web::view_models::UserSessionRo
     )
 }
 
+fn render_change_password_section() -> String {
+    r#"<details class="card">
+    <summary class="rm-profile-section-title">Сменить пароль</summary>
+    <div class="rm-danger-zone-body">
+        <form method="post" action="/app/account/password" class="rm-danger-zone-form">
+            <label class="rm-auth-label" for="current-password-input">Текущий пароль</label>
+            <input id="current-password-input" name="current_password" type="password"
+                   class="ui-input rm-auth-input" autocomplete="current-password" required>
+
+            <label class="rm-auth-label" for="new-password-input">Новый пароль</label>
+            <input id="new-password-input" name="new_password" type="password"
+                   class="ui-input rm-auth-input" autocomplete="new-password" minlength="8" required>
+
+            <label class="rm-auth-label" for="new-password-confirm-input">Повторите новый пароль</label>
+            <input id="new-password-confirm-input" name="new_password_confirm" type="password"
+                   class="ui-input rm-auth-input" autocomplete="new-password" minlength="8" required>
+
+            <button type="submit" class="ui-button">Сменить пароль</button>
+        </form>
+    </div>
+</details>"#
+        .to_string()
+}
+
 fn render_account_danger_zone() -> String {
     r#"<details class="card rm-danger-zone">
     <summary class="rm-danger-zone-summary">Удалить аккаунт</summary>
@@ -343,9 +367,11 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     </button>
 </form>
 {sessions_panel}
+{password_section}
 {danger_zone}"#,
             account_header = account_header,
             sessions_panel = render_user_sessions_panel(&user_sessions),
+            password_section = render_change_password_section(),
             danger_zone = render_account_danger_zone(),
         )
     } else {
