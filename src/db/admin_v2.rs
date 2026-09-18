@@ -346,21 +346,77 @@ pub fn initialize() -> rusqlite::Result<()> {
     connection.busy_timeout(Duration::from_secs(10))?;
     connection.pragma_update(None, "foreign_keys", "ON")?;
 
-    let owner_user_id = configured_owner_user_id(&connection)?.unwrap_or(INITIAL_OWNER_USER_ID);
+    let owner = resolve_owner_user_id(&connection)?;
 
-    initialize_connection(&mut connection, owner_user_id)
+    initialize_connection(&mut connection, owner)
 }
 
-fn configured_owner_user_id(connection: &Connection) -> rusqlite::Result<Option<i64>> {
-    let Some(email) = std::env::var("OWNER_BOOTSTRAP_EMAIL")
-        .ok()
-        .map(|value| value.trim().to_ascii_lowercase())
-        .filter(|value| value.len() >= 5 && value.len() <= 254 && value.contains('@'))
-    else {
-        return Ok(None);
+/// Outcome of deciding which account should hold the world/role-5 (owner)
+/// assignment on this run.
+///
+/// `Unresolved` exists because of a real incident: `OWNER_BOOTSTRAP_EMAIL`
+/// was set correctly and pointed at a real, verified, active account, but
+/// on one restart the lookup below still came back empty — and the old
+/// code silently fell back to `INITIAL_OWNER_USER_ID`, which made
+/// `reconcile_active_owner` revoke the real owner's assignment and hand
+/// ownership to whatever account that constant happens to be. Whatever the
+/// exact trigger turns out to be (see the logging below), an ambiguous
+/// resolution must never again cause an automatic ownership change —
+/// so `Unresolved` skips reconciliation entirely instead of guessing.
+enum OwnerResolution {
+    /// No `OWNER_BOOTSTRAP_EMAIL` override configured — use the built-in
+    /// default owner account, as always.
+    Default(i64),
+    /// The override resolved to a real, verified, active account — enforce it.
+    Configured(i64),
+    /// `OWNER_BOOTSTRAP_EMAIL` is set but did not resolve to a verified,
+    /// active account this run. Ownership is left untouched.
+    Unresolved,
+}
+
+impl OwnerResolution {
+    fn enforce_as(&self) -> Option<i64> {
+        match self {
+            OwnerResolution::Default(id) | OwnerResolution::Configured(id) => Some(*id),
+            OwnerResolution::Unresolved => None,
+        }
+    }
+}
+
+fn resolve_owner_user_id(connection: &Connection) -> rusqlite::Result<OwnerResolution> {
+    let Some(raw_email) = std::env::var("OWNER_BOOTSTRAP_EMAIL").ok() else {
+        return Ok(OwnerResolution::Default(INITIAL_OWNER_USER_ID));
     };
 
-    verified_owner_user_id_for_email(connection, &email)
+    let email = raw_email.trim().to_ascii_lowercase();
+
+    if email.len() < 5 || email.len() > 254 || !email.contains('@') {
+        eprintln!(
+            "admin_v2: OWNER_BOOTSTRAP_EMAIL='{raw_email}' имеет некорректный формат — \
+             использую владельца по умолчанию (id={INITIAL_OWNER_USER_ID})"
+        );
+        return Ok(OwnerResolution::Default(INITIAL_OWNER_USER_ID));
+    }
+
+    match verified_owner_user_id_for_email(connection, &email)? {
+        Some(user_id) => {
+            println!(
+                "admin_v2: OWNER_BOOTSTRAP_EMAIL='{email}' -> user_id={user_id} \
+                 (найден подтверждённый активный аккаунт)"
+            );
+            Ok(OwnerResolution::Configured(user_id))
+        }
+        None => {
+            eprintln!(
+                "admin_v2: OWNER_BOOTSTRAP_EMAIL='{email}' задан, но подтверждённый активный \
+                 аккаунт с этим email не найден в auth_identities/users — пропускаю \
+                 переустановку владельца на этом запуске, текущее назначение НЕ трогаю. \
+                 Проверьте auth_identities.provider='email', verified_at>0 и users.is_active \
+                 для этого email."
+            );
+            Ok(OwnerResolution::Unresolved)
+        }
+    }
 }
 
 fn verified_owner_user_id_for_email(
@@ -388,7 +444,7 @@ fn reconcile_active_owner(
     transaction: &Transaction<'_>,
     owner_user_id: i64,
 ) -> rusqlite::Result<()> {
-    transaction.execute(
+    let revoked_assignments = transaction.execute(
         "UPDATE admin_assignments
          SET status = 'revoked',
              valid_until = CASE
@@ -404,7 +460,7 @@ fn reconcile_active_owner(
         params![owner_user_id],
     )?;
 
-    transaction.execute(
+    let revoked_sessions = transaction.execute(
         "UPDATE admin_sessions
          SET revoked_at = strftime('%s','now'),
              revoke_reason = 'owner_email_rebinding'
@@ -419,18 +475,32 @@ fn reconcile_active_owner(
         params![owner_user_id],
     )?;
 
+    if revoked_assignments > 0 || revoked_sessions > 0 {
+        println!(
+            "admin_v2: reconcile_active_owner(owner_user_id={owner_user_id}) revoked \
+             {revoked_assignments} назначение(й) и {revoked_sessions} сессию/сессий владельца \
+             у других аккаунтов"
+        );
+    }
+
     Ok(())
 }
 
-fn initialize_connection(connection: &mut Connection, owner_user_id: i64) -> rusqlite::Result<()> {
+fn initialize_connection(
+    connection: &mut Connection,
+    owner: OwnerResolution,
+) -> rusqlite::Result<()> {
     let transaction = connection.transaction_with_behavior(TransactionBehavior::Immediate)?;
 
     transaction.execute_batch(ADMIN_V2_SCHEMA)?;
     seed_permissions(&transaction)?;
     seed_world_scope(&transaction)?;
     transaction.execute_batch(ADMIN_V2_SECURITY_SCHEMA)?;
-    reconcile_active_owner(&transaction, owner_user_id)?;
-    seed_initial_owner(&transaction, owner_user_id)?;
+
+    if let Some(owner_user_id) = owner.enforce_as() {
+        reconcile_active_owner(&transaction, owner_user_id)?;
+        seed_initial_owner(&transaction, owner_user_id)?;
+    }
 
     transaction.execute(
         "INSERT OR IGNORE INTO schema_migrations (version, name)
@@ -818,8 +888,11 @@ mod tests {
             )
             .expect("users table");
 
-        initialize_connection(&mut connection, INITIAL_OWNER_USER_ID)
-            .expect("admin migration without pre-seeded owner");
+        initialize_connection(
+            &mut connection,
+            OwnerResolution::Configured(INITIAL_OWNER_USER_ID),
+        )
+        .expect("admin migration without pre-seeded owner");
 
         let owner_count: i64 = connection
             .query_row(
@@ -835,7 +908,11 @@ mod tests {
     fn migration_creates_single_level_five_owner() {
         let mut connection = test_connection();
 
-        initialize_connection(&mut connection, INITIAL_OWNER_USER_ID).expect("admin migration");
+        initialize_connection(
+            &mut connection,
+            OwnerResolution::Configured(INITIAL_OWNER_USER_ID),
+        )
+        .expect("admin migration");
 
         let owner: (i64, i64, String, String) = connection
             .query_row(
@@ -860,9 +937,17 @@ mod tests {
     fn migration_is_idempotent() {
         let mut connection = test_connection();
 
-        initialize_connection(&mut connection, INITIAL_OWNER_USER_ID).expect("first migration");
+        initialize_connection(
+            &mut connection,
+            OwnerResolution::Configured(INITIAL_OWNER_USER_ID),
+        )
+        .expect("first migration");
 
-        initialize_connection(&mut connection, INITIAL_OWNER_USER_ID).expect("second migration");
+        initialize_connection(
+            &mut connection,
+            OwnerResolution::Configured(INITIAL_OWNER_USER_ID),
+        )
+        .expect("second migration");
 
         let assignments: i64 = connection
             .query_row("SELECT COUNT(*) FROM admin_assignments", [], |row| {
@@ -915,7 +1000,11 @@ mod tests {
     #[test]
     fn owner_rebinding_revokes_the_previous_global_owner() {
         let mut connection = test_connection();
-        initialize_connection(&mut connection, INITIAL_OWNER_USER_ID).expect("first owner");
+        initialize_connection(
+            &mut connection,
+            OwnerResolution::Configured(INITIAL_OWNER_USER_ID),
+        )
+        .expect("first owner");
 
         let replacement_owner = INITIAL_OWNER_USER_ID + 1;
         connection
@@ -925,7 +1014,11 @@ mod tests {
             )
             .expect("replacement user");
 
-        initialize_connection(&mut connection, replacement_owner).expect("owner rebinding");
+        initialize_connection(
+            &mut connection,
+            OwnerResolution::Configured(replacement_owner),
+        )
+        .expect("owner rebinding");
 
         let active_owner: i64 = connection
             .query_row(
@@ -955,10 +1048,44 @@ mod tests {
     }
 
     #[test]
+    fn unresolved_owner_email_leaves_current_owner_untouched() {
+        let mut connection = test_connection();
+        initialize_connection(
+            &mut connection,
+            OwnerResolution::Configured(INITIAL_OWNER_USER_ID),
+        )
+        .expect("first owner");
+
+        // Simulates the incident: OWNER_BOOTSTRAP_EMAIL was set but didn't
+        // resolve to a verified, active account. This must be a no-op for
+        // ownership, not a silent fallback that revokes the real owner.
+        initialize_connection(&mut connection, OwnerResolution::Unresolved)
+            .expect("unresolved run must not fail");
+
+        let (active_owner, status): (i64, String) = connection
+            .query_row(
+                "SELECT user_id, status
+                 FROM admin_assignments
+                 WHERE role_level = 5
+                   AND scope_type = 'world'",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?)),
+            )
+            .expect("owner assignment");
+
+        assert_eq!(active_owner, INITIAL_OWNER_USER_ID);
+        assert_eq!(status, "active");
+    }
+
+    #[test]
     fn audit_rejects_updates_and_deletes() {
         let mut connection = test_connection();
 
-        initialize_connection(&mut connection, INITIAL_OWNER_USER_ID).expect("migration");
+        initialize_connection(
+            &mut connection,
+            OwnerResolution::Configured(INITIAL_OWNER_USER_ID),
+        )
+        .expect("migration");
 
         let assignment_id: i64 = connection
             .query_row("SELECT id FROM admin_assignments", [], |row| row.get(0))
@@ -1034,15 +1161,22 @@ mod tests {
             )
             .expect("deactivate");
 
-        assert!(initialize_connection(&mut connection, INITIAL_OWNER_USER_ID).is_err());
+        assert!(initialize_connection(
+            &mut connection,
+            OwnerResolution::Configured(INITIAL_OWNER_USER_ID)
+        )
+        .is_err());
     }
 
     #[test]
     fn migration_creates_reauthentication_challenges() {
         let mut connection = test_connection();
 
-        initialize_connection(&mut connection, INITIAL_OWNER_USER_ID)
-            .expect("admin security migration");
+        initialize_connection(
+            &mut connection,
+            OwnerResolution::Configured(INITIAL_OWNER_USER_ID),
+        )
+        .expect("admin security migration");
 
         let table_count: i64 = connection
             .query_row(
@@ -1067,7 +1201,11 @@ mod tests {
     fn migration_seeds_geographic_hierarchy() {
         let mut connection = test_connection();
 
-        initialize_connection(&mut connection, INITIAL_OWNER_USER_ID).expect("geography migration");
+        initialize_connection(
+            &mut connection,
+            OwnerResolution::Configured(INITIAL_OWNER_USER_ID),
+        )
+        .expect("geography migration");
 
         let counts = ["world", "continent", "country", "city", "group"].map(|scope_type| {
             connection
