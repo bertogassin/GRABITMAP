@@ -217,7 +217,7 @@ pub fn brand_logo() -> &'static str {
 
 pub(crate) fn site_head_links() -> String {
     format!(
-        r##"<meta name="theme-color" content="#080a0d">
+        r##"<meta name="theme-color" content="#000000">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -238,37 +238,59 @@ pub(crate) fn site_head_links() -> String {
 pub(crate) fn base_style() -> &'static str {
     r#"
 :root {
-    --bg: #080a0d;
-    --bg-soft: #10141b;
-    --surface: #141922;
-    --card: rgba(24, 28, 36, .86);
-    --card-hover: rgba(32, 37, 46, .94);
-    --line: rgba(232, 204, 150, .26);
+    /* Поверхности — чёрный фон, слои через яркость, не через цвет */
+    --bg: #000000;
+    --bg-soft: #060606;
+    --surface: #0d0d0f;
+    --card: #141416;
+    --card-hover: #1c1c1f;
+    --line: rgba(255, 255, 255, .08);
 
-    --text: #fffdf8;
-    --muted: #d0d5de;
-    --text-muted: #d0d5de;
+    --text: #f2f2f3;
+    --muted: #8b8b90;
+    --text-muted: #8b8b90;
 
-    --gold: #e8cc96;
-    --gold-light: #ffe4b8;
-    --gold-glow: rgba(232, 204, 150, .42);
+    /* Один акцент — сдержанное золото, только для интерактива */
+    --gold: #c9a876;
+    --gold-light: #d9bd8f;
+    --gold-glow: rgba(201, 168, 118, .20);
+    --gold-soft: rgba(201, 168, 118, .14);
 
-    --sea: #7ed4e4;
-    --sea-light: #a8e8f4;
-    --sea-glow: rgba(126, 212, 228, .28);
-
-    --success: #6fe8b8;
-    --warning: #ffb85c;
-    --danger: #ff8f98;
-    --info: #8ec5ff;
+    /* Функциональные — только статус, не украшение */
+    --success: #34d399;
+    --warning: #fbbf24;
+    --danger: #fb7185;
+    --info: #64a8ff;
 
     --radius: 20px;
     --radius-sm: 14px;
     --radius-lg: 26px;
-    --theme-color: #080a0d;
-    --on-gold: #16120c;
-    --bubble-mine: rgba(232, 204, 150, .16);
-    --bubble-peer: rgba(255,255,255,.065);
+    --theme-color: #000000;
+    --on-gold: #14110a;
+    --bubble-mine: rgba(201, 168, 118, .12);
+    --bubble-peer: rgba(255, 255, 255, .05);
+
+    /* Отступы — шире, по восьмёрке */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --space-7: 48px;
+    --space-8: 64px;
+
+    /* Типографика */
+    --text-xs: 12px;
+    --text-sm: 14px;
+    --text-base: 16px;
+    --text-lg: 18px;
+    --text-xl: 22px;
+    --text-2xl: 28px;
+    --text-3xl: 36px;
+    --line-tight: 1.2;
+    --line-normal: 1.5;
+    --line-relaxed: 1.65;
 }
 
 /* Светлая тема — html.light-theme до отрисовки, body.light-theme после скрипта */
@@ -288,10 +310,7 @@ body.light-theme {
     --gold: #a5761f;
     --gold-light: #7a5814;
     --gold-glow: rgba(165, 118, 31, .28);
-
-    --sea: #2f7d8d;
-    --sea-light: #246472;
-    --sea-glow: rgba(47, 125, 141, .20);
+    --gold-soft: rgba(165, 118, 31, .12);
 
     --success: #1f8a64;
     --warning: #b06d12;
@@ -485,8 +504,7 @@ body {
     color: var(--text);
 
     background:
-        radial-gradient(circle at 12% 0%, rgba(126, 212, 228, .07), transparent 40%),
-        radial-gradient(circle at 88% 8%, rgba(232, 204, 150, .08), transparent 34%),
+        radial-gradient(circle at 50% 0%, rgba(201, 168, 118, .05), transparent 42%),
         linear-gradient(160deg, var(--bg) 0%, var(--bg-soft) 48%, var(--bg) 100%);
 }
 
@@ -945,18 +963,18 @@ body::before { display: none; }
 .card:hover {
     transform: translateY(-2px);
 
-    border-color: rgba(232, 204, 150, .38);
+    border-color: var(--gold-glow);
 
     background:
         linear-gradient(
             145deg,
-            rgba(232, 204, 150, .11),
-            rgba(126, 212, 228, .06)
+            var(--gold-soft),
+            rgba(255,255,255,.03)
         );
 
     box-shadow:
         0 22px 56px rgba(0,0,0,.32),
-        0 0 48px rgba(232, 204, 150, .10),
+        0 0 48px var(--gold-glow),
         inset 0 1px 0 rgba(255,255,255,.08);
 }
 
@@ -1641,46 +1659,46 @@ html[data-page="chat"] .rm-version-footer {
 .rm-auth-wrap {
     width: min(100%, 520px);
     margin: 0 auto;
-    padding: 18px;
+    padding: var(--space-5);
 }
 
 .rm-auth-card {
     display: block;
-    padding: 28px 22px;
-    border-color: rgba(232, 204, 150, .22);
+    padding: var(--space-6);
+    border-color: var(--line);
 }
 
 .rm-auth-title {
-    margin: 0 0 10px;
+    margin: 0 0 var(--space-2);
     color: var(--text);
     font-size: clamp(26px, 7vw, 36px);
     letter-spacing: -.03em;
 }
 
 .rm-auth-subtitle {
-    margin: 0 0 24px;
+    margin: 0 0 var(--space-5);
     color: var(--muted);
-    font-size: 16px;
-    line-height: 1.58;
+    font-size: var(--text-base);
+    line-height: var(--line-relaxed);
 }
 
 .rm-auth-label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
     color: var(--text);
-    font-size: 14px;
+    font-size: var(--text-sm);
     font-weight: 750;
 }
 
 .rm-auth-label + .rm-auth-input + .rm-auth-label,
 .rm-auth-step .rm-auth-label {
-    margin-top: 16px;
+    margin-top: var(--space-4);
 }
 
 .rm-auth-input {
     width: 100%;
     min-height: 52px;
-    padding: 0 15px;
+    padding: 0 var(--space-4);
     border-radius: 14px;
 }
 
@@ -1693,18 +1711,18 @@ html[data-page="chat"] .rm-version-footer {
 .rm-auth-password-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: 10px;
+    gap: var(--space-3);
     align-items: center;
 }
 
 .rm-auth-password-toggle {
     min-height: 52px;
-    padding: 0 14px;
+    padding: 0 var(--space-4);
     border-radius: 14px;
-    border: 1px solid rgba(214, 183, 122, .24);
+    border: 1px solid var(--line);
     background: rgba(255, 255, 255, .03);
     color: var(--text);
-    font-size: 14px;
+    font-size: var(--text-sm);
     font-weight: 650;
     cursor: pointer;
 }
@@ -1712,9 +1730,9 @@ html[data-page="chat"] .rm-version-footer {
 .rm-auth-links {
     display: flex;
     justify-content: space-between;
-    gap: 12px;
-    margin-top: 10px;
-    font-size: 13px;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
 }
 
 .rm-auth-links a {
@@ -1732,22 +1750,22 @@ html[data-page="chat"] .rm-version-footer {
 .rm-auth-button {
     width: 100%;
     min-height: 52px;
-    margin-top: 16px;
+    margin-top: var(--space-4);
     border-radius: 14px;
-    font-size: 16px;
+    font-size: var(--text-base);
     font-weight: 850;
     cursor: pointer;
 }
 
 .rm-auth-button--compact {
-    margin-top: 12px;
+    margin-top: var(--space-3);
 }
 
 .rm-auth-status {
     min-height: 22px;
-    margin: 15px 0 0;
+    margin: var(--space-4) 0 0;
     color: var(--muted);
-    font-size: 14px;
+    font-size: var(--text-sm);
 }
 
 .rm-auth-status.is-error,
@@ -1756,10 +1774,10 @@ html[data-page="chat"] .rm-version-footer {
 }
 
 .rm-auth-footer {
-    margin: 18px 0 0;
+    margin: var(--space-5) 0 0;
     text-align: center;
     color: var(--muted);
-    font-size: 14px;
+    font-size: var(--text-sm);
 }
 
 .rm-auth-footer a {
@@ -2055,16 +2073,16 @@ a.feature.rm-feature-add {
 .ui-textarea:focus-visible,
 .ui-select:focus-visible,
 .ui-button:focus-visible {
-    outline: 2px solid rgba(214,183,122,.70);
+    outline: 2px solid rgba(201,168,118,.70);
     outline-offset: 2px;
 }
 
 .ui-input:focus,
 .ui-textarea:focus,
 .ui-select:focus {
-    border-color: rgba(214,183,122,.45);
+    border-color: rgba(201,168,118,.45);
     background: rgba(0,0,0,.065);
-    box-shadow: 0 0 0 4px rgba(214,183,122,.06);
+    box-shadow: 0 0 0 4px rgba(201,168,118,.06);
     outline: none;
 }
 
@@ -4294,8 +4312,8 @@ html[dir="rtl"] .rm-menu-row {
     min-height: 46px;
     padding: 0 16px;
     border-radius: 14px;
-    border: 1px solid rgba(232, 204, 150, .30);
-    background: rgba(232, 204, 150, .10);
+    border: 1px solid var(--gold-glow);
+    background: var(--gold-soft);
     color: var(--gold-light);
     font-size: 14px;
     font-weight: 800;
@@ -7084,7 +7102,7 @@ mod public_entry_tests {
 
         assert!(style.contains("position: relative;\n    overflow: hidden;"));
         assert!(style.contains("0 12px 35px rgba(0,0,0,.18),"));
-        assert!(style.contains("border-color: rgba(232, 204, 150, .38);"));
+        assert!(style.contains("border-color: var(--gold-glow);"));
         assert!(style.contains("0 22px 56px rgba(0,0,0,.32),"));
     }
 

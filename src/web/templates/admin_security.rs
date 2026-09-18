@@ -61,10 +61,6 @@ pub fn render_admin_security(data: AdminSecurityData) -> String {
     let head = r#"<meta name="robots" content="noindex,nofollow">
 <meta name="color-scheme" content="dark">
 <style>
-:root {{
- --gold:#dfc07f;--green:#62e0ad;--orange:#f3a94f;
- --text:#fffdf8;--muted:#d0d5de;--line:rgba(223,192,127,.2);
-}}
 *{{box-sizing:border-box}}
 body{{
  margin:0;min-height:100vh;
@@ -105,12 +101,12 @@ h1{{
 p{{color:var(--muted);line-height:1.6}}
 .state{{margin-top:22px;padding:18px;border-radius:18px}}
 .state.verified{{
- color:var(--green);border:1px solid rgba(98,224,173,.3);
- background:rgba(98,224,173,.07)
+ color:var(--success);border:1px solid rgba(52,211,153,.3);
+ background:rgba(52,211,153,.07)
 }}
 .state.pending{{
- color:var(--orange);border:1px solid rgba(243,169,79,.3);
- background:rgba(243,169,79,.07)
+ color:var(--warning);border:1px solid rgba(251,191,36,.3);
+ background:rgba(251,191,36,.07)
 }}
 .state strong{{display:block;font-size:18px}}
 .state span{{display:block;margin-top:6px;color:var(--muted);font-size:13px}}
@@ -136,8 +132,8 @@ input{{
 }}
 .message{{
  margin-top:15px;padding:14px;border-radius:14px;
- color:var(--green);border:1px solid rgba(98,224,173,.25);
- background:rgba(98,224,173,.06)
+ color:var(--success);border:1px solid rgba(52,211,153,.25);
+ background:rgba(52,211,153,.06)
 }}
 .notice{{margin-top:15px;color:var(--muted);font-size:12px;line-height:1.55}}
 </style>"#

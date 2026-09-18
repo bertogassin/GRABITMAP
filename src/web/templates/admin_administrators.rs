@@ -380,20 +380,6 @@ pub fn render_admin_administrators(data: AdminAdministratorsData) -> String {
     let head = r##"<meta name="robots" content="noindex,nofollow">
 <meta name="color-scheme" content="dark">
 <style>
-:root {{
-    --bg:#07090d;
-    --surface:#101319;
-    --surface-2:#151923;
-    --gold:#dfc07f;
-    --gold-soft:rgba(223,192,127,.16);
-    --green:#62e0ad;
-    --red:#ff6d78;
-    --blue:#7ab9ff;
-    --violet:#a893ff;
-    --text:#fffdf8;
-    --muted:#d0d5de;
-    --line:rgba(223,192,127,.18);
-}}
 * {{ box-sizing:border-box; }}
 html {{ scroll-behavior:smooth; }}
 body {{
@@ -434,7 +420,7 @@ body {{
     font-weight:800;
 }}
 .protected {{
-    color:var(--green);
+    color:var(--success);
     font-size:12px;
     font-weight:900;
     letter-spacing:.08em;
@@ -596,14 +582,14 @@ h1 {{
     text-transform:uppercase;
 }}
 .status.active {{
-    color:var(--green);
-    border:1px solid rgba(98,224,173,.30);
-    background:rgba(98,224,173,.08);
+    color:var(--success);
+    border:1px solid rgba(52,211,153,.30);
+    background:rgba(52,211,153,.08);
 }}
 .status.inactive {{
-    color:var(--red);
-    border:1px solid rgba(255,109,120,.30);
-    background:rgba(255,109,120,.08);
+    color:var(--danger);
+    border:1px solid rgba(251,113,133,.30);
+    background:rgba(251,113,133,.08);
 }}
 .role-name {{
     margin-top:17px;
@@ -697,14 +683,14 @@ h1 {{
     background:rgba(255,194,111,.08);
 }}
 .lifecycle-form .restore-action {{
-    color:var(--green);
-    border-color:rgba(98,224,173,.30);
-    background:rgba(98,224,173,.08);
+    color:var(--success);
+    border-color:rgba(52,211,153,.30);
+    background:rgba(52,211,153,.08);
 }}
 .lifecycle-form .danger-action {{
-    color:var(--red);
-    border-color:rgba(255,109,120,.32);
-    background:rgba(255,109,120,.08);
+    color:var(--danger);
+    border-color:rgba(251,113,133,.32);
+    background:rgba(251,113,133,.08);
 }}
 .owner-lock {{
     margin-top:17px;
@@ -731,7 +717,7 @@ h1 {{
     font-size:11px;
 }}
 .live-dot {{
-    color:var(--green);
+    color:var(--success);
     font-size:11px;
     font-weight:900;
 }}
@@ -742,8 +728,8 @@ h1 {{
     height:7px;
     margin-right:6px;
     border-radius:50%;
-    background:var(--green);
-    box-shadow:0 0 14px rgba(98,224,173,.5);
+    background:var(--success);
+    box-shadow:0 0 14px rgba(52,211,153,.5);
 }}
 .session-grid {{
     display:grid;
@@ -802,10 +788,10 @@ h1 {{
 .revoke-form button {{
     min-height:44px;
     padding:0 15px;
-    border:1px solid rgba(255,109,120,.30);
+    border:1px solid rgba(251,113,133,.30);
     border-radius:13px;
     color:#ff8992;
-    background:rgba(255,109,120,.08);
+    background:rgba(251,113,133,.08);
     font-weight:900;
     cursor:pointer;
 }}
