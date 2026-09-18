@@ -2381,6 +2381,27 @@ a.feature.rm-feature-add {
     min-height: 44px;
 }
 
+.rm-danger-zone {
+    margin-top: 12px;
+    padding: 14px 16px;
+}
+
+.rm-danger-zone-summary {
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--danger);
+}
+
+.rm-danger-zone-body {
+    margin-top: 12px;
+}
+
+.rm-danger-zone-form {
+    margin-top: 10px;
+    display: grid;
+    gap: 8px;
+}
+
 .rm-me-stats {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -108,7 +108,7 @@ fn env_first(keys: &[&str]) -> Result<String, std::env::VarError> {
     Err(std::env::VarError::NotPresent)
 }
 
-fn cookie_security_flags() -> &'static str {
+pub(super) fn cookie_security_flags() -> &'static str {
     match env_first(&["GRABIT_COOKIE_SECURE", "RESURSMAP_COOKIE_SECURE"]).as_deref() {
         Ok("0") | Ok("false") | Ok("False") => "HttpOnly; SameSite=Lax",
         _ => "HttpOnly; Secure; SameSite=Lax",

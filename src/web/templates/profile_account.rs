@@ -166,6 +166,32 @@ fn render_user_sessions_panel(sessions: &[crate::web::view_models::UserSessionRo
     )
 }
 
+fn render_account_danger_zone() -> String {
+    r#"<details class="card rm-danger-zone">
+    <summary class="rm-danger-zone-summary">Удалить аккаунт</summary>
+    <div class="rm-danger-zone-body">
+        <p class="card-meta">
+            Аккаунт и объявления будут скрыты сразу. Все данные будут
+            безвозвратно удалены через 7 дней. Чтобы отменить — просто
+            войдите в аккаунт снова в течение этого времени.
+        </p>
+        <form method="post" action="/app/account/delete" class="rm-danger-zone-form">
+            <label class="rm-auth-label" for="delete-password-input">Пароль</label>
+            <input id="delete-password-input"
+                   name="password"
+                   type="password"
+                   class="ui-input rm-auth-input"
+                   autocomplete="current-password"
+                   required>
+            <button type="submit" class="ui-button rm-session-revoke-btn">
+                Удалить аккаунт
+            </button>
+        </form>
+    </div>
+</details>"#
+        .to_string()
+}
+
 fn count_badge(count: i64) -> String {
     if count <= 0 {
         return String::new();
@@ -316,9 +342,11 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
         Выйти из аккаунта
     </button>
 </form>
-{sessions_panel}"#,
+{sessions_panel}
+{danger_zone}"#,
             account_header = account_header,
             sessions_panel = render_user_sessions_panel(&user_sessions),
+            danger_zone = render_account_danger_zone(),
         )
     } else {
         account_header

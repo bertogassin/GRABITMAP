@@ -72,7 +72,7 @@ pub(super) fn hash_password(password: &str) -> Result<String, &'static str> {
         .map_err(|_| "password_hash_failed")
 }
 
-fn verify_password(password: &str, password_hash: &str) -> bool {
+pub(super) fn verify_password(password: &str, password_hash: &str) -> bool {
     if password_hash.is_empty() {
         return false;
     }
@@ -218,6 +218,15 @@ pub(super) fn email_password_auth_response(
     user_id: i64,
     headers: &HeaderMap,
 ) -> Response {
+    // A pending account deletion is cancelled by the very next successful
+    // login — this is the only path back, since the deletion request
+    // itself revokes all sessions. Must run before `create_user_session`:
+    // that session would otherwise be dead on arrival, because
+    // `verify_user_session` requires `users.is_active = 1`.
+    if let Ok(mut db) = crate::db::pool::get_connection(&state.db_pool) {
+        let _ = crate::account_deletion::restore_if_pending(&mut db, user_id);
+    }
+
     let session = match create_user_session(state, user_id, headers) {
         Ok(session) => session,
         Err(error) => {

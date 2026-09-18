@@ -1,5 +1,6 @@
 use std::env;
 
+mod account_deletion;
 mod catalog;
 mod db;
 mod geography;
@@ -114,6 +115,7 @@ async fn main() {
     let state = AppState::new(db_pool.clone(), bot_token.clone(), admin_key);
 
     internal_promotions::spawn_expiry_worker(db_pool.clone());
+    account_deletion::spawn_expiry_worker(db_pool.clone());
     db::group_member_search::spawn_backfill_worker(db_pool.clone());
 
     let app = web::routes::routes(state);

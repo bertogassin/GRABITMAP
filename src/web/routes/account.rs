@@ -1,9 +1,10 @@
 use super::super::handlers::{
-    api_attention_count, api_open_count, api_profile_avatar_set, api_profile_get, api_profile_set,
-    api_public_profile_avatar_get, app_logout, app_me, app_revoke_other_sessions,
-    app_revoke_session, email_auth_request, email_auth_verify, favorites_page,
-    forgot_password_page, forgot_password_request, join_invite, login_code_page, login_email,
-    login_page, mark_all_notifications_read, notifications_page, open_notification,
+    account_delete_request, api_attention_count, api_open_count, api_profile_avatar_set,
+    api_profile_get, api_profile_set, api_public_profile_avatar_get, app_logout, app_me,
+    app_revoke_other_sessions, app_revoke_session, email_auth_request, email_auth_verify,
+    favorites_page, forgot_password_page, forgot_password_request, join_invite, login_code_page,
+    login_email, login_page, mark_all_notifications_read, notifications_page, open_notification,
+    public_account_delete_confirm, public_account_delete_page, public_account_delete_request,
     public_user_profile, register_email, register_page, reset_password, unread_count,
 };
 use crate::state::app_state::AppState;
@@ -17,6 +18,14 @@ pub(super) fn routes() -> Router<AppState> {
         .route("/login", get(login_page))
         .route("/login/code", get(login_code_page))
         .route("/login/forgot", get(forgot_password_page))
+        .route(
+            "/account/delete",
+            get(public_account_delete_page).post(public_account_delete_request),
+        )
+        .route(
+            "/account/delete/confirm",
+            post(public_account_delete_confirm),
+        )
         .route("/register", get(register_page))
         .route("/auth/register-email", post(register_email))
         .route("/auth/login-email", post(login_email))
@@ -30,6 +39,7 @@ pub(super) fn routes() -> Router<AppState> {
             post(app_revoke_other_sessions),
         )
         .route("/app/sessions/revoke", post(app_revoke_session))
+        .route("/app/account/delete", post(account_delete_request))
         .route("/app/auth/email/request", post(email_auth_request))
         .route("/app/auth/email/verify", post(email_auth_verify))
         .route("/app/locale", post(crate::i18n::set_locale))

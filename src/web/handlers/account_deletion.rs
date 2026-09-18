@@ -1,0 +1,625 @@
+use super::auth::{
+    cookie_security_flags, email_rate_limit_id, normalize_email, verify_authenticated_user,
+};
+use super::auth_email::verify_password;
+use super::common::{
+    csrf_rejected_response, rate_limit_retry_after, request_is_cross_site, unix_now,
+};
+use crate::state::app_state::AppState;
+use crate::web::templates;
+use axum::{
+    extract::{Form, State},
+    http::{header, HeaderMap, HeaderValue, StatusCode},
+    response::{Html, IntoResponse, Response},
+    Json,
+};
+use hmac::{Hmac, Mac};
+use serde::Deserialize;
+use serde_json::json;
+use sha2::Sha256;
+
+const DELETION_CODE_TTL_SECONDS: i64 = 600;
+const DELETION_CODE_MAX_ATTEMPTS: i64 = 5;
+
+fn generate_deletion_code() -> String {
+    let mut bytes = [0u8; 4];
+    getrandom::getrandom(&mut bytes).expect("secure random");
+    let value = u32::from_be_bytes(bytes) % 1_000_000;
+    format!("{value:06}")
+}
+
+fn hash_deletion_code(state: &AppState, email: &str, code: &str, expires_at: i64) -> String {
+    type HmacSha256 = Hmac<Sha256>;
+
+    let payload = format!("account-deletion-code:{email}:{code}:{expires_at}");
+    let mut mac = HmacSha256::new_from_slice(state.admin_key.as_bytes()).expect("HMAC key");
+    mac.update(payload.as_bytes());
+    hex::encode(mac.finalize().into_bytes())
+}
+
+async fn send_deletion_code_email(email: &str, code: &str) -> Result<(), String> {
+    let api_key = std::env::var("RESEND_API_KEY")
+        .map_err(|_| "RESEND_API_KEY is not configured".to_string())?;
+
+    let from = std::env::var("GRABIT_MAIL_FROM")
+        .or_else(|_| std::env::var("RESURSMAP_MAIL_FROM"))
+        .unwrap_or_else(|_| "GRABIT <noreply@grabitmap.com>".to_string());
+
+    let client = reqwest::Client::new();
+
+    let response = client
+        .post("https://api.resend.com/emails")
+        .bearer_auth(api_key)
+        .json(&json!({
+            "from": from,
+            "to": [email],
+            "subject": "Подтверждение удаления аккаунта GRABIT",
+            "html": templates::transactional_code_email_html(
+                "GRABIT",
+                "Код для удаления аккаунта:",
+                code,
+                "Код действует 10 минут. После подтверждения аккаунт будет скрыт сразу, а данные удалены безвозвратно через 7 дней.",
+                "Если вы не запрашивали удаление, проигнорируйте письмо — код никого не пустит в аккаунт.",
+            )
+        }))
+        .send()
+        .await
+        .map_err(|_| "mail_transport_error".to_string())?;
+
+    if !response.status().is_success() {
+        return Err(format!("mail_provider_status_{}", response.status()));
+    }
+
+    Ok(())
+}
+
+fn deletion_scheduled_response(document_title: &str, purge_at: i64) -> String {
+    let until = crate::account_deletion::format_until(purge_at);
+    templates::status_page(
+        document_title,
+        "GRABIT",
+        "Аккаунт скрыт",
+        &format!(
+            "Данные будут удалены безвозвратно {until}. Чтобы отменить — просто войдите \
+             в аккаунт снова до этой даты.",
+        ),
+        r#"<a class="ui-button" href="/login">Войти обратно</a>"#,
+    )
+}
+
+#[derive(Debug, Deserialize)]
+pub struct AccountDeleteForm {
+    pub password: String,
+}
+
+/// Authenticated flow: a logged-in owner deletes their own account after
+/// re-entering their password. Every session (including this one) is
+/// revoked immediately by `request_deletion`.
+pub async fn account_delete_request(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Form(form): Form<AccountDeleteForm>,
+) -> Response {
+    if request_is_cross_site(&headers) {
+        return csrf_rejected_response();
+    }
+
+    let Some(authenticated) = verify_authenticated_user(&state, &headers) else {
+        return (
+            StatusCode::SEE_OTHER,
+            [(header::LOCATION, "/login?next=/app/me")],
+        )
+            .into_response();
+    };
+
+    if let Some(_retry_after) = rate_limit_retry_after(
+        &state,
+        authenticated.user_id,
+        "account_delete_request",
+        5,
+        3_600,
+    )
+    .await
+    {
+        return Html(templates::status_page(
+            "Удаление аккаунта · GRABIT",
+            "⚠ GRABIT",
+            "Слишком много попыток",
+            "Подождите немного и повторите попытку.",
+            r#"<a class="ui-button" href="/app/me">Назад в профиль</a>"#,
+        ))
+        .into_response();
+    }
+
+    let db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => {
+            return (StatusCode::SERVICE_UNAVAILABLE, "Сервис недоступен").into_response();
+        }
+    };
+
+    let password_hash: Option<String> = db
+        .query_row(
+            "SELECT password_hash
+             FROM auth_identities
+             WHERE user_id = ?1
+               AND provider = 'email'
+             LIMIT 1",
+            rusqlite::params![authenticated.user_id],
+            |row| row.get(0),
+        )
+        .ok();
+
+    let password_hash = password_hash.unwrap_or_default();
+
+    if !verify_password(form.password.trim(), &password_hash) {
+        return Html(templates::status_page(
+            "Удаление аккаунта · GRABIT",
+            "⚠ GRABIT",
+            "Неверный пароль",
+            "Введите текущий пароль, чтобы подтвердить удаление аккаунта.",
+            r#"<a class="ui-button" href="/app/me">Назад в профиль</a>"#,
+        ))
+        .into_response();
+    }
+
+    drop(db);
+
+    let mut db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => {
+            return (StatusCode::SERVICE_UNAVAILABLE, "Сервис недоступен").into_response();
+        }
+    };
+
+    let purge_at =
+        match crate::account_deletion::request_deletion(&mut db, authenticated.user_id, unix_now())
+        {
+            Ok(purge_at) => purge_at,
+            Err(_) => {
+                return Html(templates::status_page(
+                    "Удаление аккаунта · GRABIT",
+                    "⚠ GRABIT",
+                    "Не удалось удалить аккаунт",
+                    "Попробуйте ещё раз позже.",
+                    r#"<a class="ui-button" href="/app/me">Назад в профиль</a>"#,
+                ))
+                .into_response();
+            }
+        };
+
+    let mut response = Html(deletion_scheduled_response(
+        "Аккаунт удаляется · GRABIT",
+        purge_at,
+    ))
+    .into_response();
+
+    // The session was just revoked server-side; also drop the cookie so
+    // the browser stops sending a dead token.
+    let cookie = format!(
+        "resursmap_user=; Path=/; {}; Max-Age=0",
+        cookie_security_flags()
+    );
+
+    if let Ok(value) = HeaderValue::from_str(&cookie) {
+        response.headers_mut().append(header::SET_COOKIE, value);
+    }
+
+    response
+}
+
+pub async fn public_account_delete_page() -> Html<String> {
+    let body_html = r##"
+        <label class="rm-auth-label" for="email-input">Почта</label>
+        <input id="email-input" class="ui-input rm-auth-input" type="email" autocomplete="email" maxlength="254" placeholder="pochta@mail.ru">
+
+        <button id="request-button" type="button" class="ui-button rm-auth-button rm-auth-button--compact">Отправить код</button>
+
+        <div id="confirm-section" hidden class="rm-auth-step">
+            <p class="card-meta">Аккаунт будет скрыт сразу. Данные удаляются безвозвратно через 7 дней — вход в аккаунт в течение этого времени отменяет удаление.</p>
+
+            <label class="rm-auth-label" for="code-input">Код из письма</label>
+            <input id="code-input" class="ui-input rm-auth-input rm-auth-input--code" type="text" inputmode="numeric" maxlength="6" placeholder="000000">
+
+            <button id="confirm-button" type="button" class="ui-button rm-auth-button rm-auth-button--compact rm-session-revoke-btn">Удалить аккаунт</button>
+        </div>
+"##;
+
+    let footer_html = r##"<p class="rm-auth-footer"><a href="/login">Вернуться ко входу</a></p>"##;
+
+    let body_after = r##"
+<script>
+(function () {
+    const emailInput = document.getElementById("email-input");
+    const codeInput = document.getElementById("code-input");
+    const confirmSection = document.getElementById("confirm-section");
+    const requestButton = document.getElementById("request-button");
+    const confirmButton = document.getElementById("confirm-button");
+    const authStatus = document.getElementById("auth-status");
+
+    function setStatus(message, isError) {
+        authStatus.textContent = message;
+        authStatus.classList.toggle("is-error", isError);
+    }
+
+    function deletionError(error) {
+        const messages = {
+            invalid_email: "Проверьте правильность почты.",
+            invalid_code: "Введите шестизначный код.",
+            code_store_failed: "Не удалось сохранить код. Попробуйте ещё раз.",
+            code_not_found: "Сначала запросите код.",
+            code_used: "Этот код уже использован.",
+            code_expired: "Срок действия кода истёк.",
+            wrong_code: "Код введён неверно.",
+            too_many_attempts: "Слишком много попыток. Запросите код заново.",
+            rate_limited: "Слишком много попыток.",
+            mail_unavailable: "Почта не настроена. Обратитесь к администратору."
+        };
+        return messages[error] || "Не удалось выполнить запрос.";
+    }
+
+    async function requestCode() {
+        const email = emailInput.value.trim();
+        if (!email) {
+            setStatus("Введите почту.", true);
+            emailInput.focus();
+            return;
+        }
+
+        requestButton.disabled = true;
+        setStatus("Отправляем код...", false);
+
+        try {
+            const response = await fetch("/account/delete/request", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email })
+            });
+            const data = await response.json().catch(function () { return {}; });
+
+            if (!response.ok || !data.ok) {
+                setStatus(deletionError(data.error), true);
+                requestButton.disabled = false;
+                return;
+            }
+
+            confirmSection.hidden = false;
+            setStatus("Если аккаунт с такой почтой существует, код отправлен.", false);
+            codeInput.focus();
+        } catch (error) {
+            setStatus("Не удалось отправить запрос. Проверьте соединение.", true);
+        } finally {
+            requestButton.disabled = false;
+        }
+    }
+
+    async function confirmDeletion() {
+        const email = emailInput.value.trim();
+        const code = codeInput.value.trim();
+
+        if (!code || code.length !== 6) {
+            setStatus("Введите шестизначный код.", true);
+            codeInput.focus();
+            return;
+        }
+
+        confirmButton.disabled = true;
+        setStatus("Проверяем код...", false);
+
+        try {
+            const response = await fetch("/account/delete/confirm", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, code })
+            });
+            const data = await response.json().catch(function () { return {}; });
+
+            if (!response.ok || !data.ok) {
+                setStatus(deletionError(data.error), true);
+                confirmButton.disabled = false;
+                return;
+            }
+
+            document.querySelector(".rm-auth-card").innerHTML =
+                '<h1>Аккаунт скрыт</h1><p>Данные будут удалены безвозвратно ' +
+                'через 7 дней. Войдите в аккаунт в течение этого времени, ' +
+                'чтобы отменить удаление.</p>' +
+                '<p><a class="ui-button" href="/login">Вернуться ко входу</a></p>';
+        } catch (error) {
+            setStatus("Не удалось отправить запрос. Проверьте соединение.", true);
+            confirmButton.disabled = false;
+        }
+    }
+
+    requestButton.addEventListener("click", requestCode);
+    confirmButton.addEventListener("click", confirmDeletion);
+})();
+</script>
+"##;
+
+    Html(templates::render_auth_page(templates::AuthPageParams {
+        document_title: "Удаление аккаунта · GRABIT",
+        heading: "Удаление аккаунта",
+        subtitle: "Без входа в аккаунт: подтвердите почту кодом.",
+        body_html,
+        footer_html,
+        script_html: body_after,
+    }))
+}
+
+#[derive(Debug, Deserialize)]
+pub struct PublicAccountDeleteRequest {
+    pub email: String,
+}
+
+pub async fn public_account_delete_request(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Json(payload): Json<PublicAccountDeleteRequest>,
+) -> Response {
+    if request_is_cross_site(&headers) {
+        return csrf_rejected_response();
+    }
+
+    let Some(email) = normalize_email(&payload.email) else {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "ok": false, "error": "invalid_email" })),
+        )
+            .into_response();
+    };
+
+    let rate_id = email_rate_limit_id(&state, &email);
+
+    if let Some(retry_after) =
+        rate_limit_retry_after(&state, rate_id, "account_deletion_public_request", 5, 600).await
+    {
+        return (
+            StatusCode::TOO_MANY_REQUESTS,
+            Json(json!({ "ok": false, "error": "rate_limited", "retry_after": retry_after })),
+        )
+            .into_response();
+    }
+
+    let db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => {
+            return (
+                StatusCode::SERVICE_UNAVAILABLE,
+                Json(json!({ "ok": false, "error": "database_unavailable" })),
+            )
+                .into_response();
+        }
+    };
+
+    // Same shape regardless of whether the account exists — avoids leaking
+    // which emails are registered.
+    let account_exists: bool = db
+        .query_row(
+            "SELECT 1 FROM auth_identities WHERE provider = 'email' AND email = ?1 LIMIT 1",
+            rusqlite::params![&email],
+            |_| Ok(()),
+        )
+        .is_ok();
+
+    if account_exists {
+        let code = generate_deletion_code();
+        let expires_at = unix_now() + DELETION_CODE_TTL_SECONDS;
+        let code_hash = hash_deletion_code(&state, &email, &code, expires_at);
+
+        let _ = db.execute(
+            "UPDATE email_login_codes
+             SET consumed_at = ?2
+             WHERE email = ?1
+               AND purpose = 'account_deletion'
+               AND consumed_at = 0",
+            rusqlite::params![&email, unix_now()],
+        );
+
+        if db
+            .execute(
+                "INSERT INTO email_login_codes (
+                    email, code_hash, expires_at, attempts, consumed_at, created_at, purpose
+                 ) VALUES (?1, ?2, ?3, 0, 0, ?4, 'account_deletion')",
+                rusqlite::params![&email, &code_hash, expires_at, unix_now()],
+            )
+            .is_err()
+        {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({ "ok": false, "error": "code_store_failed" })),
+            )
+                .into_response();
+        }
+
+        if send_deletion_code_email(&email, &code).await.is_err() {
+            let _ = db.execute(
+                "UPDATE email_login_codes
+                 SET consumed_at = ?2
+                 WHERE email = ?1
+                   AND purpose = 'account_deletion'
+                   AND consumed_at = 0",
+                rusqlite::params![&email, unix_now()],
+            );
+        }
+    }
+
+    (
+        StatusCode::OK,
+        Json(json!({ "ok": true, "expires_in": DELETION_CODE_TTL_SECONDS })),
+    )
+        .into_response()
+}
+
+#[derive(Debug, Deserialize)]
+pub struct PublicAccountDeleteConfirm {
+    pub email: String,
+    pub code: String,
+}
+
+pub async fn public_account_delete_confirm(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Json(payload): Json<PublicAccountDeleteConfirm>,
+) -> Response {
+    if request_is_cross_site(&headers) {
+        return csrf_rejected_response();
+    }
+
+    let Some(email) = normalize_email(&payload.email) else {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "ok": false, "error": "invalid_email" })),
+        )
+            .into_response();
+    };
+
+    let code = payload.code.trim();
+
+    if code.len() != 6 || !code.bytes().all(|byte| byte.is_ascii_digit()) {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "ok": false, "error": "invalid_code" })),
+        )
+            .into_response();
+    }
+
+    let rate_id = email_rate_limit_id(&state, &email);
+
+    if let Some(retry_after) =
+        rate_limit_retry_after(&state, rate_id, "account_deletion_public_confirm", 15, 600).await
+    {
+        return (
+            StatusCode::TOO_MANY_REQUESTS,
+            Json(json!({ "ok": false, "error": "rate_limited", "retry_after": retry_after })),
+        )
+            .into_response();
+    }
+
+    let db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => {
+            return (
+                StatusCode::SERVICE_UNAVAILABLE,
+                Json(json!({ "ok": false, "error": "database_unavailable" })),
+            )
+                .into_response();
+        }
+    };
+
+    let row: Option<(i64, String, i64, i64, i64)> = db
+        .query_row(
+            "SELECT id, code_hash, expires_at, attempts, consumed_at
+             FROM email_login_codes
+             WHERE email = ?1
+               AND purpose = 'account_deletion'
+             ORDER BY id DESC
+             LIMIT 1",
+            rusqlite::params![&email],
+            |row| {
+                Ok((
+                    row.get(0)?,
+                    row.get(1)?,
+                    row.get(2)?,
+                    row.get(3)?,
+                    row.get(4)?,
+                ))
+            },
+        )
+        .ok();
+
+    let (code_id, expected_hash, expires_at, attempts, consumed_at) = match row {
+        Some(row) => row,
+        None => {
+            return (
+                StatusCode::UNAUTHORIZED,
+                Json(json!({ "ok": false, "error": "code_not_found" })),
+            )
+                .into_response();
+        }
+    };
+
+    if consumed_at != 0 {
+        return (
+            StatusCode::UNAUTHORIZED,
+            Json(json!({ "ok": false, "error": "code_used" })),
+        )
+            .into_response();
+    }
+
+    if expires_at < unix_now() {
+        return (
+            StatusCode::UNAUTHORIZED,
+            Json(json!({ "ok": false, "error": "code_expired" })),
+        )
+            .into_response();
+    }
+
+    if attempts >= DELETION_CODE_MAX_ATTEMPTS {
+        return (
+            StatusCode::TOO_MANY_REQUESTS,
+            Json(json!({ "ok": false, "error": "too_many_attempts" })),
+        )
+            .into_response();
+    }
+
+    if hash_deletion_code(&state, &email, code, expires_at) != expected_hash {
+        let _ = db.execute(
+            "UPDATE email_login_codes SET attempts = attempts + 1 WHERE id = ?1",
+            rusqlite::params![code_id],
+        );
+
+        return (
+            StatusCode::UNAUTHORIZED,
+            Json(json!({ "ok": false, "error": "wrong_code" })),
+        )
+            .into_response();
+    }
+
+    let user_id: Option<i64> = db
+        .query_row(
+            "SELECT user_id FROM auth_identities WHERE provider = 'email' AND email = ?1 LIMIT 1",
+            rusqlite::params![&email],
+            |row| row.get(0),
+        )
+        .ok();
+
+    let Some(user_id) = user_id else {
+        return (
+            StatusCode::UNAUTHORIZED,
+            Json(json!({ "ok": false, "error": "code_not_found" })),
+        )
+            .into_response();
+    };
+
+    let _ = db.execute(
+        "UPDATE email_login_codes SET consumed_at = ?2 WHERE id = ?1",
+        rusqlite::params![code_id, unix_now()],
+    );
+
+    drop(db);
+
+    let mut db = match crate::db::pool::get_connection(&state.db_pool) {
+        Ok(db) => db,
+        Err(_) => {
+            return (
+                StatusCode::SERVICE_UNAVAILABLE,
+                Json(json!({ "ok": false, "error": "database_unavailable" })),
+            )
+                .into_response();
+        }
+    };
+
+    match crate::account_deletion::request_deletion(&mut db, user_id, unix_now()) {
+        Ok(purge_at) => (
+            StatusCode::OK,
+            Json(json!({ "ok": true, "purge_at": purge_at })),
+        )
+            .into_response(),
+        Err(_) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({ "ok": false, "error": "deletion_request_failed" })),
+        )
+            .into_response(),
+    }
+}

@@ -78,6 +78,37 @@ pub fn init_db() -> Result<Connection> {
         conn.execute("ALTER TABLE users ADD COLUMN telegram_id INTEGER", [])?;
     }
 
+    // Account deletion (soft-delete with a 7-day grace period).
+    //
+    // deletion_requested_at: 0 = не запрашивалось; иначе момент запроса.
+    //   Пока не 0, аккаунт скрыт (is_active=0), но данные ещё не стёрты —
+    //   вход в аккаунт в течение окна отменяет удаление.
+    // deleted_at: 0 = ещё не анонимизирован; иначе момент, когда фоновый
+    //   воркер необратимо стёр персональные данные по истечении окна.
+    if !user_columns
+        .iter()
+        .any(|name| name == "deletion_requested_at")
+    {
+        conn.execute(
+            "ALTER TABLE users ADD COLUMN deletion_requested_at INTEGER NOT NULL DEFAULT 0",
+            [],
+        )?;
+    }
+
+    if !user_columns.iter().any(|name| name == "deleted_at") {
+        conn.execute(
+            "ALTER TABLE users ADD COLUMN deleted_at INTEGER NOT NULL DEFAULT 0",
+            [],
+        )?;
+    }
+
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_users_deletion_requested
+         ON users(deletion_requested_at)
+         WHERE deletion_requested_at <> 0",
+        [],
+    )?;
+
     conn.execute(
         "UPDATE users
          SET telegram_id = id
@@ -313,6 +344,28 @@ pub fn init_db() -> Result<Connection> {
          ON resources(is_active)",
         [],
     )?;
+
+    // hidden_by_deletion_at: non-zero when this listing was taken offline
+    // because its owner requested account deletion (not moderation). Lets
+    // the grace-period restore flow bring back exactly the listings it hid,
+    // without resurrecting anything a moderator had separately rejected.
+    let resource_columns: Vec<String> = {
+        let mut stmt = conn.prepare("PRAGMA table_info(resources)")?;
+        let columns = stmt
+            .query_map([], |row| row.get::<_, String>(1))?
+            .collect::<Result<Vec<_>, _>>()?;
+        columns
+    };
+
+    if !resource_columns
+        .iter()
+        .any(|name| name == "hidden_by_deletion_at")
+    {
+        conn.execute(
+            "ALTER TABLE resources ADD COLUMN hidden_by_deletion_at INTEGER NOT NULL DEFAULT 0",
+            [],
+        )?;
+    }
 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS resource_votes (

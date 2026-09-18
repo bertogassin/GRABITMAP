@@ -119,6 +119,12 @@ pub use auth_email_recovery::{
     forgot_password_page, forgot_password_request, login_code_page, reset_password,
 };
 
+mod account_deletion;
+pub use account_deletion::{
+    account_delete_request, public_account_delete_confirm, public_account_delete_page,
+    public_account_delete_request,
+};
+
 pub use admin_administrators::administrators_panel;
 
 pub use admin_assignment_actions::{create_admin_assignment, new_admin_assignment_page};
