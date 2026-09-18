@@ -10,6 +10,7 @@ TEMP_STAGED_CADDY="$(mktemp)"
 TEMP_PRIMARY_CADDY="$(mktemp)"
 BACKUP_ROOT="${BACKUP_ROOT:-/root/grabit-backups}"
 BACKUP_DIR="$BACKUP_ROOT/staged-$(date -u +%Y%m%dT%H%M%SZ)"
+KEEP_STAGED_BACKUPS="${KEEP_STAGED_BACKUPS:-5}"
 PUBLIC_URL="${PUBLIC_URL:-https://grabitmap.com}"
 PUBLIC_URL="${PUBLIC_URL%/}"
 EXPECTED_HSTS="${EXPECTED_HSTS:-max-age=31536000}"
@@ -272,5 +273,14 @@ fi
 echo "PUBLIC_VERIFICATION=health,ready,hsts"
 SWITCHED=0
 docker rm -f "$NEXT_NAME" >/dev/null
+
+echo "=== PRUNE OLD STAGED BACKUPS (keep $KEEP_STAGED_BACKUPS) ==="
+mapfile -t STAGED_BACKUPS < <(find "$BACKUP_ROOT" -maxdepth 1 -mindepth 1 -type d -name 'staged-*' | sort -r)
+if [ "${#STAGED_BACKUPS[@]}" -gt "$KEEP_STAGED_BACKUPS" ]; then
+    for old_backup in "${STAGED_BACKUPS[@]:$KEEP_STAGED_BACKUPS}"; do
+        echo "removing $old_backup"
+        rm -rf -- "$old_backup"
+    done
+fi
 
 echo "✅ STAGED DEPLOY COMPLETED"
