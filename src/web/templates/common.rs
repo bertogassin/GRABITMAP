@@ -4894,6 +4894,10 @@ pub(crate) struct AuthPageParams<'a> {
     pub body_html: &'a str,
     pub footer_html: &'a str,
     pub script_html: &'a str,
+    /// Whether to render the standalone "← Города" link below the card.
+    /// Set to `false` when `footer_html` already includes that link as
+    /// part of a shared footer nav (see `auth_footer_nav`).
+    pub back_link: bool,
 }
 
 pub(crate) fn auth_support_scripts() -> String {
@@ -4904,24 +4908,41 @@ pub(crate) fn auth_support_scripts() -> String {
 }
 
 pub(crate) fn render_auth_page(params: AuthPageParams<'_>) -> String {
+    let back_link_html = if params.back_link {
+        format!(
+            r#"<div class="rm-auth-back">
+        <a href="/app">&larr; {back}</a>
+    </div>"#,
+            back = crate::i18n::t("back_to_cities"),
+        )
+    } else {
+        String::new()
+    };
+
+    let subtitle_html = if params.subtitle.is_empty() {
+        String::new()
+    } else {
+        format!(
+            r#"<p class="rm-auth-subtitle">{}</p>"#,
+            escape_html(params.subtitle)
+        )
+    };
+
     let main_html = format!(
         r#"<div class="rm-auth-wrap">
     <section class="card rm-auth-card">
         <h1 class="rm-auth-title">{heading}</h1>
-        <p class="rm-auth-subtitle">{subtitle}</p>
+        {subtitle_html}
         {body}
         <p id="auth-status" class="rm-auth-status" role="status" aria-live="polite"></p>
         {footer}
     </section>
-    <div class="rm-auth-back">
-        <a href="/app">&larr; {back}</a>
-    </div>
+    {back_link}
 </div>"#,
         heading = escape_html(params.heading),
-        subtitle = escape_html(params.subtitle),
         body = params.body_html,
         footer = params.footer_html,
-        back = crate::i18n::t("back_to_cities"),
+        back_link = back_link_html,
     );
 
     page_document(

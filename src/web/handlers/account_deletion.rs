@@ -307,7 +307,8 @@ pub async fn public_account_delete_page() -> Html<String> {
         </div>
 "##;
 
-    let footer_html = r##"<p class="rm-auth-footer"><a href="/login">Вход</a></p>"##;
+    let footer_html =
+        super::auth_email::auth_footer_nav("/app", super::auth_email::email_delivery_configured());
 
     let body_after = r##"
 <script>
@@ -471,8 +472,9 @@ pub async fn public_account_delete_page() -> Html<String> {
         heading: "Удалить аккаунт",
         subtitle: "Без входа: код на почту.",
         body_html,
-        footer_html,
+        footer_html: &footer_html,
         script_html: body_after,
+        back_link: false,
     }))
 }
 

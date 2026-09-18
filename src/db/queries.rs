@@ -138,6 +138,23 @@ pub fn init_db() -> Result<Connection> {
         )?;
     }
 
+    // Terms/privacy consent, recorded at registration.
+    if !identity_columns.iter().any(|name| name == "consent_accepted_at") {
+        conn.execute(
+            "ALTER TABLE auth_identities
+             ADD COLUMN consent_accepted_at INTEGER NOT NULL DEFAULT 0",
+            [],
+        )?;
+    }
+
+    if !identity_columns.iter().any(|name| name == "consent_version") {
+        conn.execute(
+            "ALTER TABLE auth_identities
+             ADD COLUMN consent_version TEXT NOT NULL DEFAULT ''",
+            [],
+        )?;
+    }
+
     conn.execute(
         "CREATE UNIQUE INDEX IF NOT EXISTS idx_auth_email_unique
          ON auth_identities(email)

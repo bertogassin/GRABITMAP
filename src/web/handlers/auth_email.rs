@@ -31,6 +31,10 @@ pub struct EmailRegisterRequest {
     pub password: String,
     #[serde(default)]
     pub password_confirm: String,
+    /// Must be explicitly `true` — the checkbox is enforced server-side too,
+    /// not just via the disabled submit button.
+    #[serde(default)]
+    pub consent: bool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -48,6 +52,33 @@ pub(super) fn auth_related_href(base: &str, redirect_target: &str) -> String {
     }
 }
 
+/// Shared footer nav for the auth screen family (login/register/forgot
+/// password/account deletion) — same set of links on all four, per design.
+pub(super) fn auth_footer_nav(redirect_target: &str, mail_ready: bool) -> String {
+    let login_href = auth_related_href("/login", redirect_target);
+    let register_href = auth_related_href("/register", redirect_target);
+    let delete_href = auth_related_href("/account/delete", redirect_target);
+
+    let forgot_link = if mail_ready {
+        format!(
+            r#"<a href="{href}">Забыли пароль?</a>"#,
+            href = auth_related_href("/login/forgot", redirect_target),
+        )
+    } else {
+        String::new()
+    };
+
+    format!(
+        r##"<nav class="rm-auth-footer">
+            <a href="{login_href}">Вход</a>
+            <a href="{register_href}">Регистрация</a>
+            {forgot_link}
+            <a href="{delete_href}">Удалить аккаунт</a>
+            <a href="/app">&larr; Города</a>
+        </nav>"##,
+    )
+}
+
 pub(super) fn validate_password(password: &str) -> Result<(), &'static str> {
     let password = password.trim();
 
@@ -57,6 +88,23 @@ pub(super) fn validate_password(password: &str) -> Result<(), &'static str> {
 
     if password.len() > 128 {
         return Err("password_too_long");
+    }
+
+    Ok(())
+}
+
+/// Registration-only: on top of the length check every password reset also
+/// enforces, new accounts must mix letters and digits. Scoped to signup so
+/// it doesn't change behavior for existing password-reset/change flows.
+fn validate_new_account_password(password: &str) -> Result<(), &'static str> {
+    validate_password(password)?;
+
+    let password = password.trim();
+    let has_letter = password.chars().any(|c| c.is_alphabetic());
+    let has_digit = password.chars().any(|c| c.is_ascii_digit());
+
+    if !has_letter || !has_digit {
+        return Err("password_too_weak");
     }
 
     Ok(())
@@ -120,6 +168,10 @@ pub(crate) fn email_delivery_configured() -> bool {
         .unwrap_or(false)
 }
 
+/// Bumped whenever the terms/privacy documents change in a way that needs
+/// re-consent; recorded on each account alongside when they accepted.
+pub(super) const CURRENT_CONSENT_VERSION: &str = "2026-09-18";
+
 fn provision_email_account(
     transaction: &rusqlite::Transaction<'_>,
     email: &str,
@@ -138,8 +190,22 @@ fn provision_email_account(
         )
         .ok();
 
-    if existing_user_id.is_some() {
-        return Err("email_already_registered");
+    if let Some(existing_user_id) = existing_user_id {
+        let pending_deletion: bool = transaction
+            .query_row(
+                "SELECT deletion_requested_at <> 0 AND deleted_at = 0
+                 FROM users
+                 WHERE id = ?1",
+                rusqlite::params![existing_user_id],
+                |row| row.get(0),
+            )
+            .unwrap_or(false);
+
+        return Err(if pending_deletion {
+            "pending_deletion"
+        } else {
+            "email_already_registered"
+        });
     }
 
     let now = unix_now();
@@ -168,6 +234,8 @@ fn provision_email_account(
                 email,
                 password_hash,
                 verified_at,
+                consent_accepted_at,
+                consent_version,
                 created_at,
                 updated_at
              )
@@ -179,9 +247,18 @@ fn provision_email_account(
                 ?3,
                 ?4,
                 ?5,
+                ?6,
+                ?5,
                 ?5
              )",
-            rusqlite::params![next_id, email, password_hash, verified_at, now],
+            rusqlite::params![
+                next_id,
+                email,
+                password_hash,
+                verified_at,
+                now,
+                CURRENT_CONSENT_VERSION
+            ],
         )
         .map_err(|_| "identity_create_failed")?;
 
@@ -277,7 +354,7 @@ pub async fn register_email(
         }
     };
 
-    if let Err(error) = validate_password(&payload.password) {
+    if let Err(error) = validate_new_account_password(&payload.password) {
         return (
             StatusCode::BAD_REQUEST,
             Json(json!({
@@ -294,6 +371,17 @@ pub async fn register_email(
             Json(json!({
                 "ok": false,
                 "error": "password_mismatch"
+            })),
+        )
+            .into_response();
+    }
+
+    if !payload.consent {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({
+                "ok": false,
+                "error": "consent_required"
             })),
         )
             .into_response();
@@ -363,7 +451,7 @@ pub async fn register_email(
     let user_id = match provision_email_account(&transaction, &email, &password_hash, verified_at) {
         Ok(user_id) => user_id,
         Err(error) => {
-            let status = if error == "email_already_registered" {
+            let status = if error == "email_already_registered" || error == "pending_deletion" {
                 StatusCode::CONFLICT
             } else {
                 StatusCode::INTERNAL_SERVER_ERROR
@@ -529,45 +617,37 @@ pub async fn login_email(
 
 pub async fn login_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
     let redirect_target = auth_redirect_target(query.next.as_deref());
-    let register_href = auth_related_href("/register", &redirect_target);
-    let forgot_href = auth_related_href("/login/forgot", &redirect_target);
-    let code_href = auth_related_href("/login/code", &redirect_target);
     let mail_ready = email_delivery_configured();
-    let auth_links = if mail_ready {
-        format!(
-            r##"<div class="rm-auth-links">
-            <a href="{forgot_href}">Забыли пароль?</a>
-            <a href="{code_href}">Войти по коду</a>
-        </div>"##,
-            forgot_href = forgot_href,
-            code_href = code_href,
-        )
-    } else {
-        String::new()
-    };
 
-    let body_html = format!(
-        r##"
-        <label class="rm-auth-label" for="email-input">Почта</label>
-        <input id="email-input" class="ui-input rm-auth-input" type="email" autocomplete="email" maxlength="254" placeholder="pochta@mail.ru">
-
-        <label class="rm-auth-label" for="password-input">Пароль</label>
-        <div class="rm-auth-password-row">
-            <input id="password-input" class="ui-input rm-auth-input" type="password" autocomplete="current-password" maxlength="128" placeholder="********">
-            <button id="password-toggle" type="button" class="rm-auth-password-toggle" aria-label="Показать пароль">Показать</button>
+    let body_html = r##"
+        <div class="rm-auth-field">
+            <label class="rm-auth-label" for="email-input">Почта</label>
+            <input id="email-input" class="rm-auth-input" type="email" inputmode="email" autocomplete="email" maxlength="254" placeholder="pochta@mail.ru">
+            <span id="email-error" class="rm-auth-field-error"></span>
         </div>
 
-        {auth_links}
+        <div class="rm-auth-field">
+            <label class="rm-auth-label" for="password-input">Пароль</label>
+            <div class="rm-auth-password-row">
+                <input id="password-input" class="rm-auth-input" type="password" autocomplete="current-password" maxlength="128" placeholder="********">
+                <button id="password-toggle" type="button" class="rm-auth-password-toggle" aria-label="Показать пароль" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                        <line class="slash" x1="3" y1="3" x2="21" y2="21"/>
+                    </svg>
+                </button>
+            </div>
+            <span id="password-error" class="rm-auth-field-error"></span>
+        </div>
 
-        <button id="login-button" type="button" class="ui-button rm-auth-button">Войти</button>
-"##,
-        auth_links = auth_links,
-    );
+        <button id="login-button" type="button" class="rm-auth-button">
+            <span class="rm-auth-spinner" aria-hidden="true"></span>
+            <span class="rm-auth-button-label">Войти</span>
+        </button>
+"##;
 
-    let footer_html = format!(
-        r##"<p class="rm-auth-footer">Нет аккаунта? <a href="{register_href}">Зарегистрироваться</a></p>"##,
-        register_href = register_href,
-    );
+    let footer_html = super::auth_email::auth_footer_nav(&redirect_target, mail_ready);
 
     let body_after = format!(
         r##"
@@ -575,14 +655,21 @@ pub async fn login_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
 (function () {{
     const redirectTarget = {redirect_target_json};
     const emailInput = document.getElementById("email-input");
+    const emailError = document.getElementById("email-error");
     const passwordInput = document.getElementById("password-input");
+    const passwordError = document.getElementById("password-error");
     const passwordToggle = document.getElementById("password-toggle");
     const loginButton = document.getElementById("login-button");
     const authStatus = document.getElementById("auth-status");
 
-    function setStatus(message, isError) {{
-        authStatus.textContent = message;
-        authStatus.classList.toggle("is-error", isError);
+    function setStatus(message, kind) {{
+        authStatus.textContent = message || "";
+        authStatus.className = "rm-auth-status" + (kind ? " is-" + kind : "");
+    }}
+
+    function setLoading(button, loading) {{
+        button.disabled = loading;
+        button.dataset.loading = loading ? "true" : "false";
     }}
 
     function errorMessage(error) {{
@@ -598,24 +685,38 @@ pub async fn login_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
         return messages[error] || "Не удалось выполнить вход.";
     }}
 
+    function showError(error) {{
+        const message = errorMessage(error);
+        if (error === "invalid_email") {{
+            emailError.textContent = message;
+        }} else if (error === "invalid_password" || error === "password_not_set") {{
+            passwordError.textContent = message;
+        }} else {{
+            setStatus(message, "error");
+        }}
+    }}
+
     async function login() {{
         const email = emailInput.value.trim();
         const password = passwordInput.value;
 
+        emailError.textContent = "";
+        passwordError.textContent = "";
+        setStatus("", null);
+
         if (!email) {{
-            setStatus("Введите почту.", true);
+            emailError.textContent = "Введите почту.";
             emailInput.focus();
             return;
         }}
 
         if (!password) {{
-            setStatus("Введите пароль.", true);
+            passwordError.textContent = "Введите пароль.";
             passwordInput.focus();
             return;
         }}
 
-        loginButton.disabled = true;
-        setStatus("Входим...", false);
+        setLoading(loginButton, true);
 
         try {{
             const response = await fetch("/auth/login-email", {{
@@ -629,23 +730,28 @@ pub async fn login_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
             }});
 
             if (!response.ok || !data.ok) {{
-                setStatus(errorMessage(data.error), true);
+                showError(data.error);
                 return;
             }}
 
-            setStatus("Вход выполнен", false);
+            setStatus("Вход выполнен", "success");
             window.location.replace(redirectTarget);
         }} catch (_) {{
-            setStatus("Ошибка соединения. Попробуйте ещё раз.", true);
+            setStatus("Нет соединения. Проверьте интернет и попробуйте снова.", "error");
         }} finally {{
-            loginButton.disabled = false;
+            setLoading(loginButton, false);
         }}
     }}
+
+    passwordToggle.addEventListener("click", function () {{
+        const showing = passwordInput.type === "text";
+        passwordInput.type = showing ? "password" : "text";
+        passwordToggle.setAttribute("aria-pressed", showing ? "false" : "true");
+    }});
 
     loginButton.addEventListener("click", login);
 
     if (window.resursmapAuthForms) {{
-        window.resursmapAuthForms.bindPasswordToggle(passwordToggle, passwordInput);
         window.resursmapAuthForms.bindEnterSubmit([emailInput, passwordInput], login);
     }}
 
@@ -661,52 +767,73 @@ pub async fn login_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
         crate::web::templates::AuthPageParams {
             document_title: "Вход · GRABIT",
             heading: "Вход",
-            subtitle:
-                "Города и поиск работают без регистрации. Вход нужен для сообщений, избранного и публикаций.",
-            body_html: &body_html,
+            subtitle: "",
+            body_html,
             footer_html: &footer_html,
             script_html: &body_after,
+            back_link: false,
         },
     ))
 }
 
 pub async fn register_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
     let redirect_target = auth_redirect_target(query.next.as_deref());
-    let login_href = auth_related_href("/login", &redirect_target);
-    let forgot_href = auth_related_href("/login/forgot", &redirect_target);
     let mail_ready = email_delivery_configured();
 
     let body_html = r##"
-        <label class="rm-auth-label" for="email-input">Почта</label>
-        <input id="email-input" class="ui-input rm-auth-input" type="email" autocomplete="email" maxlength="254" placeholder="pochta@mail.ru">
-
-        <label class="rm-auth-label" for="password-input">Пароль</label>
-        <div class="rm-auth-password-row">
-            <input id="password-input" class="ui-input rm-auth-input" type="password" autocomplete="new-password" maxlength="128" placeholder="Минимум 8 символов">
-            <button id="password-toggle" type="button" class="rm-auth-password-toggle" aria-label="Показать пароль">Показать</button>
+        <div class="rm-auth-field">
+            <label class="rm-auth-label" for="email-input">Почта</label>
+            <input id="email-input" class="rm-auth-input" type="email" inputmode="email" autocomplete="email" maxlength="254" placeholder="pochta@mail.ru">
+            <span id="email-error" class="rm-auth-field-error"></span>
         </div>
 
-        <label class="rm-auth-label" for="password-confirm-input">Повторите пароль</label>
-        <div class="rm-auth-password-row">
-            <input id="password-confirm-input" class="ui-input rm-auth-input" type="password" autocomplete="new-password" maxlength="128" placeholder="Ещё раз">
-            <button id="password-confirm-toggle" type="button" class="rm-auth-password-toggle" aria-label="Показать пароль">Показать</button>
+        <div class="rm-auth-field">
+            <label class="rm-auth-label" for="password-input">Пароль</label>
+            <div class="rm-auth-password-row">
+                <input id="password-input" class="rm-auth-input" type="password" autocomplete="new-password" maxlength="128" placeholder="Минимум 8 символов">
+                <button id="password-toggle" type="button" class="rm-auth-password-toggle" aria-label="Показать пароль" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                        <line class="slash" x1="3" y1="3" x2="21" y2="21"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="password-strength" class="rm-auth-strength" data-level="0" aria-hidden="true">
+                <i></i><i></i><i></i><i></i>
+            </div>
+            <span id="password-error" class="rm-auth-field-error"></span>
         </div>
 
-        <button id="register-button" type="button" class="ui-button rm-auth-button">Создать аккаунт</button>
+        <div class="rm-auth-field">
+            <label class="rm-auth-label" for="password-confirm-input">Повторите пароль</label>
+            <div class="rm-auth-password-row">
+                <input id="password-confirm-input" class="rm-auth-input" type="password" autocomplete="new-password" maxlength="128" placeholder="Ещё раз">
+                <button id="password-confirm-toggle" type="button" class="rm-auth-password-toggle" aria-label="Показать пароль" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                        <line class="slash" x1="3" y1="3" x2="21" y2="21"/>
+                    </svg>
+                </button>
+            </div>
+            <span id="password-confirm-error" class="rm-auth-field-error"></span>
+        </div>
+
+        <label class="rm-auth-consent" for="consent-checkbox">
+            <input id="consent-checkbox" type="checkbox">
+            <span>Принимаю <a href="/rules" target="_blank" rel="noopener">условия использования</a> и
+            <a href="/privacy" target="_blank" rel="noopener">политику конфиденциальности</a></span>
+        </label>
+        <span id="consent-error" class="rm-auth-field-error"></span>
+
+        <button id="register-button" type="button" class="rm-auth-button">
+            <span class="rm-auth-spinner" aria-hidden="true"></span>
+            <span class="rm-auth-button-label">Создать аккаунт</span>
+        </button>
 "##;
 
-    let footer_html = if mail_ready {
-        format!(
-            r##"<p class="rm-auth-footer">Уже есть аккаунт? <a href="{login_href}">Войти</a> · <a href="{forgot_href}">Забыли пароль?</a></p>"##,
-            login_href = login_href,
-            forgot_href = forgot_href,
-        )
-    } else {
-        format!(
-            r##"<p class="rm-auth-footer">Уже есть аккаунт? <a href="{login_href}">Войти</a></p>"##,
-            login_href = login_href,
-        )
-    };
+    let footer_html = auth_footer_nav(&redirect_target, mail_ready);
 
     let body_after = format!(
         r##"
@@ -714,24 +841,45 @@ pub async fn register_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
 (function () {{
     const redirectTarget = {redirect_target_json};
     const emailInput = document.getElementById("email-input");
+    const emailError = document.getElementById("email-error");
     const passwordInput = document.getElementById("password-input");
+    const passwordError = document.getElementById("password-error");
+    const passwordStrength = document.getElementById("password-strength");
     const passwordConfirmInput = document.getElementById("password-confirm-input");
+    const passwordConfirmError = document.getElementById("password-confirm-error");
     const passwordToggle = document.getElementById("password-toggle");
     const passwordConfirmToggle = document.getElementById("password-confirm-toggle");
+    const consentCheckbox = document.getElementById("consent-checkbox");
+    const consentError = document.getElementById("consent-error");
     const registerButton = document.getElementById("register-button");
     const authStatus = document.getElementById("auth-status");
 
-    function setStatus(message, isError) {{
-        authStatus.textContent = message;
-        authStatus.classList.toggle("is-error", isError);
+    function setStatus(message, kind) {{
+        authStatus.textContent = message || "";
+        authStatus.className = "rm-auth-status" + (kind ? " is-" + kind : "");
+    }}
+
+    function setLoading(button, loading) {{
+        button.disabled = loading;
+        button.dataset.loading = loading ? "true" : "false";
+    }}
+
+    function clearFieldErrors() {{
+        emailError.textContent = "";
+        emailError.innerHTML = "";
+        passwordError.textContent = "";
+        passwordConfirmError.textContent = "";
+        consentError.textContent = "";
     }}
 
     function errorMessage(error) {{
         const messages = {{
             invalid_email: "Проверьте правильность почты.",
-            password_too_short: "Пароль должен быть не короче 8 символов.",
+            password_too_short: "Пароль короче 8 символов.",
             password_too_long: "Пароль слишком длинный.",
+            password_too_weak: "Нужны и буквы, и цифры.",
             password_mismatch: "Пароли не совпадают.",
+            consent_required: "Нужно принять условия и политику.",
             email_already_registered: "Эта почта уже зарегистрирована. Попробуйте войти.",
             verification_required: "Подтвердите почту кодом из письма.",
             rate_limited: "Слишком много попыток. Попробуйте позже.",
@@ -740,31 +888,91 @@ pub async fn register_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
         return messages[error] || "Не удалось зарегистрироваться.";
     }}
 
+    function showError(error) {{
+        if (error === "pending_deletion") {{
+            emailError.innerHTML = "Аккаунт с этой почтой ожидает удаления. " +
+                "<a href=\"/login\">Войти, чтобы отменить удаление</a>.";
+            return;
+        }}
+
+        const message = errorMessage(error);
+
+        if (error === "invalid_email" || error === "email_already_registered") {{
+            emailError.textContent = message;
+        }} else if (error === "password_too_short" || error === "password_too_long" || error === "password_too_weak") {{
+            passwordError.textContent = message;
+        }} else if (error === "password_mismatch") {{
+            passwordConfirmError.textContent = message;
+        }} else if (error === "consent_required") {{
+            consentError.textContent = message;
+        }} else {{
+            setStatus(message, "error");
+        }}
+    }}
+
+    function passwordStrengthLevel(password) {{
+        if (!password) return 0;
+        let score = 0;
+        if (password.length >= 8) score++;
+        if (/[a-zA-Zа-яА-ЯёЁ]/.test(password) && /[0-9]/.test(password)) score++;
+        if (/[a-zа-яё]/.test(password) && /[A-ZА-ЯЁ]/.test(password)) score++;
+        if (password.length >= 12 || /[^a-zA-Zа-яА-ЯёЁ0-9]/.test(password)) score++;
+        return Math.min(score, 4);
+    }}
+
+    passwordInput.addEventListener("input", function () {{
+        passwordStrength.dataset.level = String(passwordStrengthLevel(passwordInput.value));
+        passwordError.textContent = "";
+        if (passwordConfirmInput.value) {{
+            passwordConfirmError.textContent = passwordConfirmInput.value === passwordInput.value
+                ? "" : "Пароли не совпадают.";
+        }}
+    }});
+
+    passwordConfirmInput.addEventListener("input", function () {{
+        passwordConfirmError.textContent = !passwordConfirmInput.value || passwordConfirmInput.value === passwordInput.value
+            ? "" : "Пароли не совпадают.";
+    }});
+
+    consentCheckbox.addEventListener("change", function () {{
+        if (consentCheckbox.checked) {{
+            consentError.textContent = "";
+        }}
+    }});
+
     async function register() {{
         const email = emailInput.value.trim();
         const password = passwordInput.value;
         const passwordConfirm = passwordConfirmInput.value;
 
+        clearFieldErrors();
+        setStatus("", null);
+
         if (!email) {{
-            setStatus("Введите почту.", true);
+            emailError.textContent = "Введите почту.";
             emailInput.focus();
             return;
         }}
 
         if (password.length < 8) {{
-            setStatus("Пароль должен быть не короче 8 символов.", true);
+            passwordError.textContent = "Пароль короче 8 символов.";
             passwordInput.focus();
             return;
         }}
 
         if (password !== passwordConfirm) {{
-            setStatus("Пароли не совпадают.", true);
+            passwordConfirmError.textContent = "Пароли не совпадают.";
             passwordConfirmInput.focus();
             return;
         }}
 
-        registerButton.disabled = true;
-        setStatus("Создаём аккаунт...", false);
+        if (!consentCheckbox.checked) {{
+            consentError.textContent = "Нужно принять условия и политику.";
+            consentCheckbox.focus();
+            return;
+        }}
+
+        setLoading(registerButton, true);
 
         try {{
             const response = await fetch("/auth/register-email", {{
@@ -773,7 +981,8 @@ pub async fn register_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
                 body: JSON.stringify({{
                     email,
                     password,
-                    password_confirm: passwordConfirm
+                    password_confirm: passwordConfirm,
+                    consent: consentCheckbox.checked
                 }})
             }});
 
@@ -782,12 +991,12 @@ pub async fn register_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
             }});
 
             if (!response.ok || !data.ok) {{
-                setStatus(errorMessage(data.error), true);
+                showError(data.error);
                 return;
             }}
 
             if (data.verification_required) {{
-                setStatus("Отправляем код на почту...", false);
+                setStatus("Отправляем код на почту...", null);
                 let mailSent = false;
                 try {{
                     const codeResponse = await fetch("/auth/email/request", {{
@@ -812,35 +1021,33 @@ pub async fn register_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
                 return;
             }}
 
-            setStatus("Аккаунт создан", false);
+            setStatus("Аккаунт создан", "success");
             window.location.replace(redirectTarget);
         }} catch (_) {{
-            setStatus("Ошибка соединения. Попробуйте ещё раз.", true);
+            setStatus("Нет соединения. Проверьте интернет и попробуйте снова.", "error");
         }} finally {{
-            registerButton.disabled = false;
+            setLoading(registerButton, false);
         }}
     }}
 
+    [passwordToggle, passwordConfirmToggle].forEach(function (button) {{
+        const input = button === passwordToggle ? passwordInput : passwordConfirmInput;
+        button.addEventListener("click", function () {{
+            const showing = input.type === "text";
+            input.type = showing ? "password" : "text";
+            button.setAttribute("aria-pressed", showing ? "false" : "true");
+        }});
+    }});
+
+    registerButton.addEventListener("click", register);
+
     if (window.resursmapAuthForms) {{
-        if (window.resursmapAuthForms.bindLinkedPasswordToggles) {{
-            window.resursmapAuthForms.bindLinkedPasswordToggles([
-                {{ button: passwordToggle, input: passwordInput }},
-                {{ button: passwordConfirmToggle, input: passwordConfirmInput }}
-            ]);
-        }} else {{
-            window.resursmapAuthForms.bindPasswordToggle(
-                passwordToggle,
-                passwordInput,
-                passwordConfirmInput
-            );
-        }}
         window.resursmapAuthForms.bindEnterSubmit(
             [emailInput, passwordInput, passwordConfirmInput],
             register
         );
     }}
 
-    registerButton.addEventListener("click", register);
     emailInput.focus();
 }})();
 </script>
@@ -854,13 +1061,14 @@ pub async fn register_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
             document_title: "Регистрация · GRABIT",
             heading: "Регистрация",
             subtitle: if mail_ready {
-                "Почта и пароль. Если письма включены, придёт код подтверждения."
+                "Почта и пароль. Придёт код подтверждения."
             } else {
                 "Почта и пароль. После регистрации вход сразу."
             },
             body_html,
             footer_html: &footer_html,
             script_html: &body_after,
+            back_link: false,
         },
     ))
 }

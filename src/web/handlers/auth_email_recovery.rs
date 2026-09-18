@@ -470,6 +470,7 @@ pub async fn login_code_page(Query(query): Query<AuthNextQuery>) -> Html<String>
                 body_html: "",
                 footer_html: &footer_html,
                 script_html: "",
+                back_link: true,
             },
         ));
     }
@@ -645,19 +646,17 @@ pub async fn login_code_page(Query(query): Query<AuthNextQuery>) -> Html<String>
             body_html,
             footer_html: &footer_html,
             script_html: &body_after,
+            back_link: true,
         },
     ))
 }
 
 pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<String> {
     let redirect_target = auth_redirect_target(query.next.as_deref());
-    let login_href = auth_related_href("/login", &redirect_target);
+    let mail_ready = email_delivery_configured();
 
-    if !email_delivery_configured() {
-        let footer_html = format!(
-            r##"<p class="rm-auth-footer"><a href="{login_href}">Вернуться ко входу</a></p>"##,
-            login_href = login_href,
-        );
+    if !mail_ready {
+        let footer_html = super::auth_email::auth_footer_nav(&redirect_target, false);
         return Html(crate::web::templates::render_auth_page(
             crate::web::templates::AuthPageParams {
                 document_title: "Сброс пароля · GRABIT",
@@ -666,40 +665,59 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
                 body_html: "",
                 footer_html: &footer_html,
                 script_html: "",
+                back_link: false,
             },
         ));
     }
 
     let body_html = r##"
-        <label class="rm-auth-label" for="email-input">Почта</label>
-        <input id="email-input" class="ui-input rm-auth-input" type="email" autocomplete="email" maxlength="254" placeholder="pochta@mail.ru">
+        <div class="rm-auth-field">
+            <label class="rm-auth-label" for="email-input">Почта</label>
+            <input id="email-input" class="rm-auth-input" type="email" inputmode="email" autocomplete="email" maxlength="254" placeholder="pochta@mail.ru">
+            <span id="email-error" class="rm-auth-field-error"></span>
+        </div>
 
-        <button id="request-button" type="button" class="ui-button rm-auth-button rm-auth-button--compact">Отправить код</button>
+        <button id="request-button" type="button" class="rm-auth-button rm-auth-button--compact">
+            <span class="rm-auth-spinner" aria-hidden="true"></span>
+            <span class="rm-auth-button-label">Отправить</span>
+        </button>
 
         <div id="reset-section" hidden class="rm-auth-step">
-            <label class="rm-auth-label" for="code-input">Код из письма</label>
-            <input id="code-input" class="ui-input rm-auth-input rm-auth-input--code" type="text" inputmode="numeric" maxlength="6" placeholder="000000">
-
-            <label class="rm-auth-label" for="password-input">Новый пароль</label>
-            <div class="rm-auth-password-row">
-                <input id="password-input" class="ui-input rm-auth-input" type="password" autocomplete="new-password" maxlength="128" placeholder="Минимум 8 символов">
-                <button id="password-toggle" type="button" class="rm-auth-password-toggle" aria-label="Показать пароль">Показать</button>
+            <div class="rm-auth-field">
+                <label class="rm-auth-label" for="code-input">Код из письма</label>
+                <input id="code-input" class="rm-auth-input rm-auth-input--code" type="text" inputmode="numeric" maxlength="6" placeholder="000000">
+                <span id="code-error" class="rm-auth-field-error"></span>
             </div>
 
-            <label class="rm-auth-label" for="password-confirm-input">Повторите пароль</label>
-            <div class="rm-auth-password-row">
-                <input id="password-confirm-input" class="ui-input rm-auth-input" type="password" autocomplete="new-password" maxlength="128" placeholder="Ещё раз">
-                <button id="password-confirm-toggle" type="button" class="rm-auth-password-toggle" aria-label="Показать пароль">Показать</button>
+            <div class="rm-auth-field">
+                <label class="rm-auth-label" for="password-input">Новый пароль</label>
+                <div class="rm-auth-password-row">
+                    <input id="password-input" class="rm-auth-input" type="password" autocomplete="new-password" maxlength="128" placeholder="Минимум 8 символов">
+                    <button id="password-toggle" type="button" class="rm-auth-password-toggle" aria-label="Показать пароль" aria-pressed="false">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                            <line class="slash" x1="3" y1="3" x2="21" y2="21"/>
+                        </svg>
+                    </button>
+                </div>
+                <span id="password-error" class="rm-auth-field-error"></span>
             </div>
 
-            <button id="reset-button" type="button" class="ui-button rm-auth-button rm-auth-button--compact">Сохранить пароль</button>
+            <div class="rm-auth-field">
+                <label class="rm-auth-label" for="password-confirm-input">Повторите пароль</label>
+                <input id="password-confirm-input" class="rm-auth-input" type="password" autocomplete="new-password" maxlength="128" placeholder="Ещё раз">
+                <span id="password-confirm-error" class="rm-auth-field-error"></span>
+            </div>
+
+            <button id="reset-button" type="button" class="rm-auth-button rm-auth-button--compact">
+                <span class="rm-auth-spinner" aria-hidden="true"></span>
+                <span class="rm-auth-button-label">Сохранить</span>
+            </button>
         </div>
 "##;
 
-    let footer_html = format!(
-        r##"<p class="rm-auth-footer"><a href="{login_href}">Вернуться ко входу</a></p>"##,
-        login_href = login_href,
-    );
+    let footer_html = super::auth_email::auth_footer_nav(&redirect_target, mail_ready);
 
     let body_after = format!(
         r##"
@@ -707,48 +725,92 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
 (function () {{
     const redirectTarget = {redirect_target_json};
     const emailInput = document.getElementById("email-input");
+    const emailError = document.getElementById("email-error");
     const codeInput = document.getElementById("code-input");
+    const codeError = document.getElementById("code-error");
     const passwordInput = document.getElementById("password-input");
+    const passwordError = document.getElementById("password-error");
     const passwordConfirmInput = document.getElementById("password-confirm-input");
+    const passwordConfirmError = document.getElementById("password-confirm-error");
     const passwordToggle = document.getElementById("password-toggle");
-    const passwordConfirmToggle = document.getElementById("password-confirm-toggle");
     const resetSection = document.getElementById("reset-section");
     const requestButton = document.getElementById("request-button");
     const resetButton = document.getElementById("reset-button");
     const authStatus = document.getElementById("auth-status");
 
-    function setStatus(message, isError) {{
-        authStatus.textContent = message;
-        authStatus.classList.toggle("is-error", isError);
+    function setStatus(message, kind) {{
+        authStatus.textContent = message || "";
+        authStatus.className = "rm-auth-status" + (kind ? " is-" + kind : "");
+    }}
+
+    function setLoading(button, loading) {{
+        button.disabled = loading;
+        button.dataset.loading = loading ? "true" : "false";
+    }}
+
+    function clearFieldErrors() {{
+        emailError.textContent = "";
+        codeError.textContent = "";
+        passwordError.textContent = "";
+        passwordConfirmError.textContent = "";
     }}
 
     function resetError(error) {{
         const messages = {{
             invalid_email: "Проверьте правильность почты.",
             invalid_code: "Введите шестизначный код.",
-            password_too_short: "Пароль должен быть не короче 8 символов.",
+            password_too_short: "Пароль короче 8 символов.",
             password_mismatch: "Пароли не совпадают.",
             code_store_failed: "Не удалось сохранить код. Попробуйте ещё раз.",
             code_not_found: "Сначала запросите код.",
             code_used: "Этот код уже использован.",
-            code_expired: "Срок действия кода истёк.",
-            wrong_code: "Код введён неверно.",
-            rate_limited: "Слишком много попыток.",
-            mail_unavailable: "Почта не настроена. Войдите по почте и паролю."
+            code_expired: "Код истёк. Запросите новый.",
+            wrong_code: "Код неверный.",
+            rate_limited: "Слишком много попыток. Попробуйте позже.",
+            mail_unavailable: "Почта не настроена. Войдите по почте и паролю.",
+            database_unavailable: "Сервис временно недоступен."
         }};
         return messages[error] || "Не удалось выполнить запрос.";
     }}
 
+    const CODE_FIELD_ERRORS = new Set([
+        "invalid_code", "code_not_found", "code_used", "code_expired", "wrong_code"
+    ]);
+
+    function showRequestError(error) {{
+        const message = resetError(error);
+        if (error === "invalid_email") {{
+            emailError.textContent = message;
+        }} else {{
+            setStatus(message, "error");
+        }}
+    }}
+
+    function showResetError(error) {{
+        const message = resetError(error);
+        if (CODE_FIELD_ERRORS.has(error)) {{
+            codeError.textContent = message;
+        }} else if (error === "password_too_short") {{
+            passwordError.textContent = message;
+        }} else if (error === "password_mismatch") {{
+            passwordConfirmError.textContent = message;
+        }} else {{
+            setStatus(message, "error");
+        }}
+    }}
+
     async function requestCode() {{
         const email = emailInput.value.trim();
+        clearFieldErrors();
+        setStatus("", null);
+
         if (!email) {{
-            setStatus("Введите почту.", true);
+            emailError.textContent = "Введите почту.";
             emailInput.focus();
             return;
         }}
 
-        requestButton.disabled = true;
-        setStatus("Отправляем код...", false);
+        setLoading(requestButton, true);
 
         try {{
             const response = await fetch("/auth/forgot-password", {{
@@ -761,17 +823,17 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
             }});
 
             if (!response.ok || !data.ok) {{
-                setStatus(resetError(data.error), true);
+                showRequestError(data.error);
                 return;
             }}
 
             resetSection.hidden = false;
-            setStatus("Если аккаунт с такой почтой существует, код отправлен.", false);
+            setStatus("Если аккаунт с такой почтой существует, код отправлен.", "success");
             codeInput.focus();
         }} catch (_) {{
-            setStatus("Ошибка соединения.", true);
+            setStatus("Нет соединения. Проверьте интернет и попробуйте снова.", "error");
         }} finally {{
-            requestButton.disabled = false;
+            setLoading(requestButton, false);
         }}
     }}
 
@@ -781,20 +843,22 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
         const password = passwordInput.value;
         const passwordConfirm = passwordConfirmInput.value;
 
+        clearFieldErrors();
+        setStatus("", null);
+
         if (password.length < 8) {{
-            setStatus("Пароль должен быть не короче 8 символов.", true);
+            passwordError.textContent = "Пароль короче 8 символов.";
             passwordInput.focus();
             return;
         }}
 
         if (password !== passwordConfirm) {{
-            setStatus("Пароли не совпадают.", true);
+            passwordConfirmError.textContent = "Пароли не совпадают.";
             passwordConfirmInput.focus();
             return;
         }}
 
-        resetButton.disabled = true;
-        setStatus("Сохраняем пароль...", false);
+        setLoading(resetButton, true);
 
         try {{
             const response = await fetch("/auth/reset-password", {{
@@ -807,29 +871,24 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
             }});
 
             if (!response.ok || !data.ok) {{
-                setStatus(resetError(data.error), true);
+                showResetError(data.error);
                 return;
             }}
 
-            setStatus("Пароль сохранён", false);
+            setStatus("Пароль сохранён", "success");
             window.location.replace(redirectTarget);
         }} catch (_) {{
-            setStatus("Ошибка соединения.", true);
+            setStatus("Нет соединения. Проверьте интернет и попробуйте снова.", "error");
         }} finally {{
-            resetButton.disabled = false;
+            setLoading(resetButton, false);
         }}
     }}
 
-    if (window.resursmapAuthForms) {{
-        if (window.resursmapAuthForms.bindLinkedPasswordToggles) {{
-            window.resursmapAuthForms.bindLinkedPasswordToggles([
-                {{ button: passwordToggle, input: passwordInput }},
-                {{ button: passwordConfirmToggle, input: passwordConfirmInput }}
-            ]);
-        }} else {{
-            window.resursmapAuthForms.bindPasswordToggle(passwordToggle, passwordInput);
-        }}
-    }}
+    passwordToggle.addEventListener("click", function () {{
+        const showing = passwordInput.type === "text";
+        passwordInput.type = showing ? "password" : "text";
+        passwordToggle.setAttribute("aria-pressed", showing ? "false" : "true");
+    }});
 
     requestButton.addEventListener("click", requestCode);
     resetButton.addEventListener("click", submitReset);
@@ -848,10 +907,11 @@ pub async fn forgot_password_page(Query(query): Query<AuthNextQuery>) -> Html<St
         crate::web::templates::AuthPageParams {
             document_title: "Сброс пароля · GRABIT",
             heading: "Сброс пароля",
-            subtitle: "Отправим код на почту. Подойдёт и для старых аккаунтов без пароля — зададите новый.",
+            subtitle: "Код придёт на почту.",
             body_html,
             footer_html: &footer_html,
             script_html: &body_after,
+            back_link: false,
         },
     ))
 }
