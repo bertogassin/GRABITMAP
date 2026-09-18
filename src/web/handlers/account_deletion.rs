@@ -441,6 +441,12 @@ pub async fn public_account_delete_request(
                    AND consumed_at = 0",
                 rusqlite::params![&email, unix_now()],
             );
+
+            return (
+                StatusCode::SERVICE_UNAVAILABLE,
+                Json(json!({ "ok": false, "error": "mail_unavailable" })),
+            )
+                .into_response();
         }
     }
 

@@ -2,6 +2,7 @@ use super::admin_access::{
     load_admin_context, record_denied_access, valid_admin_session_public_id, AdminPermission,
 };
 use super::auth::verify_authenticated_user;
+use super::auth_email::email_delivery_configured;
 use super::common::request_is_cross_site;
 use crate::state::app_state::AppState;
 use crate::web::templates::{
@@ -317,6 +318,7 @@ pub async fn admin_security_page(
         verified,
         remaining_seconds,
         message: message.to_string(),
+        mail_ready: email_delivery_configured(),
     }))
 }
 

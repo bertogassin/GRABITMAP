@@ -5,6 +5,7 @@ pub struct AdminSecurityData {
     pub verified: bool,
     pub remaining_seconds: i64,
     pub message: String,
+    pub mail_ready: bool,
 }
 
 pub fn render_admin_security(data: AdminSecurityData) -> String {
@@ -31,6 +32,29 @@ pub fn render_admin_security(data: AdminSecurityData) -> String {
         format!(
             r#"<div class="message">{}</div>"#,
             escape_html(&data.message)
+        )
+    };
+
+    let request_card = if data.mail_ready {
+        format!(
+            r#"<section class="card">
+ <h2>Получить одноразовый код</h2>
+ <p>Код будет отправлен на подтверждённый адрес владельца.</p>
+ <div class="email">{masked_email}</div>
+ <form method="post" action="/app/center/security/request">
+  <button type="submit">Отправить защищённый код</button>
+ </form>
+</section>"#,
+            masked_email = escape_html(&data.masked_email),
+        )
+    } else {
+        format!(
+            r#"<section class="card">
+ <h2>Получить одноразовый код</h2>
+ <p>Почта не настроена — отправка кода недоступна. Обратитесь к администратору.</p>
+ <div class="email">{masked_email}</div>
+</section>"#,
+            masked_email = escape_html(&data.masked_email),
         )
     };
 
@@ -138,14 +162,7 @@ input{{
  {message}
 </section>
 
-<section class="card">
- <h2>Получить одноразовый код</h2>
- <p>Код будет отправлен на подтверждённый адрес владельца.</p>
- <div class="email">{masked_email}</div>
- <form method="post" action="/app/center/security/request">
-  <button type="submit">Отправить защищённый код</button>
- </form>
-</section>
+{request_card}
 
 <section class="card">
  <h2>Подтвердить сессию</h2>
@@ -167,7 +184,7 @@ input{{
         state_title = state_title,
         state_text = escape_html(&state_text),
         message = message,
-        masked_email = escape_html(&data.masked_email),
+        request_card = request_card,
     );
 
     super::common::page_document(
@@ -191,6 +208,7 @@ mod tests {
             verified: false,
             remaining_seconds: 0,
             message: String::new(),
+            mail_ready: true,
         });
 
         assert!(html.contains(":root {"));
