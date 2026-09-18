@@ -101,7 +101,10 @@ tar \
 tar -tf "$BACKUP_DIR/data-files.tar" >/dev/null
 
 echo "=== BACK UP PRODUCTION CONFIGURATION ==="
-install -m 600 .env "$BACKUP_DIR/production.env"
+(
+    umask 077
+    grep -v -E '^OWNER_BOOTSTRAP_(EMAIL|PASSWORD)=' .env > "$BACKUP_DIR/production.env"
+)
 install -m 600 Caddyfile "$BACKUP_DIR/Caddyfile"
 install -m 600 "$COMPOSE_FILE" "$BACKUP_DIR/docker-compose.prod.yml"
 
