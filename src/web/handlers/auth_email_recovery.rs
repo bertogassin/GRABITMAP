@@ -450,6 +450,14 @@ pub async fn reset_password(
             .into_response();
     }
 
+    let _ = db.execute(
+        "UPDATE user_sessions
+         SET revoked_at = ?2
+         WHERE user_id = ?1
+           AND revoked_at IS NULL",
+        rusqlite::params![user_id, unix_now()],
+    );
+
     email_password_auth_response(&state, user_id, &headers)
 }
 
