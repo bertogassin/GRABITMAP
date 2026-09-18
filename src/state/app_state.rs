@@ -133,7 +133,6 @@ pub struct AppState {
     // Новый SQLite connection pool.
     pub db_pool: DbPool,
 
-    pub bot_token: Option<String>,
     pub admin_key: String,
 
     // Быстрый process-local rate limiter.
@@ -190,14 +189,13 @@ impl AppState {
         )
     }
 
-    pub fn new(db_pool: DbPool, bot_token: Option<String>, admin_key: String) -> Self {
+    pub fn new(db_pool: DbPool, admin_key: String) -> Self {
         let (chat_events, _) = broadcast::channel(2_048);
         let (chat_typing_events, _) = broadcast::channel(1_024);
         let initial_sequence = initial_realtime_sequence();
 
         Self {
             db_pool,
-            bot_token,
             admin_key,
             rate_limits: Arc::new(Mutex::new(HashMap::new())),
             chat_events,

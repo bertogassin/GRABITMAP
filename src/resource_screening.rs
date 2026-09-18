@@ -57,14 +57,6 @@ pub fn screen_listing_content(title: &str, description: &str, contact: &str) -> 
     }
 }
 
-pub fn listing_type_label(listing_type: &str) -> &'static str {
-    match listing_type.trim() {
-        "seeker" => "Ищу работу",
-        "offer" => "Предложение",
-        _ => "Объявление",
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

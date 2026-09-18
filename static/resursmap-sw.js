@@ -17,7 +17,6 @@ const STATIC_ASSETS = [
     "/static/nav-badge.js",
     "/static/app-reliability.js",
     "/static/i18n-boot.js",
-    "/static/i18n-runtime.js",
     "/static/paraglide/messages.js",
     "/static/paraglide/runtime.js",
     "/static/paraglide/messages/_index.js",

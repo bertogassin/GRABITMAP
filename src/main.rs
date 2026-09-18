@@ -10,8 +10,6 @@ mod resource_publisher;
 mod resource_screening;
 mod state;
 mod stripe_payments;
-mod telegram_groups;
-mod telegram_notify;
 mod web;
 
 use state::app_state::AppState;
@@ -107,12 +105,7 @@ async fn main() {
 
     let db_pool = db::pool::create_pool().expect("Не удалось создать SQLite connection pool");
 
-    let bot_token = env::var("TELEGRAM_BOT_TOKEN")
-        .ok()
-        .map(|value| value.trim().to_string())
-        .filter(|value| !value.is_empty());
-
-    let state = AppState::new(db_pool.clone(), bot_token.clone(), admin_key);
+    let state = AppState::new(db_pool.clone(), admin_key);
 
     internal_promotions::spawn_expiry_worker(db_pool.clone());
     account_deletion::spawn_expiry_worker(db_pool.clone());

@@ -1,20 +1,6 @@
 use crate::db::pool::DbPool;
-use crate::resource_screening::listing_type_label;
 use crate::state::app_state::AppState;
 use rusqlite::{params, Connection};
-
-pub fn promotion_price_minor() -> i64 {
-    std::env::var("PROMOTION_PRICE_MINOR")
-        .ok()
-        .and_then(|value| value.trim().parse::<i64>().ok())
-        .filter(|value| *value > 0)
-        .unwrap_or(499)
-}
-
-pub fn promotion_price_label() -> String {
-    let minor = promotion_price_minor();
-    format!("{:.2} €", minor as f64 / 100.0)
-}
 
 struct PromotionPublishRow {
     _request_id: i64,
@@ -24,10 +10,6 @@ struct PromotionPublishRow {
     bot_check_status: String,
     resource_id: i64,
     title: String,
-    description: String,
-    address: String,
-    category: String,
-    listing_type: String,
     telegram_chat_id: i64,
     city_name: String,
 }
@@ -70,10 +52,6 @@ fn load_publish_row(connection: &Connection, request_id: i64) -> Option<Promotio
                 COALESCE(pr.bot_check_status, 'unknown'),
                 r.id,
                 r.title,
-                r.description,
-                r.address,
-                r.category,
-                COALESCE(r.listing_type, 'general'),
                 t.telegram_chat_id,
                 t.city_name
              FROM resource_promotion_requests pr
@@ -91,37 +69,12 @@ fn load_publish_row(connection: &Connection, request_id: i64) -> Option<Promotio
                     bot_check_status: row.get(4)?,
                     resource_id: row.get(5)?,
                     title: row.get(6)?,
-                    description: row.get(7)?,
-                    address: row.get(8)?,
-                    category: row.get(9)?,
-                    listing_type: row.get(10)?,
-                    telegram_chat_id: row.get(11)?,
-                    city_name: row.get(12)?,
+                    telegram_chat_id: row.get(7)?,
+                    city_name: row.get(8)?,
                 })
             },
         )
         .ok()
-}
-
-fn format_group_message(row: &PromotionPublishRow) -> String {
-    let kind = listing_type_label(&row.listing_type);
-    let address = if row.address.trim().is_empty() {
-        String::new()
-    } else {
-        format!("\n📍 {}", row.address.trim())
-    };
-
-    format!(
-        "📢 GRABIT · {}\n{} · {}\n\n{}\n\n{}{}\n\n🔗 {}/app/resource/{}",
-        row.city_name.trim(),
-        kind,
-        row.category.trim(),
-        row.title.trim(),
-        row.description.trim(),
-        address,
-        crate::stripe_payments::public_base_url(),
-        row.resource_id,
-    )
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -202,117 +155,48 @@ pub async fn try_publish_promotion(
         return Err("moderation_required".into());
     }
 
+    // Telegram group publishing was retired and won't come back — every
+    // otherwise-eligible request now fails the same honest way a request
+    // with no connected group already did above, instead of attempting a
+    // delivery channel that no longer exists.
     let now = chrono::Utc::now().timestamp();
     let previous_status = row.status.clone();
-    let message_text = format_group_message(&row);
+    let reason = "telegram_publishing_discontinued".to_string();
 
-    if connection
-        .execute(
-            "UPDATE resource_promotion_requests
-             SET status = 'publishing',
-                 updated_at = ?2,
-                 failure_reason = ''
-             WHERE id = ?1
-               AND status IN ('pending', 'approved', 'failed')",
-            params![request_id, now],
-        )
-        .unwrap_or(0)
-        != 1
-    {
-        return Err("publish_busy".into());
-    }
+    let _ = connection.execute(
+        "UPDATE resource_promotion_requests
+         SET status = 'failed',
+             failure_reason = ?2,
+             updated_at = ?3
+         WHERE id = ?1",
+        params![request_id, reason, now],
+    );
 
-    drop(connection);
+    record_promotion_event(
+        &connection,
+        request_id,
+        actor_user_id,
+        "publish_failed",
+        &previous_status,
+        "failed",
+        &reason,
+        now,
+    );
 
-    let sent = crate::telegram_notify::publish_to_telegram_group(
-        state.bot_token.as_deref(),
-        row.telegram_chat_id,
-        &message_text,
-    )
-    .await;
+    insert_promotion_notification(
+        &connection,
+        row.requester_user_id,
+        row.resource_id,
+        "promotion_publish_failed",
+        "Публикация отложена",
+        &format!(
+            "«{}» оплачено, но отправка в группу {} не удалась. Администратор поможет завершить публикацию.",
+            row.title.trim(),
+            row.city_name.trim()
+        ),
+    );
 
-    let connection = state
-        .db_pool
-        .get()
-        .map_err(|_| "database_unavailable".to_string())?;
-
-    match sent {
-        Ok(message_id) => {
-            connection
-                .execute(
-                    "UPDATE resource_promotion_requests
-                     SET status = 'published',
-                         telegram_message_id = ?2,
-                         published_at = ?3,
-                         updated_at = ?3
-                     WHERE id = ?1",
-                    params![request_id, message_id, now],
-                )
-                .map_err(|_| "publish_update_failed".to_string())?;
-
-            record_promotion_event(
-                &connection,
-                request_id,
-                actor_user_id,
-                "published",
-                &previous_status,
-                "published",
-                "telegram_group",
-                now,
-            );
-
-            insert_promotion_notification(
-                &connection,
-                row.requester_user_id,
-                row.resource_id,
-                "promotion_published",
-                "Объявление опубликовано",
-                &format!(
-                    "«{}» опубликовано в Telegram-группе {}.",
-                    row.title.trim(),
-                    row.city_name.trim()
-                ),
-            );
-
-            Ok(())
-        }
-        Err(error) => {
-            let reason = error.to_string();
-            let _ = connection.execute(
-                "UPDATE resource_promotion_requests
-                 SET status = 'failed',
-                     failure_reason = ?2,
-                     updated_at = ?3
-                 WHERE id = ?1",
-                params![request_id, reason, now],
-            );
-            record_promotion_event(
-                &connection,
-                request_id,
-                actor_user_id,
-                "publish_failed",
-                "publishing",
-                "failed",
-                &reason,
-                now,
-            );
-
-            insert_promotion_notification(
-                &connection,
-                row.requester_user_id,
-                row.resource_id,
-                "promotion_publish_failed",
-                "Публикация отложена",
-                &format!(
-                    "«{}» оплачено, но отправка в группу {} не удалась. Администратор поможет завершить публикацию.",
-                    row.title.trim(),
-                    row.city_name.trim()
-                ),
-            );
-
-            Err(reason)
-        }
-    }
+    Err(reason)
 }
 
 pub fn mark_promotion_paid_with_reference(
