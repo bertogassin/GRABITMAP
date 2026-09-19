@@ -253,8 +253,8 @@ textarea,
     }
 
     .rm-lang-search input:focus {
-        border-color: rgba(232, 204, 150, .58);
-        box-shadow: 0 0 0 3px rgba(232, 204, 150, .10);
+        border-color: rgba(var(--text-rgb), .58);
+        box-shadow: 0 0 0 3px rgba(var(--text-rgb), .10);
     }
 
     .rm-lang-search-status {

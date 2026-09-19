@@ -1,8 +1,8 @@
-// Переключатель темы ResursMap — работает в любом месте
+// Переключатель темы GRABIT — чёрно-белая тема с data-theme на :root.
+// По умолчанию следует prefers-color-scheme; явный выбор пользователя
+// хранится в localStorage и всегда побеждает системную настройку.
 (function() {
-    function themeColorMeta() {
-        return document.querySelector('meta[name="theme-color"]');
-    }
+    var STORAGE_KEY = "resursmap-theme";
 
     function t(key, fallback) {
         if (typeof window.rmT === "function") {
@@ -12,6 +12,23 @@
             }
         }
         return fallback;
+    }
+
+    function storedTheme() {
+        try {
+            var value = localStorage.getItem(STORAGE_KEY);
+            return value === "light" || value === "dark" ? value : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function systemPrefersLight() {
+        return Boolean(window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches);
+    }
+
+    function effectiveTheme() {
+        return storedTheme() || (systemPrefersLight() ? "light" : "dark");
     }
 
     function setButtonLabels(isLight) {
@@ -24,28 +41,14 @@
         }
     }
 
-    function applyTheme(isLight) {
-        document.documentElement.classList.toggle("light-theme", isLight);
-        document.body.classList.toggle("light-theme", isLight);
-        document.documentElement.style.colorScheme = isLight ? "light" : "dark";
-
-        var meta = themeColorMeta();
-        if (meta) {
-            meta.setAttribute("content", isLight ? "#f4f1ea" : "#080a0d");
-        }
-
+    function applyTheme(theme) {
+        var isLight = theme === "light";
+        document.documentElement.setAttribute("data-theme", theme);
+        document.documentElement.style.colorScheme = theme;
         setButtonLabels(isLight);
     }
 
-    function savedIsLight() {
-        try {
-            return localStorage.getItem("resursmap-theme") === "light";
-        } catch (e) {
-            return false;
-        }
-    }
-
-    applyTheme(savedIsLight());
+    applyTheme(effectiveTheme());
 
     document.addEventListener("click", function(event) {
         var btn = event.target.closest(".theme-toggle-btn");
@@ -53,16 +56,16 @@
 
         event.preventDefault();
 
-        var isLight = !document.body.classList.contains("light-theme");
+        var next = effectiveTheme() === "light" ? "dark" : "light";
 
         try {
-            localStorage.setItem("resursmap-theme", isLight ? "light" : "dark");
+            localStorage.setItem(STORAGE_KEY, next);
         } catch (e) {}
 
-        applyTheme(isLight);
+        applyTheme(next);
     });
 
     document.addEventListener("DOMContentLoaded", function() {
-        applyTheme(savedIsLight());
+        applyTheme(effectiveTheme());
     });
 })();

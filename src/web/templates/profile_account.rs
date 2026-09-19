@@ -510,19 +510,19 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     overflow:hidden;
     margin-bottom:24px;
     padding:24px;
-    border:1px solid rgba(232,204,150,.30);
+    border:1px solid rgba(var(--text-rgb),.30);
     border-radius:26px;
     background:
         radial-gradient(circle at 100% 0%,
             rgba(126,212,228,.16),transparent 34%),
         radial-gradient(circle at 0% 100%,
-            rgba(232,204,150,.14),transparent 36%),
+            rgba(var(--text-rgb),.14),transparent 36%),
         linear-gradient(145deg,
             rgba(20,23,30,.98),
             rgba(10,12,17,.98));
     box-shadow:
         0 24px 68px rgba(0,0,0,.30),
-        0 0 48px rgba(232,204,150,.06);
+        0 0 48px rgba(var(--text-rgb),.06);
 }}
 .rm-personal-center::after {{
     content:"";
@@ -531,10 +531,10 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     height:230px;
     top:-145px;
     right:-115px;
-    border:1px solid rgba(214,183,122,.17);
+    border:1px solid rgba(var(--text-rgb),.17);
     border-radius:50%;
     box-shadow:
-        0 0 0 35px rgba(214,183,122,.025),
+        0 0 0 35px rgba(var(--text-rgb),.025),
         0 0 0 72px rgba(119,87,185,.025);
     pointer-events:none;
 }}
@@ -620,7 +620,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     font-size:23px;
     line-height:1;
     color:var(--gold-light);
-    text-shadow:0 0 24px rgba(232,204,150,.12);
+    text-shadow:0 0 24px rgba(var(--text-rgb),.12);
 }}
 .rm-center-metric span {{
     display:block;
@@ -675,26 +675,26 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
 }}
 .rm-command-card:hover {{
     transform:translateY(-3px);
-    border-color:rgba(232,204,150,.36);
+    border-color:rgba(var(--text-rgb),.36);
     background:
         linear-gradient(145deg,
-            rgba(232,204,150,.10),
+            rgba(var(--text-rgb),.10),
             rgba(126,212,228,.05));
     box-shadow:
         0 14px 36px rgba(0,0,0,.24),
-        0 0 32px rgba(232,204,150,.08);
+        0 0 32px rgba(var(--text-rgb),.08);
 }}
 .rm-command-icon {{
     flex:0 0 43px;
     height:43px;
     display:grid;
     place-items:center;
-    border:1px solid rgba(232,204,150,.28);
+    border:1px solid rgba(var(--text-rgb),.28);
     border-radius:14px;
     color:var(--center-gold);
     background:
         radial-gradient(circle at 30% 20%, rgba(255,228,184,.14), transparent 55%),
-        rgba(232,204,150,.09);
+        rgba(var(--text-rgb),.09);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
 }}
 .rm-command-icon svg {{
@@ -733,26 +733,26 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     display:grid;
     place-items:center;
     padding:0 7px;
-    border:1px solid rgba(214,183,122,.32);
+    border:1px solid rgba(var(--text-rgb),.32);
     border-radius:999px;
     color:var(--center-gold);
-    background:rgba(214,183,122,.09);
+    background:rgba(var(--text-rgb),.09);
     font-size:10px;
     font-weight:950;
 }}
 .rm-admin-command {{
-    border-color:rgba(214,183,122,.24);
+    border-color:rgba(var(--text-rgb),.24);
     background:
         linear-gradient(135deg,
-            rgba(214,183,122,.075),
+            rgba(var(--text-rgb),.075),
             rgba(119,87,185,.055));
 }}
 .rm-future-panel {{
     margin-bottom:24px;
     padding:18px;
-    border:1px dashed rgba(214,183,122,.22);
+    border:1px dashed rgba(var(--text-rgb),.22);
     border-radius:19px;
-    background:rgba(214,183,122,.025);
+    background:rgba(var(--text-rgb),.025);
 }}
 .rm-future-panel strong {{
     display:block;
@@ -789,20 +789,17 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
         transition:none;
     }}
 }}
-html.light-theme .rm-status-pill,
-body.light-theme .rm-status-pill {{
-    background:#fff;
+:root[data-theme="light"] .rm-status-pill {{
+    background:var(--surface);
     border-color:rgba(26,29,33,.10);
 }}
-html.light-theme .rm-center-metric,
-body.light-theme .rm-center-metric {{
-    background:#fff;
+:root[data-theme="light"] .rm-center-metric {{
+    background:var(--surface);
     border-color:rgba(26,29,33,.10);
     box-shadow:0 8px 20px rgba(26,29,33,.05);
 }}
-html.light-theme .rm-command-icon,
-body.light-theme .rm-command-icon {{
-    background:rgba(165,118,31,.08);
+:root[data-theme="light"] .rm-command-icon {{
+    background:rgba(var(--text-rgb),.08);
 }}
 </style>
 

@@ -522,7 +522,7 @@ pub fn render_geo_root(
     );
     let styles = r#"<style>
 .rm-map-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:20px}
-.rm-map-stats div{padding:12px 6px;border:1px solid rgba(232,204,150,.22);border-radius:15px;text-align:center;background:rgba(255,255,255,.025)}
+.rm-map-stats div{padding:12px 6px;border:1px solid rgba(var(--text-rgb),.22);border-radius:15px;text-align:center;background:rgba(255,255,255,.025)}
 .rm-map-stats strong,.rm-map-stats span{display:block}.rm-map-stats strong{color:var(--gold-light);font-size:21px}.rm-map-stats span{margin-top:4px;color:var(--muted);font-size:9px;text-transform:uppercase}
 .rm-map-grid{align-items:stretch}
 .rm-continue-home{margin-bottom:14px}
@@ -885,12 +885,12 @@ pub fn render_continents(
         margin-top:12px;
         padding:10px 12px;
         border-radius:14px;
-        border:1px solid rgba(224,196,138,.24);
-        background:linear-gradient(135deg, rgba(224,196,138,.10), rgba(114,196,212,.06));
+        border:1px solid rgba(var(--text-rgb),.24);
+        background:linear-gradient(135deg, rgba(var(--text-rgb),.10), rgba(114,196,212,.06));
         color:var(--muted);
         font-size:13px;
         line-height:1.5;
-        box-shadow:0 0 24px rgba(224,196,138,.06);
+        box-shadow:0 0 24px rgba(var(--text-rgb),.06);
     }
 
     .rm-stats-row {
@@ -906,9 +906,9 @@ pub fn render_continents(
         min-width:0;
         padding:14px 10px;
         border-radius:16px;
-        border:1px solid rgba(232,204,150,.24);
+        border:1px solid rgba(var(--text-rgb),.24);
         background:
-            linear-gradient(145deg, rgba(232,204,150,.12), rgba(126,212,228,.06));
+            linear-gradient(145deg, rgba(var(--text-rgb),.12), rgba(126,212,228,.06));
         box-shadow:
             inset 0 1px 0 rgba(255,255,255,.07),
             0 10px 28px rgba(0,0,0,.20);
@@ -942,10 +942,10 @@ pub fn render_continents(
     .rm-home-explorer {
         margin-top:20px;
         padding:16px 16px 14px;
-        border:1px solid rgba(232,204,150,.28);
+        border:1px solid rgba(var(--text-rgb),.28);
         background:
             radial-gradient(circle at 100% 0%, rgba(126,212,228,.10), transparent 42%),
-            radial-gradient(circle at 0% 100%, rgba(232,204,150,.08), transparent 40%),
+            radial-gradient(circle at 0% 100%, rgba(var(--text-rgb),.08), transparent 40%),
             rgba(255,255,255,.02);
         box-shadow:
             0 18px 44px rgba(0,0,0,.24),
@@ -975,7 +975,7 @@ pub fn render_continents(
         gap:10px;
         padding:4px 4px 4px 14px;
         border-radius:16px;
-        border:1px solid rgba(232,204,150,.32);
+        border:1px solid rgba(var(--text-rgb),.32);
         background:rgba(0,0,0,.18);
         transition:
             border-color .18s ease,
@@ -983,8 +983,8 @@ pub fn render_continents(
     }
 
     .rm-home-explorer-field:focus-within {
-        border-color:rgba(232,204,150,.55);
-        box-shadow:0 0 0 4px rgba(232,204,150,.10);
+        border-color:rgba(var(--text-rgb),.55);
+        box-shadow:0 0 0 4px rgba(var(--text-rgb),.10);
     }
 
     .rm-home-explorer-icon {
@@ -1047,8 +1047,8 @@ pub fn render_continents(
     .rm-explore-hit:hover,
     .rm-explore-hit.is-active {
         transform:translateY(-1px);
-        border-color:rgba(232,204,150,.34);
-        background:rgba(232,204,150,.08);
+        border-color:rgba(var(--text-rgb),.34);
+        background:rgba(var(--text-rgb),.08);
     }
 
     .rm-explore-hit-icon {
@@ -1058,7 +1058,7 @@ pub fn render_continents(
         align-items:center;
         justify-content:center;
         border-radius:11px;
-        background:rgba(232,204,150,.10);
+        background:rgba(var(--text-rgb),.10);
         font-size:16px;
     }
 
@@ -1109,33 +1109,28 @@ pub fn render_continents(
         }
     }
 
-    html.light-theme .rm-stat,
-    body.light-theme .rm-stat {
-        background:#fff;
+    :root[data-theme="light"] .rm-stat {
+        background:var(--surface);
         box-shadow:0 8px 20px rgba(26,29,33,.06);
     }
 
-    html.light-theme .rm-home-explorer,
-    body.light-theme .rm-home-explorer {
-        background:#fff;
+    :root[data-theme="light"] .rm-home-explorer {
+        background:var(--surface);
     }
 
-    html.light-theme .rm-home-explorer-clear,
-    body.light-theme .rm-home-explorer-clear {
+    :root[data-theme="light"] .rm-home-explorer-clear {
         background:rgba(26,29,33,.06);
         color:var(--text);
     }
 
-    html.light-theme .rm-explore-hit,
-    body.light-theme .rm-explore-hit {
-        background:#fff;
+    :root[data-theme="light"] .rm-explore-hit {
+        background:var(--surface);
         border-color:rgba(26,29,33,.10);
     }
 
-    html.light-theme .rm-guest-hint,
-    body.light-theme .rm-guest-hint {
-        background:rgba(165,118,31,.08);
-        border-color:rgba(165,118,31,.22);
+    :root[data-theme="light"] .rm-guest-hint {
+        background:rgba(var(--text-rgb),.08);
+        border-color:rgba(var(--text-rgb),.22);
     }
 </style>"####;
 

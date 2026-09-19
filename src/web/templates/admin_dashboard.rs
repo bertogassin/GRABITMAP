@@ -66,7 +66,7 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     --owner-blue:#64a8ff;
     --owner-danger:#ef5964;
     --owner-panel:rgba(17,20,25,.86);
-    --owner-line:rgba(214,183,122,.18);
+    --owner-line:rgba(var(--text-rgb),.18);
     max-width:1180px;
     margin:0 auto;
     padding:
@@ -78,7 +78,7 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     position:relative;
     overflow:hidden;
     padding:28px;
-    border:1px solid rgba(214,183,122,.30);
+    border:1px solid rgba(var(--text-rgb),.30);
     border-radius:26px;
     background:
         radial-gradient(circle at 85% 15%,
@@ -245,7 +245,7 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     align-items:center;
     justify-content:center;
     border-radius:12px;
-    background:rgba(214,183,122,.10);
+    background:rgba(var(--text-rgb),.10);
     color:var(--owner-gold-soft);
     font-weight:950;
 }
@@ -292,7 +292,7 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     padding:7px;
     overflow-x:auto;
     scrollbar-width:none;
-    border:1px solid rgba(214,183,122,.16);
+    border:1px solid rgba(var(--text-rgb),.16);
     border-radius:18px;
     background:rgba(8,10,13,.84);
     box-shadow:0 16px 40px rgba(0,0,0,.28);
@@ -315,7 +315,7 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
 }
 .admin-command-nav a:first-child {
     color:#f4ddb0;
-    background:rgba(214,183,122,.10);
+    background:rgba(var(--text-rgb),.10);
 }
 .admin-owner-hero::before {
     content:"";
@@ -324,8 +324,8 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     pointer-events:none;
     opacity:.22;
     background-image:
-        linear-gradient(rgba(214,183,122,.10) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(214,183,122,.10) 1px,transparent 1px);
+        linear-gradient(rgba(var(--text-rgb),.10) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(var(--text-rgb),.10) 1px,transparent 1px);
     background-size:42px 42px;
     mask-image:linear-gradient(to bottom,black,transparent 78%);
 }
@@ -336,10 +336,10 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     height:280px;
     right:-125px;
     top:-130px;
-    border:1px solid rgba(214,183,122,.22);
+    border:1px solid rgba(var(--text-rgb),.22);
     border-radius:50%;
     box-shadow:
-        0 0 0 25px rgba(214,183,122,.025),
+        0 0 0 25px rgba(var(--text-rgb),.025),
         0 0 0 55px rgba(137,116,255,.025);
 }
 .admin-owner-hero > * {
@@ -354,7 +354,7 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     align-items:center;
     justify-content:center;
     overflow:hidden;
-    border:1px solid rgba(214,183,122,.14);
+    border:1px solid rgba(var(--text-rgb),.14);
     border-radius:22px;
     background:
         radial-gradient(circle,
@@ -365,10 +365,10 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     position:relative;
     width:150px;
     height:150px;
-    border:1px solid rgba(214,183,122,.55);
+    border:1px solid rgba(var(--text-rgb),.55);
     border-radius:50%;
     box-shadow:
-        0 0 45px rgba(214,183,122,.10),
+        0 0 45px rgba(var(--text-rgb),.10),
         inset 0 0 34px rgba(42,199,133,.08);
 }
 .admin-globe::before,
@@ -376,7 +376,7 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     content:"";
     position:absolute;
     inset:17px 0;
-    border:1px solid rgba(214,183,122,.28);
+    border:1px solid rgba(var(--text-rgb),.28);
     border-radius:50%;
 }
 .admin-globe::after {
@@ -388,7 +388,7 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     right:3px;
     top:50%;
     height:1px;
-    background:rgba(214,183,122,.35);
+    background:rgba(var(--text-rgb),.35);
 }
 .admin-globe-core {
     position:absolute;
@@ -401,8 +401,8 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     font-size:17px;
     font-weight:950;
     letter-spacing:.08em;
-    background:rgba(214,183,122,.09);
-    box-shadow:0 0 30px rgba(214,183,122,.14);
+    background:rgba(var(--text-rgb),.09);
+    box-shadow:0 0 30px rgba(var(--text-rgb),.14);
 }
 .admin-orbit {
     position:absolute;
@@ -468,21 +468,21 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     height:70px;
     right:-30px;
     bottom:-35px;
-    border:1px solid rgba(214,183,122,.12);
+    border:1px solid rgba(var(--text-rgb),.12);
     border-radius:50%;
 }
 .admin-stat:nth-child(3n+1) {
     border-top-color:rgba(100,168,255,.55);
 }
 .admin-stat:nth-child(3n+2) {
-    border-top-color:rgba(214,183,122,.60);
+    border-top-color:rgba(var(--text-rgb),.60);
 }
 .admin-stat:nth-child(3n+3) {
     border-top-color:rgba(42,199,133,.55);
 }
 .admin-stat:hover {
     transform:translateY(-2px);
-    border-color:rgba(214,183,122,.32);
+    border-color:rgba(var(--text-rgb),.32);
 }
 .admin-command-card::before {
     content:"";
@@ -495,19 +495,19 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     background:linear-gradient(
         to bottom,
         transparent,
-        rgba(214,183,122,.75),
+        rgba(var(--text-rgb),.75),
         transparent
     );
 }
 .admin-level-row:hover {
     transform:translateX(3px);
-    border-color:rgba(214,183,122,.28);
+    border-color:rgba(var(--text-rgb),.28);
 }
 .admin-level-row:nth-child(5) {
-    border-color:rgba(214,183,122,.35);
+    border-color:rgba(var(--text-rgb),.35);
     background:
         linear-gradient(90deg,
-            rgba(214,183,122,.09),
+            rgba(var(--text-rgb),.09),
             rgba(137,116,255,.04));
 }
 @media (max-width:420px) {
@@ -545,7 +545,7 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     @keyframes ownerPulse {
         50% {
             box-shadow:
-                0 0 60px rgba(214,183,122,.16),
+                0 0 60px rgba(var(--text-rgb),.16),
                 inset 0 0 38px rgba(42,199,133,.12);
         }
     }
