@@ -892,7 +892,7 @@ mod tests {
                     is_active INTEGER NOT NULL DEFAULT 1
                  );
                  INSERT INTO users (id, is_active)
-                 VALUES (4000000000000000009, 1);",
+                 VALUES (1, 1);",
             )
             .expect("base schema");
 
@@ -1206,11 +1206,10 @@ mod tests {
 
         connection
             .execute(
-                "UPDATE users SET is_active = 0
-                 WHERE id = ?1",
+                "INSERT INTO users (id, is_active) VALUES (?1, 0)",
                 params![INITIAL_OWNER_USER_ID],
             )
-            .expect("deactivate");
+            .expect("seed inactive owner candidate");
 
         assert!(initialize_connection(
             &mut connection,

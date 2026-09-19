@@ -2553,7 +2553,9 @@ a.feature.rm-feature-add {
 }
 .rm-group-action--danger,
 .ui-button--danger {
-    color: var(--danger);
+    background: var(--danger);
+    border-color: var(--danger);
+    color: var(--on-danger);
 }
 .ui-button--secondary {
     background: var(--surface);
@@ -7159,7 +7161,7 @@ mod public_entry_tests {
 
         assert_eq!(style.lines().filter(|line| *line == "body {").count(), 1);
         assert!(style.contains(
-            "radial-gradient(circle at 12% 0%, rgba(126, 212, 228, .07), transparent 40%),"
+            "radial-gradient(circle at 50% 0%, rgba(var(--text-rgb), .05), transparent 42%),"
         ));
         assert!(style.contains(
             "linear-gradient(160deg, var(--bg) 0%, var(--bg-soft) 48%, var(--bg) 100%);"

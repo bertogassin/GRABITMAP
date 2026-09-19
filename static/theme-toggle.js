@@ -4,6 +4,10 @@
 (function() {
     var STORAGE_KEY = "resursmap-theme";
 
+    function themeColorMeta() {
+        return document.querySelector('meta[name="theme-color"]');
+    }
+
     function t(key, fallback) {
         if (typeof window.rmT === "function") {
             var value = window.rmT(key);
@@ -45,6 +49,12 @@
         var isLight = theme === "light";
         document.documentElement.setAttribute("data-theme", theme);
         document.documentElement.style.colorScheme = theme;
+
+        var meta = themeColorMeta();
+        if (meta) {
+            meta.setAttribute("content", isLight ? "#ffffff" : "#000000");
+        }
+
         setButtonLabels(isLight);
     }
 

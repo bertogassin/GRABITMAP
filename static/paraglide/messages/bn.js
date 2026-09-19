@@ -414,7 +414,7 @@ export const chat_actions_aria = /** @type {(inputs: Chat_Actions_AriaInputs) =>
 };
 
 export const chat_all_read = /** @type {(inputs: Chat_All_ReadInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`All read`)
+	return /** @type {LocalizedString} */ (`সব পড়া হয়েছে`)
 };
 
 export const chat_attachment = /** @type {(inputs: Chat_AttachmentInputs) => LocalizedString} */ () => {
@@ -490,7 +490,7 @@ export const chat_connecting_initial = /** @type {(inputs: Chat_Connecting_Initi
 };
 
 export const chat_copy = /** @type {(inputs: Chat_CopyInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Copy`)
+	return /** @type {LocalizedString} */ (`কপি করুন`)
 };
 
 export const chat_days_ago = /** @type {(inputs: Chat_Days_AgoInputs) => LocalizedString} */ (i) => {
@@ -498,7 +498,7 @@ export const chat_days_ago = /** @type {(inputs: Chat_Days_AgoInputs) => Localiz
 };
 
 export const chat_delete = /** @type {(inputs: Chat_DeleteInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Delete`)
+	return /** @type {LocalizedString} */ (`মুছুন`)
 };
 
 export const chat_delete_body = /** @type {(inputs: Chat_Delete_BodyInputs) => LocalizedString} */ () => {
@@ -522,7 +522,7 @@ export const chat_dialog_open_failed = /** @type {(inputs: Chat_Dialog_Open_Fail
 };
 
 export const chat_dialogs = /** @type {(inputs: Chat_DialogsInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Conversations`)
+	return /** @type {LocalizedString} */ (`কথোপকথন`)
 };
 
 export const chat_document = /** @type {(inputs: Chat_DocumentInputs) => LocalizedString} */ () => {
@@ -534,7 +534,7 @@ export const chat_document_invalid = /** @type {(inputs: Chat_Document_InvalidIn
 };
 
 export const chat_edit = /** @type {(inputs: Chat_EditInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Edit`)
+	return /** @type {LocalizedString} */ (`সম্পাদনা করুন`)
 };
 
 export const chat_edit_title = /** @type {(inputs: Chat_Edit_TitleInputs) => LocalizedString} */ () => {
@@ -546,11 +546,11 @@ export const chat_edited = /** @type {(inputs: Chat_EditedInputs) => LocalizedSt
 };
 
 export const chat_empty = /** @type {(inputs: Chat_EmptyInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`No conversations`)
+	return /** @type {LocalizedString} */ (`কোনো কথোপকথন নেই`)
 };
 
 export const chat_forward = /** @type {(inputs: Chat_ForwardInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Forward`)
+	return /** @type {LocalizedString} */ (`ফরওয়ার্ড করুন`)
 };
 
 export const chat_forward_empty = /** @type {(inputs: Chat_Forward_EmptyInputs) => LocalizedString} */ () => {
@@ -606,7 +606,7 @@ export const chat_forwarding_voice = /** @type {(inputs: Chat_Forwarding_VoiceIn
 };
 
 export const chat_group = /** @type {(inputs: Chat_GroupInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Group`)
+	return /** @type {LocalizedString} */ (`গ্রুপ`)
 };
 
 export const chat_history_error = /** @type {(inputs: Chat_History_ErrorInputs) => LocalizedString} */ () => {
@@ -634,11 +634,11 @@ export const chat_last_seen = /** @type {(inputs: Chat_Last_SeenInputs) => Local
 };
 
 export const chat_lead = /** @type {(inputs: Chat_LeadInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Direct messages and groups.`)
+	return /** @type {LocalizedString} */ (`সরাসরি বার্তা ও গ্রুপ।`)
 };
 
 export const chat_leave = /** @type {(inputs: Chat_LeaveInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Leave`)
+	return /** @type {LocalizedString} */ (`ত্যাগ করুন`)
 };
 
 export const chat_link_off = /** @type {(inputs: Chat_Link_OffInputs) => LocalizedString} */ () => {
@@ -678,7 +678,7 @@ export const chat_member_muted = /** @type {(inputs: Chat_Member_MutedInputs) =>
 };
 
 export const chat_members = /** @type {(inputs: Chat_MembersInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Members`)
+	return /** @type {LocalizedString} */ (`সদস্য`)
 };
 
 export const chat_message = /** @type {(inputs: Chat_MessageInputs) => LocalizedString} */ () => {
@@ -702,7 +702,7 @@ export const chat_new_dialog = /** @type {(inputs: Chat_New_DialogInputs) => Loc
 };
 
 export const chat_new_group = /** @type {(inputs: Chat_New_GroupInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Create group`)
+	return /** @type {LocalizedString} */ (`গ্রুপ তৈরি করুন`)
 };
 
 export const chat_new_group_preview = /** @type {(inputs: Chat_New_Group_PreviewInputs) => LocalizedString} */ () => {
@@ -718,7 +718,7 @@ export const chat_offline = /** @type {(inputs: Chat_OfflineInputs) => Localized
 };
 
 export const chat_online = /** @type {(inputs: Chat_OnlineInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`online`)
+	return /** @type {LocalizedString} */ (`অনলাইন`)
 };
 
 export const chat_original = /** @type {(inputs: Chat_OriginalInputs) => LocalizedString} */ () => {
@@ -730,7 +730,7 @@ export const chat_peer = /** @type {(inputs: Chat_PeerInputs) => LocalizedString
 };
 
 export const chat_photo = /** @type {(inputs: Chat_PhotoInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Photo`)
+	return /** @type {LocalizedString} */ (`ছবি`)
 };
 
 export const chat_photo_error = /** @type {(inputs: Chat_Photo_ErrorInputs) => LocalizedString} */ () => {
@@ -782,7 +782,7 @@ export const chat_recording_release = /** @type {(inputs: Chat_Recording_Release
 };
 
 export const chat_reply = /** @type {(inputs: Chat_ReplyInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Reply`)
+	return /** @type {LocalizedString} */ (`উত্তর দিন`)
 };
 
 export const chat_reply_label = /** @type {(inputs: Chat_Reply_LabelInputs) => LocalizedString} */ () => {
@@ -794,11 +794,11 @@ export const chat_reply_unavailable = /** @type {(inputs: Chat_Reply_Unavailable
 };
 
 export const chat_retry_in_sec = /** @type {(inputs: Chat_Retry_In_SecInputs) => LocalizedString} */ (i) => {
-	return /** @type {LocalizedString} */ (`Limit · retry in ${i?.n}s`)
+	return /** @type {LocalizedString} */ (`সীমা · ${i?.n} সেকেন্ডে পুনরায় চেষ্টা`)
 };
 
 export const chat_retry_soon = /** @type {(inputs: Chat_Retry_SoonInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Retrying in a few seconds…`)
+	return /** @type {LocalizedString} */ (`কয়েক সেকেন্ডে পুনরায় চেষ্টা করা হচ্ছে…`)
 };
 
 export const chat_save = /** @type {(inputs: Chat_SaveInputs) => LocalizedString} */ () => {
@@ -814,7 +814,7 @@ export const chat_send_action = /** @type {(inputs: Chat_Send_ActionInputs) => L
 };
 
 export const chat_send_error = /** @type {(inputs: Chat_Send_ErrorInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Send failed`)
+	return /** @type {LocalizedString} */ (`পাঠাতে ব্যর্থ`)
 };
 
 export const chat_send_failed_retry = /** @type {(inputs: Chat_Send_Failed_RetryInputs) => LocalizedString} */ () => {
@@ -878,7 +878,7 @@ export const chat_title = /** @type {(inputs: Chat_TitleInputs) => LocalizedStri
 };
 
 export const chat_typing = /** @type {(inputs: Chat_TypingInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`typing…`)
+	return /** @type {LocalizedString} */ (`টাইপ করছে…`)
 };
 
 export const chat_unpin = /** @type {(inputs: Chat_UnpinInputs) => LocalizedString} */ () => {
@@ -966,11 +966,11 @@ export const chat_you = /** @type {(inputs: Chat_YouInputs) => LocalizedString} 
 };
 
 export const common_account_needed = /** @type {(inputs: Common_Account_NeededInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Account required`)
+	return /** @type {LocalizedString} */ (`অ্যাকাউন্ট প্রয়োজন`)
 };
 
 export const common_account_needed_body = /** @type {(inputs: Common_Account_Needed_BodyInputs) => LocalizedString} */ (i) => {
-	return /** @type {LocalizedString} */ (`“${i?.feature}” is available after login. Cities and search work without an account.`)
+	return /** @type {LocalizedString} */ (`লগইনের পর "${i?.feature}" ব্যবহার করা যাবে। শহর ও অনুসন্ধান অ্যাকাউন্ট ছাড়াই কাজ করে।`)
 };
 
 export const common_all = /** @type {(inputs: Common_AllInputs) => LocalizedString} */ () => {
@@ -978,7 +978,7 @@ export const common_all = /** @type {(inputs: Common_AllInputs) => LocalizedStri
 };
 
 export const common_back = /** @type {(inputs: Common_BackInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Back`)
+	return /** @type {LocalizedString} */ (`পিছনে`)
 };
 
 export const common_business = /** @type {(inputs: Common_BusinessInputs) => LocalizedString} */ () => {
@@ -990,15 +990,15 @@ export const common_clear = /** @type {(inputs: Common_ClearInputs) => Localized
 };
 
 export const common_create_account = /** @type {(inputs: Common_Create_AccountInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Create an account`)
+	return /** @type {LocalizedString} */ (`অ্যাকাউন্ট তৈরি করুন`)
 };
 
 export const common_guest_copy = /** @type {(inputs: Common_Guest_CopyInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Browse the map and listings without signing up. Log in for messages, favorites and posts.`)
+	return /** @type {LocalizedString} */ (`নিবন্ধন ছাড়াই মানচিত্র ও বিজ্ঞাপন দেখুন। বার্তা, পছন্দ ও পোস্ট করার জন্য লগইন করুন।`)
 };
 
 export const common_guest_mode = /** @type {(inputs: Common_Guest_ModeInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`You are browsing as a guest`)
+	return /** @type {LocalizedString} */ (`আপনি অতিথি হিসেবে দেখছেন`)
 };
 
 export const common_listing = /** @type {(inputs: Common_ListingInputs) => LocalizedString} */ () => {
@@ -1010,7 +1010,7 @@ export const common_login = /** @type {(inputs: Common_LoginInputs) => Localized
 };
 
 export const common_login_password = /** @type {(inputs: Common_Login_PasswordInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Email and password`)
+	return /** @type {LocalizedString} */ (`ইমেইল ও পাসওয়ার্ড`)
 };
 
 export const common_offer = /** @type {(inputs: Common_OfferInputs) => LocalizedString} */ () => {
@@ -1026,7 +1026,7 @@ export const common_online_short = /** @type {(inputs: Common_Online_ShortInputs
 };
 
 export const common_open_profile = /** @type {(inputs: Common_Open_ProfileInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Open profile`)
+	return /** @type {LocalizedString} */ (`প্রোফাইল খুলুন`)
 };
 
 export const common_premium = /** @type {(inputs: Common_PremiumInputs) => LocalizedString} */ () => {
@@ -1042,7 +1042,7 @@ export const common_profile = /** @type {(inputs: Common_ProfileInputs) => Local
 };
 
 export const common_rating = /** @type {(inputs: Common_RatingInputs) => LocalizedString} */ (i) => {
-	return /** @type {LocalizedString} */ (`Rating ${i?.rating} · ${i?.votes}`)
+	return /** @type {LocalizedString} */ (`রেটিং ${i?.rating} · ${i?.votes}`)
 };
 
 export const common_register = /** @type {(inputs: Common_RegisterInputs) => LocalizedString} */ () => {
@@ -1058,11 +1058,11 @@ export const common_seeker = /** @type {(inputs: Common_SeekerInputs) => Localiz
 };
 
 export const common_share = /** @type {(inputs: Common_ShareInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Share`)
+	return /** @type {LocalizedString} */ (`শেয়ার করুন`)
 };
 
 export const common_to_map = /** @type {(inputs: Common_To_MapInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`To the map`)
+	return /** @type {LocalizedString} */ (`মানচিত্রে যান`)
 };
 
 export const common_verified = /** @type {(inputs: Common_VerifiedInputs) => LocalizedString} */ () => {
@@ -1086,39 +1086,39 @@ export const common_write = /** @type {(inputs: Common_WriteInputs) => Localized
 };
 
 export const explore_empty = /** @type {(inputs: Explore_EmptyInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Nothing found. Press Enter for full search.`)
+	return /** @type {LocalizedString} */ (`কিছু পাওয়া যায়নি। সম্পূর্ণ খোঁজার জন্য Enter চাপুন।`)
 };
 
 export const explore_icon_biz = /** @type {(inputs: Explore_Icon_BizInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Biz`)
+	return /** @type {LocalizedString} */ (`ব্যবসা`)
 };
 
 export const explore_icon_city = /** @type {(inputs: Explore_Icon_CityInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`City`)
+	return /** @type {LocalizedString} */ (`শহর`)
 };
 
 export const explore_icon_country = /** @type {(inputs: Explore_Icon_CountryInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Ctry`)
+	return /** @type {LocalizedString} */ (`দেশ`)
 };
 
 export const explore_icon_people = /** @type {(inputs: Explore_Icon_PeopleInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Ppl`)
+	return /** @type {LocalizedString} */ (`মানুষ`)
 };
 
 export const explore_icon_pro = /** @type {(inputs: Explore_Icon_ProInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Pro`)
+	return /** @type {LocalizedString} */ (`পেশা`)
 };
 
 export const explore_icon_work = /** @type {(inputs: Explore_Icon_WorkInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Job`)
+	return /** @type {LocalizedString} */ (`কাজ`)
 };
 
 export const explore_icon_world = /** @type {(inputs: Explore_Icon_WorldInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`World`)
+	return /** @type {LocalizedString} */ (`বিশ্ব`)
 };
 
 export const footer_aria = /** @type {(inputs: Footer_AriaInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`App version`)
+	return /** @type {LocalizedString} */ (`অ্যাপ সংস্করণ`)
 };
 
 export const inbox_empty_body = /** @type {(inputs: Inbox_Empty_BodyInputs) => LocalizedString} */ () => {
@@ -1270,11 +1270,11 @@ export const lang_zh_tw2 = /** @type {(inputs: Lang_Zh_Tw2Inputs) => LocalizedSt
 };
 
 export const legal_privacy = /** @type {(inputs: Legal_PrivacyInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Privacy`)
+	return /** @type {LocalizedString} */ (`গোপনীয়তা`)
 };
 
 export const legal_rules = /** @type {(inputs: Legal_RulesInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Rules`)
+	return /** @type {LocalizedString} */ (`নিয়মাবলি`)
 };
 
 export const map_all_continents = /** @type {(inputs: Map_All_ContinentsInputs) => LocalizedString} */ () => {
@@ -1298,23 +1298,23 @@ export const map_back_to_sections = /** @type {(inputs: Map_Back_To_SectionsInpu
 };
 
 export const map_catalog_error = /** @type {(inputs: Map_Catalog_ErrorInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Couldn’t open the catalog. Try again.`)
+	return /** @type {LocalizedString} */ (`ক্যাটালগ খোলা যায়নি। আবার চেষ্টা করুন।`)
 };
 
 export const map_catalog_found = /** @type {(inputs: Map_Catalog_FoundInputs) => LocalizedString} */ (i) => {
-	return /** @type {LocalizedString} */ (`Found in full catalog: ${i?.n}`)
+	return /** @type {LocalizedString} */ (`সম্পূর্ণ ক্যাটালগে পাওয়া গেছে: ${i?.n}`)
 };
 
 export const map_catalog_hint = /** @type {(inputs: Map_Catalog_HintInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Pick a section below or start typing`)
+	return /** @type {LocalizedString} */ (`নিচে থেকে একটি বিভাগ বেছে নিন বা টাইপ শুরু করুন`)
 };
 
 export const map_catalog_none = /** @type {(inputs: Map_Catalog_NoneInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`No such field in the catalog yet`)
+	return /** @type {LocalizedString} */ (`এই বিভাগ এখনও ক্যাটালগে নেই`)
 };
 
 export const map_catalog_searching = /** @type {(inputs: Map_Catalog_SearchingInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Searching professions and services…`)
+	return /** @type {LocalizedString} */ (`পেশা ও সেবা খোঁজা হচ্ছে…`)
 };
 
 export const map_cities = /** @type {(inputs: Map_CitiesInputs) => LocalizedString} */ () => {
@@ -1322,7 +1322,7 @@ export const map_cities = /** @type {(inputs: Map_CitiesInputs) => LocalizedStri
 };
 
 export const map_cities_load_error = /** @type {(inputs: Map_Cities_Load_ErrorInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Couldn’t load cities. Try again.`)
+	return /** @type {LocalizedString} */ (`শহর লোড করা যায়নি। আবার চেষ্টা করুন।`)
 };
 
 export const map_cities_professions = /** @type {(inputs: Map_Cities_ProfessionsInputs) => LocalizedString} */ () => {
@@ -1342,7 +1342,7 @@ export const map_city_label = /** @type {(inputs: Map_City_LabelInputs) => Local
 };
 
 export const map_city_not_found = /** @type {(inputs: Map_City_Not_FoundInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`City not found in this country`)
+	return /** @type {LocalizedString} */ (`এই দেশে শহর পাওয়া যায়নি`)
 };
 
 export const map_city_pick_lead = /** @type {(inputs: Map_City_Pick_LeadInputs) => LocalizedString} */ () => {
@@ -1374,7 +1374,7 @@ export const map_country_dot = /** @type {(inputs: Map_Country_DotInputs) => Loc
 };
 
 export const map_country_not_found = /** @type {(inputs: Map_Country_Not_FoundInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Country not found on this continent`)
+	return /** @type {LocalizedString} */ (`এই মহাদেশে দেশ পাওয়া যায়নি`)
 };
 
 export const map_download_app = /** @type {(inputs: Map_Download_AppInputs) => LocalizedString} */ () => {
@@ -1406,7 +1406,7 @@ export const map_find_in_city = /** @type {(inputs: Map_Find_In_CityInputs) => L
 };
 
 export const map_found_n = /** @type {(inputs: Map_Found_NInputs) => LocalizedString} */ (i) => {
-	return /** @type {LocalizedString} */ (`Found: ${i?.n}`)
+	return /** @type {LocalizedString} */ (`পাওয়া গেছে: ${i?.n}`)
 };
 
 export const map_global_lead = /** @type {(inputs: Map_Global_LeadInputs) => LocalizedString} */ () => {
@@ -1470,7 +1470,7 @@ export const map_pick_profession = /** @type {(inputs: Map_Pick_ProfessionInputs
 };
 
 export const map_profession_label = /** @type {(inputs: Map_Profession_LabelInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Profession`)
+	return /** @type {LocalizedString} */ (`পেশা`)
 };
 
 export const map_professions = /** @type {(inputs: Map_ProfessionsInputs) => LocalizedString} */ () => {
@@ -1506,35 +1506,35 @@ export const map_title = /** @type {(inputs: Map_TitleInputs) => LocalizedString
 };
 
 export const menu_add_card = /** @type {(inputs: Menu_Add_CardInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Add a listing`)
+	return /** @type {LocalizedString} */ (`বিজ্ঞাপন যোগ করুন`)
 };
 
 export const menu_add_meta = /** @type {(inputs: Menu_Add_MetaInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`City, category and text`)
+	return /** @type {LocalizedString} */ (`শহর, বিভাগ ও লেখা`)
 };
 
 export const menu_app = /** @type {(inputs: Menu_AppInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`App`)
+	return /** @type {LocalizedString} */ (`অ্যাপ`)
 };
 
 export const menu_download = /** @type {(inputs: Menu_DownloadInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Download`)
+	return /** @type {LocalizedString} */ (`ডাউনলোড`)
 };
 
 export const menu_haptics = /** @type {(inputs: Menu_HapticsInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Haptics`)
+	return /** @type {LocalizedString} */ (`কম্পন`)
 };
 
 export const menu_haptics_off = /** @type {(inputs: Menu_Haptics_OffInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Off`)
+	return /** @type {LocalizedString} */ (`বন্ধ`)
 };
 
 export const menu_haptics_on = /** @type {(inputs: Menu_Haptics_OnInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`On`)
+	return /** @type {LocalizedString} */ (`চালু`)
 };
 
 export const menu_install_hint = /** @type {(inputs: Menu_Install_HintInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Add to your phone home screen`)
+	return /** @type {LocalizedString} */ (`ফোনের হোম স্ক্রিনে যোগ করুন`)
 };
 
 export const menu_language = /** @type {(inputs: Menu_LanguageInputs) => LocalizedString} */ () => {
@@ -1542,19 +1542,19 @@ export const menu_language = /** @type {(inputs: Menu_LanguageInputs) => Localiz
 };
 
 export const menu_language_hint = /** @type {(inputs: Menu_Language_HintInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`App interface`)
+	return /** @type {LocalizedString} */ (`অ্যাপের ভাষা`)
 };
 
 export const menu_lead = /** @type {(inputs: Menu_LeadInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Sound, day and night, home-screen shortcut.`)
+	return /** @type {LocalizedString} */ (`শব্দ, দিন ও রাত, হোম স্ক্রিন শর্টকাট।`)
 };
 
 export const menu_profile_card = /** @type {(inputs: Menu_Profile_CardInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Profile`)
+	return /** @type {LocalizedString} */ (`প্রোফাইল`)
 };
 
 export const menu_profile_meta = /** @type {(inputs: Menu_Profile_MetaInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Account and listings`)
+	return /** @type {LocalizedString} */ (`অ্যাকাউন্ট ও বিজ্ঞাপন`)
 };
 
 export const menu_save_language = /** @type {(inputs: Menu_Save_LanguageInputs) => LocalizedString} */ () => {
@@ -1562,39 +1562,39 @@ export const menu_save_language = /** @type {(inputs: Menu_Save_LanguageInputs) 
 };
 
 export const menu_section_caption = /** @type {(inputs: Menu_Section_CaptionInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Profile, listing and settings`)
+	return /** @type {LocalizedString} */ (`প্রোফাইল, বিজ্ঞাপন ও সেটিংস`)
 };
 
 export const menu_sound = /** @type {(inputs: Menu_SoundInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Sound`)
+	return /** @type {LocalizedString} */ (`শব্দ`)
 };
 
 export const menu_sound_off = /** @type {(inputs: Menu_Sound_OffInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Off`)
+	return /** @type {LocalizedString} */ (`বন্ধ`)
 };
 
 export const menu_sound_on = /** @type {(inputs: Menu_Sound_OnInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`On`)
+	return /** @type {LocalizedString} */ (`চালু`)
 };
 
 export const menu_sound_test = /** @type {(inputs: Menu_Sound_TestInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Test sound`)
+	return /** @type {LocalizedString} */ (`শব্দ পরীক্ষা করুন`)
 };
 
 export const menu_sound_test_hint = /** @type {(inputs: Menu_Sound_Test_HintInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Short signal`)
+	return /** @type {LocalizedString} */ (`সংক্ষিপ্ত সংকেত`)
 };
 
 export const menu_theme = /** @type {(inputs: Menu_ThemeInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Day and night`)
+	return /** @type {LocalizedString} */ (`দিন ও রাত`)
 };
 
 export const menu_theme_dark = /** @type {(inputs: Menu_Theme_DarkInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Dark now`)
+	return /** @type {LocalizedString} */ (`এখন ডার্ক`)
 };
 
 export const menu_theme_light = /** @type {(inputs: Menu_Theme_LightInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Light now`)
+	return /** @type {LocalizedString} */ (`এখন লাইট`)
 };
 
 export const menu_title = /** @type {(inputs: Menu_TitleInputs) => LocalizedString} */ () => {
@@ -1754,19 +1754,19 @@ export const place_selector_title = /** @type {(inputs: Place_Selector_TitleInpu
 };
 
 export const profile_login_write = /** @type {(inputs: Profile_Login_WriteInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Sign in to message`)
+	return /** @type {LocalizedString} */ (`লগইন করে লিখুন`)
 };
 
 export const profile_settings = /** @type {(inputs: Profile_SettingsInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Settings`)
+	return /** @type {LocalizedString} */ (`সেটিংস`)
 };
 
 export const profile_settings_sound = /** @type {(inputs: Profile_Settings_SoundInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Sound and shortcut`)
+	return /** @type {LocalizedString} */ (`শব্দ ও শর্টকাট`)
 };
 
 export const profile_share_text = /** @type {(inputs: Profile_Share_TextInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Join GRABIT with my link. Chat and find work nearby.`)
+	return /** @type {LocalizedString} */ (`আমার লিংক দিয়ে GRABIT-এ যোগ দিন। চ্যাট করুন এবং কাছাকাছি কাজ খুঁজুন।`)
 };
 
 export const profile_title = /** @type {(inputs: Profile_TitleInputs) => LocalizedString} */ () => {
@@ -1774,15 +1774,15 @@ export const profile_title = /** @type {(inputs: Profile_TitleInputs) => Localiz
 };
 
 export const profile_write_hint = /** @type {(inputs: Profile_Write_HintInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Message now. You can block or delete later.`)
+	return /** @type {LocalizedString} */ (`এখনই লিখুন। পরে ব্লক বা মুছে ফেলতে পারবেন।`)
 };
 
 export const profile_write_login_hint = /** @type {(inputs: Profile_Write_Login_HintInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Sign in to message this member.`)
+	return /** @type {LocalizedString} */ (`এই সদস্যকে বার্তা পাঠাতে লগইন করুন।`)
 };
 
 export const pwa_installed = /** @type {(inputs: Pwa_InstalledInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Already installed`)
+	return /** @type {LocalizedString} */ (`ইতিমধ্যে ইনস্টল করা আছে`)
 };
 
 export const rating_votes = /** @type {(inputs: Rating_VotesInputs) => LocalizedString} */ (i) => {

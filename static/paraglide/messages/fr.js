@@ -414,7 +414,7 @@ export const chat_actions_aria = /** @type {(inputs: Chat_Actions_AriaInputs) =>
 };
 
 export const chat_all_read = /** @type {(inputs: Chat_All_ReadInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`All read`)
+	return /** @type {LocalizedString} */ (`Tout est lu`)
 };
 
 export const chat_attachment = /** @type {(inputs: Chat_AttachmentInputs) => LocalizedString} */ () => {
@@ -490,7 +490,7 @@ export const chat_connecting_initial = /** @type {(inputs: Chat_Connecting_Initi
 };
 
 export const chat_copy = /** @type {(inputs: Chat_CopyInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Copy`)
+	return /** @type {LocalizedString} */ (`Copier`)
 };
 
 export const chat_days_ago = /** @type {(inputs: Chat_Days_AgoInputs) => LocalizedString} */ (i) => {
@@ -498,7 +498,7 @@ export const chat_days_ago = /** @type {(inputs: Chat_Days_AgoInputs) => Localiz
 };
 
 export const chat_delete = /** @type {(inputs: Chat_DeleteInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Delete`)
+	return /** @type {LocalizedString} */ (`Supprimer`)
 };
 
 export const chat_delete_body = /** @type {(inputs: Chat_Delete_BodyInputs) => LocalizedString} */ () => {
@@ -534,7 +534,7 @@ export const chat_document_invalid = /** @type {(inputs: Chat_Document_InvalidIn
 };
 
 export const chat_edit = /** @type {(inputs: Chat_EditInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Edit`)
+	return /** @type {LocalizedString} */ (`Modifier`)
 };
 
 export const chat_edit_title = /** @type {(inputs: Chat_Edit_TitleInputs) => LocalizedString} */ () => {
@@ -546,11 +546,11 @@ export const chat_edited = /** @type {(inputs: Chat_EditedInputs) => LocalizedSt
 };
 
 export const chat_empty = /** @type {(inputs: Chat_EmptyInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`No conversations`)
+	return /** @type {LocalizedString} */ (`Aucune conversation`)
 };
 
 export const chat_forward = /** @type {(inputs: Chat_ForwardInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Forward`)
+	return /** @type {LocalizedString} */ (`Transférer`)
 };
 
 export const chat_forward_empty = /** @type {(inputs: Chat_Forward_EmptyInputs) => LocalizedString} */ () => {
@@ -606,7 +606,7 @@ export const chat_forwarding_voice = /** @type {(inputs: Chat_Forwarding_VoiceIn
 };
 
 export const chat_group = /** @type {(inputs: Chat_GroupInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Group`)
+	return /** @type {LocalizedString} */ (`Groupe`)
 };
 
 export const chat_history_error = /** @type {(inputs: Chat_History_ErrorInputs) => LocalizedString} */ () => {
@@ -634,11 +634,11 @@ export const chat_last_seen = /** @type {(inputs: Chat_Last_SeenInputs) => Local
 };
 
 export const chat_lead = /** @type {(inputs: Chat_LeadInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Direct messages and groups.`)
+	return /** @type {LocalizedString} */ (`Messages privés et groupes.`)
 };
 
 export const chat_leave = /** @type {(inputs: Chat_LeaveInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Leave`)
+	return /** @type {LocalizedString} */ (`Quitter`)
 };
 
 export const chat_link_off = /** @type {(inputs: Chat_Link_OffInputs) => LocalizedString} */ () => {
@@ -678,7 +678,7 @@ export const chat_member_muted = /** @type {(inputs: Chat_Member_MutedInputs) =>
 };
 
 export const chat_members = /** @type {(inputs: Chat_MembersInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Members`)
+	return /** @type {LocalizedString} */ (`Membres`)
 };
 
 export const chat_message = /** @type {(inputs: Chat_MessageInputs) => LocalizedString} */ () => {
@@ -702,7 +702,7 @@ export const chat_new_dialog = /** @type {(inputs: Chat_New_DialogInputs) => Loc
 };
 
 export const chat_new_group = /** @type {(inputs: Chat_New_GroupInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Create group`)
+	return /** @type {LocalizedString} */ (`Créer un groupe`)
 };
 
 export const chat_new_group_preview = /** @type {(inputs: Chat_New_Group_PreviewInputs) => LocalizedString} */ () => {
@@ -718,7 +718,7 @@ export const chat_offline = /** @type {(inputs: Chat_OfflineInputs) => Localized
 };
 
 export const chat_online = /** @type {(inputs: Chat_OnlineInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`online`)
+	return /** @type {LocalizedString} */ (`en ligne`)
 };
 
 export const chat_original = /** @type {(inputs: Chat_OriginalInputs) => LocalizedString} */ () => {
@@ -782,7 +782,7 @@ export const chat_recording_release = /** @type {(inputs: Chat_Recording_Release
 };
 
 export const chat_reply = /** @type {(inputs: Chat_ReplyInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Reply`)
+	return /** @type {LocalizedString} */ (`Répondre`)
 };
 
 export const chat_reply_label = /** @type {(inputs: Chat_Reply_LabelInputs) => LocalizedString} */ () => {
@@ -878,7 +878,7 @@ export const chat_title = /** @type {(inputs: Chat_TitleInputs) => LocalizedStri
 };
 
 export const chat_typing = /** @type {(inputs: Chat_TypingInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`typing…`)
+	return /** @type {LocalizedString} */ (`écrit…`)
 };
 
 export const chat_unpin = /** @type {(inputs: Chat_UnpinInputs) => LocalizedString} */ () => {
@@ -966,11 +966,11 @@ export const chat_you = /** @type {(inputs: Chat_YouInputs) => LocalizedString} 
 };
 
 export const common_account_needed = /** @type {(inputs: Common_Account_NeededInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Account required`)
+	return /** @type {LocalizedString} */ (`Compte requis`)
 };
 
 export const common_account_needed_body = /** @type {(inputs: Common_Account_Needed_BodyInputs) => LocalizedString} */ (i) => {
-	return /** @type {LocalizedString} */ (`“${i?.feature}” is available after login. Cities and search work without an account.`)
+	return /** @type {LocalizedString} */ (`« ${i?.feature} » est disponible après connexion. Les villes et la recherche fonctionnent sans compte.`)
 };
 
 export const common_all = /** @type {(inputs: Common_AllInputs) => LocalizedString} */ () => {
@@ -978,7 +978,7 @@ export const common_all = /** @type {(inputs: Common_AllInputs) => LocalizedStri
 };
 
 export const common_back = /** @type {(inputs: Common_BackInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Back`)
+	return /** @type {LocalizedString} */ (`Retour`)
 };
 
 export const common_business = /** @type {(inputs: Common_BusinessInputs) => LocalizedString} */ () => {
@@ -990,15 +990,15 @@ export const common_clear = /** @type {(inputs: Common_ClearInputs) => Localized
 };
 
 export const common_create_account = /** @type {(inputs: Common_Create_AccountInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Create an account`)
+	return /** @type {LocalizedString} */ (`Créer un compte`)
 };
 
 export const common_guest_copy = /** @type {(inputs: Common_Guest_CopyInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Browse the map and listings without signing up. Log in for messages, favorites and posts.`)
+	return /** @type {LocalizedString} */ (`Parcourez la carte et les annonces sans inscription. Connectez-vous pour les messages, favoris et publications.`)
 };
 
 export const common_guest_mode = /** @type {(inputs: Common_Guest_ModeInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`You are browsing as a guest`)
+	return /** @type {LocalizedString} */ (`Vous naviguez en tant qu'invité`)
 };
 
 export const common_listing = /** @type {(inputs: Common_ListingInputs) => LocalizedString} */ () => {
@@ -1010,7 +1010,7 @@ export const common_login = /** @type {(inputs: Common_LoginInputs) => Localized
 };
 
 export const common_login_password = /** @type {(inputs: Common_Login_PasswordInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Email and password`)
+	return /** @type {LocalizedString} */ (`E-mail et mot de passe`)
 };
 
 export const common_offer = /** @type {(inputs: Common_OfferInputs) => LocalizedString} */ () => {
@@ -1026,7 +1026,7 @@ export const common_online_short = /** @type {(inputs: Common_Online_ShortInputs
 };
 
 export const common_open_profile = /** @type {(inputs: Common_Open_ProfileInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Open profile`)
+	return /** @type {LocalizedString} */ (`Ouvrir le profil`)
 };
 
 export const common_premium = /** @type {(inputs: Common_PremiumInputs) => LocalizedString} */ () => {
@@ -1062,7 +1062,7 @@ export const common_share = /** @type {(inputs: Common_ShareInputs) => Localized
 };
 
 export const common_to_map = /** @type {(inputs: Common_To_MapInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`To the map`)
+	return /** @type {LocalizedString} */ (`Vers la carte`)
 };
 
 export const common_verified = /** @type {(inputs: Common_VerifiedInputs) => LocalizedString} */ () => {
@@ -1090,7 +1090,7 @@ export const explore_empty = /** @type {(inputs: Explore_EmptyInputs) => Localiz
 };
 
 export const explore_icon_biz = /** @type {(inputs: Explore_Icon_BizInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Biz`)
+	return /** @type {LocalizedString} */ (`Ent`)
 };
 
 export const explore_icon_city = /** @type {(inputs: Explore_Icon_CityInputs) => LocalizedString} */ () => {
@@ -1118,7 +1118,7 @@ export const explore_icon_world = /** @type {(inputs: Explore_Icon_WorldInputs) 
 };
 
 export const footer_aria = /** @type {(inputs: Footer_AriaInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`App version`)
+	return /** @type {LocalizedString} */ (`Version de l'application`)
 };
 
 export const inbox_empty_body = /** @type {(inputs: Inbox_Empty_BodyInputs) => LocalizedString} */ () => {
@@ -1270,11 +1270,11 @@ export const lang_zh_tw2 = /** @type {(inputs: Lang_Zh_Tw2Inputs) => LocalizedSt
 };
 
 export const legal_privacy = /** @type {(inputs: Legal_PrivacyInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Privacy`)
+	return /** @type {LocalizedString} */ (`Confidentialité`)
 };
 
 export const legal_rules = /** @type {(inputs: Legal_RulesInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Rules`)
+	return /** @type {LocalizedString} */ (`Règles`)
 };
 
 export const map_all_continents = /** @type {(inputs: Map_All_ContinentsInputs) => LocalizedString} */ () => {
@@ -1506,35 +1506,35 @@ export const map_title = /** @type {(inputs: Map_TitleInputs) => LocalizedString
 };
 
 export const menu_add_card = /** @type {(inputs: Menu_Add_CardInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Add a listing`)
+	return /** @type {LocalizedString} */ (`Ajouter une annonce`)
 };
 
 export const menu_add_meta = /** @type {(inputs: Menu_Add_MetaInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`City, category and text`)
+	return /** @type {LocalizedString} */ (`Ville, catégorie et texte`)
 };
 
 export const menu_app = /** @type {(inputs: Menu_AppInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`App`)
+	return /** @type {LocalizedString} */ (`Application`)
 };
 
 export const menu_download = /** @type {(inputs: Menu_DownloadInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Download`)
+	return /** @type {LocalizedString} */ (`Télécharger`)
 };
 
 export const menu_haptics = /** @type {(inputs: Menu_HapticsInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Haptics`)
+	return /** @type {LocalizedString} */ (`Vibrations`)
 };
 
 export const menu_haptics_off = /** @type {(inputs: Menu_Haptics_OffInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Off`)
+	return /** @type {LocalizedString} */ (`Désactivées`)
 };
 
 export const menu_haptics_on = /** @type {(inputs: Menu_Haptics_OnInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`On`)
+	return /** @type {LocalizedString} */ (`Activées`)
 };
 
 export const menu_install_hint = /** @type {(inputs: Menu_Install_HintInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Add to your phone home screen`)
+	return /** @type {LocalizedString} */ (`Ajouter à l'écran d'accueil du téléphone`)
 };
 
 export const menu_language = /** @type {(inputs: Menu_LanguageInputs) => LocalizedString} */ () => {
@@ -1542,19 +1542,19 @@ export const menu_language = /** @type {(inputs: Menu_LanguageInputs) => Localiz
 };
 
 export const menu_language_hint = /** @type {(inputs: Menu_Language_HintInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`App interface`)
+	return /** @type {LocalizedString} */ (`Interface de l'application`)
 };
 
 export const menu_lead = /** @type {(inputs: Menu_LeadInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Sound, day and night, home-screen shortcut.`)
+	return /** @type {LocalizedString} */ (`Son, jour et nuit, raccourci sur l'écran d'accueil.`)
 };
 
 export const menu_profile_card = /** @type {(inputs: Menu_Profile_CardInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Profile`)
+	return /** @type {LocalizedString} */ (`Profil`)
 };
 
 export const menu_profile_meta = /** @type {(inputs: Menu_Profile_MetaInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Account and listings`)
+	return /** @type {LocalizedString} */ (`Compte et annonces`)
 };
 
 export const menu_save_language = /** @type {(inputs: Menu_Save_LanguageInputs) => LocalizedString} */ () => {
@@ -1562,39 +1562,39 @@ export const menu_save_language = /** @type {(inputs: Menu_Save_LanguageInputs) 
 };
 
 export const menu_section_caption = /** @type {(inputs: Menu_Section_CaptionInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Profile, listing and settings`)
+	return /** @type {LocalizedString} */ (`Profil, annonce et paramètres`)
 };
 
 export const menu_sound = /** @type {(inputs: Menu_SoundInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Sound`)
+	return /** @type {LocalizedString} */ (`Son`)
 };
 
 export const menu_sound_off = /** @type {(inputs: Menu_Sound_OffInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Off`)
+	return /** @type {LocalizedString} */ (`Désactivé`)
 };
 
 export const menu_sound_on = /** @type {(inputs: Menu_Sound_OnInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`On`)
+	return /** @type {LocalizedString} */ (`Activé`)
 };
 
 export const menu_sound_test = /** @type {(inputs: Menu_Sound_TestInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Test sound`)
+	return /** @type {LocalizedString} */ (`Tester le son`)
 };
 
 export const menu_sound_test_hint = /** @type {(inputs: Menu_Sound_Test_HintInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Short signal`)
+	return /** @type {LocalizedString} */ (`Signal bref`)
 };
 
 export const menu_theme = /** @type {(inputs: Menu_ThemeInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Day and night`)
+	return /** @type {LocalizedString} */ (`Jour et nuit`)
 };
 
 export const menu_theme_dark = /** @type {(inputs: Menu_Theme_DarkInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Dark now`)
+	return /** @type {LocalizedString} */ (`Sombre actuellement`)
 };
 
 export const menu_theme_light = /** @type {(inputs: Menu_Theme_LightInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Light now`)
+	return /** @type {LocalizedString} */ (`Clair actuellement`)
 };
 
 export const menu_title = /** @type {(inputs: Menu_TitleInputs) => LocalizedString} */ () => {
@@ -1758,11 +1758,11 @@ export const profile_login_write = /** @type {(inputs: Profile_Login_WriteInputs
 };
 
 export const profile_settings = /** @type {(inputs: Profile_SettingsInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Settings`)
+	return /** @type {LocalizedString} */ (`Paramètres`)
 };
 
 export const profile_settings_sound = /** @type {(inputs: Profile_Settings_SoundInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Sound and shortcut`)
+	return /** @type {LocalizedString} */ (`Son et raccourci`)
 };
 
 export const profile_share_text = /** @type {(inputs: Profile_Share_TextInputs) => LocalizedString} */ () => {
@@ -1782,7 +1782,7 @@ export const profile_write_login_hint = /** @type {(inputs: Profile_Write_Login_
 };
 
 export const pwa_installed = /** @type {(inputs: Pwa_InstalledInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Already installed`)
+	return /** @type {LocalizedString} */ (`Déjà installée`)
 };
 
 export const rating_votes = /** @type {(inputs: Rating_VotesInputs) => LocalizedString} */ (i) => {

@@ -414,7 +414,7 @@ export const chat_actions_aria = /** @type {(inputs: Chat_Actions_AriaInputs) =>
 };
 
 export const chat_all_read = /** @type {(inputs: Chat_All_ReadInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`All read`)
+	return /** @type {LocalizedString} */ (`Đã đọc hết`)
 };
 
 export const chat_attachment = /** @type {(inputs: Chat_AttachmentInputs) => LocalizedString} */ () => {
@@ -490,7 +490,7 @@ export const chat_connecting_initial = /** @type {(inputs: Chat_Connecting_Initi
 };
 
 export const chat_copy = /** @type {(inputs: Chat_CopyInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Copy`)
+	return /** @type {LocalizedString} */ (`Sao chép`)
 };
 
 export const chat_days_ago = /** @type {(inputs: Chat_Days_AgoInputs) => LocalizedString} */ (i) => {
@@ -498,7 +498,7 @@ export const chat_days_ago = /** @type {(inputs: Chat_Days_AgoInputs) => Localiz
 };
 
 export const chat_delete = /** @type {(inputs: Chat_DeleteInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Delete`)
+	return /** @type {LocalizedString} */ (`Xóa`)
 };
 
 export const chat_delete_body = /** @type {(inputs: Chat_Delete_BodyInputs) => LocalizedString} */ () => {
@@ -522,7 +522,7 @@ export const chat_dialog_open_failed = /** @type {(inputs: Chat_Dialog_Open_Fail
 };
 
 export const chat_dialogs = /** @type {(inputs: Chat_DialogsInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Conversations`)
+	return /** @type {LocalizedString} */ (`Cuộc trò chuyện`)
 };
 
 export const chat_document = /** @type {(inputs: Chat_DocumentInputs) => LocalizedString} */ () => {
@@ -534,7 +534,7 @@ export const chat_document_invalid = /** @type {(inputs: Chat_Document_InvalidIn
 };
 
 export const chat_edit = /** @type {(inputs: Chat_EditInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Edit`)
+	return /** @type {LocalizedString} */ (`Chỉnh sửa`)
 };
 
 export const chat_edit_title = /** @type {(inputs: Chat_Edit_TitleInputs) => LocalizedString} */ () => {
@@ -546,11 +546,11 @@ export const chat_edited = /** @type {(inputs: Chat_EditedInputs) => LocalizedSt
 };
 
 export const chat_empty = /** @type {(inputs: Chat_EmptyInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`No conversations`)
+	return /** @type {LocalizedString} */ (`Không có cuộc trò chuyện`)
 };
 
 export const chat_forward = /** @type {(inputs: Chat_ForwardInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Forward`)
+	return /** @type {LocalizedString} */ (`Chuyển tiếp`)
 };
 
 export const chat_forward_empty = /** @type {(inputs: Chat_Forward_EmptyInputs) => LocalizedString} */ () => {
@@ -606,7 +606,7 @@ export const chat_forwarding_voice = /** @type {(inputs: Chat_Forwarding_VoiceIn
 };
 
 export const chat_group = /** @type {(inputs: Chat_GroupInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Group`)
+	return /** @type {LocalizedString} */ (`Nhóm`)
 };
 
 export const chat_history_error = /** @type {(inputs: Chat_History_ErrorInputs) => LocalizedString} */ () => {
@@ -634,11 +634,11 @@ export const chat_last_seen = /** @type {(inputs: Chat_Last_SeenInputs) => Local
 };
 
 export const chat_lead = /** @type {(inputs: Chat_LeadInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Direct messages and groups.`)
+	return /** @type {LocalizedString} */ (`Tin nhắn trực tiếp và nhóm.`)
 };
 
 export const chat_leave = /** @type {(inputs: Chat_LeaveInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Leave`)
+	return /** @type {LocalizedString} */ (`Rời khỏi`)
 };
 
 export const chat_link_off = /** @type {(inputs: Chat_Link_OffInputs) => LocalizedString} */ () => {
@@ -678,7 +678,7 @@ export const chat_member_muted = /** @type {(inputs: Chat_Member_MutedInputs) =>
 };
 
 export const chat_members = /** @type {(inputs: Chat_MembersInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Members`)
+	return /** @type {LocalizedString} */ (`Thành viên`)
 };
 
 export const chat_message = /** @type {(inputs: Chat_MessageInputs) => LocalizedString} */ () => {
@@ -702,7 +702,7 @@ export const chat_new_dialog = /** @type {(inputs: Chat_New_DialogInputs) => Loc
 };
 
 export const chat_new_group = /** @type {(inputs: Chat_New_GroupInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Create group`)
+	return /** @type {LocalizedString} */ (`Tạo nhóm`)
 };
 
 export const chat_new_group_preview = /** @type {(inputs: Chat_New_Group_PreviewInputs) => LocalizedString} */ () => {
@@ -718,7 +718,7 @@ export const chat_offline = /** @type {(inputs: Chat_OfflineInputs) => Localized
 };
 
 export const chat_online = /** @type {(inputs: Chat_OnlineInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`online`)
+	return /** @type {LocalizedString} */ (`đang hoạt động`)
 };
 
 export const chat_original = /** @type {(inputs: Chat_OriginalInputs) => LocalizedString} */ () => {
@@ -730,7 +730,7 @@ export const chat_peer = /** @type {(inputs: Chat_PeerInputs) => LocalizedString
 };
 
 export const chat_photo = /** @type {(inputs: Chat_PhotoInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Photo`)
+	return /** @type {LocalizedString} */ (`Ảnh`)
 };
 
 export const chat_photo_error = /** @type {(inputs: Chat_Photo_ErrorInputs) => LocalizedString} */ () => {
@@ -782,7 +782,7 @@ export const chat_recording_release = /** @type {(inputs: Chat_Recording_Release
 };
 
 export const chat_reply = /** @type {(inputs: Chat_ReplyInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Reply`)
+	return /** @type {LocalizedString} */ (`Trả lời`)
 };
 
 export const chat_reply_label = /** @type {(inputs: Chat_Reply_LabelInputs) => LocalizedString} */ () => {
@@ -794,11 +794,11 @@ export const chat_reply_unavailable = /** @type {(inputs: Chat_Reply_Unavailable
 };
 
 export const chat_retry_in_sec = /** @type {(inputs: Chat_Retry_In_SecInputs) => LocalizedString} */ (i) => {
-	return /** @type {LocalizedString} */ (`Limit · retry in ${i?.n}s`)
+	return /** @type {LocalizedString} */ (`Giới hạn · thử lại sau ${i?.n}s`)
 };
 
 export const chat_retry_soon = /** @type {(inputs: Chat_Retry_SoonInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Retrying in a few seconds…`)
+	return /** @type {LocalizedString} */ (`Đang thử lại sau vài giây…`)
 };
 
 export const chat_save = /** @type {(inputs: Chat_SaveInputs) => LocalizedString} */ () => {
@@ -814,7 +814,7 @@ export const chat_send_action = /** @type {(inputs: Chat_Send_ActionInputs) => L
 };
 
 export const chat_send_error = /** @type {(inputs: Chat_Send_ErrorInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Send failed`)
+	return /** @type {LocalizedString} */ (`Gửi thất bại`)
 };
 
 export const chat_send_failed_retry = /** @type {(inputs: Chat_Send_Failed_RetryInputs) => LocalizedString} */ () => {
@@ -878,7 +878,7 @@ export const chat_title = /** @type {(inputs: Chat_TitleInputs) => LocalizedStri
 };
 
 export const chat_typing = /** @type {(inputs: Chat_TypingInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`typing…`)
+	return /** @type {LocalizedString} */ (`đang nhập…`)
 };
 
 export const chat_unpin = /** @type {(inputs: Chat_UnpinInputs) => LocalizedString} */ () => {
@@ -966,11 +966,11 @@ export const chat_you = /** @type {(inputs: Chat_YouInputs) => LocalizedString} 
 };
 
 export const common_account_needed = /** @type {(inputs: Common_Account_NeededInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Account required`)
+	return /** @type {LocalizedString} */ (`Cần có tài khoản`)
 };
 
 export const common_account_needed_body = /** @type {(inputs: Common_Account_Needed_BodyInputs) => LocalizedString} */ (i) => {
-	return /** @type {LocalizedString} */ (`“${i?.feature}” is available after login. Cities and search work without an account.`)
+	return /** @type {LocalizedString} */ (`"${i?.feature}" khả dụng sau khi đăng nhập. Xem thành phố và tìm kiếm hoạt động không cần tài khoản.`)
 };
 
 export const common_all = /** @type {(inputs: Common_AllInputs) => LocalizedString} */ () => {
@@ -978,7 +978,7 @@ export const common_all = /** @type {(inputs: Common_AllInputs) => LocalizedStri
 };
 
 export const common_back = /** @type {(inputs: Common_BackInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Back`)
+	return /** @type {LocalizedString} */ (`Quay lại`)
 };
 
 export const common_business = /** @type {(inputs: Common_BusinessInputs) => LocalizedString} */ () => {
@@ -990,15 +990,15 @@ export const common_clear = /** @type {(inputs: Common_ClearInputs) => Localized
 };
 
 export const common_create_account = /** @type {(inputs: Common_Create_AccountInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Create an account`)
+	return /** @type {LocalizedString} */ (`Tạo tài khoản`)
 };
 
 export const common_guest_copy = /** @type {(inputs: Common_Guest_CopyInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Browse the map and listings without signing up. Log in for messages, favorites and posts.`)
+	return /** @type {LocalizedString} */ (`Xem bản đồ và tin đăng mà không cần đăng ký. Đăng nhập để nhắn tin, lưu yêu thích và đăng tin.`)
 };
 
 export const common_guest_mode = /** @type {(inputs: Common_Guest_ModeInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`You are browsing as a guest`)
+	return /** @type {LocalizedString} */ (`Bạn đang duyệt với tư cách khách`)
 };
 
 export const common_listing = /** @type {(inputs: Common_ListingInputs) => LocalizedString} */ () => {
@@ -1010,7 +1010,7 @@ export const common_login = /** @type {(inputs: Common_LoginInputs) => Localized
 };
 
 export const common_login_password = /** @type {(inputs: Common_Login_PasswordInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Email and password`)
+	return /** @type {LocalizedString} */ (`Email và mật khẩu`)
 };
 
 export const common_offer = /** @type {(inputs: Common_OfferInputs) => LocalizedString} */ () => {
@@ -1026,7 +1026,7 @@ export const common_online_short = /** @type {(inputs: Common_Online_ShortInputs
 };
 
 export const common_open_profile = /** @type {(inputs: Common_Open_ProfileInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Open profile`)
+	return /** @type {LocalizedString} */ (`Mở hồ sơ`)
 };
 
 export const common_premium = /** @type {(inputs: Common_PremiumInputs) => LocalizedString} */ () => {
@@ -1042,7 +1042,7 @@ export const common_profile = /** @type {(inputs: Common_ProfileInputs) => Local
 };
 
 export const common_rating = /** @type {(inputs: Common_RatingInputs) => LocalizedString} */ (i) => {
-	return /** @type {LocalizedString} */ (`Rating ${i?.rating} · ${i?.votes}`)
+	return /** @type {LocalizedString} */ (`Đánh giá ${i?.rating} · ${i?.votes}`)
 };
 
 export const common_register = /** @type {(inputs: Common_RegisterInputs) => LocalizedString} */ () => {
@@ -1058,11 +1058,11 @@ export const common_seeker = /** @type {(inputs: Common_SeekerInputs) => Localiz
 };
 
 export const common_share = /** @type {(inputs: Common_ShareInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Share`)
+	return /** @type {LocalizedString} */ (`Chia sẻ`)
 };
 
 export const common_to_map = /** @type {(inputs: Common_To_MapInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`To the map`)
+	return /** @type {LocalizedString} */ (`Đến bản đồ`)
 };
 
 export const common_verified = /** @type {(inputs: Common_VerifiedInputs) => LocalizedString} */ () => {
@@ -1086,39 +1086,39 @@ export const common_write = /** @type {(inputs: Common_WriteInputs) => Localized
 };
 
 export const explore_empty = /** @type {(inputs: Explore_EmptyInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Nothing found. Press Enter for full search.`)
+	return /** @type {LocalizedString} */ (`Không tìm thấy gì. Nhấn Enter để tìm kiếm đầy đủ.`)
 };
 
 export const explore_icon_biz = /** @type {(inputs: Explore_Icon_BizInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Biz`)
+	return /** @type {LocalizedString} */ (`DN`)
 };
 
 export const explore_icon_city = /** @type {(inputs: Explore_Icon_CityInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`City`)
+	return /** @type {LocalizedString} */ (`TP`)
 };
 
 export const explore_icon_country = /** @type {(inputs: Explore_Icon_CountryInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Ctry`)
+	return /** @type {LocalizedString} */ (`QG`)
 };
 
 export const explore_icon_people = /** @type {(inputs: Explore_Icon_PeopleInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Ppl`)
+	return /** @type {LocalizedString} */ (`Người`)
 };
 
 export const explore_icon_pro = /** @type {(inputs: Explore_Icon_ProInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Pro`)
+	return /** @type {LocalizedString} */ (`CN`)
 };
 
 export const explore_icon_work = /** @type {(inputs: Explore_Icon_WorkInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Job`)
+	return /** @type {LocalizedString} */ (`VL`)
 };
 
 export const explore_icon_world = /** @type {(inputs: Explore_Icon_WorldInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`World`)
+	return /** @type {LocalizedString} */ (`TG`)
 };
 
 export const footer_aria = /** @type {(inputs: Footer_AriaInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`App version`)
+	return /** @type {LocalizedString} */ (`Phiên bản ứng dụng`)
 };
 
 export const inbox_empty_body = /** @type {(inputs: Inbox_Empty_BodyInputs) => LocalizedString} */ () => {
@@ -1270,11 +1270,11 @@ export const lang_zh_tw2 = /** @type {(inputs: Lang_Zh_Tw2Inputs) => LocalizedSt
 };
 
 export const legal_privacy = /** @type {(inputs: Legal_PrivacyInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Privacy`)
+	return /** @type {LocalizedString} */ (`Quyền riêng tư`)
 };
 
 export const legal_rules = /** @type {(inputs: Legal_RulesInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Rules`)
+	return /** @type {LocalizedString} */ (`Quy định`)
 };
 
 export const map_all_continents = /** @type {(inputs: Map_All_ContinentsInputs) => LocalizedString} */ () => {
@@ -1298,23 +1298,23 @@ export const map_back_to_sections = /** @type {(inputs: Map_Back_To_SectionsInpu
 };
 
 export const map_catalog_error = /** @type {(inputs: Map_Catalog_ErrorInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Couldn’t open the catalog. Try again.`)
+	return /** @type {LocalizedString} */ (`Không thể mở danh mục. Thử lại.`)
 };
 
 export const map_catalog_found = /** @type {(inputs: Map_Catalog_FoundInputs) => LocalizedString} */ (i) => {
-	return /** @type {LocalizedString} */ (`Found in full catalog: ${i?.n}`)
+	return /** @type {LocalizedString} */ (`Tìm thấy trong danh mục đầy đủ: ${i?.n}`)
 };
 
 export const map_catalog_hint = /** @type {(inputs: Map_Catalog_HintInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Pick a section below or start typing`)
+	return /** @type {LocalizedString} */ (`Chọn một mục bên dưới hoặc bắt đầu gõ`)
 };
 
 export const map_catalog_none = /** @type {(inputs: Map_Catalog_NoneInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`No such field in the catalog yet`)
+	return /** @type {LocalizedString} */ (`Lĩnh vực này chưa có trong danh mục`)
 };
 
 export const map_catalog_searching = /** @type {(inputs: Map_Catalog_SearchingInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Searching professions and services…`)
+	return /** @type {LocalizedString} */ (`Đang tìm trong ngành nghề và dịch vụ…`)
 };
 
 export const map_cities = /** @type {(inputs: Map_CitiesInputs) => LocalizedString} */ () => {
@@ -1322,7 +1322,7 @@ export const map_cities = /** @type {(inputs: Map_CitiesInputs) => LocalizedStri
 };
 
 export const map_cities_load_error = /** @type {(inputs: Map_Cities_Load_ErrorInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Couldn’t load cities. Try again.`)
+	return /** @type {LocalizedString} */ (`Không thể tải thành phố. Thử lại.`)
 };
 
 export const map_cities_professions = /** @type {(inputs: Map_Cities_ProfessionsInputs) => LocalizedString} */ () => {
@@ -1342,7 +1342,7 @@ export const map_city_label = /** @type {(inputs: Map_City_LabelInputs) => Local
 };
 
 export const map_city_not_found = /** @type {(inputs: Map_City_Not_FoundInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`City not found in this country`)
+	return /** @type {LocalizedString} */ (`Không tìm thấy thành phố ở quốc gia này`)
 };
 
 export const map_city_pick_lead = /** @type {(inputs: Map_City_Pick_LeadInputs) => LocalizedString} */ () => {
@@ -1374,7 +1374,7 @@ export const map_country_dot = /** @type {(inputs: Map_Country_DotInputs) => Loc
 };
 
 export const map_country_not_found = /** @type {(inputs: Map_Country_Not_FoundInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Country not found on this continent`)
+	return /** @type {LocalizedString} */ (`Không tìm thấy quốc gia ở châu lục này`)
 };
 
 export const map_download_app = /** @type {(inputs: Map_Download_AppInputs) => LocalizedString} */ () => {
@@ -1406,7 +1406,7 @@ export const map_find_in_city = /** @type {(inputs: Map_Find_In_CityInputs) => L
 };
 
 export const map_found_n = /** @type {(inputs: Map_Found_NInputs) => LocalizedString} */ (i) => {
-	return /** @type {LocalizedString} */ (`Found: ${i?.n}`)
+	return /** @type {LocalizedString} */ (`Tìm thấy: ${i?.n}`)
 };
 
 export const map_global_lead = /** @type {(inputs: Map_Global_LeadInputs) => LocalizedString} */ () => {
@@ -1470,7 +1470,7 @@ export const map_pick_profession = /** @type {(inputs: Map_Pick_ProfessionInputs
 };
 
 export const map_profession_label = /** @type {(inputs: Map_Profession_LabelInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Profession`)
+	return /** @type {LocalizedString} */ (`Ngành nghề`)
 };
 
 export const map_professions = /** @type {(inputs: Map_ProfessionsInputs) => LocalizedString} */ () => {
@@ -1506,35 +1506,35 @@ export const map_title = /** @type {(inputs: Map_TitleInputs) => LocalizedString
 };
 
 export const menu_add_card = /** @type {(inputs: Menu_Add_CardInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Add a listing`)
+	return /** @type {LocalizedString} */ (`Đăng tin`)
 };
 
 export const menu_add_meta = /** @type {(inputs: Menu_Add_MetaInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`City, category and text`)
+	return /** @type {LocalizedString} */ (`Thành phố, danh mục và nội dung`)
 };
 
 export const menu_app = /** @type {(inputs: Menu_AppInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`App`)
+	return /** @type {LocalizedString} */ (`Ứng dụng`)
 };
 
 export const menu_download = /** @type {(inputs: Menu_DownloadInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Download`)
+	return /** @type {LocalizedString} */ (`Tải xuống`)
 };
 
 export const menu_haptics = /** @type {(inputs: Menu_HapticsInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Haptics`)
+	return /** @type {LocalizedString} */ (`Rung`)
 };
 
 export const menu_haptics_off = /** @type {(inputs: Menu_Haptics_OffInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Off`)
+	return /** @type {LocalizedString} */ (`Tắt`)
 };
 
 export const menu_haptics_on = /** @type {(inputs: Menu_Haptics_OnInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`On`)
+	return /** @type {LocalizedString} */ (`Bật`)
 };
 
 export const menu_install_hint = /** @type {(inputs: Menu_Install_HintInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Add to your phone home screen`)
+	return /** @type {LocalizedString} */ (`Thêm vào màn hình chính điện thoại`)
 };
 
 export const menu_language = /** @type {(inputs: Menu_LanguageInputs) => LocalizedString} */ () => {
@@ -1542,19 +1542,19 @@ export const menu_language = /** @type {(inputs: Menu_LanguageInputs) => Localiz
 };
 
 export const menu_language_hint = /** @type {(inputs: Menu_Language_HintInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`App interface`)
+	return /** @type {LocalizedString} */ (`Ngôn ngữ ứng dụng`)
 };
 
 export const menu_lead = /** @type {(inputs: Menu_LeadInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Sound, day and night, home-screen shortcut.`)
+	return /** @type {LocalizedString} */ (`Âm thanh, ngày và đêm, lối tắt màn hình chính.`)
 };
 
 export const menu_profile_card = /** @type {(inputs: Menu_Profile_CardInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Profile`)
+	return /** @type {LocalizedString} */ (`Hồ sơ`)
 };
 
 export const menu_profile_meta = /** @type {(inputs: Menu_Profile_MetaInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Account and listings`)
+	return /** @type {LocalizedString} */ (`Tài khoản và tin đăng`)
 };
 
 export const menu_save_language = /** @type {(inputs: Menu_Save_LanguageInputs) => LocalizedString} */ () => {
@@ -1562,39 +1562,39 @@ export const menu_save_language = /** @type {(inputs: Menu_Save_LanguageInputs) 
 };
 
 export const menu_section_caption = /** @type {(inputs: Menu_Section_CaptionInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Profile, listing and settings`)
+	return /** @type {LocalizedString} */ (`Hồ sơ, tin đăng và cài đặt`)
 };
 
 export const menu_sound = /** @type {(inputs: Menu_SoundInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Sound`)
+	return /** @type {LocalizedString} */ (`Âm thanh`)
 };
 
 export const menu_sound_off = /** @type {(inputs: Menu_Sound_OffInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Off`)
+	return /** @type {LocalizedString} */ (`Tắt`)
 };
 
 export const menu_sound_on = /** @type {(inputs: Menu_Sound_OnInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`On`)
+	return /** @type {LocalizedString} */ (`Bật`)
 };
 
 export const menu_sound_test = /** @type {(inputs: Menu_Sound_TestInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Test sound`)
+	return /** @type {LocalizedString} */ (`Kiểm tra âm thanh`)
 };
 
 export const menu_sound_test_hint = /** @type {(inputs: Menu_Sound_Test_HintInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Short signal`)
+	return /** @type {LocalizedString} */ (`Tín hiệu ngắn`)
 };
 
 export const menu_theme = /** @type {(inputs: Menu_ThemeInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Day and night`)
+	return /** @type {LocalizedString} */ (`Ngày và đêm`)
 };
 
 export const menu_theme_dark = /** @type {(inputs: Menu_Theme_DarkInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Dark now`)
+	return /** @type {LocalizedString} */ (`Hiện đang tối`)
 };
 
 export const menu_theme_light = /** @type {(inputs: Menu_Theme_LightInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Light now`)
+	return /** @type {LocalizedString} */ (`Hiện đang sáng`)
 };
 
 export const menu_title = /** @type {(inputs: Menu_TitleInputs) => LocalizedString} */ () => {
@@ -1754,19 +1754,19 @@ export const place_selector_title = /** @type {(inputs: Place_Selector_TitleInpu
 };
 
 export const profile_login_write = /** @type {(inputs: Profile_Login_WriteInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Sign in to message`)
+	return /** @type {LocalizedString} */ (`Đăng nhập và nhắn tin`)
 };
 
 export const profile_settings = /** @type {(inputs: Profile_SettingsInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Settings`)
+	return /** @type {LocalizedString} */ (`Cài đặt`)
 };
 
 export const profile_settings_sound = /** @type {(inputs: Profile_Settings_SoundInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Sound and shortcut`)
+	return /** @type {LocalizedString} */ (`Âm thanh và lối tắt`)
 };
 
 export const profile_share_text = /** @type {(inputs: Profile_Share_TextInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Join GRABIT with my link. Chat and find work nearby.`)
+	return /** @type {LocalizedString} */ (`Tham gia GRABIT qua liên kết của tôi. Trò chuyện và tìm việc gần bạn.`)
 };
 
 export const profile_title = /** @type {(inputs: Profile_TitleInputs) => LocalizedString} */ () => {
@@ -1774,15 +1774,15 @@ export const profile_title = /** @type {(inputs: Profile_TitleInputs) => Localiz
 };
 
 export const profile_write_hint = /** @type {(inputs: Profile_Write_HintInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Message now. You can block or delete later.`)
+	return /** @type {LocalizedString} */ (`Nhắn ngay bây giờ. Bạn có thể chặn hoặc xóa sau.`)
 };
 
 export const profile_write_login_hint = /** @type {(inputs: Profile_Write_Login_HintInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Sign in to message this member.`)
+	return /** @type {LocalizedString} */ (`Đăng nhập để nhắn tin cho thành viên này.`)
 };
 
 export const pwa_installed = /** @type {(inputs: Pwa_InstalledInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Already installed`)
+	return /** @type {LocalizedString} */ (`Đã cài đặt`)
 };
 
 export const rating_votes = /** @type {(inputs: Rating_VotesInputs) => LocalizedString} */ (i) => {
