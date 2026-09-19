@@ -60,13 +60,13 @@ fn hash_reset_code(state: &AppState, email: &str, code: &str, expires_at: i64) -
 async fn send_reset_email(email: &str, code: &str) -> Result<(), String> {
     send_transactional_email(
         email,
-        "Сброс пароля GRABIT",
+        &crate::i18n::t("email_password_reset_subject"),
         transactional_code_email_html(
             "GRABIT",
-            "Код для сброса пароля:",
+            &crate::i18n::t("email_password_reset_intro"),
             code,
-            "Код действует 10 минут.",
-            "Если вы не запрашивали сброс, проигнорируйте письмо.",
+            &crate::i18n::t("email_password_reset_expiry"),
+            &crate::i18n::t("email_password_reset_footer"),
         ),
     )
     .await

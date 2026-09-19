@@ -7,12 +7,13 @@ pub fn escape_html(value: &str) -> String {
         .replace('\'', "&#39;")
 }
 
-pub(crate) fn ru_plural(
-    n: i64,
-    one: &'static str,
-    few: &'static str,
-    many: &'static str,
-) -> &'static str {
+/// Translates `key` and encodes it as a JSON string literal, safe to embed
+/// directly inside an inline `<script>` block.
+pub(crate) fn js_string(key: &str) -> String {
+    serde_json::to_string(&crate::i18n::t(key)).unwrap_or_else(|_| "\"\"".into())
+}
+
+pub(crate) fn ru_plural<'a>(n: i64, one: &'a str, few: &'a str, many: &'a str) -> &'a str {
     let n = n.abs();
     let n10 = n % 10;
     let n100 = n % 100;
@@ -27,6 +28,28 @@ pub(crate) fn ru_plural(
 
 pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'static str) -> String {
     format!("{n} {}", ru_plural(n, one, few, many))
+}
+
+/// Locale-aware plural word, with no leading count. Uses Russian's three
+/// plural forms when the current locale is `ru`; falls back to a
+/// singular/plural split (n == 1 vs. everything else) for the rest, which
+/// fits the majority of the supported locales.
+pub(crate) fn plural_word(n: i64, key_one: &str, key_few: &str, key_many: &str) -> String {
+    let one = crate::i18n::t(key_one);
+    let few = crate::i18n::t(key_few);
+    let many = crate::i18n::t(key_many);
+    if crate::i18n::locale() == "ru" {
+        ru_plural(n, &one, &few, &many).to_string()
+    } else if n.abs() == 1 {
+        one
+    } else {
+        many
+    }
+}
+
+/// Locale-aware count label ("{n} {word}"). See [`plural_word`].
+pub(crate) fn plural_count(n: i64, key_one: &str, key_few: &str, key_many: &str) -> String {
+    format!("{n} {}", plural_word(n, key_one, key_few, key_many))
 }
 
 pub const STATIC_ASSET_VERSION: &str = concat!(env!("CARGO_PKG_VERSION"), "-r9");
@@ -904,7 +927,7 @@ body::before { display: none; }
     padding: 0;
     border: 0;
     color: var(--text);
-    background: rgba(8, 10, 14, .92);
+    background: var(--bg);
 }
 
 .rm-global-search-dialog::backdrop {
@@ -3608,9 +3631,7 @@ a.feature.rm-feature-add {
     overflow: hidden;
     margin-bottom: 14px;
     border-color: rgba(var(--text-rgb), .34);
-    background:
-        radial-gradient(circle at 90% 10%, rgba(137, 116, 255, .16), transparent 38%),
-        linear-gradient(145deg, rgba(var(--text-rgb), .09), rgba(8, 10, 14, .96));
+    background: var(--card);
     box-shadow: 0 18px 48px rgba(0, 0, 0, .22);
 }
 
@@ -4392,9 +4413,7 @@ html[dir="rtl"] .rm-menu-row {
     overflow: hidden;
     padding: 0;
     border: 1px solid rgba(var(--text-rgb), .52);
-    background:
-        radial-gradient(circle at 100% 0%, rgba(126, 212, 228, .15), transparent 34%),
-        linear-gradient(145deg, rgba(20, 23, 30, .99), rgba(10, 12, 17, .99));
+    background: var(--card);
     box-shadow:
         0 22px 60px rgba(0, 0, 0, .30),
         0 0 38px rgba(var(--text-rgb), .08);
@@ -5577,7 +5596,7 @@ pub(crate) fn resource_result_card(params: ResourceResultCardParams<'_>) -> Stri
             write = crate::i18n::t("common_write"),
         )
     };
-    let share_html = share_button(href, "Поделиться");
+    let share_html = share_button(href, &crate::i18n::t("common_share"));
     let rating_line = crate::i18n::tf(
         "common_rating",
         &[
@@ -5695,7 +5714,7 @@ pub(crate) fn profile_resource_card(params: ProfileResourceCardParams<'_>) -> St
         _ => String::new(),
     };
 
-    let share_html = share_button(href, "Поделиться");
+    let share_html = share_button(href, &crate::i18n::t("common_share"));
 
     format!(
         r#"<div class="card card--result card--listing" data-share-scope>
@@ -5734,11 +5753,7 @@ pub(crate) fn profile_resource_card(params: ProfileResourceCardParams<'_>) -> St
                 ("rating", &format!("{rating:.1}")),
                 (
                     "votes",
-                    &if crate::i18n::locale() == "ru" {
-                        ru_count(votes, "голос", "голоса", "голосов")
-                    } else {
-                        votes.to_string()
-                    },
+                    &plural_count(votes, "count_vote_one", "count_vote_few", "count_vote_many"),
                 ),
             ],
         )),
@@ -5898,14 +5913,11 @@ pub(crate) fn resource_visibility_with_status(active: i64, status: &str) -> Stri
 
 pub(crate) fn moderator_level_badge(level: i64) -> String {
     let (text, class) = match level {
-        1 => ("Уровень 1 · Помощник группы", "rm-mod-level-badge--1"),
-        2 => ("Уровень 2 · Администратор города", "rm-mod-level-badge--2"),
-        3 => ("Уровень 3 · Администратор страны", "rm-mod-level-badge--3"),
-        4 => (
-            "Уровень 4 · Администратор континента",
-            "rm-mod-level-badge--4",
-        ),
-        5 => ("Уровень 5 · Владелец GRABIT", "rm-mod-level-badge--5"),
+        1 => (crate::i18n::t("mod_level_1"), "rm-mod-level-badge--1"),
+        2 => (crate::i18n::t("mod_level_2"), "rm-mod-level-badge--2"),
+        3 => (crate::i18n::t("mod_level_3"), "rm-mod-level-badge--3"),
+        4 => (crate::i18n::t("mod_level_4"), "rm-mod-level-badge--4"),
+        5 => (crate::i18n::t("mod_level_5"), "rm-mod-level-badge--5"),
         _ => return String::new(),
     };
 
@@ -5916,20 +5928,26 @@ pub(crate) fn moderator_level_badge(level: i64) -> String {
     )
 }
 
-pub(crate) fn my_resource_moderation_badge(is_active: i64, status: &str) -> &'static str {
+pub(crate) fn my_resource_moderation_badge(is_active: i64, status: &str) -> String {
     if is_active == 0 && status != "rejected" {
-        r#"<span class="rm-resource-mod-badge rm-resource-mod-badge--hidden">⚫ Скрыт</span>"#
+        format!(
+            r#"<span class="rm-resource-mod-badge rm-resource-mod-badge--hidden">⚫ {}</span>"#,
+            crate::i18n::t("status_hidden_short")
+        )
     } else {
         match status {
-            "approved" => {
-                r#"<span class="rm-resource-mod-badge rm-resource-mod-badge--approved">🟢 Одобрен</span>"#
-            }
-            "rejected" => {
-                r#"<span class="rm-resource-mod-badge rm-resource-mod-badge--rejected">🔴 Отклонён</span>"#
-            }
-            _ => {
-                r#"<span class="rm-resource-mod-badge rm-resource-mod-badge--pending">🟡 На проверке</span>"#
-            }
+            "approved" => format!(
+                r#"<span class="rm-resource-mod-badge rm-resource-mod-badge--approved">🟢 {}</span>"#,
+                crate::i18n::t("status_approved_short")
+            ),
+            "rejected" => format!(
+                r#"<span class="rm-resource-mod-badge rm-resource-mod-badge--rejected">🔴 {}</span>"#,
+                crate::i18n::t("status_rejected_short")
+            ),
+            _ => format!(
+                r#"<span class="rm-resource-mod-badge rm-resource-mod-badge--pending">🟡 {}</span>"#,
+                crate::i18n::t("moderation_pending_title")
+            ),
         }
     }
 }
@@ -6045,7 +6063,7 @@ fn admin_ops_styles() -> &'static str {
     padding: 17px;
     border: 1px solid var(--ops-line);
     border-radius: 18px;
-    background: rgba(16, 26, 22, .88);
+    background: var(--surface);
 }
 .rm-admin-ops .metric strong {
     display: block;
@@ -6082,7 +6100,7 @@ fn admin_ops_styles() -> &'static str {
     padding: 16px;
     border: 1px solid var(--ops-line);
     border-radius: 17px;
-    background: linear-gradient(145deg, rgba(20, 34, 28, .96), rgba(11, 20, 16, .96));
+    background: var(--card);
 }
 .rm-admin-ops .event-head {
     display: flex;
@@ -6202,7 +6220,7 @@ fn admin_ops_styles() -> &'static str {
 }
 .rm-admin-ops--city .hero {
     border-color: rgba(85, 228, 154, .28);
-    background: linear-gradient(145deg, rgba(21, 50, 38, .98), rgba(8, 20, 15, .98));
+    background: var(--card);
 }
 .rm-admin-ops--city .eyebrow {
     color: #55e49a;
@@ -6251,7 +6269,7 @@ fn admin_ops_styles() -> &'static str {
     padding: 16px;
     border: 1px solid var(--ops-line);
     border-radius: 18px;
-    background: linear-gradient(145deg, rgba(18, 38, 29, .96), rgba(8, 19, 14, .96));
+    background: var(--card);
 }
 .rm-admin-ops--city .panel {
     padding: 0;
@@ -6329,7 +6347,7 @@ fn admin_ops_styles() -> &'static str {
     margin: 0 0 18px;
     border: 1px solid var(--ops-line);
     border-radius: 18px;
-    background: rgba(7, 9, 13, .86);
+    background: var(--surface);
     backdrop-filter: blur(18px);
 }
 .rm-admin-ops--geo .search input {
@@ -6364,7 +6382,7 @@ fn admin_ops_styles() -> &'static str {
     padding: 18px;
     border: 1px solid var(--ops-line);
     border-radius: 20px;
-    background: linear-gradient(145deg, rgba(22, 27, 36, .95), rgba(13, 17, 23, .96));
+    background: var(--card);
 }
 .rm-admin-ops--geo .city-title-row {
     display: flex;
@@ -6428,7 +6446,7 @@ fn admin_ops_styles() -> &'static str {
     padding: 14px;
     border: 1px solid var(--ops-line);
     border-radius: 15px;
-    background: rgba(0, 0, 0, .18);
+    background: var(--surface);
 }
 .rm-admin-ops--geo .group-panel small {
     margin-top: 5px;
@@ -6535,7 +6553,7 @@ fn admin_ops_styles() -> &'static str {
     padding: 18px;
     border: 1px solid var(--ops-line);
     border-radius: 20px;
-    background: linear-gradient(145deg, rgba(19, 40, 30, .96), rgba(9, 23, 16, .96));
+    background: var(--card);
 }
 .rm-admin-ops--helpers .fields {
     display: grid;
@@ -6591,7 +6609,7 @@ fn admin_ops_styles() -> &'static str {
     padding: 18px;
     border: 1px solid var(--ops-line);
     border-radius: 20px;
-    background: linear-gradient(145deg, rgba(19, 40, 30, .96), rgba(9, 23, 16, .96));
+    background: var(--card);
 }
 .rm-admin-ops--helpers .card p {
     color: var(--ops-muted);
@@ -6630,7 +6648,7 @@ fn admin_ops_styles() -> &'static str {
     color: var(--ops-muted);
     font-size: 13px;
     line-height: 1.65;
-    background: linear-gradient(145deg, rgba(20, 24, 32, .96), rgba(10, 12, 17, .97));
+    background: var(--surface);
 }
 .rm-admin-ops--assign .form-card {
     display: grid;
@@ -6639,7 +6657,7 @@ fn admin_ops_styles() -> &'static str {
     padding: 24px;
     border: 1px solid var(--ops-line);
     border-radius: 24px;
-    background: linear-gradient(145deg, rgba(20, 24, 32, .96), rgba(10, 12, 17, .97));
+    background: var(--card);
     box-shadow: 0 24px 70px rgba(0, 0, 0, .28);
 }
 .rm-admin-ops--assign label {

@@ -1,8 +1,8 @@
 use super::common::{
     back_navigation_card, bottom_nav, empty_state_action, empty_state_card_with_actions,
     escape_html, guest_mode_hint, icon, intent_kind_chips, is_generic_profession_key, kind_chip,
-    navigation_card, page_document, page_shell, premium_badge_html, profession_label,
-    resource_listing_label, resource_result_card, ru_count, ru_plural, search_form_hero,
+    navigation_card, page_document, page_shell, plural_count, plural_word, premium_badge_html,
+    profession_label, resource_listing_label, resource_result_card, search_form_hero,
     search_people_cards, section_head, simple_hero, static_asset, topbar, verified_badge_html,
 };
 use crate::geography::world;
@@ -45,11 +45,14 @@ fn search_rubric_chips(
         return String::new();
     };
 
-    let mut chips = String::from(r#"<nav class="rm-kind-chips" aria-label="Рубрика">"#);
+    let mut chips = format!(
+        r#"<nav class="rm-kind-chips" aria-label="{}">"#,
+        crate::i18n::t("aria_rubric")
+    );
     chips.push_str(&kind_chip(
         active.is_none(),
         &search_page_href(q, kind, None, city_id),
-        "Все",
+        &crate::i18n::t("common_all"),
     ));
     for rubric in crate::catalog::by_kind(filter_kind) {
         chips.push_str(&kind_chip(
@@ -158,22 +161,22 @@ fn build_home_explore_index(
     push_explore_entry(
         &mut parts,
         "work",
-        "Работа",
-        "Вакансии и предложения работы",
+        &crate::i18n::t("common_work"),
+        &crate::i18n::t("explore_work_subtitle"),
         "/app/search?kind=work",
     );
     push_explore_entry(
         &mut parts,
         "workers",
-        "Работники",
-        "Профессии и объявления тех, кто ищет работу",
+        &crate::i18n::t("common_workers"),
+        &crate::i18n::t("explore_workers_subtitle"),
         "/app/search?kind=workers",
     );
     push_explore_entry(
         &mut parts,
         "business",
-        "Бизнес",
-        "Компании и предложения",
+        &crate::i18n::t("common_business"),
+        &crate::i18n::t("explore_business_subtitle"),
         "/app/search?kind=business",
     );
 
@@ -182,16 +185,16 @@ fn build_home_explore_index(
         let subtitle = match rubric.kind {
             crate::catalog::RubricKind::Work => {
                 if count > 0 {
-                    format!("Работа · {count}")
+                    format!("{} · {count}", crate::i18n::t("common_work"))
                 } else {
-                    "Работа и работники".to_string()
+                    crate::i18n::t("rubric_group_work")
                 }
             }
             crate::catalog::RubricKind::Business => {
                 if count > 0 {
-                    format!("Бизнес · {count}")
+                    format!("{} · {count}", crate::i18n::t("common_business"))
                 } else {
-                    "Бизнес".to_string()
+                    crate::i18n::t("common_business")
                 }
             }
         };
@@ -472,7 +475,7 @@ pub fn render_geo_root(
                 "globe",
                 name,
                 &if crate::i18n::locale() == "ru" {
-                    ru_count(*countries, "страна", "страны", "стран")
+                    plural_count(*countries, "count_country_one", "count_country_few", "count_country_many")
                 } else {
                     crate::i18n::tf("map_n_countries", &[("n", &countries.to_string())])
                 },
@@ -486,12 +489,12 @@ pub fn render_geo_root(
         String::new()
     };
     let users_word = if crate::i18n::locale() == "ru" {
-        ru_plural(users_count, "участник", "участника", "участников").to_string()
+        plural_word(users_count, "count_member_one", "count_member_few", "count_member_many")
     } else {
         crate::i18n::t("map_stat_members")
     };
     let resources_word = if crate::i18n::locale() == "ru" {
-        ru_plural(resources_count, "объявление", "объявления", "объявлений").to_string()
+        plural_word(resources_count, "count_resource_one", "count_resource_few", "count_resource_many")
     } else {
         crate::i18n::t("map_stat_listings")
     };
@@ -556,7 +559,7 @@ pub fn render_geo_continent(
                 "building",
                 country,
                 &if crate::i18n::locale() == "ru" {
-                    ru_count(*cities, "город", "города", "городов")
+                    plural_count(*cities, "count_city_one", "count_city_few", "count_city_many")
                 } else {
                     crate::i18n::tf("map_n_cities", &[("n", &cities.to_string())])
                 },
@@ -572,7 +575,7 @@ pub fn render_geo_continent(
         clear = crate::i18n::t("map_clear_search"),
     );
     let countries_caption = if crate::i18n::locale() == "ru" {
-        ru_count(countries.len() as i64, "страна", "страны", "стран")
+        plural_count(countries.len() as i64, "count_country_one", "count_country_few", "count_country_many")
     } else {
         crate::i18n::tf("map_n_countries", &[("n", &countries.len().to_string())])
     };
@@ -635,7 +638,7 @@ pub fn render_geo_country(
         clear = crate::i18n::t("map_clear_search"),
     );
     let cities_caption = if crate::i18n::locale() == "ru" {
-        ru_count(total, "город", "города", "городов")
+        plural_count(total, "count_city_one", "count_city_few", "count_city_many")
     } else {
         crate::i18n::tf("map_n_cities", &[("n", &total.to_string())])
     };
@@ -694,7 +697,7 @@ pub fn render_geo_city(
                 ),
                 "briefcase",
                 name,
-                &ru_count(*count, "профессия", "профессии", "профессий"),
+                &plural_count(*count, "count_profession_one", "count_profession_few", "count_profession_many"),
             )
         })
         .collect::<Vec<_>>()
@@ -728,41 +731,41 @@ pub fn render_geo_city(
             &crate::i18n::t("map_need_lead"),
             Some(22)
         ),
-        work = category("Работа", "Вакансии и поиск работы", "работа", "briefcase"),
+        work = category(&crate::i18n::t("common_work"), &crate::i18n::t("nearby_jobs_subtitle"), "работа", "briefcase"),
         services = category(
-            "Услуги",
-            "Ищу специалиста или предлагаю услугу",
+            &crate::i18n::t("common_services"),
+            &crate::i18n::t("services_subtitle"),
             "услуги",
             "user"
         ),
         business = category(
-            "Бизнес",
-            "Компании, партнёры и сотрудничество",
+            &crate::i18n::t("common_business"),
+            &crate::i18n::t("business_partners_subtitle"),
             "бизнес",
             "building"
         ),
         housing = category(
-            "Жильё",
-            "Сниму, сдам, куплю или продам",
+            &crate::i18n::t("common_housing"),
+            &crate::i18n::t("housing_subtitle"),
             "жильё",
             "building"
         ),
         transport = category(
-            "Транспорт",
-            "Куплю, продам, аренда и перевозки",
+            &crate::i18n::t("common_transport"),
+            &crate::i18n::t("transport_subtitle"),
             "транспорт",
             "map"
         ),
         education = category(
-            "Обучение",
-            "Курсы, преподаватели и ученики",
+            &crate::i18n::t("common_education"),
+            &crate::i18n::t("education_subtitle"),
             "обучение",
             "briefcase"
         ),
-        help = category("Помощь", "Нужна помощь или могу помочь", "помощь", "heart"),
+        help = category(&crate::i18n::t("common_help"), &crate::i18n::t("help_subtitle"), "помощь", "heart"),
         other = category(
-            "Другое",
-            "Остальные предложения и запросы",
+            &crate::i18n::t("report_reason_other"),
+            &crate::i18n::t("other_subtitle"),
             "другое",
             "menu"
         ),
@@ -819,11 +822,11 @@ pub fn render_geo_professions(
         head = section_head(
             &crate::i18n::t("map_professions"),
             &if crate::i18n::locale() == "ru" {
-                ru_count(
+                plural_count(
                     professions.len() as i64,
-                    "профессия",
-                    "профессии",
-                    "профессий",
+                    "count_profession_one",
+                    "count_profession_few",
+                    "count_profession_many",
                 )
             } else {
                 crate::i18n::tf(
@@ -886,7 +889,7 @@ pub fn render_continents(
         padding:10px 12px;
         border-radius:14px;
         border:1px solid rgba(var(--text-rgb),.24);
-        background:linear-gradient(135deg, rgba(var(--text-rgb),.10), rgba(114,196,212,.06));
+        background:var(--surface);
         color:var(--muted);
         font-size:13px;
         line-height:1.5;
@@ -907,8 +910,7 @@ pub fn render_continents(
         padding:14px 10px;
         border-radius:16px;
         border:1px solid rgba(var(--text-rgb),.24);
-        background:
-            linear-gradient(145deg, rgba(var(--text-rgb),.12), rgba(126,212,228,.06));
+        background: var(--card);
         box-shadow:
             inset 0 1px 0 rgba(255,255,255,.07),
             0 10px 28px rgba(0,0,0,.20);
@@ -943,10 +945,7 @@ pub fn render_continents(
         margin-top:20px;
         padding:16px 16px 14px;
         border:1px solid rgba(var(--text-rgb),.28);
-        background:
-            radial-gradient(circle at 100% 0%, rgba(126,212,228,.10), transparent 42%),
-            radial-gradient(circle at 0% 100%, rgba(var(--text-rgb),.08), transparent 40%),
-            rgba(255,255,255,.02);
+        background: var(--surface);
         box-shadow:
             0 18px 44px rgba(0,0,0,.24),
             inset 0 1px 0 rgba(255,255,255,.06);
@@ -1220,12 +1219,12 @@ pub fn render_continents(
         common_clear = crate::i18n::t("common_clear"),
         online_label = crate::i18n::t("common_online_short"),
         users_word = if crate::i18n::locale() == "ru" {
-            ru_plural(users_count, "участник", "участника", "участников").to_string()
+            plural_word(users_count, "count_member_one", "count_member_few", "count_member_many")
         } else {
             crate::i18n::t("map_stat_members")
         },
         resources_word = if crate::i18n::locale() == "ru" {
-            ru_plural(resources_count, "объявление", "объявления", "объявлений").to_string()
+            plural_word(resources_count, "count_resource_one", "count_resource_few", "count_resource_many")
         } else {
             crate::i18n::t("map_stat_listings")
         },
@@ -1354,8 +1353,12 @@ pub fn render_country(ci: usize, si: usize) -> String {
             }
 
             let section_head_cities = section_head(
-                "Города",
-                &ru_count(cities.len() as i64, "город", "города", "городов"),
+                &crate::i18n::t("map_cities"),
+                &if crate::i18n::locale() == "ru" {
+                    plural_count(cities.len() as i64, "count_city_one", "count_city_few", "count_city_many")
+                } else {
+                    crate::i18n::tf("map_n_cities", &[("n", &cities.len().to_string())])
+                },
                 None,
             );
 
@@ -1399,7 +1402,11 @@ pub fn render_city(ci: usize, si: usize, zi: usize) -> String {
     if let Some((_cname, countries)) = w.iter().nth(ci) {
         if let Some((country, cities)) = countries.iter().nth(si) {
             if let Some(city) = cities.get(zi) {
-                let section_head_sections = section_head("Разделы", "Выберите направление", None);
+                let section_head_sections = section_head(
+                    &crate::i18n::t("sections_heading"),
+                    &crate::i18n::t("choose_direction_hint"),
+                    None,
+                );
 
                 let content = format!(
                     r#"
@@ -1421,26 +1428,26 @@ pub fn render_city(ci: usize, si: usize, zi: usize) -> String {
                     all_card = navigation_card(
                         &format!("/app/{}/{}/{}/all", ci, si, zi),
                         "globe",
-                        "Все объявления",
-                        "Все публикации города",
+                        &crate::i18n::t("category_all_title"),
+                        &crate::i18n::t("all_listings_subtitle"),
                     ),
                     work_card = navigation_card(
                         &format!("/app/{}/{}/{}/cat/work?type=offer", ci, si, zi),
                         "briefcase",
-                        "Работа",
-                        "Вакансии рядом",
+                        &crate::i18n::t("common_work"),
+                        &crate::i18n::t("nearby_jobs_subtitle"),
                     ),
                     workers_card = navigation_card(
                         &format!("/app/{}/{}/{}/cat/work?type=seeker", ci, si, zi),
                         "user",
-                        "Работники",
-                        "Профессии и кто ищет работу",
+                        &crate::i18n::t("common_workers"),
+                        &crate::i18n::t("workers_subtitle"),
                     ),
                     business_card = navigation_card(
                         &format!("/app/{}/{}/{}/cat/business", ci, si, zi),
                         "building",
-                        "Бизнес",
-                        "Компании рядом",
+                        &crate::i18n::t("common_business"),
+                        &crate::i18n::t("business_nearby_subtitle"),
                     ),
                 );
 
@@ -1604,8 +1611,8 @@ pub fn render_search(
 </section>
 "#,
             people_head = section_head(
-                "По профессии",
-                &format!("Найдено: {}", people_count),
+                &crate::i18n::t("resource_people_section_title"),
+                &crate::i18n::tf("resource_found_count", &[("n", &people_count.to_string())]),
                 Some(24),
             ),
             people_cards = search_people_cards(&people),
@@ -1613,10 +1620,11 @@ pub fn render_search(
     };
 
     let result_count = resources.len();
-    let city_label = city_name
+    let city_fallback = crate::i18n::t("this_city_fallback");
+    let city_label: Option<&str> = city_name
         .map(str::trim)
         .filter(|value| !value.is_empty())
-        .or(city_id.is_some().then_some("этот город"));
+        .or(city_id.is_some().then_some(city_fallback.as_str()));
 
     let has_criteria =
         !q.trim().is_empty() || !kind.is_empty() || active_rubric.is_some() || city_id.is_some();
@@ -1624,56 +1632,57 @@ pub fn render_search(
         String::new()
     } else if resources.is_empty() && people.is_empty() && location_results.is_empty() {
         let empty_query = if !q.trim().is_empty() {
-            q
+            q.to_string()
         } else if let Some(rubric) = active_rubric {
-            rubric.label
+            rubric.label.to_string()
         } else if let Some(name) = city_label {
-            name
+            name.to_string()
         } else {
             match kind {
-                "work" => "работа",
-                "workers" => "работники",
-                "business" => "бизнес",
-                _ => q,
+                "work" => crate::i18n::t("common_work"),
+                "workers" => crate::i18n::t("common_workers"),
+                "business" => crate::i18n::t("common_business"),
+                _ => q.to_string(),
             }
         };
         let empty_copy = if city_id.is_some() && q.trim().is_empty() && active_rubric.is_none() {
-            format!(
-                "В городе «{}» пока нет объявлений.",
-                escape_html(city_label.unwrap_or("этот город"))
+            crate::i18n::tf(
+                "no_listings_in_city",
+                &[("city", &escape_html(city_label.unwrap_or(&city_fallback)))],
             )
         } else {
-            format!(
-                "По запросу «{}» пока ничего не найдено.",
-                escape_html(empty_query)
+            crate::i18n::tf(
+                "no_results_for_query",
+                &[("query", &escape_html(&empty_query))],
             )
         };
         empty_state_card_with_actions(
-            "Ничего не найдено",
+            &crate::i18n::t("nothing_found_title"),
             &format!(
-                "{empty_copy} Можно сменить город или добавить объявление.",
-                empty_copy = empty_copy
+                "{empty_copy} {suffix}",
+                empty_copy = empty_copy,
+                suffix = crate::i18n::t("change_city_or_add_hint"),
             ),
             &format!(
                 "{}{}",
-                empty_state_action("/app", "Другой город"),
+                empty_state_action("/app", &crate::i18n::t("other_city_action")),
                 empty_state_action(
                     &city_id
                         .map(|id| format!("/app/add/city/{id}"))
                         .unwrap_or_else(|| "/app/add".to_string()),
-                    "Добавить объявление",
+                    &crate::i18n::t("resource_add_action"),
                 ),
             ),
         )
     } else if resources.is_empty() {
         empty_state_card_with_actions(
-            "Объявлений нет",
-            "Есть участники или города по этому запросу, но объявлений пока нет.",
+            &crate::i18n::t("resource_empty_people_title"),
+            &crate::i18n::t("no_listings_with_matches_body"),
             &empty_state_action(
                 &city_id
                     .map(|id| format!("/app/add/city/{id}"))
                     .unwrap_or_else(|| "/app/add".to_string()),
-                "Добавить объявление",
+                &crate::i18n::t("resource_add_action"),
             ),
         )
     } else {
@@ -1708,7 +1717,7 @@ pub fn render_search(
                                     .map(|city| format!("{} · {}", city, country))
                             })
                         })
-                        .unwrap_or_else(|| "Местоположение не указано".to_string());
+                        .unwrap_or_else(|| crate::i18n::t("location_unspecified"));
 
                     let category_line = {
                         let base = if is_generic_profession_key(rubric) {
@@ -1784,8 +1793,11 @@ pub fn render_search(
     {location_results}
 </section>
 "#,
-            location_head =
-                section_head("Места", &format!("Найдено: {}", location_count), Some(24),),
+            location_head = section_head(
+                &crate::i18n::t("places_heading"),
+                &crate::i18n::tf("resource_found_count", &[("n", &location_count.to_string())]),
+                Some(24),
+            ),
             location_results = location_results,
         )
     };
@@ -1794,21 +1806,23 @@ pub fn render_search(
         String::new()
     } else {
         section_head(
-            match kind {
-                "work" => "Вакансии",
-                "workers" => "Объявления",
-                "business" => "Бизнес",
-                _ => "Объявления",
+            &match kind {
+                "work" => crate::i18n::t("vacancies_heading"),
+                "workers" => crate::i18n::t("resources_section_title"),
+                "business" => crate::i18n::t("common_business"),
+                _ => crate::i18n::t("resources_section_title"),
             },
-            &format!("Найдено: {}", result_count),
+            &crate::i18n::tf("resource_found_count", &[("n", &result_count.to_string())]),
             Some(24),
         )
     };
 
     let suggestions = if !has_criteria {
-        let mut chips = String::from(
-            r#"<nav class="rm-kind-chips" id="rm-recent-searches" hidden aria-label="Недавние поиски"></nav>
-<nav class="rm-kind-chips" aria-label="Частые рубрики">"#,
+        let mut chips = format!(
+            r#"<nav class="rm-kind-chips" id="rm-recent-searches" hidden aria-label="{recent}"></nav>
+<nav class="rm-kind-chips" aria-label="{frequent}">"#,
+            recent = crate::i18n::t("recent_searches_aria"),
+            frequent = crate::i18n::t("frequent_rubrics_aria"),
         );
 
         for rubric in crate::catalog::all().iter().take(12) {
@@ -1824,7 +1838,7 @@ pub fn render_search(
         format!(
             r#"
 <section class="card rm-search-suggest">
-    <div class="card-title">С чего начать</div>
+    <div class="card-title">{where_to_start}</div>
     <div class="card-meta">{search_what}</div>
     <p id="rm-search-continue" hidden>
         <a class="ui-button" id="rm-search-continue-link" href="/app/search"></a>
@@ -1832,6 +1846,7 @@ pub fn render_search(
     {chips}
 </section>
 "#,
+            where_to_start = crate::i18n::t("where_to_start_title"),
             chips = chips,
             search_what = escape_html(&crate::i18n::t("search_what")),
         )
@@ -1873,11 +1888,12 @@ pub fn render_search(
 
     let city_chip = match (city_id.filter(|value| *value > 0), city_label) {
         (Some(_), Some(name)) => format!(
-            r#"<nav class="rm-kind-chips" aria-label="Город">{}</nav>"#,
+            r#"<nav class="rm-kind-chips" aria-label="{}">{}</nav>"#,
+            crate::i18n::t("map_city_label"),
             kind_chip(
                 true,
                 &search_page_href(q, kind, active_rubric.map(|item| item.id), None),
-                &format!("{name} · сбросить"),
+                &crate::i18n::tf("city_chip_reset", &[("name", name)]),
             )
         ),
         _ => String::new(),
@@ -1885,8 +1901,8 @@ pub fn render_search(
     let hero_extra = format!("{guest_hint}{kind_chips}{city_chip}{rubric_chips}");
 
     page_shell(
-        "Поиск · GRABIT",
-        &topbar("Поиск", "search"),
+        &format!("{} · GRABIT", crate::i18n::t("search_title")),
+        &topbar(&crate::i18n::t("search_title"), "search"),
         &search_form_hero(
             &crate::i18n::t("search_title"),
             &match (kind, active_rubric) {
@@ -1914,21 +1930,24 @@ pub fn render_menu(invite_public_id: &str, admin_level: i64) -> String {
             r#"<a class="card rm-owner-center-entry" href="/app/center" data-owner-center-entry>
     <div class="card-icon">{shield}</div>
     <div class="card-content">
-        <div class="card-title">Центр владельца</div>
-        <div class="card-meta">Глобальное управление, безопасность и production</div>
+        <div class="card-title">{title}</div>
+        <div class="card-meta">{desc}</div>
     </div>
-    <span class="rm-owner-center-level">УРОВЕНЬ 5</span>
+    <span class="rm-owner-center-level">{level}</span>
     {chevron}
 </a>"#,
             shield = icon("shield"),
+            title = crate::i18n::t("owner_center_title"),
+            desc = crate::i18n::t("owner_center_desc"),
+            level = crate::i18n::t("level_5_label"),
             chevron = icon("chevron"),
         )
     } else if admin_level > 0 {
         navigation_card(
             "/app/center",
             "shield",
-            "Центр управления",
-            &format!("Административный уровень {admin_level}"),
+            &crate::i18n::t("admin_center_title"),
+            &crate::i18n::tf("admin_level_nav_label", &[("level", &admin_level.to_string())]),
         )
     } else {
         String::new()
@@ -2272,7 +2291,12 @@ mod search_catalog_tests {
         assert!(owner.contains("УРОВЕНЬ 5"));
 
         let regular = render_menu("", 0);
+        // The full i18n message table (all locale strings, including the
+        // owner-center title) is always embedded on the page for
+        // client-side use, so check the actual card markup is absent via
+        // its unique data attribute rather than grepping for translated
+        // text or a CSS class name, both of which legitimately appear
+        // elsewhere on the page regardless of what's rendered here.
         assert!(!regular.contains("data-owner-center-entry"));
-        assert!(!regular.contains("Центр владельца"));
     }
 }

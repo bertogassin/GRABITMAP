@@ -1,7 +1,8 @@
 use super::common::{
     back_hero, back_link, bottom_nav, bottom_nav_with_badge, empty_state_action, empty_state_card,
     empty_state_card_with_actions, error_status_html, escape_html, guest_locked_section, icon,
-    page_document, page_shell, ru_count, section_head, simple_hero, static_asset, topbar,
+    js_string, page_document, page_shell, plural_count, section_head, simple_hero, static_asset,
+    topbar,
 };
 
 // ============================================================
@@ -27,7 +28,7 @@ pub(crate) fn conversation_display_name(
     } else if !safe_username.is_empty() {
         format!("@{safe_username}")
     } else {
-        "Участник GRABIT".to_string()
+        crate::i18n::t("member_fallback_name")
     }
 }
 
@@ -76,7 +77,7 @@ pub(crate) fn conversation_preview_text(value: &str) -> String {
         "__deleted__" => crate::i18n::t("chat_deleted"),
         "__image__" => crate::i18n::t("chat_photo"),
         "__voice__" => crate::i18n::t("chat_voice"),
-        _ if listing_id_from_message(value).is_some() => "Объявление GRABIT".to_string(),
+        _ if listing_id_from_message(value).is_some() => crate::i18n::t("listing_share_fallback_title"),
         _ => value.to_string(),
     }
 }
@@ -149,16 +150,16 @@ pub fn render_messages(
                 };
                 let official_badge = if is_group && !conversation.group_scope_type.is_empty() {
                     let label = match conversation.group_scope_type.as_str() {
-                        "world" => "Официальная группа мира",
-                        "continent" => "Официальная группа континента",
-                        "country" => "Официальная группа страны",
-                        "city" => "Официальная группа города",
-                        _ => "Официальная группа",
+                        "world" => crate::i18n::t("official_group_world"),
+                        "continent" => crate::i18n::t("official_group_continent"),
+                        "country" => crate::i18n::t("official_group_country"),
+                        "city" => crate::i18n::t("official_group_city"),
+                        _ => crate::i18n::t("nearby_official_group"),
                     };
                     format!(
                         r#"<span class="chat-official-group" data-scope-id="{}">✓ {}</span>"#,
                         conversation.group_scope_id,
-                        escape_html(label),
+                        escape_html(&label),
                     )
                 } else {
                     String::new()
@@ -214,7 +215,7 @@ pub fn render_messages(
                 let muted = conversation.muted_until > chrono::Utc::now().timestamp();
                 let controls = format!(
                     r#"<details class="chat-dialog-controls">
-    <summary aria-label="Действия с чатом">{more_icon}</summary>
+    <summary aria-label="{dialog_actions_aria}">{more_icon}</summary>
     <div class="chat-dialog-menu" role="menu">
     <form method="post" action="/app/chat-preference/{preference_kind}/{target_id}">
         <input type="hidden" name="action" value="{pin_action}"><input type="hidden" name="return_view" value="{return_view}">
@@ -231,14 +232,15 @@ pub fn render_messages(
 </div>
 </details>"#,
                     more_icon = r#"<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>"#,
+                    dialog_actions_aria = crate::i18n::t("chat_dialog_actions_aria"),
                     pin_action = if conversation.pinned_at > 0 { "unpin" } else { "pin" },
-                    pin_label = if conversation.pinned_at > 0 { "Открепить" } else { "Закрепить" },
+                    pin_label = if conversation.pinned_at > 0 { crate::i18n::t("chat_unpin") } else { crate::i18n::t("chat_pin") },
                     pin_icon = r#"<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 4 6 0-1 5 3 3v2H7v-2l3-3-1-5Z"/><path d="M12 14v6"/></svg>"#,
                     mute_action = if muted { "unmute" } else { "mute" },
-                    mute_label = if muted { "Включить уведомления" } else { "Отключить уведомления" },
+                    mute_label = if muted { crate::i18n::t("chat_unmute") } else { crate::i18n::t("chat_mute") },
                     mute_icon = r#"<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>"#,
                     archive_action = if archived { "unarchive" } else { "archive" },
-                    archive_label = if archived { "Вернуть из архива" } else { "В архив" },
+                    archive_label = if archived { crate::i18n::t("chat_unarchive") } else { crate::i18n::t("chat_archive") },
                     archive_icon = r#"<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v13H4z"/><path d="M3 3h18v4H3z"/><path d="M9 11h6"/></svg>"#,
                 );
 
@@ -332,13 +334,14 @@ pub fn render_messages(
         <p class="section-caption" id="inbox-unread-caption">{unread_caption}</p>
     </div>
     <div class="inbox-head-actions">
-        <a href="/app/official-groups" class="ui-button ui-button--secondary inbox-group-btn">Официальные</a>
+        <a href="/app/official-groups" class="ui-button ui-button--secondary inbox-group-btn">{official_link}</a>
         <a href="/app/groups/new" class="ui-button inbox-group-btn">{group}</a>
         <span class="inbox-live-badge" id="inbox-live-badge" hidden aria-hidden="true">{live}</span>
     </div>
 </div>"#,
             dialogs = crate::i18n::t("chat_dialogs"),
             unread_caption = unread_caption,
+            official_link = crate::i18n::t("official_groups_link"),
             group = crate::i18n::t("chat_group"),
             live = crate::i18n::t("chat_link_ok"),
         )
@@ -383,12 +386,15 @@ pub fn render_messages(
     };
     let inbox_views = if authenticated {
         format!(
-            r#"<nav class="inbox-views" aria-label="Разделы чатов">
-    <a href="/app/messages" class="{}">Активные</a>
-    <a href="/app/messages?view=archived" class="{}">Архив</a>
+            r#"<nav class="inbox-views" aria-label="{sections_aria}">
+    <a href="/app/messages" class="{}">{active_tab}</a>
+    <a href="/app/messages?view=archived" class="{}">{archive_tab}</a>
 </nav>"#,
             if archived { "" } else { "is-active" },
             if archived { "is-active" } else { "" },
+            sections_aria = crate::i18n::t("inbox_sections_aria"),
+            active_tab = crate::i18n::t("inbox_active_tab"),
+            archive_tab = crate::i18n::t("inbox_archive_tab"),
         )
     } else {
         String::new()
@@ -539,7 +545,9 @@ fn chat_message_body_html(message: &crate::web::view_models::ChatMessageRow) -> 
 
     if let Some(id) = listing_id {
         return format!(
-            r#"<div class="chat-message-body chat-message-body--listing" data-listing-preview-id="{id}"><a class="chat-listing-card" href="/app/listing/{id}"><div class="chat-listing-brand"><img src="/static/grabit-mascot-v2.png" alt="" width="88" height="53"><strong>GRABIT</strong></div><strong class="chat-listing-title">Объявление GRABIT</strong><span class="chat-listing-footer"><span></span><span>Открыть</span></span></a></div>"#
+            r#"<div class="chat-message-body chat-message-body--listing" data-listing-preview-id="{id}"><a class="chat-listing-card" href="/app/listing/{id}"><div class="chat-listing-brand"><img src="/static/grabit-mascot-v2.png" alt="" width="88" height="53"><strong>GRABIT</strong></div><strong class="chat-listing-title">{title}</strong><span class="chat-listing-footer"><span></span><span>{open_label}</span></span></a></div>"#,
+            title = crate::i18n::t("listing_share_fallback_title"),
+            open_label = crate::i18n::t("common_open"),
         );
     }
 
@@ -824,7 +832,7 @@ pub fn render_group_chat(
     messages: Vec<crate::web::view_models::ChatMessageRow>,
 ) -> String {
     let subtitle = if group_description.trim().is_empty() {
-        ru_count(member_count, "участник", "участника", "участников")
+        plural_count(member_count, "count_member_one", "count_member_few", "count_member_many")
     } else {
         group_description.trim().to_string()
     };
@@ -870,9 +878,9 @@ fn render_chat_thread(
     } else if !safe_username.is_empty() {
         format!("@{}", safe_username)
     } else if other_user_id > 0 {
-        "Участник GRABIT".to_string()
+        crate::i18n::t("member_fallback_name")
     } else {
-        "Группа".to_string()
+        crate::i18n::t("chat_group")
     };
 
     let subtitle = if group_id > 0 && !safe_last_name.is_empty() {
@@ -880,12 +888,12 @@ fn render_chat_thread(
     } else if !safe_username.is_empty() {
         format!("@{}", safe_username)
     } else {
-        "Личный диалог".to_string()
+        crate::i18n::t("direct_dialog_subtitle")
     };
 
     let content = if !authenticated {
         guest_locked_section(
-            "Чат",
+            &crate::i18n::t("chat_title"),
             &if group_id > 0 {
                 format!("/app/group/{group_id}")
             } else if !other_public_id.is_empty() {
@@ -895,7 +903,7 @@ fn render_chat_thread(
             },
         )
     } else if group_id <= 0 && (other_user_id <= 0 || other_user_id == viewer_user_id) {
-        empty_state_card("Чат недоступен", "Диалог недоступен.")
+        empty_state_card(&crate::i18n::t("chat_unavailable_title"), &crate::i18n::t("chat_unavailable_body"))
     } else {
         let first_message_id = messages.first().map(|message| message.id).unwrap_or(0);
 
@@ -904,14 +912,17 @@ fn render_chat_thread(
         let may_have_older = if messages.len() >= 100 { "1" } else { "0" };
 
         let message_cards = if messages.is_empty() {
-            r#"
+            format!(
+                r#"
 <div class="chat-empty-thread">
     <div class="chat-empty-thread-icon" aria-hidden="true"></div>
-    <strong>Диалог открыт</strong>
-    <p>Напишите сообщение.</p>
+    <strong>{title}</strong>
+    <p>{body}</p>
 </div>
-"#
-            .to_string()
+"#,
+                title = crate::i18n::t("chat_empty_thread_title"),
+                body = crate::i18n::t("chat_empty_thread_body"),
+            )
         } else {
             let mut last_date_key = String::new();
 
@@ -947,12 +958,12 @@ fn render_chat_thread(
          hidden>
         <div class="chat-reply-accent"></div>
         <div class="chat-reply-copy">
-            <strong>Ответ</strong>
+            <strong>{reply_label}</strong>
             <span id="chat-reply-text"></span>
         </div>
         <button id="chat-reply-close"
                 type="button"
-                aria-label="Отменить ответ">
+                aria-label="{cancel_reply_aria}">
             ×
         </button>
     </div>
@@ -962,48 +973,70 @@ fn render_chat_thread(
          hidden>
         <div class="chat-forward-accent"></div>
         <div class="chat-reply-copy">
-            <strong>Переслать</strong>
+            <strong>{forward_label}</strong>
             <span id="chat-forward-text"></span>
         </div>
         <button id="chat-forward-close"
                 type="button"
-                aria-label="Отменить пересылку">
+                aria-label="{cancel_forward_aria}">
             ×
         </button>
     </div>
 
-    <div id="chat-emoji-panel" class="chat-emoji-panel" hidden aria-label="Быстрые эмодзи">
-        <button type="button" data-chat-emoji="😀" aria-label="Улыбка">😀</button>
-        <button type="button" data-chat-emoji="😂" aria-label="Смех">😂</button>
-        <button type="button" data-chat-emoji="❤️" aria-label="Сердце">❤️</button>
-        <button type="button" data-chat-emoji="👍" aria-label="Нравится">👍</button>
-        <button type="button" data-chat-emoji="🙏" aria-label="Спасибо">🙏</button>
-        <button type="button" data-chat-emoji="🔥" aria-label="Огонь">🔥</button>
-        <button type="button" data-chat-emoji="🎉" aria-label="Праздник">🎉</button>
-        <button type="button" data-chat-emoji="🤝" aria-label="Договорились">🤝</button>
+    <div id="chat-emoji-panel" class="chat-emoji-panel" hidden aria-label="{quick_emoji_aria}">
+        <button type="button" data-chat-emoji="😀" aria-label="{emoji_smile}">😀</button>
+        <button type="button" data-chat-emoji="😂" aria-label="{emoji_laugh}">😂</button>
+        <button type="button" data-chat-emoji="❤️" aria-label="{emoji_heart}">❤️</button>
+        <button type="button" data-chat-emoji="👍" aria-label="{emoji_like}">👍</button>
+        <button type="button" data-chat-emoji="🙏" aria-label="{emoji_thanks}">🙏</button>
+        <button type="button" data-chat-emoji="🔥" aria-label="{emoji_fire}">🔥</button>
+        <button type="button" data-chat-emoji="🎉" aria-label="{emoji_party}">🎉</button>
+        <button type="button" data-chat-emoji="🤝" aria-label="{emoji_deal}">🤝</button>
     </div>
 
     <div class="chat-composer-main">
-        <button id="chat-emoji-btn" type="button" class="chat-emoji-btn" aria-label="Открыть эмодзи" aria-controls="chat-emoji-panel" aria-expanded="false"><svg class="chat-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 14.5c1 1.2 2.1 1.8 3.5 1.8s2.5-.6 3.5-1.8"></path><path d="M9 9.5h.01M15 9.5h.01"></path></svg></button>
-        <textarea id="chat-input" name="message" rows="1" maxlength="2000" autocomplete="off" enterkeyhint="send" aria-label="Текст сообщения" placeholder="Сообщение…" class="ui-textarea chat-input"></textarea>
-        <button id="chat-image-btn" type="button" class="chat-image-btn" aria-label="Добавить вложение">
+        <button id="chat-emoji-btn" type="button" class="chat-emoji-btn" aria-label="{open_emoji_aria}" aria-controls="chat-emoji-panel" aria-expanded="false"><svg class="chat-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 14.5c1 1.2 2.1 1.8 3.5 1.8s2.5-.6 3.5-1.8"></path><path d="M9 9.5h.01M15 9.5h.01"></path></svg></button>
+        <textarea id="chat-input" name="message" rows="1" maxlength="2000" autocomplete="off" enterkeyhint="send" aria-label="{message_text_aria}" placeholder="{message_placeholder}" class="ui-textarea chat-input"></textarea>
+        <button id="chat-image-btn" type="button" class="chat-image-btn" aria-label="{add_attachment_aria}">
             <span class="chat-action-icon" aria-hidden="true"><svg class="chat-icon" viewBox="0 0 24 24" focusable="false"><path d="M8.5 12.5 14.8 6.2a3 3 0 0 1 4.2 4.2l-7.8 7.8a5 5 0 0 1-7.1-7.1l7.7-7.7"></path></svg></span>
-            <span class="chat-action-label">Вложение</span>
+            <span class="chat-action-label">{attachment_label}</span>
         </button>
     </div>
     <input type="file" id="chat-image-input" accept="image/jpeg,image/png,image/webp" class="chat-file-input">
-    <button id="chat-voice-btn" type="button" class="chat-voice-btn" aria-label="Голосовое">
+    <button id="chat-voice-btn" type="button" class="chat-voice-btn" aria-label="{voice_aria}">
         <span class="chat-action-icon" aria-hidden="true"><svg class="chat-icon" viewBox="0 0 24 24" focusable="false"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M6.5 11.5a5.5 5.5 0 0 0 11 0M12 17v4M9 21h6"></path></svg></span>
-        <span class="chat-action-label">Голос</span>
+        <span class="chat-action-label">{voice_label}</span>
     </button>
-    <button id="chat-send" type="submit" class="ui-button chat-send-button" aria-label="Отправить">
+    <button id="chat-send" type="submit" class="ui-button chat-send-button" aria-label="{send_label}">
         <span class="chat-action-icon" aria-hidden="true"><svg class="chat-icon" viewBox="0 0 24 24" focusable="false"><path d="m4 4 17 8-17 8 3-8-3-8Z"></path><path d="M7 12h14"></path></svg></span>
-        <span class="chat-action-label">Отправить</span>
+        <span class="chat-action-label">{send_label}</span>
     </button>
-    <div class="chat-composer-footer"><span id="chat-send-state">Enter — отправить · Shift+Enter — новая строка</span><span id="chat-counter">0 / 2000</span></div>
+    <div class="chat-composer-footer"><span id="chat-send-state">{send_hint}</span><span id="chat-counter">0 / 2000</span></div>
 </form>
 "#,
-            composer_action = escape_html(&composer_action)
+            composer_action = escape_html(&composer_action),
+            reply_label = crate::i18n::t("chat_reply_label"),
+            cancel_reply_aria = crate::i18n::t("chat_cancel_reply"),
+            forward_label = crate::i18n::t("chat_forward"),
+            cancel_forward_aria = crate::i18n::t("chat_cancel_forward_aria"),
+            quick_emoji_aria = crate::i18n::t("chat_quick_emoji_aria"),
+            emoji_smile = crate::i18n::t("emoji_smile"),
+            emoji_laugh = crate::i18n::t("emoji_laugh"),
+            emoji_heart = crate::i18n::t("emoji_heart"),
+            emoji_like = crate::i18n::t("emoji_like"),
+            emoji_thanks = crate::i18n::t("emoji_thanks"),
+            emoji_fire = crate::i18n::t("emoji_fire"),
+            emoji_party = crate::i18n::t("emoji_party"),
+            emoji_deal = crate::i18n::t("emoji_deal"),
+            open_emoji_aria = crate::i18n::t("chat_open_emoji_aria"),
+            message_text_aria = crate::i18n::t("chat_message_text_aria"),
+            message_placeholder = crate::i18n::t("chat_message_placeholder"),
+            add_attachment_aria = crate::i18n::t("chat_add_attachment_aria"),
+            attachment_label = crate::i18n::t("chat_attachment"),
+            voice_aria = crate::i18n::t("chat_voice"),
+            voice_label = crate::i18n::t("chat_voice_label"),
+            send_label = crate::i18n::t("chat_send_action"),
+            send_hint = crate::i18n::t("chat_send_hint"),
         );
 
         format!(
@@ -1078,7 +1111,7 @@ fn render_chat_thread(
             type="button"
             class="chat-scroll-bottom"
             hidden
-            aria-label="К новым сообщениям">
+            aria-label="{scroll_bottom_aria}">
         <span aria-hidden="true">{arrow_down_icon}</span>
         <span id="chat-scroll-unread"
               class="chat-scroll-unread"
@@ -1110,6 +1143,7 @@ fn render_chat_thread(
             arrow_down_icon = icon("arrow-down"),
             load_older_label = escape_html(&crate::i18n::t("chat_load_older")),
             connecting_label = escape_html(&crate::i18n::t("chat_connecting")),
+            scroll_bottom_aria = crate::i18n::t("chat_scroll_bottom_aria"),
             other_public_id = escape_html(other_public_id),
             viewer_public_id = escape_html(viewer_public_id),
             group_id_attr = if group_id > 0 {
@@ -1159,7 +1193,7 @@ fn render_chat_thread(
             <button id="chat-header-more"
                     type="button"
                     class="chat-header-more"
-                    aria-label="Меню чата"
+                    aria-label="{menu_aria}"
                     aria-expanded="false"
                     aria-controls="chat-header-menu">
                 ⋮
@@ -1174,25 +1208,25 @@ fn render_chat_thread(
                 <button id="chat-sound-toggle"
                         type="button"
                         class="chat-sound-toggle"
-                        aria-label="Звуки чата"
+                        aria-label="{sound_toggle_aria}"
                         aria-pressed="true">
                     <svg class="chat-header-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4Z"/><path d="M15 9a4 4 0 0 1 0 6"/><path d="M18 6a8 8 0 0 1 0 12"/></svg>
-                    <span class="chat-header-menu-label">Звуки включены</span>
+                    <span class="chat-header-menu-label">{sound_on_label}</span>
                 </button>
                 <button id="chat-haptic-toggle"
                         type="button"
                         class="chat-sound-toggle chat-haptic-toggle"
-                        aria-label="Вибрация чата"
+                        aria-label="{haptic_toggle_aria}"
                         aria-pressed="true">
                     <svg class="chat-header-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M4 8v8M20 8v8"/></svg>
-                    <span class="chat-header-menu-label">Вибрация включена</span>
+                    <span class="chat-header-menu-label">{haptic_on_label}</span>
                 </button>
                 <button id="chat-block-toggle"
                         type="button"
                         class="chat-block-toggle"
                         hidden>
                     <svg class="chat-header-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></svg>
-                    <span class="chat-header-menu-label">Заблокировать</span>
+                    <span class="chat-header-menu-label">{block_label}</span>
                 </button>
                 {group_menu}
             </div>
@@ -1203,7 +1237,13 @@ fn render_chat_thread(
 </section>
 
 {content}"####,
-        back_link = back_link("/app/messages", "Назад", "arrow-left"),
+        back_link = back_link("/app/messages", &crate::i18n::t("common_back"), "arrow-left"),
+        menu_aria = crate::i18n::t("chat_menu_aria"),
+        sound_toggle_aria = crate::i18n::t("chat_sound_toggle_aria"),
+        sound_on_label = crate::i18n::t("chat_sound_on_label"),
+        haptic_toggle_aria = crate::i18n::t("chat_haptic_toggle_aria"),
+        haptic_on_label = crate::i18n::t("chat_haptic_on_label"),
+        block_label = crate::i18n::t("chat_block_label"),
         header_avatar = if other_user_id > 0 && !other_public_id.is_empty() {
             format!(
                 r#"<img class="rm-me-avatar-img" src="/api/public-avatars/{public_id}" alt="" onerror="this.remove()">{icon}"#,
@@ -1220,7 +1260,8 @@ fn render_chat_thread(
         },
         group_menu = if group_id > 0 {
             format!(
-                r#"<a href="/app/group/{group_id}/members" class="chat-sound-toggle">Управление группой</a>"#
+                r#"<a href="/app/group/{group_id}/members" class="chat-sound-toggle">{manage_group}</a>"#,
+                manage_group = crate::i18n::t("manage_group_link"),
             )
         } else {
             String::new()
@@ -1232,12 +1273,12 @@ fn render_chat_thread(
     );
 
     page_document(
-        "Чат · GRABIT",
+        &format!("{} · GRABIT", crate::i18n::t("chat_title")),
         r#"<script>document.documentElement.dataset.page="chat";</script>"#,
         "",
         &format!(
             "{topbar}\n\n{content}",
-            topbar = topbar("Чат", "message-circle"),
+            topbar = topbar(&crate::i18n::t("chat_title"), "message-circle"),
             content = content_html,
         ),
         &bottom_nav("chats"),
@@ -1272,11 +1313,11 @@ pub struct OfficialGroupsPage<'a> {
 
 pub fn render_official_groups(params: OfficialGroupsPage<'_>) -> String {
     let level = match params.scope_type {
-        "world" => "Мир",
-        "continent" => "Континент",
-        "country" => "Страна",
-        "city" => "Город",
-        _ => "Место",
+        "world" => crate::i18n::t("explore_icon_world"),
+        "continent" => crate::i18n::t("map_continent"),
+        "country" => crate::i18n::t("level_country"),
+        "city" => crate::i18n::t("map_city_label"),
+        _ => crate::i18n::t("place_selector_title"),
     };
     let current_href = format!(
         "/app/official-groups?scope_type={}&scope_id={}",
@@ -1292,7 +1333,7 @@ pub fn render_official_groups(params: OfficialGroupsPage<'_>) -> String {
             "arrow-left",
         )
     } else {
-        back_link("/app/messages", "Чаты", "arrow-left")
+        back_link("/app/messages", &crate::i18n::t("chat_title"), "arrow-left")
     };
     let error_html = if params.error.is_empty() {
         String::new()
@@ -1302,47 +1343,55 @@ pub fn render_official_groups(params: OfficialGroupsPage<'_>) -> String {
     let group_card = if params.group_id > 0 && params.is_member {
         format!(
             r#"<section class="card official-group-current">
-    <span class="chat-official-group">✓ Официальная группа</span>
+    <span class="chat-official-group">✓ {badge}</span>
     <h2>{name}</h2>
-    <p class="card-meta">{members} участников · история доступна после вступления</p>
-    <a class="ui-button" href="/app/group/{group_id}">Открыть чат</a>
+    <p class="card-meta">{members} {history_note}</p>
+    <a class="ui-button" href="/app/group/{group_id}">{open_chat}</a>
 </section>"#,
+            badge = crate::i18n::t("nearby_official_group"),
             name = escape_html(params.name),
-            members = params.member_count,
+            members = plural_count(params.member_count, "count_member_one", "count_member_few", "count_member_many"),
+            history_note = crate::i18n::t("official_group_history_note"),
+            open_chat = crate::i18n::t("open_chat_action"),
             group_id = params.group_id,
         )
     } else if params.authenticated {
         format!(
             r#"<form method="post" action="/app/official-groups/{scope_type}/{scope_id}/join" class="card official-group-current">
-    <span class="chat-official-group">✓ Официальная группа GRABIT</span>
+    <span class="chat-official-group">✓ {badge}</span>
     <h2>{name}</h2>
-    <p class="card-meta">{status} · история группы доступна после вступления</p>
-    <button class="ui-button" type="submit">Вступить в группу</button>
+    <p class="card-meta">{status} · {join_history_note}</p>
+    <button class="ui-button" type="submit">{join_button}</button>
 </form>"#,
+            badge = crate::i18n::t("official_badge_grabit"),
             scope_type = params.scope_type,
             scope_id = params.scope_id,
             name = escape_html(params.name),
             status = if params.group_id > 0 {
-                format!("{} участников", params.member_count)
+                plural_count(params.member_count, "count_member_one", "count_member_few", "count_member_many")
             } else {
-                "Готова к первому участнику".to_string()
+                crate::i18n::t("official_group_ready_first")
             },
+            join_history_note = crate::i18n::t("official_group_join_history_note"),
+            join_button = crate::i18n::t("join_group_button"),
         )
     } else {
         let next = urlencoding::encode(&current_href);
         format!(
             r#"<section class="card official-group-current">
-    <span class="chat-official-group">✓ Официальная группа GRABIT</span>
+    <span class="chat-official-group">✓ {badge}</span>
     <h2>{name}</h2>
     <p class="card-meta">{status}</p>
-    <a class="ui-button" href="/login?next={next}">Войти и вступить</a>
+    <a class="ui-button" href="/login?next={next}">{login_join}</a>
 </section>"#,
+            badge = crate::i18n::t("official_badge_grabit"),
             name = escape_html(params.name),
             status = if params.group_id > 0 {
-                format!("{} участников", params.member_count)
+                plural_count(params.member_count, "count_member_one", "count_member_few", "count_member_many")
             } else {
-                "Готова к первому участнику".to_string()
+                crate::i18n::t("official_group_ready_first")
             },
+            login_join = crate::i18n::t("login_and_join_button"),
         )
     };
     let search = if params.scope_type == "city" {
@@ -1352,12 +1401,14 @@ pub fn render_official_groups(params: OfficialGroupsPage<'_>) -> String {
             r#"<form method="get" action="/app/official-groups" class="official-group-search">
     <input type="hidden" name="scope_type" value="{scope_type}">
     <input type="hidden" name="scope_id" value="{scope_id}">
-    <input class="ui-input" type="search" name="q" maxlength="80" value="{query}" placeholder="Найти место" aria-label="Найти место">
-    <button class="ui-button ui-button--secondary" type="submit">Найти</button>
+    <input class="ui-input" type="search" name="q" maxlength="80" value="{query}" placeholder="{find_place}" aria-label="{find_place}">
+    <button class="ui-button ui-button--secondary" type="submit">{find}</button>
 </form>"#,
             scope_type = params.scope_type,
             scope_id = params.scope_id,
             query = escape_html(params.query),
+            find_place = crate::i18n::t("find_place_placeholder"),
+            find = crate::i18n::t("common_find"),
         )
     };
     let children = if params.children.is_empty() {
@@ -1365,8 +1416,8 @@ pub fn render_official_groups(params: OfficialGroupsPage<'_>) -> String {
             String::new()
         } else {
             empty_state_card(
-                "Ничего не найдено",
-                "Измените запрос или вернитесь уровнем выше.",
+                &crate::i18n::t("nothing_found_title"),
+                &crate::i18n::t("refine_search_body"),
             )
         }
     } else {
@@ -1375,9 +1426,13 @@ pub fn render_official_groups(params: OfficialGroupsPage<'_>) -> String {
             .iter()
             .map(|place| {
                 let status = if place.group_id > 0 {
-                    format!("✓ Открыта · {} участников", place.member_count)
+                    format!(
+                        "✓ {} · {}",
+                        crate::i18n::t("place_open_label"),
+                        plural_count(place.member_count, "count_member_one", "count_member_few", "count_member_many")
+                    )
                 } else {
-                    "Готова к вступлению".to_string()
+                    crate::i18n::t("place_ready_label")
                 };
                 format!(
                     r#"<a class="card official-group-place" href="/app/official-groups?scope_type={scope_type}&scope_id={scope_id}">
@@ -1397,20 +1452,21 @@ pub fn render_official_groups(params: OfficialGroupsPage<'_>) -> String {
             .join("")
     };
     let next_level = match params.scope_type {
-        "world" => "Континенты",
-        "continent" => "Страны",
-        "country" => "Города",
-        _ => "",
+        "world" => crate::i18n::t("map_continents"),
+        "continent" => crate::i18n::t("map_countries"),
+        "country" => crate::i18n::t("map_cities"),
+        _ => String::new(),
     };
     let directory = if next_level.is_empty() {
         String::new()
     } else {
         format!(
             r#"<section class="official-group-directory">
-    <div class="section-head"><div><h2 class="section-title">{next_level}</h2><p class="section-caption">Выберите следующий уровень географии</p></div></div>
+    <div class="section-head"><div><h2 class="section-title">{next_level}</h2><p class="section-caption">{choose_next_level}</p></div></div>
     {search}
     <div class="official-group-grid">{children}</div>
-</section>"#
+</section>"#,
+            choose_next_level = crate::i18n::t("choose_next_level_caption"),
         )
     };
     let content = format!(
@@ -1418,22 +1474,24 @@ pub fn render_official_groups(params: OfficialGroupsPage<'_>) -> String {
 <link rel="stylesheet" href="{communication_polish_css}">
 {error_html}{group_card}
 <aside class="card official-group-note">
-    <strong>Официальное пространство GRABIT</strong>
-    <span>Группа принадлежит платформе и запускается автоматически при первом вступлении. Первый участник не получает особых прав.</span>
+    <strong>{official_space_title}</strong>
+    <span>{official_space_body}</span>
 </aside>
 {directory}"#,
+        official_space_title = crate::i18n::t("official_space_title"),
+        official_space_body = crate::i18n::t("official_space_body"),
         chat_mature_css = static_asset("chat-mature.css"),
         communication_polish_css = static_asset("communication-polish.css"),
     );
     page_shell(
-        "Официальные группы · GRABIT",
-        &topbar("Группы", "users"),
+        &format!("{} · GRABIT", crate::i18n::t("official_groups_page_title")),
+        &topbar(&crate::i18n::t("common_groups"), "users"),
         &back_hero(
             &back,
             "globe",
-            level,
+            &level,
             params.name,
-            "Мир → континент → страна → город",
+            &crate::i18n::t("official_groups_breadcrumb_hint"),
         ),
         &content,
         &bottom_nav("chats"),
@@ -1442,10 +1500,13 @@ pub fn render_official_groups(params: OfficialGroupsPage<'_>) -> String {
 
 pub fn render_new_group(authenticated: bool, partners: Vec<(i64, String)>, error: &str) -> String {
     let page_content = if !authenticated {
-        guest_locked_section("Группа", "/app/groups/new")
+        guest_locked_section(&crate::i18n::t("chat_group"), "/app/groups/new")
     } else {
         let people = if partners.is_empty() {
-            r#"<p class="card-meta">Сначала напишите кому-нибудь в личный чат — потом их можно добавить в группу.</p>"#.to_string()
+            format!(
+                r#"<p class="card-meta">{}</p>"#,
+                crate::i18n::t("new_group_no_partners_body")
+            )
         } else {
             partners
                 .iter()
@@ -1470,16 +1531,16 @@ pub fn render_new_group(authenticated: bool, partners: Vec<(i64, String)>, error
         format!(
             r#"<form method="post" action="/app/groups" class="card rm-group-create" id="rm-group-create">
     <label class="rm-profile-field">
-        <div class="rm-profile-field-label">Название группы</div>
-        <input class="ui-input" name="name" maxlength="80" required placeholder="Например: соседи по двору">
+        <div class="rm-profile-field-label">{field_group_name}</div>
+        <input class="ui-input" name="name" maxlength="80" required placeholder="{group_name_placeholder}">
     </label>
     <div class="rm-profile-field rm-profile-field--spaced">
-        <div class="rm-profile-field-label">Участники</div>
+        <div class="rm-profile-field-label">{members_label}</div>
         <div class="rm-group-members">{people}</div>
     </div>
     <input type="hidden" name="member_ids" id="rm-group-member-ids" value="">
     {error_html}
-    <button type="submit" class="ui-button">Создать группу</button>
+    <button type="submit" class="ui-button">{create_button}</button>
 </form>
 <script>
 (function () {{
@@ -1495,8 +1556,12 @@ pub fn render_new_group(authenticated: bool, partners: Vec<(i64, String)>, error
     }});
 }})();
 </script>"#,
+            field_group_name = crate::i18n::t("field_group_name"),
+            group_name_placeholder = crate::i18n::t("group_name_placeholder"),
+            members_label = crate::i18n::t("chat_members"),
             people = people,
             error_html = error_html,
+            create_button = crate::i18n::t("chat_new_group"),
         )
     };
 
@@ -1507,14 +1572,14 @@ pub fn render_new_group(authenticated: bool, partners: Vec<(i64, String)>, error
     );
 
     page_shell(
-        "Новая группа · GRABIT",
-        &topbar("Группа", "users"),
+        &format!("{} · GRABIT", crate::i18n::t("new_group_page_title")),
+        &topbar(&crate::i18n::t("chat_group"), "users"),
         &back_hero(
-            &back_link("/app/messages", "Чаты", "arrow-left"),
+            &back_link("/app/messages", &crate::i18n::t("chat_title"), "arrow-left"),
             "users",
-            "Группа",
-            "Новая группа",
-            "Название и участники. Чат сразу общий.",
+            &crate::i18n::t("chat_group"),
+            &crate::i18n::t("new_group_page_title"),
+            &crate::i18n::t("new_group_hero_copy"),
         ),
         &content,
         &bottom_nav("chats"),
@@ -1557,9 +1622,9 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
     } = params;
     let authenticated = viewer_user_id > 0;
     let page_content = if !authenticated {
-        guest_locked_section("Группа", &format!("/app/group/{group_id}/members"))
+        guest_locked_section(&crate::i18n::t("chat_group"), &format!("/app/group/{group_id}/members"))
     } else if error == "Нет доступа" {
-        empty_state_card("Нет доступа", "Этой группы для вас нет.")
+        empty_state_card(&crate::i18n::t("no_access_title"), &crate::i18n::t("no_access_body"))
     } else {
         let is_owner = viewer_role == "owner";
         let can_manage = is_owner || viewer_role == "admin";
@@ -1568,14 +1633,14 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
             .iter()
             .map(|(id, member, role, muted_until)| {
                 let role_label = match role.as_str() {
-                    "owner" => "Владелец",
-                    "admin" => "Администратор",
-                    _ => "Участник",
+                    "owner" => crate::i18n::t("role_owner"),
+                    "admin" => crate::i18n::t("role_admin"),
+                    _ => crate::i18n::t("role_member"),
                 };
                 let you = if *id == viewer_user_id {
-                    r#"<span class="rm-group-you">Вы</span>"#
+                    format!(r#"<span class="rm-group-you">{}</span>"#, crate::i18n::t("chat_you"))
                 } else {
-                    ""
+                    String::new()
                 };
                 let role_action = if !is_official
                     && is_owner
@@ -1583,9 +1648,9 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
                     && role != "owner"
                 {
                     let (next_role, label) = if role == "admin" {
-                        ("member", "Сделать участником")
+                        ("member", crate::i18n::t("make_member_action"))
                     } else {
-                        ("admin", "Сделать администратором")
+                        ("admin", crate::i18n::t("make_admin_action"))
                     };
                     format!(
                         r#"<form method="post" action="/app/group/{group_id}/members/{id}/role">
@@ -1602,9 +1667,11 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
                     && role != "owner"
                 {
                     format!(
-                        r#"<form method="post" action="/app/group/{group_id}/members/{id}/owner" data-confirm="Передать этому участнику права владельца группы?">
-    <button type="submit" class="rm-group-action">Передать владение</button>
-</form>"#
+                        r#"<form method="post" action="/app/group/{group_id}/members/{id}/owner" data-confirm="{confirm}">
+    <button type="submit" class="rm-group-action">{label}</button>
+</form>"#,
+                        confirm = crate::i18n::t("confirm_transfer_ownership"),
+                        label = crate::i18n::t("transfer_ownership_button"),
                     )
                 } else {
                     String::new()
@@ -1614,9 +1681,11 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
                         || (viewer_role == "admin" && role == "member"));
                 let remove_action = if can_remove {
                     format!(
-                        r#"<form method="post" action="/app/group/{group_id}/members/{id}/remove" data-confirm="Удалить участника из группы?">
-    <button type="submit" class="rm-group-action rm-group-action--danger">Удалить</button>
-</form>"#
+                        r#"<form method="post" action="/app/group/{group_id}/members/{id}/remove" data-confirm="{confirm}">
+    <button type="submit" class="rm-group-action rm-group-action--danger">{label}</button>
+</form>"#,
+                        confirm = crate::i18n::t("confirm_remove_member"),
+                        label = crate::i18n::t("chat_delete"),
                     )
                 } else {
                     String::new()
@@ -1631,27 +1700,35 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
                     format!(
                         r#"<form method="post" action="/app/group/{group_id}/members/{id}/mute">
     <input type="hidden" name="seconds" value="0">
-    <button type="submit" class="rm-group-action">Разрешить писать</button>
-</form>"#
+    <button type="submit" class="rm-group-action">{label}</button>
+</form>"#,
+                        label = crate::i18n::t("allow_write_button"),
                     )
                 } else {
                     format!(
                         r#"<form method="post" action="/app/group/{group_id}/members/{id}/mute" class="rm-group-mute-form">
-    <select name="seconds" class="ui-input" aria-label="Срок ограничения">
-        <option value="600">10 минут</option>
-        <option value="3600">1 час</option>
-        <option value="86400">24 часа</option>
-        <option value="604800">7 дней</option>
-        <option value="2592000">30 дней</option>
+    <select name="seconds" class="ui-input" aria-label="{duration_aria}">
+        <option value="600">{d10min}</option>
+        <option value="3600">{d1h}</option>
+        <option value="86400">{d24h}</option>
+        <option value="604800">{d7d}</option>
+        <option value="2592000">{d30d}</option>
     </select>
-    <button type="submit" class="rm-group-action">Ограничить</button>
-</form>"#
+    <button type="submit" class="rm-group-action">{restrict}</button>
+</form>"#,
+                        duration_aria = crate::i18n::t("mute_duration_aria"),
+                        d10min = crate::i18n::t("duration_10min"),
+                        d1h = crate::i18n::t("duration_1h"),
+                        d24h = crate::i18n::t("duration_24h"),
+                        d7d = crate::i18n::t("duration_7d"),
+                        d30d = crate::i18n::t("duration_30d"),
+                        restrict = crate::i18n::t("restrict_button"),
                     )
                 };
                 let mute_status = if is_muted {
-                    r#"<span class="rm-group-you">Не может писать</span>"#
+                    format!(r#"<span class="rm-group-you">{}</span>"#, crate::i18n::t("cannot_write_tag"))
                 } else {
-                    ""
+                    String::new()
                 };
                 format!(
                     r#"<article class="rm-group-member rm-group-member--managed">
@@ -1669,7 +1746,11 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
         let add = if is_official || !can_manage {
             String::new()
         } else if candidates.is_empty() {
-            r#"<section class="card rm-group-create"><div class="rm-profile-field-label">Добавить участников</div><p class="card-meta">Все доступные собеседники уже в этой группе.</p></section>"#.to_string()
+            format!(
+                r#"<section class="card rm-group-create"><div class="rm-profile-field-label">{heading}</div><p class="card-meta">{body}</p></section>"#,
+                heading = crate::i18n::t("add_members_heading"),
+                body = crate::i18n::t("all_contacts_in_group"),
+            )
         } else {
             let boxes = candidates
                 .iter()
@@ -1683,13 +1764,16 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
                 .join("");
             format!(
                 r#"<form method="post" action="/app/group/{group_id}/members" class="card rm-group-create" id="rm-group-add">
-    <div class="rm-profile-field-label">Добавить участников</div>
-    <input class="ui-input" id="rm-group-member-search" type="search" placeholder="Найти по имени" autocomplete="off">
+    <div class="rm-profile-field-label">{heading}</div>
+    <input class="ui-input" id="rm-group-member-search" type="search" placeholder="{find_by_name}" autocomplete="off">
     <div class="rm-group-members">{boxes}</div>
     <input type="hidden" name="member_ids" id="rm-group-member-ids" value="">
-    <button type="submit" class="ui-button">Добавить в группу</button>
+    <button type="submit" class="ui-button">{add_button}</button>
 </form>"#,
+                heading = crate::i18n::t("add_members_heading"),
+                find_by_name = crate::i18n::t("find_by_name_placeholder"),
                 boxes = boxes,
+                add_button = crate::i18n::t("add_to_group_button"),
             )
         };
         let name_readonly = if is_official { "readonly" } else { "" };
@@ -1697,18 +1781,22 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
             format!(
                 r#"<form method="post" action="/app/group/{group_id}/settings/name" class="card rm-group-create">
     <label class="rm-profile-field">
-        <div class="rm-profile-field-label">Название группы</div>
+        <div class="rm-profile-field-label">{field_group_name}</div>
         <input class="ui-input" name="name" maxlength="80" required value="{name}" {name_readonly}>
     </label>
     <label class="rm-profile-field">
-        <div class="rm-profile-field-label">Описание</div>
-        <textarea class="ui-input" name="description" maxlength="500" rows="4" placeholder="О чём эта группа">{description}</textarea>
+        <div class="rm-profile-field-label">{field_description}</div>
+        <textarea class="ui-input" name="description" maxlength="500" rows="4" placeholder="{description_placeholder}">{description}</textarea>
     </label>
-    <button type="submit" class="ui-button ui-button--secondary">Сохранить информацию</button>
+    <button type="submit" class="ui-button ui-button--secondary">{save_info}</button>
 </form>"#,
+                field_group_name = crate::i18n::t("field_group_name"),
+                field_description = crate::i18n::t("field_description"),
+                description_placeholder = crate::i18n::t("group_description_placeholder"),
                 name = escape_html(name),
                 description = escape_html(description),
                 name_readonly = name_readonly,
+                save_info = crate::i18n::t("save_info_button"),
             )
         } else {
             String::new()
@@ -1722,29 +1810,38 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
         let invite = if can_manage && !is_official {
             format!(
                 r#"<section class="card rm-group-create">
-    <div class="rm-profile-field-label">Приглашение в группу</div>
-    <p class="card-meta">Ссылка действует 7 дней. Новая ссылка автоматически отключает предыдущую.</p>
+    <div class="rm-profile-field-label">{invite_heading}</div>
+    <p class="card-meta">{invite_note}</p>
     <div class="rm-group-invite-actions">
         <form method="post" action="/app/group/{group_id}/invite/create">
-            <button type="submit" class="ui-button">Создать новую ссылку</button>
+            <button type="submit" class="ui-button">{create_link}</button>
         </form>
-        <form method="post" action="/app/group/{group_id}/invite/revoke" data-confirm="Отключить действующую ссылку-приглашение?">
-            <button type="submit" class="ui-button ui-button--secondary">Отключить ссылку</button>
+        <form method="post" action="/app/group/{group_id}/invite/revoke" data-confirm="{revoke_confirm}">
+            <button type="submit" class="ui-button ui-button--secondary">{revoke_link}</button>
         </form>
     </div>
     <div id="rm-group-invite-ready" class="rm-group-invite-ready" {invite_ready_hidden}>
         <label class="rm-profile-field">
-            <div class="rm-profile-field-label">Готовая ссылка</div>
+            <div class="rm-profile-field-label">{ready_link_label}</div>
             <input id="rm-group-invite-url" class="ui-input" readonly value="{invite_url}">
         </label>
         <button id="rm-group-invite-share" type="button" class="ui-button" data-share
-                data-share-title="GRABIT · группа"
-                data-share-text="Присоединяйтесь к нашей группе в GRABIT."
+                data-share-title="{share_title}"
+                data-share-text="{share_text}"
                 data-share-url="{invite_url}">
-            Отправить приглашение
+            {send_invite}
         </button>
     </div>
 </section>"#,
+                invite_heading = crate::i18n::t("group_invite_heading"),
+                invite_note = crate::i18n::t("invite_link_note"),
+                create_link = crate::i18n::t("create_invite_link_button"),
+                revoke_confirm = crate::i18n::t("confirm_revoke_invite"),
+                revoke_link = crate::i18n::t("revoke_invite_button"),
+                ready_link_label = crate::i18n::t("ready_link_label"),
+                share_title = crate::i18n::t("group_share_title"),
+                share_text = crate::i18n::t("group_share_text"),
+                send_invite = crate::i18n::t("send_invite_button"),
                 invite_url = escape_html(&invite_url),
                 invite_ready_hidden = invite_ready_hidden,
             )
@@ -1754,38 +1851,52 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
         let avatar = if can_manage {
             format!(
                 r#"<section class="card rm-group-create">
-    <div class="rm-profile-field-label">Фото группы</div>
+    <div class="rm-profile-field-label">{heading}</div>
     <div class="rm-group-avatar-preview">
         <img src="/api/group/{group_id}/avatar" alt="" onerror="this.hidden=true">
     </div>
     <form method="post" action="/app/group/{group_id}/avatar" enctype="multipart/form-data">
         <input class="ui-input" type="file" name="image" accept="image/jpeg,image/png,image/webp" required>
-        <button type="submit" class="ui-button">Загрузить фото</button>
+        <button type="submit" class="ui-button">{upload}</button>
     </form>
-    <form method="post" action="/app/group/{group_id}/avatar/delete" data-confirm="Удалить фото группы?">
-        <button type="submit" class="ui-button ui-button--secondary">Удалить фото</button>
+    <form method="post" action="/app/group/{group_id}/avatar/delete" data-confirm="{confirm}">
+        <button type="submit" class="ui-button ui-button--secondary">{delete_photo}</button>
     </form>
-</section>"#
+</section>"#,
+                heading = crate::i18n::t("group_photo_heading"),
+                upload = crate::i18n::t("upload_photo_button"),
+                confirm = crate::i18n::t("confirm_delete_group_photo"),
+                delete_photo = crate::i18n::t("delete_photo_button"),
             )
         } else {
             String::new()
         };
         let leave = if is_owner && !is_official {
-            r#"<section class="card rm-group-create"><div class="rm-profile-field-label">Вы владелец группы</div><p class="card-meta">Перед выходом передайте владение другому участнику. Так группа не останется без управления.</p></section>"#.to_string()
+            format!(
+                r#"<section class="card rm-group-create"><div class="rm-profile-field-label">{heading}</div><p class="card-meta">{body}</p></section>"#,
+                heading = crate::i18n::t("you_are_owner_heading"),
+                body = crate::i18n::t("owner_leave_warning"),
+            )
         } else {
             format!(
-                r#"<form method="post" action="/app/group/{group_id}/leave" class="card rm-group-create" data-confirm="Выйти из этой группы?">
-    <button type="submit" class="ui-button ui-button--danger">Выйти из группы</button>
-</form>"#
+                r#"<form method="post" action="/app/group/{group_id}/leave" class="card rm-group-create" data-confirm="{confirm}">
+    <button type="submit" class="ui-button ui-button--danger">{label}</button>
+</form>"#,
+                confirm = crate::i18n::t("confirm_leave_group"),
+                label = crate::i18n::t("leave_group_button"),
             )
         };
         let delete_group = if is_owner && !is_official {
             format!(
-                r#"<form method="post" action="/app/group/{group_id}/delete" class="card rm-group-create rm-group-danger-zone" data-confirm="Удалить группу навсегда? Сообщения и приглашение будут удалены для всех участников.">
-    <div class="rm-profile-field-label">Удаление группы</div>
-    <p class="card-meta">Это действие доступно только владельцу и не отменяется.</p>
-    <button type="submit" class="ui-button ui-button--danger">Удалить группу</button>
-</form>"#
+                r#"<form method="post" action="/app/group/{group_id}/delete" class="card rm-group-create rm-group-danger-zone" data-confirm="{confirm}">
+    <div class="rm-profile-field-label">{heading}</div>
+    <p class="card-meta">{note}</p>
+    <button type="submit" class="ui-button ui-button--danger">{label}</button>
+</form>"#,
+                confirm = crate::i18n::t("confirm_delete_group"),
+                heading = crate::i18n::t("delete_group_heading"),
+                note = crate::i18n::t("owner_only_irreversible_note"),
+                label = crate::i18n::t("delete_group_button"),
             )
         } else {
             String::new()
@@ -1797,19 +1908,26 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
             format!(
                 r#"<form method="get" action="/app/group/{group_id}/members" class="rm-group-member-search">
     <label class="rm-profile-field">
-        <div class="rm-profile-field-label">Поиск участника</div>
-        <input class="ui-input" type="search" name="q" maxlength="80" value="{member_query}" placeholder="Имя или логин" autocomplete="off">
+        <div class="rm-profile-field-label">{search_label}</div>
+        <input class="ui-input" type="search" name="q" maxlength="80" value="{member_query}" placeholder="{name_or_login}" autocomplete="off">
     </label>
     <div class="rm-group-invite-actions">
-        <button type="submit" class="ui-button ui-button--secondary">Найти</button>
-        <a class="ui-button ui-button--secondary" href="/app/group/{group_id}/members">Сбросить</a>
+        <button type="submit" class="ui-button ui-button--secondary">{find}</button>
+        <a class="ui-button ui-button--secondary" href="/app/group/{group_id}/members">{reset}</a>
     </div>
 </form>"#,
+                search_label = crate::i18n::t("search_member_label"),
+                name_or_login = crate::i18n::t("name_or_login_placeholder"),
                 member_query = escape_html(&member_query),
+                find = crate::i18n::t("common_find"),
+                reset = crate::i18n::t("reset_link"),
             )
         };
         let next_members = next_after.map_or_else(String::new, |after| {
-            format!(r#"<a class="ui-button ui-button--secondary" href="/app/group/{group_id}/members?q={encoded_member_query}&after={after}">Показать следующих</a>"#)
+            format!(
+                r#"<a class="ui-button ui-button--secondary" href="/app/group/{group_id}/members?q={encoded_member_query}&after={after}">{show_more}</a>"#,
+                show_more = crate::i18n::t("show_more_members_link"),
+            )
         });
         let member_count_label = if is_official {
             member_count.to_string()
@@ -1817,11 +1935,11 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
             format!("{member_count} / 250")
         };
         let empty_members = if is_official && !can_manage {
-            r#"<p class="card-meta">Список участников официальной группы скрыт для защиты приватности. Вы продолжаете видеть авторов сообщений внутри чата.</p>"#
+            format!(r#"<p class="card-meta">{}</p>"#, crate::i18n::t("official_members_hidden_note"))
         } else if members.is_empty() {
-            r#"<p class="card-meta">Участники не найдены.</p>"#
+            format!(r#"<p class="card-meta">{}</p>"#, crate::i18n::t("no_members_found"))
         } else {
-            ""
+            String::new()
         };
         let blocked = if !is_official || !can_manage || blocked_members.is_empty() {
             String::new()
@@ -1831,25 +1949,37 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
                 .map(|(id, member)| {
                     format!(
                         r#"<article class="rm-group-member rm-group-member--managed">
-    <div class="rm-group-member-copy"><strong>{member}</strong><div class="rm-group-member-meta"><span class="rm-group-you">Доступ заблокирован</span></div></div>
-    <div class="rm-group-actions"><form method="post" action="/app/group/{group_id}/members/{id}/restore" data-confirm="Восстановить возможность вступления в официальную группу?"><button type="submit" class="rm-group-action">Восстановить доступ</button></form></div>
+    <div class="rm-group-member-copy"><strong>{member}</strong><div class="rm-group-member-meta"><span class="rm-group-you">{blocked_tag}</span></div></div>
+    <div class="rm-group-actions"><form method="post" action="/app/group/{group_id}/members/{id}/restore" data-confirm="{restore_confirm}"><button type="submit" class="rm-group-action">{restore_button}</button></form></div>
 </article>"#,
                         member = escape_html(member),
+                        blocked_tag = crate::i18n::t("access_blocked_tag"),
+                        restore_confirm = crate::i18n::t("confirm_restore_access"),
+                        restore_button = crate::i18n::t("restore_access_button"),
                     )
                 })
                 .collect::<Vec<_>>()
                 .join("");
             format!(
-                r#"<section class="card rm-group-create"><div class="rm-group-section-head"><div class="rm-profile-field-label">Заблокированные</div><span class="rm-group-count">{count}</span></div><div class="rm-group-members">{rows}</div></section>"#,
+                r#"<section class="card rm-group-create"><div class="rm-group-section-head"><div class="rm-profile-field-label">{heading}</div><span class="rm-group-count">{count}</span></div><div class="rm-group-members">{rows}</div></section>"#,
+                heading = crate::i18n::t("blocked_heading"),
                 count = blocked_members.len(),
             )
         };
         let governance = if !is_official {
             String::new()
         } else if can_manage {
-            r#"<section class="card rm-group-create"><div class="rm-profile-field-label">Вы управляете этой территорией</div><p class="card-meta">Права действуют по вашему административному назначению. Сама официальная группа принадлежит платформе GRABIT.</p></section>"#.to_string()
+            format!(
+                r#"<section class="card rm-group-create"><div class="rm-profile-field-label">{heading}</div><p class="card-meta">{body}</p></section>"#,
+                heading = crate::i18n::t("you_manage_territory_heading"),
+                body = crate::i18n::t("territory_manage_note"),
+            )
         } else {
-            r#"<section class="card rm-group-create"><div class="rm-profile-field-label">Официальная группа GRABIT</div><p class="card-meta">У группы нет человеческого владельца. Права управления определяются только действующим административным назначением территории.</p></section>"#.to_string()
+            format!(
+                r#"<section class="card rm-group-create"><div class="rm-profile-field-label">{heading}</div><p class="card-meta">{body}</p></section>"#,
+                heading = crate::i18n::t("official_badge_grabit"),
+                body = crate::i18n::t("no_human_owner_note"),
+            )
         };
         format!(
             r#"{governance}
@@ -1857,7 +1987,7 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
 {avatar}
 {invite}
 <section class="card rm-group-create">
-    <div class="rm-group-section-head"><div class="rm-profile-field-label">Участники</div><span class="rm-group-count">{member_count_label}</span></div>
+    <div class="rm-group-section-head"><div class="rm-profile-field-label">{members_label}</div><span class="rm-group-count">{member_count_label}</span></div>
     {member_search}
     <div class="rm-group-members">{list}</div>
     {empty_members}
@@ -1898,20 +2028,27 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
             }});
         }});
     }}
+    var confirmDialogTitle = {confirm_dialog_title};
+    var confirmCancelLabel = {confirm_cancel_label};
+    var confirmContinueLabel = {confirm_continue_label};
+    var confirmDefaultMessage = {confirm_default_message};
     function confirmAction(message) {{
         return new Promise(function (resolve) {{
             var dialog = document.createElement("dialog");
             dialog.className = "rm-confirm-dialog";
             dialog.innerHTML =
                 '<form method="dialog">' +
-                    '<h2>Подтвердите действие</h2>' +
+                    '<h2></h2>' +
                     '<p></p>' +
                     '<div class="rm-confirm-actions">' +
-                        '<button value="cancel" type="submit">Отмена</button>' +
-                        '<button value="confirm" type="submit" class="is-danger">Продолжить</button>' +
+                        '<button value="cancel" type="submit"></button>' +
+                        '<button value="confirm" type="submit" class="is-danger"></button>' +
                     '</div>' +
                 '</form>';
+            dialog.querySelector("h2").textContent = confirmDialogTitle;
             dialog.querySelector("p").textContent = message;
+            dialog.querySelector('[value="cancel"]').textContent = confirmCancelLabel;
+            dialog.querySelector('[value="confirm"]').textContent = confirmContinueLabel;
             dialog.addEventListener("close", function () {{
                 var accepted = dialog.returnValue === "confirm";
                 dialog.remove();
@@ -1926,7 +2063,7 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
         form.addEventListener("submit", async function (event) {{
             if (form.dataset.confirmed === "1") return;
             event.preventDefault();
-            var accepted = await confirmAction(form.getAttribute("data-confirm") || "Продолжить?");
+            var accepted = await confirmAction(form.getAttribute("data-confirm") || confirmDefaultMessage);
             if (accepted) {{
                 form.dataset.confirmed = "1";
                 form.requestSubmit();
@@ -1935,10 +2072,15 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
     }});
 }})();
 </script>"#,
+            confirm_dialog_title = js_string("confirm_dialog_title"),
+            confirm_cancel_label = js_string("common_cancel"),
+            confirm_continue_label = js_string("common_continue"),
+            confirm_default_message = js_string("confirm_default_message"),
             rename = rename,
             governance = governance,
             avatar = avatar,
             invite = invite,
+            members_label = crate::i18n::t("chat_members"),
             member_count_label = member_count_label,
             member_search = member_search,
             empty_members = empty_members,
@@ -1958,14 +2100,14 @@ pub fn render_group_members(params: GroupMembersPage<'_>) -> String {
     );
 
     page_shell(
-        "Участники · GRABIT",
-        &topbar("Группа", "users"),
+        &format!("{} · GRABIT", crate::i18n::t("members_page_title")),
+        &topbar(&crate::i18n::t("chat_group"), "users"),
         &back_hero(
-            &back_link(&format!("/app/group/{group_id}"), "Чат", "arrow-left"),
+            &back_link(&format!("/app/group/{group_id}"), &crate::i18n::t("chat_title"), "arrow-left"),
             "users",
-            "Группа",
+            &crate::i18n::t("chat_group"),
             name,
-            "Роли, участники и настройки группы.",
+            &crate::i18n::t("group_members_hero_copy"),
         ),
         &content,
         &bottom_nav("chats"),
@@ -1981,41 +2123,46 @@ pub fn render_group_invite(
 ) -> String {
     let content = if !valid {
         empty_state_card(
-            "Ссылка недействительна",
-            "Приглашение истекло, было отключено или группа уже заполнена.",
+            &crate::i18n::t("invalid_link_title"),
+            &crate::i18n::t("invite_expired_body"),
         )
     } else if !authenticated {
         let next = format!("/app/group-invite/{}", urlencoding::encode(token));
         format!(
             r#"<section class="card rm-group-create">
     <div class="rm-profile-field-label">{name}</div>
-    <p class="card-meta">{member_count} участников · приглашение действует 7 дней</p>
-    <a class="ui-button" href="/login?next={next}">Войти и присоединиться</a>
+    <p class="card-meta">{member_count} · {invite_note}</p>
+    <a class="ui-button" href="/login?next={next}">{login_join}</a>
 </section>"#,
             name = escape_html(name),
+            member_count = plural_count(member_count, "count_member_one", "count_member_few", "count_member_many"),
+            invite_note = crate::i18n::t("invite_valid_note"),
             next = urlencoding::encode(&next),
+            login_join = crate::i18n::t("login_and_join_group_button"),
         )
     } else {
         format!(
             r#"<form method="post" action="/app/group-invite/{token}" class="card rm-group-create">
     <div class="rm-profile-field-label">{name}</div>
-    <p class="card-meta">{member_count} участников</p>
-    <button type="submit" class="ui-button">Присоединиться к группе</button>
+    <p class="card-meta">{member_count}</p>
+    <button type="submit" class="ui-button">{join}</button>
 </form>"#,
             token = escape_html(token),
             name = escape_html(name),
+            member_count = plural_count(member_count, "count_member_one", "count_member_few", "count_member_many"),
+            join = crate::i18n::t("join_group_confirm_button"),
         )
     };
 
     page_shell(
-        "Приглашение в группу · GRABIT",
-        &topbar("Группа", "users"),
+        &format!("{} · GRABIT", crate::i18n::t("group_invite_heading")),
+        &topbar(&crate::i18n::t("chat_group"), "users"),
         &back_hero(
-            &back_link("/app/messages", "Чаты", "arrow-left"),
+            &back_link("/app/messages", &crate::i18n::t("chat_title"), "arrow-left"),
             "users",
             "GRABIT",
-            "Приглашение в группу",
-            "Проверьте название и присоединитесь после входа.",
+            &crate::i18n::t("group_invite_heading"),
+            &crate::i18n::t("invite_hero_copy"),
         ),
         &content,
         &bottom_nav("chats"),

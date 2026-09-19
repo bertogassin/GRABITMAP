@@ -1,5 +1,29 @@
 /* eslint-disable */
 /** @typedef {import('../runtime.js').LocalizedString} LocalizedString */
+/** @typedef {{}} Access_Blocked_TagInputs */
+/** @typedef {{}} Account_LabelInputs */
+/** @typedef {{}} Account_Number_LabelInputs */
+/** @typedef {{}} Active_Sessions_CopyInputs */
+/** @typedef {{}} Active_Sessions_TitleInputs */
+/** @typedef {{}} Add_Heading_DefaultInputs */
+/** @typedef {{}} Add_Heading_OfferInputs */
+/** @typedef {{}} Add_Heading_SeekerInputs */
+/** @typedef {{}} Add_Members_HeadingInputs */
+/** @typedef {{}} Add_Resource_Hero_CopyInputs */
+/** @typedef {{}} Add_Resource_Last_City_HintInputs */
+/** @typedef {{}} Add_Resource_Page_TitleInputs */
+/** @typedef {{}} Add_To_Group_ButtonInputs */
+/** @typedef {{}} Admin_Center_DescInputs */
+/** @typedef {{}} Admin_Center_TitleInputs */
+/** @typedef {{ level: NonNullable<unknown> }} Admin_Level_LabelInputs */
+/** @typedef {{ level: NonNullable<unknown> }} Admin_Level_Nav_LabelInputs */
+/** @typedef {{}} All_Contacts_In_GroupInputs */
+/** @typedef {{}} All_Listings_SubtitleInputs */
+/** @typedef {{}} Allow_Write_ButtonInputs */
+/** @typedef {{}} Approved_LabelInputs */
+/** @typedef {{}} Aria_RubricInputs */
+/** @typedef {{}} Aria_SortInputs */
+/** @typedef {{}} Aria_What_To_SearchInputs */
 /** @typedef {{}} Auth_EmailInputs */
 /** @typedef {{}} Auth_ForgotInputs */
 /** @typedef {{}} Auth_HideInputs */
@@ -9,9 +33,31 @@
 /** @typedef {{}} Auth_RegisterInputs */
 /** @typedef {{}} Auth_ShowInputs */
 /** @typedef {{}} Auth_Show_PasswordInputs */
+/** @typedef {{}} Available_Now_LabelInputs */
+/** @typedef {{}} Avatar_Upload_ButtonInputs */
+/** @typedef {{}} Back_To_CategoryInputs */
 /** @typedef {{}} Back_To_CitiesInputs */
+/** @typedef {{}} Back_To_CityInputs */
+/** @typedef {{}} Back_To_ListingInputs */
+/** @typedef {{}} Back_To_RubricsInputs */
+/** @typedef {{}} Back_To_Search_ActionInputs */
+/** @typedef {{}} Blocked_HeadingInputs */
+/** @typedef {{}} Business_Nearby_SubtitleInputs */
+/** @typedef {{}} Business_Partners_SubtitleInputs */
+/** @typedef {{}} Cannot_Write_TagInputs */
+/** @typedef {{}} Category_All_CopyInputs */
+/** @typedef {{}} Category_All_TitleInputs */
+/** @typedef {{}} Category_Default_CopyInputs */
+/** @typedef {{}} Category_EyebrowInputs */
+/** @typedef {{}} Category_Offer_CopyInputs */
+/** @typedef {{}} Category_Seeker_CopyInputs */
+/** @typedef {{}} Change_City_Or_Add_HintInputs */
+/** @typedef {{}} Change_Password_ActionInputs */
+/** @typedef {{}} Change_Rubric_ActionInputs */
 /** @typedef {{}} Chat_Actions_AriaInputs */
+/** @typedef {{}} Chat_Add_Attachment_AriaInputs */
 /** @typedef {{}} Chat_All_ReadInputs */
+/** @typedef {{}} Chat_ArchiveInputs */
 /** @typedef {{}} Chat_AttachmentInputs */
 /** @typedef {{}} Chat_Attachment_BusyInputs */
 /** @typedef {{}} Chat_Attachment_ErrorInputs */
@@ -23,7 +69,9 @@
 /** @typedef {{}} Chat_Attachment_TimeoutInputs */
 /** @typedef {{}} Chat_Attachment_Too_LargeInputs */
 /** @typedef {{}} Chat_Attachment_TypeInputs */
+/** @typedef {{}} Chat_Block_LabelInputs */
 /** @typedef {{}} Chat_CancelInputs */
+/** @typedef {{}} Chat_Cancel_Forward_AriaInputs */
 /** @typedef {{}} Chat_Cancel_ReplyInputs */
 /** @typedef {{}} Chat_CloseInputs */
 /** @typedef {{}} Chat_Compressing_PhotoInputs */
@@ -37,6 +85,7 @@
 /** @typedef {{}} Chat_Delete_TitleInputs */
 /** @typedef {{}} Chat_DeletedInputs */
 /** @typedef {{}} Chat_DeletingInputs */
+/** @typedef {{}} Chat_Dialog_Actions_AriaInputs */
 /** @typedef {{}} Chat_Dialog_Open_FailedInputs */
 /** @typedef {{}} Chat_DialogsInputs */
 /** @typedef {{}} Chat_DocumentInputs */
@@ -45,6 +94,8 @@
 /** @typedef {{}} Chat_Edit_TitleInputs */
 /** @typedef {{}} Chat_EditedInputs */
 /** @typedef {{}} Chat_EmptyInputs */
+/** @typedef {{}} Chat_Empty_Thread_BodyInputs */
+/** @typedef {{}} Chat_Empty_Thread_TitleInputs */
 /** @typedef {{}} Chat_ForwardInputs */
 /** @typedef {{}} Chat_Forward_EmptyInputs */
 /** @typedef {{}} Chat_Forward_FailedInputs */
@@ -60,6 +111,8 @@
 /** @typedef {{}} Chat_Forwarding_PhotoInputs */
 /** @typedef {{}} Chat_Forwarding_VoiceInputs */
 /** @typedef {{}} Chat_GroupInputs */
+/** @typedef {{}} Chat_Haptic_On_LabelInputs */
+/** @typedef {{}} Chat_Haptic_Toggle_AriaInputs */
 /** @typedef {{}} Chat_History_ErrorInputs */
 /** @typedef {{}} Chat_History_RetryInputs */
 /** @typedef {{}} Chat_History_StartInputs */
@@ -78,16 +131,21 @@
 /** @typedef {{}} Chat_Media_Queue_FullInputs */
 /** @typedef {{}} Chat_Member_MutedInputs */
 /** @typedef {{}} Chat_MembersInputs */
+/** @typedef {{}} Chat_Menu_AriaInputs */
 /** @typedef {{}} Chat_MessageInputs */
+/** @typedef {{}} Chat_Message_PlaceholderInputs */
+/** @typedef {{}} Chat_Message_Text_AriaInputs */
 /** @typedef {{}} Chat_Mic_DeniedInputs */
 /** @typedef {{}} Chat_Mic_RequestInputs */
 /** @typedef {{ n: NonNullable<unknown> }} Chat_Mins_AgoInputs */
+/** @typedef {{}} Chat_MuteInputs */
 /** @typedef {{}} Chat_New_DialogInputs */
 /** @typedef {{}} Chat_New_GroupInputs */
 /** @typedef {{}} Chat_New_Group_PreviewInputs */
 /** @typedef {{}} Chat_No_NetworkInputs */
 /** @typedef {{}} Chat_OfflineInputs */
 /** @typedef {{}} Chat_OnlineInputs */
+/** @typedef {{}} Chat_Open_Emoji_AriaInputs */
 /** @typedef {{}} Chat_OriginalInputs */
 /** @typedef {{}} Chat_PeerInputs */
 /** @typedef {{}} Chat_PhotoInputs */
@@ -100,6 +158,7 @@
 /** @typedef {{}} Chat_PinInputs */
 /** @typedef {{}} Chat_Pinned_MessageInputs */
 /** @typedef {{}} Chat_Profile_MissingInputs */
+/** @typedef {{}} Chat_Quick_Emoji_AriaInputs */
 /** @typedef {{}} Chat_Rate_LimitedInputs */
 /** @typedef {{}} Chat_RecordingInputs */
 /** @typedef {{}} Chat_Recording_ReleaseInputs */
@@ -110,9 +169,11 @@
 /** @typedef {{}} Chat_Retry_SoonInputs */
 /** @typedef {{}} Chat_SaveInputs */
 /** @typedef {{}} Chat_SavingInputs */
+/** @typedef {{}} Chat_Scroll_Bottom_AriaInputs */
 /** @typedef {{}} Chat_Send_ActionInputs */
 /** @typedef {{}} Chat_Send_ErrorInputs */
 /** @typedef {{}} Chat_Send_Failed_RetryInputs */
+/** @typedef {{}} Chat_Send_HintInputs */
 /** @typedef {{}} Chat_Send_UnavailableInputs */
 /** @typedef {{}} Chat_SendingInputs */
 /** @typedef {{}} Chat_Sending_AttachmentInputs */
@@ -125,9 +186,15 @@
 /** @typedef {{}} Chat_Share_Choose_BodyInputs */
 /** @typedef {{}} Chat_Share_Choose_TitleInputs */
 /** @typedef {{}} Chat_Share_ReadyInputs */
+/** @typedef {{}} Chat_Sound_On_LabelInputs */
+/** @typedef {{}} Chat_Sound_Toggle_AriaInputs */
 /** @typedef {{}} Chat_Status_SendingInputs */
 /** @typedef {{}} Chat_TitleInputs */
 /** @typedef {{}} Chat_TypingInputs */
+/** @typedef {{}} Chat_UnarchiveInputs */
+/** @typedef {{}} Chat_Unavailable_BodyInputs */
+/** @typedef {{}} Chat_Unavailable_TitleInputs */
+/** @typedef {{}} Chat_UnmuteInputs */
 /** @typedef {{}} Chat_UnpinInputs */
 /** @typedef {{}} Chat_Upload_CancelledInputs */
 /** @typedef {{}} Chat_Upload_ProgressInputs */
@@ -142,6 +209,7 @@
 /** @typedef {{}} Chat_VoiceInputs */
 /** @typedef {{}} Chat_Voice_ErrorInputs */
 /** @typedef {{}} Chat_Voice_FailedInputs */
+/** @typedef {{}} Chat_Voice_LabelInputs */
 /** @typedef {{}} Chat_Voice_OfflineInputs */
 /** @typedef {{}} Chat_Voice_Record_FailedInputs */
 /** @typedef {{}} Chat_Voice_Stop_SendInputs */
@@ -149,21 +217,37 @@
 /** @typedef {{}} Chat_Voice_Too_ShortInputs */
 /** @typedef {{}} Chat_Voice_UnsupportedInputs */
 /** @typedef {{}} Chat_YouInputs */
+/** @typedef {{}} Choose_Direction_HintInputs */
+/** @typedef {{}} Choose_Next_Level_CaptionInputs */
+/** @typedef {{ name: NonNullable<unknown> }} City_Chip_ResetInputs */
+/** @typedef {{}} City_Not_SpecifiedInputs */
 /** @typedef {{}} Common_Account_NeededInputs */
 /** @typedef {{ feature: NonNullable<unknown> }} Common_Account_Needed_BodyInputs */
+/** @typedef {{}} Common_AddInputs */
 /** @typedef {{}} Common_AllInputs */
 /** @typedef {{}} Common_BackInputs */
 /** @typedef {{}} Common_BusinessInputs */
+/** @typedef {{}} Common_ChatInputs */
 /** @typedef {{}} Common_ClearInputs */
+/** @typedef {{}} Common_ContactsInputs */
+/** @typedef {{}} Common_ContinueInputs */
 /** @typedef {{}} Common_Create_AccountInputs */
+/** @typedef {{}} Common_EditInputs */
+/** @typedef {{}} Common_EducationInputs */
+/** @typedef {{}} Common_FavoritesInputs */
+/** @typedef {{}} Common_FindInputs */
+/** @typedef {{}} Common_GroupsInputs */
 /** @typedef {{}} Common_Guest_CopyInputs */
 /** @typedef {{}} Common_Guest_ModeInputs */
+/** @typedef {{}} Common_HelpInputs */
+/** @typedef {{}} Common_HousingInputs */
 /** @typedef {{}} Common_ListingInputs */
 /** @typedef {{}} Common_LoginInputs */
 /** @typedef {{}} Common_Login_PasswordInputs */
 /** @typedef {{}} Common_OfferInputs */
 /** @typedef {{}} Common_OnlineInputs */
 /** @typedef {{}} Common_Online_ShortInputs */
+/** @typedef {{}} Common_OpenInputs */
 /** @typedef {{}} Common_Open_ProfileInputs */
 /** @typedef {{}} Common_PremiumInputs */
 /** @typedef {{}} Common_PrivacyInputs */
@@ -172,13 +256,93 @@
 /** @typedef {{}} Common_RegisterInputs */
 /** @typedef {{}} Common_RulesInputs */
 /** @typedef {{}} Common_SeekerInputs */
+/** @typedef {{}} Common_ServicesInputs */
 /** @typedef {{}} Common_ShareInputs */
 /** @typedef {{}} Common_To_MapInputs */
+/** @typedef {{}} Common_TransportInputs */
 /** @typedef {{}} Common_VerifiedInputs */
 /** @typedef {{}} Common_Was_RecentlyInputs */
 /** @typedef {{}} Common_WorkInputs */
 /** @typedef {{}} Common_WorkersInputs */
 /** @typedef {{}} Common_WriteInputs */
+/** @typedef {{}} Confirm_Default_MessageInputs */
+/** @typedef {{}} Confirm_Delete_GroupInputs */
+/** @typedef {{}} Confirm_Delete_Group_PhotoInputs */
+/** @typedef {{}} Confirm_Dialog_TitleInputs */
+/** @typedef {{}} Confirm_Leave_GroupInputs */
+/** @typedef {{}} Confirm_New_Password_LabelInputs */
+/** @typedef {{}} Confirm_Remove_MemberInputs */
+/** @typedef {{}} Confirm_Restore_AccessInputs */
+/** @typedef {{}} Confirm_Revoke_InviteInputs */
+/** @typedef {{}} Confirm_Transfer_OwnershipInputs */
+/** @typedef {{}} Contact_Type_CallInputs */
+/** @typedef {{}} Contact_Type_ContactInputs */
+/** @typedef {{}} Contact_Type_WebsiteInputs */
+/** @typedef {{}} Count_City_FewInputs */
+/** @typedef {{}} Count_City_ManyInputs */
+/** @typedef {{}} Count_City_OneInputs */
+/** @typedef {{}} Count_Country_FewInputs */
+/** @typedef {{}} Count_Country_ManyInputs */
+/** @typedef {{}} Count_Country_OneInputs */
+/** @typedef {{}} Count_Member_FewInputs */
+/** @typedef {{}} Count_Member_ManyInputs */
+/** @typedef {{}} Count_Member_OneInputs */
+/** @typedef {{}} Count_Profession_FewInputs */
+/** @typedef {{}} Count_Profession_ManyInputs */
+/** @typedef {{}} Count_Profession_OneInputs */
+/** @typedef {{}} Count_Resource_FewInputs */
+/** @typedef {{}} Count_Resource_ManyInputs */
+/** @typedef {{}} Count_Resource_OneInputs */
+/** @typedef {{}} Count_Vote_FewInputs */
+/** @typedef {{}} Count_Vote_ManyInputs */
+/** @typedef {{}} Count_Vote_OneInputs */
+/** @typedef {{}} Create_Invite_Link_ButtonInputs */
+/** @typedef {{}} Current_Password_LabelInputs */
+/** @typedef {{}} Current_Status_KickerInputs */
+/** @typedef {{}} Delete_Account_ActionInputs */
+/** @typedef {{}} Delete_Account_WarningInputs */
+/** @typedef {{}} Delete_Group_ButtonInputs */
+/** @typedef {{}} Delete_Group_HeadingInputs */
+/** @typedef {{}} Delete_Photo_ButtonInputs */
+/** @typedef {{}} Device_BrowserInputs */
+/** @typedef {{}} Direct_Dialog_SubtitleInputs */
+/** @typedef {{}} Duration_10minInputs */
+/** @typedef {{}} Duration_1dInputs */
+/** @typedef {{}} Duration_1hInputs */
+/** @typedef {{}} Duration_24hInputs */
+/** @typedef {{}} Duration_30dInputs */
+/** @typedef {{}} Duration_3dInputs */
+/** @typedef {{}} Duration_7dInputs */
+/** @typedef {{}} Duration_NoneInputs */
+/** @typedef {{}} Edit_Resave_NoteInputs */
+/** @typedef {{}} Edit_Resource_TitleInputs */
+/** @typedef {{}} Edit_TitleInputs */
+/** @typedef {{}} Education_SubtitleInputs */
+/** @typedef {{}} Email_Deletion_Code_ExpiryInputs */
+/** @typedef {{}} Email_Deletion_Code_FooterInputs */
+/** @typedef {{}} Email_Deletion_Code_IntroInputs */
+/** @typedef {{}} Email_Deletion_Code_SubjectInputs */
+/** @typedef {{ cancel_url: NonNullable<unknown> }} Email_Deletion_Scheduled_Body_HtmlInputs */
+/** @typedef {{}} Email_Deletion_Scheduled_SubjectInputs */
+/** @typedef {{}} Email_Login_Code_ExpiryInputs */
+/** @typedef {{}} Email_Login_Code_FooterInputs */
+/** @typedef {{}} Email_Login_Code_IntroInputs */
+/** @typedef {{}} Email_Login_Code_SubjectInputs */
+/** @typedef {{}} Email_Password_Reset_ExpiryInputs */
+/** @typedef {{}} Email_Password_Reset_FooterInputs */
+/** @typedef {{}} Email_Password_Reset_IntroInputs */
+/** @typedef {{}} Email_Password_Reset_SubjectInputs */
+/** @typedef {{}} Emoji_DealInputs */
+/** @typedef {{}} Emoji_FireInputs */
+/** @typedef {{}} Emoji_HeartInputs */
+/** @typedef {{}} Emoji_LaughInputs */
+/** @typedef {{}} Emoji_LikeInputs */
+/** @typedef {{}} Emoji_PartyInputs */
+/** @typedef {{}} Emoji_SmileInputs */
+/** @typedef {{}} Emoji_ThanksInputs */
+/** @typedef {{}} End_Session_ButtonInputs */
+/** @typedef {{}} Error_ConnectionInputs */
+/** @typedef {{}} Explore_Business_SubtitleInputs */
 /** @typedef {{}} Explore_EmptyInputs */
 /** @typedef {{}} Explore_Icon_BizInputs */
 /** @typedef {{}} Explore_Icon_CityInputs */
@@ -187,12 +351,87 @@
 /** @typedef {{}} Explore_Icon_ProInputs */
 /** @typedef {{}} Explore_Icon_WorkInputs */
 /** @typedef {{}} Explore_Icon_WorldInputs */
+/** @typedef {{}} Explore_Work_SubtitleInputs */
+/** @typedef {{}} Explore_Workers_SubtitleInputs */
+/** @typedef {{}} Favorite_Action_LabelInputs */
+/** @typedef {{}} Favorite_Added_LabelInputs */
+/** @typedef {{}} Favorite_Added_StatusInputs */
+/** @typedef {{}} Favorite_Error_StatusInputs */
+/** @typedef {{}} Favorite_Removed_StatusInputs */
+/** @typedef {{}} Favorites_Empty_BodyInputs */
+/** @typedef {{}} Favorites_Empty_TitleInputs */
+/** @typedef {{}} Favorites_Hero_CopyInputs */
+/** @typedef {{}} Field_AddressInputs */
+/** @typedef {{}} Field_ContactInputs */
+/** @typedef {{}} Field_DescriptionInputs */
+/** @typedef {{}} Field_DurationInputs */
+/** @typedef {{}} Field_Group_NameInputs */
+/** @typedef {{}} Field_Home_CityInputs */
+/** @typedef {{}} Field_IntentInputs */
+/** @typedef {{}} Field_Listing_TypeInputs */
+/** @typedef {{}} Field_ProfessionInputs */
+/** @typedef {{}} Field_RubricInputs */
+/** @typedef {{}} Field_TitleInputs */
+/** @typedef {{}} Find_By_Name_PlaceholderInputs */
+/** @typedef {{}} Find_Opportunities_DescInputs */
+/** @typedef {{}} Find_Opportunities_TitleInputs */
+/** @typedef {{}} Find_Place_PlaceholderInputs */
+/** @typedef {{}} Find_Resources_ActionInputs */
 /** @typedef {{}} Footer_AriaInputs */
+/** @typedef {{}} Frequent_Rubrics_AriaInputs */
+/** @typedef {{}} Friend_Invites_ChatInputs */
+/** @typedef {{}} Friend_Invites_GenericInputs */
+/** @typedef {{}} Friend_Invites_WorkInputs */
+/** @typedef {{}} Group_Description_PlaceholderInputs */
+/** @typedef {{}} Group_Invite_HeadingInputs */
+/** @typedef {{}} Group_Members_Hero_CopyInputs */
+/** @typedef {{}} Group_Name_PlaceholderInputs */
+/** @typedef {{}} Group_Photo_HeadingInputs */
+/** @typedef {{}} Group_Share_TextInputs */
+/** @typedef {{}} Group_Share_TitleInputs */
+/** @typedef {{}} Guest_Fallback_LabelInputs */
+/** @typedef {{}} Help_SubtitleInputs */
+/** @typedef {{}} Home_City_HintInputs */
+/** @typedef {{}} Housing_SubtitleInputs */
+/** @typedef {{}} Inbox_Active_TabInputs */
+/** @typedef {{}} Inbox_Archive_TabInputs */
 /** @typedef {{}} Inbox_Empty_BodyInputs */
 /** @typedef {{}} Inbox_Empty_TitleInputs */
 /** @typedef {{}} Inbox_Find_PeopleInputs */
+/** @typedef {{}} Inbox_Sections_AriaInputs */
 /** @typedef {{ n: NonNullable<unknown> }} Inbox_Unread_ManyInputs */
 /** @typedef {{ n: NonNullable<unknown> }} Inbox_Unread_OneInputs */
+/** @typedef {{}} Intent_PlaceholderInputs */
+/** @typedef {{}} Invalid_Link_TitleInputs */
+/** @typedef {{}} Invite_Chat_LeadInputs */
+/** @typedef {{}} Invite_Chat_Share_TextInputs */
+/** @typedef {{}} Invite_Chat_Share_TitleInputs */
+/** @typedef {{}} Invite_Expired_BodyInputs */
+/** @typedef {{}} Invite_Friend_BodyInputs */
+/** @typedef {{}} Invite_Friend_TitleInputs */
+/** @typedef {{}} Invite_Generic_LeadInputs */
+/** @typedef {{}} Invite_Hero_CopyInputs */
+/** @typedef {{}} Invite_Link_NoteInputs */
+/** @typedef {{}} Invite_Topbar_TitleInputs */
+/** @typedef {{}} Invite_Valid_NoteInputs */
+/** @typedef {{}} Invite_Work_LeadInputs */
+/** @typedef {{}} Invite_Work_Share_TextInputs */
+/** @typedef {{}} Invite_Work_Share_TitleInputs */
+/** @typedef {{ who: NonNullable<unknown> }} Invited_By_LabelInputs */
+/** @typedef {{}} Ip_UnknownInputs */
+/** @typedef {{}} Join_Group_ButtonInputs */
+/** @typedef {{}} Join_Group_Confirm_ButtonInputs */
+/** @typedef {{}} Js_Invalid_CategoryInputs */
+/** @typedef {{}} Js_Invalid_DurationInputs */
+/** @typedef {{}} Js_Invalid_IntentInputs */
+/** @typedef {{}} Js_Login_RequiredInputs */
+/** @typedef {{}} Js_Photo_Save_FailedInputs */
+/** @typedef {{}} Js_Photo_UpdatedInputs */
+/** @typedef {{}} Js_Rate_LimitedInputs */
+/** @typedef {{}} Js_Save_FailedInputs */
+/** @typedef {{}} Js_Save_Failed_LaterInputs */
+/** @typedef {{}} Js_Saving_PhotoInputs */
+/** @typedef {{}} Js_Status_SavedInputs */
 /** @typedef {{}} Lang_ArInputs */
 /** @typedef {{}} Lang_BnInputs */
 /** @typedef {{}} Lang_CsInputs */
@@ -225,8 +464,21 @@
 /** @typedef {{}} Lang_ViInputs */
 /** @typedef {{}} Lang_ZhInputs */
 /** @typedef {{}} Lang_Zh_Tw2Inputs */
+/** @typedef {{}} Leave_Group_ButtonInputs */
 /** @typedef {{}} Legal_PrivacyInputs */
 /** @typedef {{}} Legal_RulesInputs */
+/** @typedef {{}} Level_5_LabelInputs */
+/** @typedef {{}} Level_CountryInputs */
+/** @typedef {{}} Listing_Share_Fallback_TitleInputs */
+/** @typedef {{}} Location_UnspecifiedInputs */
+/** @typedef {{}} Login_And_Join_ButtonInputs */
+/** @typedef {{}} Login_And_Join_Group_ButtonInputs */
+/** @typedef {{}} Logout_ButtonInputs */
+/** @typedef {{}} Logout_Other_Devices_ButtonInputs */
+/** @typedef {{}} Make_Admin_ActionInputs */
+/** @typedef {{}} Make_Member_ActionInputs */
+/** @typedef {{}} Manage_Group_LinkInputs */
+/** @typedef {{}} Management_EyebrowInputs */
 /** @typedef {{}} Map_All_ContinentsInputs */
 /** @typedef {{}} Map_Back_To_CitiesInputs */
 /** @typedef {{}} Map_Back_To_CountriesInputs */
@@ -284,6 +536,11 @@
 /** @typedef {{}} Map_Stat_ListingsInputs */
 /** @typedef {{}} Map_Stat_MembersInputs */
 /** @typedef {{}} Map_TitleInputs */
+/** @typedef {{}} Mark_All_Read_LinkInputs */
+/** @typedef {{}} Member_Fallback_NameInputs */
+/** @typedef {{}} Member_Resources_HeadingInputs */
+/** @typedef {{}} Member_Resources_SubcaptionInputs */
+/** @typedef {{}} Members_Page_TitleInputs */
 /** @typedef {{}} Menu_Add_CardInputs */
 /** @typedef {{}} Menu_Add_MetaInputs */
 /** @typedef {{}} Menu_AppInputs */
@@ -308,6 +565,33 @@
 /** @typedef {{}} Menu_Theme_DarkInputs */
 /** @typedef {{}} Menu_Theme_LightInputs */
 /** @typedef {{}} Menu_TitleInputs */
+/** @typedef {{}} Metric_In_FavoritesInputs */
+/** @typedef {{}} Metric_Needs_AttentionInputs */
+/** @typedef {{}} Metric_PublishedInputs */
+/** @typedef {{}} Mod_Level_1Inputs */
+/** @typedef {{}} Mod_Level_2Inputs */
+/** @typedef {{}} Mod_Level_3Inputs */
+/** @typedef {{}} Mod_Level_4Inputs */
+/** @typedef {{}} Mod_Level_5Inputs */
+/** @typedef {{}} Moderation_Hidden_BodyInputs */
+/** @typedef {{}} Moderation_Hidden_TitleInputs */
+/** @typedef {{}} Moderation_Pending_BodyInputs */
+/** @typedef {{}} Moderation_Pending_TitleInputs */
+/** @typedef {{}} Moderation_Rejected_BodyInputs */
+/** @typedef {{}} Moderation_Rejected_TitleInputs */
+/** @typedef {{}} Mute_Duration_AriaInputs */
+/** @typedef {{}} My_Directions_HeadingInputs */
+/** @typedef {{}} My_Resource_Hidden_BodyInputs */
+/** @typedef {{}} My_Resource_Hidden_LeadInputs */
+/** @typedef {{ approved: NonNullable<unknown>, pending: NonNullable<unknown>, rejected: NonNullable<unknown> }} My_Resources_Command_SummaryInputs */
+/** @typedef {{}} My_Resources_Empty_BodyInputs */
+/** @typedef {{}} My_Resources_Empty_TitleInputs */
+/** @typedef {{}} My_Resources_Hero_CopyInputs */
+/** @typedef {{}} My_Resources_TitleInputs */
+/** @typedef {{}} My_Status_DescInputs */
+/** @typedef {{}} My_Status_TitleInputs */
+/** @typedef {{}} Name_Or_Login_PlaceholderInputs */
+/** @typedef {{}} Nav_CategoryInputs */
 /** @typedef {{}} Nav_ChatsInputs */
 /** @typedef {{}} Nav_CitiesInputs */
 /** @typedef {{}} Nav_ExploreInputs */
@@ -319,6 +603,7 @@
 /** @typedef {{}} Nearby_Empty_BodyInputs */
 /** @typedef {{}} Nearby_Empty_TitleInputs */
 /** @typedef {{}} Nearby_FreshInputs */
+/** @typedef {{}} Nearby_Jobs_SubtitleInputs */
 /** @typedef {{}} Nearby_LeadInputs */
 /** @typedef {{}} Nearby_Location_UnavailableInputs */
 /** @typedef {{}} Nearby_Need_City_BodyInputs */
@@ -330,14 +615,64 @@
 /** @typedef {{ name: NonNullable<unknown> }} Nearby_Scope_RadiusInputs */
 /** @typedef {{}} Nearby_Scope_WorldInputs */
 /** @typedef {{}} Nearby_Unknown_PlaceInputs */
+/** @typedef {{}} New_Badge_LabelInputs */
+/** @typedef {{}} New_Group_Hero_CopyInputs */
+/** @typedef {{}} New_Group_No_Partners_BodyInputs */
+/** @typedef {{}} New_Group_Page_TitleInputs */
+/** @typedef {{}} New_Password_LabelInputs */
+/** @typedef {{}} New_Resource_TitleInputs */
+/** @typedef {{}} No_Access_BodyInputs */
+/** @typedef {{}} No_Access_TitleInputs */
+/** @typedef {{}} No_Direction_LabelInputs */
+/** @typedef {{}} No_Human_Owner_NoteInputs */
+/** @typedef {{ city: NonNullable<unknown> }} No_Listings_In_CityInputs */
+/** @typedef {{}} No_Listings_With_Matches_BodyInputs */
+/** @typedef {{}} No_Members_FoundInputs */
+/** @typedef {{ query: NonNullable<unknown> }} No_Results_For_QueryInputs */
+/** @typedef {{}} Nothing_Found_TitleInputs */
+/** @typedef {{}} Notifications_Center_CopyInputs */
+/** @typedef {{}} Notifications_Center_TitleInputs */
+/** @typedef {{}} Notifications_Command_DescInputs */
+/** @typedef {{}} Notifications_Empty_BodyInputs */
+/** @typedef {{}} Notifications_Empty_TitleInputs */
 /** @typedef {{}} Notifications_TitleInputs */
 /** @typedef {{}} Notify_GenericInputs */
 /** @typedef {{}} Notify_New_MessageInputs */
 /** @typedef {{}} Notify_Open_ChatInputs */
+/** @typedef {{}} Now_KickerInputs */
+/** @typedef {{}} Official_Badge_GrabitInputs */
+/** @typedef {{}} Official_Group_CityInputs */
+/** @typedef {{}} Official_Group_ContinentInputs */
+/** @typedef {{}} Official_Group_CountryInputs */
+/** @typedef {{}} Official_Group_History_NoteInputs */
+/** @typedef {{}} Official_Group_Join_History_NoteInputs */
+/** @typedef {{}} Official_Group_Ready_FirstInputs */
+/** @typedef {{}} Official_Group_WorldInputs */
+/** @typedef {{}} Official_Groups_Breadcrumb_HintInputs */
+/** @typedef {{}} Official_Groups_LinkInputs */
+/** @typedef {{}} Official_Groups_Page_TitleInputs */
+/** @typedef {{}} Official_Members_Hidden_NoteInputs */
+/** @typedef {{}} Official_Space_BodyInputs */
+/** @typedef {{}} Official_Space_TitleInputs */
+/** @typedef {{}} Open_Chat_ActionInputs */
+/** @typedef {{}} Open_Cities_ActionInputs */
+/** @typedef {{}} Open_On_Map_LabelInputs */
+/** @typedef {{}} Other_City_ActionInputs */
+/** @typedef {{}} Other_SubtitleInputs */
+/** @typedef {{}} Overview_HeadingInputs */
+/** @typedef {{}} Overview_SubtitleInputs */
+/** @typedef {{}} Owner_Center_DescInputs */
+/** @typedef {{}} Owner_Center_TitleInputs */
+/** @typedef {{}} Owner_Leave_WarningInputs */
+/** @typedef {{}} Owner_Level_LabelInputs */
+/** @typedef {{}} Owner_Only_Irreversible_NoteInputs */
+/** @typedef {{}} Payment_TitleInputs */
 /** @typedef {{}} Place_Chip_ChooseInputs */
 /** @typedef {{}} Place_Chip_NearbyInputs */
 /** @typedef {{}} Place_Chip_WorldInputs */
 /** @typedef {{ name: NonNullable<unknown> }} Place_ContinueInputs */
+/** @typedef {{}} Place_Open_LabelInputs */
+/** @typedef {{}} Place_Ready_LabelInputs */
 /** @typedef {{}} Place_Selector_CloseInputs */
 /** @typedef {{}} Place_Selector_DeniedInputs */
 /** @typedef {{}} Place_Selector_GeographyInputs */
@@ -346,17 +681,115 @@
 /** @typedef {{}} Place_Selector_RecentInputs */
 /** @typedef {{}} Place_Selector_SearchInputs */
 /** @typedef {{}} Place_Selector_TitleInputs */
+/** @typedef {{}} Placeholder_AddressInputs */
+/** @typedef {{}} Placeholder_ContactInputs */
+/** @typedef {{}} Placeholder_DescriptionInputs */
+/** @typedef {{}} Placeholder_TitleInputs */
+/** @typedef {{}} Places_HeadingInputs */
+/** @typedef {{}} Profession_HelpInputs */
+/** @typedef {{}} Profession_Hero_Fallback_CopyInputs */
+/** @typedef {{}} Profession_PlaceholderInputs */
+/** @typedef {{}} Profile_Hero_CopyInputs */
 /** @typedef {{}} Profile_Login_WriteInputs */
+/** @typedef {{}} Profile_No_Resources_BodyInputs */
+/** @typedef {{}} Profile_Not_Found_CopyInputs */
+/** @typedef {{}} Profile_Not_Found_TitleInputs */
+/** @typedef {{}} Profile_Photo_TitleInputs */
 /** @typedef {{}} Profile_SettingsInputs */
 /** @typedef {{}} Profile_Settings_SoundInputs */
 /** @typedef {{}} Profile_Share_TextInputs */
 /** @typedef {{}} Profile_TitleInputs */
 /** @typedef {{}} Profile_Write_HintInputs */
 /** @typedef {{}} Profile_Write_Login_HintInputs */
+/** @typedef {{}} Promo_Active_TitleInputs */
+/** @typedef {{ date: NonNullable<unknown> }} Promo_Active_UntilInputs */
+/** @typedef {{ reason: NonNullable<unknown> }} Promo_Bot_Reason_LabelInputs */
+/** @typedef {{}} Promo_Button_ShortInputs */
+/** @typedef {{}} Promo_Discount_BodyInputs */
+/** @typedef {{}} Promo_Discount_NoteInputs */
+/** @typedef {{}} Promo_Discount_TitleInputs */
+/** @typedef {{}} Promo_EyebrowInputs */
+/** @typedef {{}} Promo_Hero_CopyInputs */
+/** @typedef {{}} Promo_Hero_TitleInputs */
+/** @typedef {{}} Promo_Not_Yet_BodyInputs */
+/** @typedef {{}} Promo_Not_Yet_TitleInputs */
+/** @typedef {{}} Promo_Pay_Amount_PrefixInputs */
+/** @typedef {{}} Promo_Pay_Hero_CopyInputs */
+/** @typedef {{ price: NonNullable<unknown> }} Promo_Pay_Mock_ButtonInputs */
+/** @typedef {{}} Promo_Pay_Mock_NoteInputs */
+/** @typedef {{ price: NonNullable<unknown> }} Promo_Pay_Stripe_ButtonInputs */
+/** @typedef {{}} Promo_Pay_Stripe_NoteInputs */
+/** @typedef {{}} Promo_Pay_TitleInputs */
+/** @typedef {{}} Promo_Pay_UnavailableInputs */
+/** @typedef {{}} Promo_Pay_Unavailable_NoteInputs */
+/** @typedef {{}} Promo_Preview_FooterInputs */
+/** @typedef {{}} Promo_Preview_KickerInputs */
+/** @typedef {{}} Promo_Renew_ButtonInputs */
+/** @typedef {{}} Promo_Start_ButtonInputs */
+/** @typedef {{}} Promo_TitleInputs */
+/** @typedef {{}} Publish_ButtonInputs */
 /** @typedef {{}} Pwa_InstalledInputs */
+/** @typedef {{}} Rate_Prompt_LabelInputs */
+/** @typedef {{}} Rating_LabelInputs */
 /** @typedef {{ rating: NonNullable<unknown>, votes: NonNullable<unknown> }} Rating_VotesInputs */
+/** @typedef {{}} Ready_Link_LabelInputs */
+/** @typedef {{}} Real_Account_SectionsInputs */
+/** @typedef {{}} Recent_Searches_AriaInputs */
+/** @typedef {{}} Refine_Search_BodyInputs */
+/** @typedef {{}} Rejected_HintInputs */
+/** @typedef {{}} Rejected_LabelInputs */
+/** @typedef {{}} Rejection_Reason_LabelInputs */
+/** @typedef {{}} Report_Error_StatusInputs */
+/** @typedef {{}} Report_LabelInputs */
+/** @typedef {{}} Report_Reason_InsultInputs */
+/** @typedef {{}} Report_Reason_OtherInputs */
+/** @typedef {{}} Report_Reason_ScamInputs */
+/** @typedef {{}} Report_Reason_SpamInputs */
+/** @typedef {{}} Report_Sent_StatusInputs */
+/** @typedef {{}} Reset_LinkInputs */
+/** @typedef {{}} Resource_About_LabelInputs */
+/** @typedef {{}} Resource_Add_ActionInputs */
+/** @typedef {{}} Resource_Author_LabelInputs */
+/** @typedef {{}} Resource_Author_Profile_MetaInputs */
+/** @typedef {{}} Resource_Author_Profile_TitleInputs */
+/** @typedef {{}} Resource_Empty_All_ActionInputs */
+/** @typedef {{}} Resource_Empty_All_BodyInputs */
+/** @typedef {{}} Resource_Empty_Default_BodyInputs */
+/** @typedef {{}} Resource_Empty_People_BodyInputs */
+/** @typedef {{}} Resource_Empty_People_TitleInputs */
+/** @typedef {{}} Resource_Empty_Seeker_BodyInputs */
+/** @typedef {{}} Resource_Empty_TitleInputs */
+/** @typedef {{}} Resource_Form_Heading_OfferInputs */
+/** @typedef {{ n: NonNullable<unknown> }} Resource_Found_CountInputs */
+/** @typedef {{}} Resource_Id_LabelInputs */
+/** @typedef {{}} Resource_People_Section_TitleInputs */
+/** @typedef {{}} Resources_Section_TitleInputs */
+/** @typedef {{}} Restore_Access_ButtonInputs */
+/** @typedef {{}} Restrict_ButtonInputs */
+/** @typedef {{}} Revoke_Invite_ButtonInputs */
+/** @typedef {{}} Role_AdminInputs */
+/** @typedef {{}} Role_MemberInputs */
+/** @typedef {{}} Role_OwnerInputs */
+/** @typedef {{}} Rubric_First_EyebrowInputs */
+/** @typedef {{}} Rubric_Group_WorkInputs */
+/** @typedef {{}} Rubric_Pick_HintInputs */
+/** @typedef {{}} Rubric_Picker_CopyInputs */
+/** @typedef {{}} Rubric_Picker_TitleInputs */
+/** @typedef {{ rubric: NonNullable<unknown> }} Rubric_Prefix_LabelInputs */
+/** @typedef {{}} Save_Changes_ButtonInputs */
+/** @typedef {{}} Save_Info_ButtonInputs */
+/** @typedef {{}} Save_Status_ButtonInputs */
+/** @typedef {{ n: NonNullable<unknown> }} Saved_Resources_CountInputs */
+/** @typedef {{}} Saved_Resources_TitleInputs */
+/** @typedef {{}} Search_First_BodyInputs */
+/** @typedef {{}} Search_First_TitleInputs */
+/** @typedef {{}} Search_Member_LabelInputs */
 /** @typedef {{}} Search_TitleInputs */
 /** @typedef {{}} Search_WhatInputs */
+/** @typedef {{}} Sections_HeadingInputs */
+/** @typedef {{}} Select_PlaceholderInputs */
+/** @typedef {{}} Send_Invite_ButtonInputs */
+/** @typedef {{}} Services_SubtitleInputs */
 /** @typedef {{}} Share_Card_SentInputs */
 /** @typedef {{}} Share_Copy_AddressInputs */
 /** @typedef {{}} Share_ExternalInputs */
@@ -366,8 +799,128 @@
 /** @typedef {{}} Share_Open_DetailsInputs */
 /** @typedef {{}} Share_SentInputs */
 /** @typedef {{}} Share_TaglineInputs */
+/** @typedef {{}} Show_More_Members_LinkInputs */
+/** @typedef {{}} Sort_By_RatingInputs */
+/** @typedef {{}} Sort_NewestInputs */
 /** @typedef {{}} SpecialistInputs */
+/** @typedef {{}} Status_Approved_ShortInputs */
+/** @typedef {{}} Status_Hidden_ShortInputs */
+/** @typedef {{}} Status_Not_SetInputs */
+/** @typedef {{}} Status_Rejected_ShortInputs */
+/** @typedef {{}} Status_SavingInputs */
+/** @typedef {{}} Status_SendingInputs */
+/** @typedef {{}} Territory_Manage_NoteInputs */
+/** @typedef {{}} This_City_FallbackInputs */
+/** @typedef {{}} This_Device_TagInputs */
+/** @typedef {{}} To_Map_ActionInputs */
+/** @typedef {{}} Transfer_Ownership_ButtonInputs */
+/** @typedef {{}} Transport_SubtitleInputs */
+/** @typedef {{}} Upload_Photo_ButtonInputs */
+/** @typedef {{}} User_Fallback_LabelInputs */
+/** @typedef {{}} Vacancies_HeadingInputs */
+/** @typedef {{}} Vote_Error_StatusInputs */
+/** @typedef {{}} Vote_Saved_StatusInputs */
+/** @typedef {{}} Where_To_Start_TitleInputs */
+/** @typedef {{}} Workers_SubtitleInputs */
+/** @typedef {{}} You_Are_Owner_HeadingInputs */
+/** @typedef {{}} You_Manage_Territory_HeadingInputs */
 
+
+export const access_blocked_tag = /** @type {(inputs: Access_Blocked_TagInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Доступ заблокирован`)
+};
+
+export const account_label = /** @type {(inputs: Account_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Аккаунт`)
+};
+
+export const account_number_label = /** @type {(inputs: Account_Number_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Номер аккаунта`)
+};
+
+export const active_sessions_copy = /** @type {(inputs: Active_Sessions_CopyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Устройства, где вы вошли в GRABIT.`)
+};
+
+export const active_sessions_title = /** @type {(inputs: Active_Sessions_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Активные сессии`)
+};
+
+export const add_heading_default = /** @type {(inputs: Add_Heading_DefaultInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Выберите рубрику`)
+};
+
+export const add_heading_offer = /** @type {(inputs: Add_Heading_OfferInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Какая вакансия?`)
+};
+
+export const add_heading_seeker = /** @type {(inputs: Add_Heading_SeekerInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Кем вы хотите работать?`)
+};
+
+export const add_members_heading = /** @type {(inputs: Add_Members_HeadingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Добавить участников`)
+};
+
+export const add_resource_hero_copy = /** @type {(inputs: Add_Resource_Hero_CopyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Рубрика уже выбрана. Осталось заполнить детали.`)
+};
+
+export const add_resource_last_city_hint = /** @type {(inputs: Add_Resource_Last_City_HintInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Откроется последний город`)
+};
+
+export const add_resource_page_title = /** @type {(inputs: Add_Resource_Page_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Добавить объявление`)
+};
+
+export const add_to_group_button = /** @type {(inputs: Add_To_Group_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Добавить в группу`)
+};
+
+export const admin_center_desc = /** @type {(inputs: Admin_Center_DescInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Модерация и управление вашей территорией`)
+};
+
+export const admin_center_title = /** @type {(inputs: Admin_Center_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Центр управления`)
+};
+
+export const admin_level_label = /** @type {(inputs: Admin_Level_LabelInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`АДМИНИСТРАТОР · УРОВЕНЬ ${i?.level}`)
+};
+
+export const admin_level_nav_label = /** @type {(inputs: Admin_Level_Nav_LabelInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Административный уровень ${i?.level}`)
+};
+
+export const all_contacts_in_group = /** @type {(inputs: All_Contacts_In_GroupInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Все доступные собеседники уже в этой группе.`)
+};
+
+export const all_listings_subtitle = /** @type {(inputs: All_Listings_SubtitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Все публикации города`)
+};
+
+export const allow_write_button = /** @type {(inputs: Allow_Write_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Разрешить писать`)
+};
+
+export const approved_label = /** @type {(inputs: Approved_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Одобрено`)
+};
+
+export const aria_rubric = /** @type {(inputs: Aria_RubricInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Рубрика`)
+};
+
+export const aria_sort = /** @type {(inputs: Aria_SortInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сортировка`)
+};
+
+export const aria_what_to_search = /** @type {(inputs: Aria_What_To_SearchInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Что искать`)
+};
 
 export const auth_email = /** @type {(inputs: Auth_EmailInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Email`)
@@ -405,16 +958,104 @@ export const auth_show_password = /** @type {(inputs: Auth_Show_PasswordInputs) 
 	return /** @type {LocalizedString} */ (`Показать пароль`)
 };
 
+export const available_now_label = /** @type {(inputs: Available_Now_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Можно писать сразу`)
+};
+
+export const avatar_upload_button = /** @type {(inputs: Avatar_Upload_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Фото на аватар`)
+};
+
+export const back_to_category = /** @type {(inputs: Back_To_CategoryInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Вернуться к разделу`)
+};
+
 export const back_to_cities = /** @type {(inputs: Back_To_CitiesInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Вернуться к городам`)
+};
+
+export const back_to_city = /** @type {(inputs: Back_To_CityInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Вернуться к городу`)
+};
+
+export const back_to_listing = /** @type {(inputs: Back_To_ListingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Назад к объявлению`)
+};
+
+export const back_to_rubrics = /** @type {(inputs: Back_To_RubricsInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`К рубрикам`)
+};
+
+export const back_to_search_action = /** @type {(inputs: Back_To_Search_ActionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Вернуться к поиску`)
+};
+
+export const blocked_heading = /** @type {(inputs: Blocked_HeadingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Заблокированные`)
+};
+
+export const business_nearby_subtitle = /** @type {(inputs: Business_Nearby_SubtitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Компании рядом`)
+};
+
+export const business_partners_subtitle = /** @type {(inputs: Business_Partners_SubtitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Компании, партнёры и сотрудничество`)
+};
+
+export const cannot_write_tag = /** @type {(inputs: Cannot_Write_TagInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Не может писать`)
+};
+
+export const category_all_copy = /** @type {(inputs: Category_All_CopyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Все опубликованные объявления в городе.`)
+};
+
+export const category_all_title = /** @type {(inputs: Category_All_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Все объявления`)
+};
+
+export const category_default_copy = /** @type {(inputs: Category_Default_CopyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Объявления города в этом разделе.`)
+};
+
+export const category_eyebrow = /** @type {(inputs: Category_EyebrowInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Раздел`)
+};
+
+export const category_offer_copy = /** @type {(inputs: Category_Offer_CopyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Вакансии и предложения работы в городе.`)
+};
+
+export const category_seeker_copy = /** @type {(inputs: Category_Seeker_CopyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Объявления и специалисты по профессии в городе.`)
+};
+
+export const change_city_or_add_hint = /** @type {(inputs: Change_City_Or_Add_HintInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Можно сменить город или добавить объявление.`)
+};
+
+export const change_password_action = /** @type {(inputs: Change_Password_ActionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сменить пароль`)
+};
+
+export const change_rubric_action = /** @type {(inputs: Change_Rubric_ActionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Изменить рубрику`)
 };
 
 export const chat_actions_aria = /** @type {(inputs: Chat_Actions_AriaInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Действия с сообщением`)
 };
 
+export const chat_add_attachment_aria = /** @type {(inputs: Chat_Add_Attachment_AriaInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Добавить вложение`)
+};
+
 export const chat_all_read = /** @type {(inputs: Chat_All_ReadInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Все прочитано`)
+};
+
+export const chat_archive = /** @type {(inputs: Chat_ArchiveInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`В архив`)
 };
 
 export const chat_attachment = /** @type {(inputs: Chat_AttachmentInputs) => LocalizedString} */ () => {
@@ -461,8 +1102,16 @@ export const chat_attachment_type = /** @type {(inputs: Chat_Attachment_TypeInpu
 	return /** @type {LocalizedString} */ (`Этот тип файла не поддерживается`)
 };
 
+export const chat_block_label = /** @type {(inputs: Chat_Block_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Заблокировать`)
+};
+
 export const chat_cancel = /** @type {(inputs: Chat_CancelInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Отмена`)
+};
+
+export const chat_cancel_forward_aria = /** @type {(inputs: Chat_Cancel_Forward_AriaInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Отменить пересылку`)
 };
 
 export const chat_cancel_reply = /** @type {(inputs: Chat_Cancel_ReplyInputs) => LocalizedString} */ () => {
@@ -517,6 +1166,10 @@ export const chat_deleting = /** @type {(inputs: Chat_DeletingInputs) => Localiz
 	return /** @type {LocalizedString} */ (`Удаление…`)
 };
 
+export const chat_dialog_actions_aria = /** @type {(inputs: Chat_Dialog_Actions_AriaInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Действия с чатом`)
+};
+
 export const chat_dialog_open_failed = /** @type {(inputs: Chat_Dialog_Open_FailedInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Не удалось открыть диалог`)
 };
@@ -547,6 +1200,14 @@ export const chat_edited = /** @type {(inputs: Chat_EditedInputs) => LocalizedSt
 
 export const chat_empty = /** @type {(inputs: Chat_EmptyInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Нет диалогов`)
+};
+
+export const chat_empty_thread_body = /** @type {(inputs: Chat_Empty_Thread_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Напишите сообщение.`)
+};
+
+export const chat_empty_thread_title = /** @type {(inputs: Chat_Empty_Thread_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Диалог открыт`)
 };
 
 export const chat_forward = /** @type {(inputs: Chat_ForwardInputs) => LocalizedString} */ () => {
@@ -607,6 +1268,14 @@ export const chat_forwarding_voice = /** @type {(inputs: Chat_Forwarding_VoiceIn
 
 export const chat_group = /** @type {(inputs: Chat_GroupInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Группа`)
+};
+
+export const chat_haptic_on_label = /** @type {(inputs: Chat_Haptic_On_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Вибрация включена`)
+};
+
+export const chat_haptic_toggle_aria = /** @type {(inputs: Chat_Haptic_Toggle_AriaInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Вибрация чата`)
 };
 
 export const chat_history_error = /** @type {(inputs: Chat_History_ErrorInputs) => LocalizedString} */ () => {
@@ -681,8 +1350,20 @@ export const chat_members = /** @type {(inputs: Chat_MembersInputs) => Localized
 	return /** @type {LocalizedString} */ (`Участники`)
 };
 
+export const chat_menu_aria = /** @type {(inputs: Chat_Menu_AriaInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Меню чата`)
+};
+
 export const chat_message = /** @type {(inputs: Chat_MessageInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Сообщение`)
+};
+
+export const chat_message_placeholder = /** @type {(inputs: Chat_Message_PlaceholderInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сообщение…`)
+};
+
+export const chat_message_text_aria = /** @type {(inputs: Chat_Message_Text_AriaInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Текст сообщения`)
 };
 
 export const chat_mic_denied = /** @type {(inputs: Chat_Mic_DeniedInputs) => LocalizedString} */ () => {
@@ -695,6 +1376,10 @@ export const chat_mic_request = /** @type {(inputs: Chat_Mic_RequestInputs) => L
 
 export const chat_mins_ago = /** @type {(inputs: Chat_Mins_AgoInputs) => LocalizedString} */ (i) => {
 	return /** @type {LocalizedString} */ (`${i?.n} мин назад`)
+};
+
+export const chat_mute = /** @type {(inputs: Chat_MuteInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Отключить уведомления`)
 };
 
 export const chat_new_dialog = /** @type {(inputs: Chat_New_DialogInputs) => LocalizedString} */ () => {
@@ -719,6 +1404,10 @@ export const chat_offline = /** @type {(inputs: Chat_OfflineInputs) => Localized
 
 export const chat_online = /** @type {(inputs: Chat_OnlineInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`онлайн`)
+};
+
+export const chat_open_emoji_aria = /** @type {(inputs: Chat_Open_Emoji_AriaInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Открыть эмодзи`)
 };
 
 export const chat_original = /** @type {(inputs: Chat_OriginalInputs) => LocalizedString} */ () => {
@@ -769,6 +1458,10 @@ export const chat_profile_missing = /** @type {(inputs: Chat_Profile_MissingInpu
 	return /** @type {LocalizedString} */ (`Профиль не найден`)
 };
 
+export const chat_quick_emoji_aria = /** @type {(inputs: Chat_Quick_Emoji_AriaInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Быстрые эмодзи`)
+};
+
 export const chat_rate_limited = /** @type {(inputs: Chat_Rate_LimitedInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Слишком часто · подождите`)
 };
@@ -809,6 +1502,10 @@ export const chat_saving = /** @type {(inputs: Chat_SavingInputs) => LocalizedSt
 	return /** @type {LocalizedString} */ (`Сохранение…`)
 };
 
+export const chat_scroll_bottom_aria = /** @type {(inputs: Chat_Scroll_Bottom_AriaInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`К новым сообщениям`)
+};
+
 export const chat_send_action = /** @type {(inputs: Chat_Send_ActionInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Отправить`)
 };
@@ -819,6 +1516,10 @@ export const chat_send_error = /** @type {(inputs: Chat_Send_ErrorInputs) => Loc
 
 export const chat_send_failed_retry = /** @type {(inputs: Chat_Send_Failed_RetryInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Не отправлено · нажмите повторить`)
+};
+
+export const chat_send_hint = /** @type {(inputs: Chat_Send_HintInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Enter — отправить · Shift+Enter — новая строка`)
 };
 
 export const chat_send_unavailable = /** @type {(inputs: Chat_Send_UnavailableInputs) => LocalizedString} */ () => {
@@ -869,6 +1570,14 @@ export const chat_share_ready = /** @type {(inputs: Chat_Share_ReadyInputs) => L
 	return /** @type {LocalizedString} */ (`Карточка объявления готова к отправке`)
 };
 
+export const chat_sound_on_label = /** @type {(inputs: Chat_Sound_On_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Звуки включены`)
+};
+
+export const chat_sound_toggle_aria = /** @type {(inputs: Chat_Sound_Toggle_AriaInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Звуки чата`)
+};
+
 export const chat_status_sending = /** @type {(inputs: Chat_Status_SendingInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Отправляется`)
 };
@@ -879,6 +1588,22 @@ export const chat_title = /** @type {(inputs: Chat_TitleInputs) => LocalizedStri
 
 export const chat_typing = /** @type {(inputs: Chat_TypingInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`печатает…`)
+};
+
+export const chat_unarchive = /** @type {(inputs: Chat_UnarchiveInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Вернуть из архива`)
+};
+
+export const chat_unavailable_body = /** @type {(inputs: Chat_Unavailable_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Диалог недоступен.`)
+};
+
+export const chat_unavailable_title = /** @type {(inputs: Chat_Unavailable_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Чат недоступен`)
+};
+
+export const chat_unmute = /** @type {(inputs: Chat_UnmuteInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Включить уведомления`)
 };
 
 export const chat_unpin = /** @type {(inputs: Chat_UnpinInputs) => LocalizedString} */ () => {
@@ -937,6 +1662,10 @@ export const chat_voice_failed = /** @type {(inputs: Chat_Voice_FailedInputs) =>
 	return /** @type {LocalizedString} */ (`Голосовое не отправлено`)
 };
 
+export const chat_voice_label = /** @type {(inputs: Chat_Voice_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Голос`)
+};
+
 export const chat_voice_offline = /** @type {(inputs: Chat_Voice_OfflineInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Нет сети — голосовое нельзя отправить офлайн`)
 };
@@ -965,12 +1694,32 @@ export const chat_you = /** @type {(inputs: Chat_YouInputs) => LocalizedString} 
 	return /** @type {LocalizedString} */ (`Вы`)
 };
 
+export const choose_direction_hint = /** @type {(inputs: Choose_Direction_HintInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Выберите направление`)
+};
+
+export const choose_next_level_caption = /** @type {(inputs: Choose_Next_Level_CaptionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Выберите следующий уровень географии`)
+};
+
+export const city_chip_reset = /** @type {(inputs: City_Chip_ResetInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`${i?.name} · сбросить`)
+};
+
+export const city_not_specified = /** @type {(inputs: City_Not_SpecifiedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Город не указан`)
+};
+
 export const common_account_needed = /** @type {(inputs: Common_Account_NeededInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Нужен аккаунт`)
 };
 
 export const common_account_needed_body = /** @type {(inputs: Common_Account_Needed_BodyInputs) => LocalizedString} */ (i) => {
 	return /** @type {LocalizedString} */ (`Раздел «${i?.feature}» доступен после входа. Города и поиск работают без регистрации.`)
+};
+
+export const common_add = /** @type {(inputs: Common_AddInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Добавить`)
 };
 
 export const common_all = /** @type {(inputs: Common_AllInputs) => LocalizedString} */ () => {
@@ -985,12 +1734,44 @@ export const common_business = /** @type {(inputs: Common_BusinessInputs) => Loc
 	return /** @type {LocalizedString} */ (`Бизнес`)
 };
 
+export const common_chat = /** @type {(inputs: Common_ChatInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Чат`)
+};
+
 export const common_clear = /** @type {(inputs: Common_ClearInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Очистить`)
 };
 
+export const common_contacts = /** @type {(inputs: Common_ContactsInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Контакты`)
+};
+
+export const common_continue = /** @type {(inputs: Common_ContinueInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Продолжить`)
+};
+
 export const common_create_account = /** @type {(inputs: Common_Create_AccountInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Создать аккаунт на сайте`)
+};
+
+export const common_edit = /** @type {(inputs: Common_EditInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Редактировать`)
+};
+
+export const common_education = /** @type {(inputs: Common_EducationInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Обучение`)
+};
+
+export const common_favorites = /** @type {(inputs: Common_FavoritesInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Избранное`)
+};
+
+export const common_find = /** @type {(inputs: Common_FindInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Найти`)
+};
+
+export const common_groups = /** @type {(inputs: Common_GroupsInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Группы`)
 };
 
 export const common_guest_copy = /** @type {(inputs: Common_Guest_CopyInputs) => LocalizedString} */ () => {
@@ -999,6 +1780,14 @@ export const common_guest_copy = /** @type {(inputs: Common_Guest_CopyInputs) =>
 
 export const common_guest_mode = /** @type {(inputs: Common_Guest_ModeInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Вы в гостевом режиме`)
+};
+
+export const common_help = /** @type {(inputs: Common_HelpInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Помощь`)
+};
+
+export const common_housing = /** @type {(inputs: Common_HousingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Жильё`)
 };
 
 export const common_listing = /** @type {(inputs: Common_ListingInputs) => LocalizedString} */ () => {
@@ -1023,6 +1812,10 @@ export const common_online = /** @type {(inputs: Common_OnlineInputs) => Localiz
 
 export const common_online_short = /** @type {(inputs: Common_Online_ShortInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`онлайн`)
+};
+
+export const common_open = /** @type {(inputs: Common_OpenInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Открыть`)
 };
 
 export const common_open_profile = /** @type {(inputs: Common_Open_ProfileInputs) => LocalizedString} */ () => {
@@ -1057,12 +1850,20 @@ export const common_seeker = /** @type {(inputs: Common_SeekerInputs) => Localiz
 	return /** @type {LocalizedString} */ (`Ищу работу`)
 };
 
+export const common_services = /** @type {(inputs: Common_ServicesInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Услуги`)
+};
+
 export const common_share = /** @type {(inputs: Common_ShareInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Поделиться`)
 };
 
 export const common_to_map = /** @type {(inputs: Common_To_MapInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`К карте`)
+};
+
+export const common_transport = /** @type {(inputs: Common_TransportInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Транспорт`)
 };
 
 export const common_verified = /** @type {(inputs: Common_VerifiedInputs) => LocalizedString} */ () => {
@@ -1083,6 +1884,318 @@ export const common_workers = /** @type {(inputs: Common_WorkersInputs) => Local
 
 export const common_write = /** @type {(inputs: Common_WriteInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Написать`)
+};
+
+export const confirm_default_message = /** @type {(inputs: Confirm_Default_MessageInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Продолжить?`)
+};
+
+export const confirm_delete_group = /** @type {(inputs: Confirm_Delete_GroupInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Удалить группу навсегда? Сообщения и приглашение будут удалены для всех участников.`)
+};
+
+export const confirm_delete_group_photo = /** @type {(inputs: Confirm_Delete_Group_PhotoInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Удалить фото группы?`)
+};
+
+export const confirm_dialog_title = /** @type {(inputs: Confirm_Dialog_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Подтвердите действие`)
+};
+
+export const confirm_leave_group = /** @type {(inputs: Confirm_Leave_GroupInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Выйти из этой группы?`)
+};
+
+export const confirm_new_password_label = /** @type {(inputs: Confirm_New_Password_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Повторите новый пароль`)
+};
+
+export const confirm_remove_member = /** @type {(inputs: Confirm_Remove_MemberInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Удалить участника из группы?`)
+};
+
+export const confirm_restore_access = /** @type {(inputs: Confirm_Restore_AccessInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Восстановить возможность вступления в официальную группу?`)
+};
+
+export const confirm_revoke_invite = /** @type {(inputs: Confirm_Revoke_InviteInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Отключить действующую ссылку-приглашение?`)
+};
+
+export const confirm_transfer_ownership = /** @type {(inputs: Confirm_Transfer_OwnershipInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Передать этому участнику права владельца группы?`)
+};
+
+export const contact_type_call = /** @type {(inputs: Contact_Type_CallInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Позвонить`)
+};
+
+export const contact_type_contact = /** @type {(inputs: Contact_Type_ContactInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Связаться`)
+};
+
+export const contact_type_website = /** @type {(inputs: Contact_Type_WebsiteInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сайт`)
+};
+
+export const count_city_few = /** @type {(inputs: Count_City_FewInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`города`)
+};
+
+export const count_city_many = /** @type {(inputs: Count_City_ManyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`городов`)
+};
+
+export const count_city_one = /** @type {(inputs: Count_City_OneInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`город`)
+};
+
+export const count_country_few = /** @type {(inputs: Count_Country_FewInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`страны`)
+};
+
+export const count_country_many = /** @type {(inputs: Count_Country_ManyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`стран`)
+};
+
+export const count_country_one = /** @type {(inputs: Count_Country_OneInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`страна`)
+};
+
+export const count_member_few = /** @type {(inputs: Count_Member_FewInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`участника`)
+};
+
+export const count_member_many = /** @type {(inputs: Count_Member_ManyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`участников`)
+};
+
+export const count_member_one = /** @type {(inputs: Count_Member_OneInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`участник`)
+};
+
+export const count_profession_few = /** @type {(inputs: Count_Profession_FewInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`профессии`)
+};
+
+export const count_profession_many = /** @type {(inputs: Count_Profession_ManyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`профессий`)
+};
+
+export const count_profession_one = /** @type {(inputs: Count_Profession_OneInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`профессия`)
+};
+
+export const count_resource_few = /** @type {(inputs: Count_Resource_FewInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`объявления`)
+};
+
+export const count_resource_many = /** @type {(inputs: Count_Resource_ManyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`объявлений`)
+};
+
+export const count_resource_one = /** @type {(inputs: Count_Resource_OneInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`объявление`)
+};
+
+export const count_vote_few = /** @type {(inputs: Count_Vote_FewInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`голоса`)
+};
+
+export const count_vote_many = /** @type {(inputs: Count_Vote_ManyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`голосов`)
+};
+
+export const count_vote_one = /** @type {(inputs: Count_Vote_OneInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`голос`)
+};
+
+export const create_invite_link_button = /** @type {(inputs: Create_Invite_Link_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Создать новую ссылку`)
+};
+
+export const current_password_label = /** @type {(inputs: Current_Password_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Текущий пароль`)
+};
+
+export const current_status_kicker = /** @type {(inputs: Current_Status_KickerInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Актуальный статус`)
+};
+
+export const delete_account_action = /** @type {(inputs: Delete_Account_ActionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Удалить аккаунт`)
+};
+
+export const delete_account_warning = /** @type {(inputs: Delete_Account_WarningInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Аккаунт и объявления будут скрыты сразу. Все данные будут безвозвратно удалены через 30 дней. Чтобы отменить — просто войдите в аккаунт снова в течение этого времени.`)
+};
+
+export const delete_group_button = /** @type {(inputs: Delete_Group_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Удалить группу`)
+};
+
+export const delete_group_heading = /** @type {(inputs: Delete_Group_HeadingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Удаление группы`)
+};
+
+export const delete_photo_button = /** @type {(inputs: Delete_Photo_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Удалить фото`)
+};
+
+export const device_browser = /** @type {(inputs: Device_BrowserInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Браузер`)
+};
+
+export const direct_dialog_subtitle = /** @type {(inputs: Direct_Dialog_SubtitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Личный диалог`)
+};
+
+export const duration_10min = /** @type {(inputs: Duration_10minInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`10 минут`)
+};
+
+export const duration_1d = /** @type {(inputs: Duration_1dInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`1 день`)
+};
+
+export const duration_1h = /** @type {(inputs: Duration_1hInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`1 час`)
+};
+
+export const duration_24h = /** @type {(inputs: Duration_24hInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`24 часа`)
+};
+
+export const duration_30d = /** @type {(inputs: Duration_30dInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`30 дней`)
+};
+
+export const duration_3d = /** @type {(inputs: Duration_3dInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`3 дня`)
+};
+
+export const duration_7d = /** @type {(inputs: Duration_7dInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`7 дней`)
+};
+
+export const duration_none = /** @type {(inputs: Duration_NoneInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Без срока`)
+};
+
+export const edit_resave_note = /** @type {(inputs: Edit_Resave_NoteInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`После сохранения объявление автоматически вернётся на повторную модерацию.`)
+};
+
+export const edit_resource_title = /** @type {(inputs: Edit_Resource_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Редактировать объявление`)
+};
+
+export const edit_title = /** @type {(inputs: Edit_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Редактирование`)
+};
+
+export const education_subtitle = /** @type {(inputs: Education_SubtitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Курсы, преподаватели и ученики`)
+};
+
+export const email_deletion_code_expiry = /** @type {(inputs: Email_Deletion_Code_ExpiryInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Код действует 15 минут. После подтверждения аккаунт будет скрыт сразу, а данные удалены безвозвратно через 30 дней.`)
+};
+
+export const email_deletion_code_footer = /** @type {(inputs: Email_Deletion_Code_FooterInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Если вы не запрашивали удаление, проигнорируйте письмо — код никого не пустит в аккаунт.`)
+};
+
+export const email_deletion_code_intro = /** @type {(inputs: Email_Deletion_Code_IntroInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Код для удаления аккаунта:`)
+};
+
+export const email_deletion_code_subject = /** @type {(inputs: Email_Deletion_Code_SubjectInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Подтверждение удаления аккаунта GRABIT`)
+};
+
+export const email_deletion_scheduled_body_html = /** @type {(inputs: Email_Deletion_Scheduled_Body_HtmlInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`<p>Аккаунт скрыт и будет удалён безвозвратно через 30 дней.</p><p>Чтобы отменить: войдите в аккаунт как обычно, либо перейдите по ссылке ниже (действует 30 дней, можно использовать один раз):</p><p><a href="${i?.cancel_url}">Отменить удаление</a></p><p>Если вы не запрашивали удаление — срочно смените пароль.</p>`)
+};
+
+export const email_deletion_scheduled_subject = /** @type {(inputs: Email_Deletion_Scheduled_SubjectInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Удаление аккаунта GRABIT запланировано`)
+};
+
+export const email_login_code_expiry = /** @type {(inputs: Email_Login_Code_ExpiryInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Код действует 10 минут.`)
+};
+
+export const email_login_code_footer = /** @type {(inputs: Email_Login_Code_FooterInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Если вы не запрашивали вход, просто проигнорируйте это письмо.`)
+};
+
+export const email_login_code_intro = /** @type {(inputs: Email_Login_Code_IntroInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ваш код входа:`)
+};
+
+export const email_login_code_subject = /** @type {(inputs: Email_Login_Code_SubjectInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Код входа в GRABIT`)
+};
+
+export const email_password_reset_expiry = /** @type {(inputs: Email_Password_Reset_ExpiryInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Код действует 10 минут.`)
+};
+
+export const email_password_reset_footer = /** @type {(inputs: Email_Password_Reset_FooterInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Если вы не запрашивали сброс, проигнорируйте письмо.`)
+};
+
+export const email_password_reset_intro = /** @type {(inputs: Email_Password_Reset_IntroInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Код для сброса пароля:`)
+};
+
+export const email_password_reset_subject = /** @type {(inputs: Email_Password_Reset_SubjectInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сброс пароля GRABIT`)
+};
+
+export const emoji_deal = /** @type {(inputs: Emoji_DealInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Договорились`)
+};
+
+export const emoji_fire = /** @type {(inputs: Emoji_FireInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Огонь`)
+};
+
+export const emoji_heart = /** @type {(inputs: Emoji_HeartInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сердце`)
+};
+
+export const emoji_laugh = /** @type {(inputs: Emoji_LaughInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Смех`)
+};
+
+export const emoji_like = /** @type {(inputs: Emoji_LikeInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Нравится`)
+};
+
+export const emoji_party = /** @type {(inputs: Emoji_PartyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Праздник`)
+};
+
+export const emoji_smile = /** @type {(inputs: Emoji_SmileInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Улыбка`)
+};
+
+export const emoji_thanks = /** @type {(inputs: Emoji_ThanksInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Спасибо`)
+};
+
+export const end_session_button = /** @type {(inputs: End_Session_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Завершить`)
+};
+
+export const error_connection = /** @type {(inputs: Error_ConnectionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ошибка соединения.`)
+};
+
+export const explore_business_subtitle = /** @type {(inputs: Explore_Business_SubtitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Компании и предложения`)
 };
 
 export const explore_empty = /** @type {(inputs: Explore_EmptyInputs) => LocalizedString} */ () => {
@@ -1117,8 +2230,180 @@ export const explore_icon_world = /** @type {(inputs: Explore_Icon_WorldInputs) 
 	return /** @type {LocalizedString} */ (`Мир`)
 };
 
+export const explore_work_subtitle = /** @type {(inputs: Explore_Work_SubtitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Вакансии и предложения работы`)
+};
+
+export const explore_workers_subtitle = /** @type {(inputs: Explore_Workers_SubtitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Профессии и объявления тех, кто ищет работу`)
+};
+
+export const favorite_action_label = /** @type {(inputs: Favorite_Action_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`В избранное`)
+};
+
+export const favorite_added_label = /** @type {(inputs: Favorite_Added_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`В избранном`)
+};
+
+export const favorite_added_status = /** @type {(inputs: Favorite_Added_StatusInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`✓ Добавлено в избранное`)
+};
+
+export const favorite_error_status = /** @type {(inputs: Favorite_Error_StatusInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Не удалось изменить избранное.`)
+};
+
+export const favorite_removed_status = /** @type {(inputs: Favorite_Removed_StatusInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Удалено из избранного`)
+};
+
+export const favorites_empty_body = /** @type {(inputs: Favorites_Empty_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Откройте любое объявление и сохраните его в избранное.`)
+};
+
+export const favorites_empty_title = /** @type {(inputs: Favorites_Empty_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Избранное пока пустое`)
+};
+
+export const favorites_hero_copy = /** @type {(inputs: Favorites_Hero_CopyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Всё, что вы отметили сердцем.`)
+};
+
+export const field_address = /** @type {(inputs: Field_AddressInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Адрес`)
+};
+
+export const field_contact = /** @type {(inputs: Field_ContactInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Контакт или ссылка`)
+};
+
+export const field_description = /** @type {(inputs: Field_DescriptionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Описание`)
+};
+
+export const field_duration = /** @type {(inputs: Field_DurationInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Срок актуальности`)
+};
+
+export const field_group_name = /** @type {(inputs: Field_Group_NameInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Название группы`)
+};
+
+export const field_home_city = /** @type {(inputs: Field_Home_CityInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ваш город`)
+};
+
+export const field_intent = /** @type {(inputs: Field_IntentInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Что вы ищете или предлагаете`)
+};
+
+export const field_listing_type = /** @type {(inputs: Field_Listing_TypeInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Тип объявления`)
+};
+
+export const field_profession = /** @type {(inputs: Field_ProfessionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Профессия или направление`)
+};
+
+export const field_rubric = /** @type {(inputs: Field_RubricInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Рубрика`)
+};
+
+export const field_title = /** @type {(inputs: Field_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Название`)
+};
+
+export const find_by_name_placeholder = /** @type {(inputs: Find_By_Name_PlaceholderInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Найти по имени`)
+};
+
+export const find_opportunities_desc = /** @type {(inputs: Find_Opportunities_DescInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Работа, работники и бизнес`)
+};
+
+export const find_opportunities_title = /** @type {(inputs: Find_Opportunities_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Найти возможности`)
+};
+
+export const find_place_placeholder = /** @type {(inputs: Find_Place_PlaceholderInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Найти место`)
+};
+
+export const find_resources_action = /** @type {(inputs: Find_Resources_ActionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Найти объявления`)
+};
+
 export const footer_aria = /** @type {(inputs: Footer_AriaInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Версия приложения`)
+};
+
+export const frequent_rubrics_aria = /** @type {(inputs: Frequent_Rubrics_AriaInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Частые рубрики`)
+};
+
+export const friend_invites_chat = /** @type {(inputs: Friend_Invites_ChatInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Друг зовёт в чат`)
+};
+
+export const friend_invites_generic = /** @type {(inputs: Friend_Invites_GenericInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Друг зовёт в GRABIT`)
+};
+
+export const friend_invites_work = /** @type {(inputs: Friend_Invites_WorkInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Друг зовёт к работе`)
+};
+
+export const group_description_placeholder = /** @type {(inputs: Group_Description_PlaceholderInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`О чём эта группа`)
+};
+
+export const group_invite_heading = /** @type {(inputs: Group_Invite_HeadingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Приглашение в группу`)
+};
+
+export const group_members_hero_copy = /** @type {(inputs: Group_Members_Hero_CopyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Роли, участники и настройки группы.`)
+};
+
+export const group_name_placeholder = /** @type {(inputs: Group_Name_PlaceholderInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Например: соседи по двору`)
+};
+
+export const group_photo_heading = /** @type {(inputs: Group_Photo_HeadingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Фото группы`)
+};
+
+export const group_share_text = /** @type {(inputs: Group_Share_TextInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Присоединяйтесь к нашей группе в GRABIT.`)
+};
+
+export const group_share_title = /** @type {(inputs: Group_Share_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`GRABIT · группа`)
+};
+
+export const guest_fallback_label = /** @type {(inputs: Guest_Fallback_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Гость`)
+};
+
+export const help_subtitle = /** @type {(inputs: Help_SubtitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Нужна помощь или могу помочь`)
+};
+
+export const home_city_hint = /** @type {(inputs: Home_City_HintInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Нужен, чтобы вас находили в разделе «Работники» этого города.`)
+};
+
+export const housing_subtitle = /** @type {(inputs: Housing_SubtitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сниму, сдам, куплю или продам`)
+};
+
+export const inbox_active_tab = /** @type {(inputs: Inbox_Active_TabInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Активные`)
+};
+
+export const inbox_archive_tab = /** @type {(inputs: Inbox_Archive_TabInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Архив`)
 };
 
 export const inbox_empty_body = /** @type {(inputs: Inbox_Empty_BodyInputs) => LocalizedString} */ () => {
@@ -1133,12 +2418,140 @@ export const inbox_find_people = /** @type {(inputs: Inbox_Find_PeopleInputs) =>
 	return /** @type {LocalizedString} */ (`Найти участников`)
 };
 
+export const inbox_sections_aria = /** @type {(inputs: Inbox_Sections_AriaInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Разделы чатов`)
+};
+
 export const inbox_unread_many = /** @type {(inputs: Inbox_Unread_ManyInputs) => LocalizedString} */ (i) => {
 	return /** @type {LocalizedString} */ (`${i?.n} непрочитанных`)
 };
 
 export const inbox_unread_one = /** @type {(inputs: Inbox_Unread_OneInputs) => LocalizedString} */ (i) => {
 	return /** @type {LocalizedString} */ (`${i?.n} непрочитанное`)
+};
+
+export const intent_placeholder = /** @type {(inputs: Intent_PlaceholderInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Например: ищу электрика в своём городе или предлагаю перевозки...`)
+};
+
+export const invalid_link_title = /** @type {(inputs: Invalid_Link_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ссылка недействительна`)
+};
+
+export const invite_chat_lead = /** @type {(inputs: Invite_Chat_LeadInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Напишите сразу. Потом можно заблокировать или удалить.`)
+};
+
+export const invite_chat_share_text = /** @type {(inputs: Invite_Chat_Share_TextInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Напиши мне в GRABIT. Чат сразу, без заявки.`)
+};
+
+export const invite_chat_share_title = /** @type {(inputs: Invite_Chat_Share_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`GRABIT · написать`)
+};
+
+export const invite_expired_body = /** @type {(inputs: Invite_Expired_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Приглашение истекло, было отключено или группа уже заполнена.`)
+};
+
+export const invite_friend_body = /** @type {(inputs: Invite_Friend_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Отправьте личную ссылку для чата или поиска работы.`)
+};
+
+export const invite_friend_title = /** @type {(inputs: Invite_Friend_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Пригласить друга`)
+};
+
+export const invite_generic_lead = /** @type {(inputs: Invite_Generic_LeadInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Чат и поиск работы рядом. Войдите — и вы уже у друга.`)
+};
+
+export const invite_hero_copy = /** @type {(inputs: Invite_Hero_CopyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Проверьте название и присоединитесь после входа.`)
+};
+
+export const invite_link_note = /** @type {(inputs: Invite_Link_NoteInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ссылка действует 7 дней. Новая ссылка автоматически отключает предыдущую.`)
+};
+
+export const invite_topbar_title = /** @type {(inputs: Invite_Topbar_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Приглашение`)
+};
+
+export const invite_valid_note = /** @type {(inputs: Invite_Valid_NoteInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`приглашение действует 7 дней`)
+};
+
+export const invite_work_lead = /** @type {(inputs: Invite_Work_LeadInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`После входа откроется поиск работы, и вы сразу сможете написать другу.`)
+};
+
+export const invite_work_share_text = /** @type {(inputs: Invite_Work_Share_TextInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ищем работу рядом в GRABIT. Заходи по ссылке.`)
+};
+
+export const invite_work_share_title = /** @type {(inputs: Invite_Work_Share_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`GRABIT · работа`)
+};
+
+export const invited_by_label = /** @type {(inputs: Invited_By_LabelInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Вас зовёт ${i?.who}.`)
+};
+
+export const ip_unknown = /** @type {(inputs: Ip_UnknownInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`IP не определён`)
+};
+
+export const join_group_button = /** @type {(inputs: Join_Group_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Вступить в группу`)
+};
+
+export const join_group_confirm_button = /** @type {(inputs: Join_Group_Confirm_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Присоединиться к группе`)
+};
+
+export const js_invalid_category = /** @type {(inputs: Js_Invalid_CategoryInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Проверьте название профессии.`)
+};
+
+export const js_invalid_duration = /** @type {(inputs: Js_Invalid_DurationInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Выберите срок показа статуса.`)
+};
+
+export const js_invalid_intent = /** @type {(inputs: Js_Invalid_IntentInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Текст статуса слишком длинный.`)
+};
+
+export const js_login_required = /** @type {(inputs: Js_Login_RequiredInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Войдите в аккаунт.`)
+};
+
+export const js_photo_save_failed = /** @type {(inputs: Js_Photo_Save_FailedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Не удалось сохранить фото`)
+};
+
+export const js_photo_updated = /** @type {(inputs: Js_Photo_UpdatedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Фото обновлено`)
+};
+
+export const js_rate_limited = /** @type {(inputs: Js_Rate_LimitedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Слишком часто. Подождите немного.`)
+};
+
+export const js_save_failed = /** @type {(inputs: Js_Save_FailedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Не удалось сохранить.`)
+};
+
+export const js_save_failed_later = /** @type {(inputs: Js_Save_Failed_LaterInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Не удалось сохранить. Попробуйте позже.`)
+};
+
+export const js_saving_photo = /** @type {(inputs: Js_Saving_PhotoInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сохраняем фото…`)
+};
+
+export const js_status_saved = /** @type {(inputs: Js_Status_SavedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`✓ Статус сохранён`)
 };
 
 export const lang_ar = /** @type {(inputs: Lang_ArInputs) => LocalizedString} */ () => {
@@ -1269,12 +2682,64 @@ export const lang_zh_tw2 = /** @type {(inputs: Lang_Zh_Tw2Inputs) => LocalizedSt
 	return /** @type {LocalizedString} */ (`中文（繁體）`)
 };
 
+export const leave_group_button = /** @type {(inputs: Leave_Group_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Выйти из группы`)
+};
+
 export const legal_privacy = /** @type {(inputs: Legal_PrivacyInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Политика`)
 };
 
 export const legal_rules = /** @type {(inputs: Legal_RulesInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Правила`)
+};
+
+export const level_5_label = /** @type {(inputs: Level_5_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`УРОВЕНЬ 5`)
+};
+
+export const level_country = /** @type {(inputs: Level_CountryInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Страна`)
+};
+
+export const listing_share_fallback_title = /** @type {(inputs: Listing_Share_Fallback_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Объявление GRABIT`)
+};
+
+export const location_unspecified = /** @type {(inputs: Location_UnspecifiedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Местоположение не указано`)
+};
+
+export const login_and_join_button = /** @type {(inputs: Login_And_Join_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Войти и вступить`)
+};
+
+export const login_and_join_group_button = /** @type {(inputs: Login_And_Join_Group_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Войти и присоединиться`)
+};
+
+export const logout_button = /** @type {(inputs: Logout_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Выйти из аккаунта`)
+};
+
+export const logout_other_devices_button = /** @type {(inputs: Logout_Other_Devices_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Выйти на других устройствах`)
+};
+
+export const make_admin_action = /** @type {(inputs: Make_Admin_ActionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сделать администратором`)
+};
+
+export const make_member_action = /** @type {(inputs: Make_Member_ActionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сделать участником`)
+};
+
+export const manage_group_link = /** @type {(inputs: Manage_Group_LinkInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Управление группой`)
+};
+
+export const management_eyebrow = /** @type {(inputs: Management_EyebrowInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Управление`)
 };
 
 export const map_all_continents = /** @type {(inputs: Map_All_ContinentsInputs) => LocalizedString} */ () => {
@@ -1505,6 +2970,26 @@ export const map_title = /** @type {(inputs: Map_TitleInputs) => LocalizedString
 	return /** @type {LocalizedString} */ (`Карта`)
 };
 
+export const mark_all_read_link = /** @type {(inputs: Mark_All_Read_LinkInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Прочитать все`)
+};
+
+export const member_fallback_name = /** @type {(inputs: Member_Fallback_NameInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Участник GRABIT`)
+};
+
+export const member_resources_heading = /** @type {(inputs: Member_Resources_HeadingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Объявления участника`)
+};
+
+export const member_resources_subcaption = /** @type {(inputs: Member_Resources_SubcaptionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Только активные и одобренные`)
+};
+
+export const members_page_title = /** @type {(inputs: Members_Page_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Участники`)
+};
+
 export const menu_add_card = /** @type {(inputs: Menu_Add_CardInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Добавить объявление`)
 };
@@ -1601,6 +3086,114 @@ export const menu_title = /** @type {(inputs: Menu_TitleInputs) => LocalizedStri
 	return /** @type {LocalizedString} */ (`Меню`)
 };
 
+export const metric_in_favorites = /** @type {(inputs: Metric_In_FavoritesInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`в избранном`)
+};
+
+export const metric_needs_attention = /** @type {(inputs: Metric_Needs_AttentionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`требуют внимания`)
+};
+
+export const metric_published = /** @type {(inputs: Metric_PublishedInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`опубликовано`)
+};
+
+export const mod_level_1 = /** @type {(inputs: Mod_Level_1Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Уровень 1 · Помощник группы`)
+};
+
+export const mod_level_2 = /** @type {(inputs: Mod_Level_2Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Уровень 2 · Администратор города`)
+};
+
+export const mod_level_3 = /** @type {(inputs: Mod_Level_3Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Уровень 3 · Администратор страны`)
+};
+
+export const mod_level_4 = /** @type {(inputs: Mod_Level_4Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Уровень 4 · Администратор континента`)
+};
+
+export const mod_level_5 = /** @type {(inputs: Mod_Level_5Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Уровень 5 · Владелец GRABIT`)
+};
+
+export const moderation_hidden_body = /** @type {(inputs: Moderation_Hidden_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Другие участники его не видят.`)
+};
+
+export const moderation_hidden_title = /** @type {(inputs: Moderation_Hidden_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Объявление скрыто`)
+};
+
+export const moderation_pending_body = /** @type {(inputs: Moderation_Pending_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Другие участники это объявление пока не видят. После одобрения оно появится в поиске и в городе.`)
+};
+
+export const moderation_pending_title = /** @type {(inputs: Moderation_Pending_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`На проверке`)
+};
+
+export const moderation_rejected_body = /** @type {(inputs: Moderation_Rejected_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Исправьте текст и сохраните снова — оно уйдёт на повторную проверку.`)
+};
+
+export const moderation_rejected_title = /** @type {(inputs: Moderation_Rejected_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Объявление отклонено`)
+};
+
+export const mute_duration_aria = /** @type {(inputs: Mute_Duration_AriaInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Срок ограничения`)
+};
+
+export const my_directions_heading = /** @type {(inputs: My_Directions_HeadingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Мои направления`)
+};
+
+export const my_resource_hidden_body = /** @type {(inputs: My_Resource_Hidden_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Публикация недоступна другим участникам.`)
+};
+
+export const my_resource_hidden_lead = /** @type {(inputs: My_Resource_Hidden_LeadInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Объявление скрыто.`)
+};
+
+export const my_resources_command_summary = /** @type {(inputs: My_Resources_Command_SummaryInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Опубликовано: ${i?.approved} · На проверке: ${i?.pending} · Отклонено: ${i?.rejected}`)
+};
+
+export const my_resources_empty_body = /** @type {(inputs: My_Resources_Empty_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Добавьте объявление в выбранном городе и категории.`)
+};
+
+export const my_resources_empty_title = /** @type {(inputs: My_Resources_Empty_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Нет опубликованных объявлений`)
+};
+
+export const my_resources_hero_copy = /** @type {(inputs: My_Resources_Hero_CopyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ваши объявления по работе и бизнесу.`)
+};
+
+export const my_resources_title = /** @type {(inputs: My_Resources_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Мои объявления`)
+};
+
+export const my_status_desc = /** @type {(inputs: My_Status_DescInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Расскажите сообществу, что вы ищете или что можете предложить.`)
+};
+
+export const my_status_title = /** @type {(inputs: My_Status_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Мой статус`)
+};
+
+export const name_or_login_placeholder = /** @type {(inputs: Name_Or_Login_PlaceholderInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Имя или логин`)
+};
+
+export const nav_category = /** @type {(inputs: Nav_CategoryInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Категория`)
+};
+
 export const nav_chats = /** @type {(inputs: Nav_ChatsInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Чаты`)
 };
@@ -1643,6 +3236,10 @@ export const nearby_empty_title = /** @type {(inputs: Nearby_Empty_TitleInputs) 
 
 export const nearby_fresh = /** @type {(inputs: Nearby_FreshInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Свежие карточки`)
+};
+
+export const nearby_jobs_subtitle = /** @type {(inputs: Nearby_Jobs_SubtitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Вакансии рядом`)
 };
 
 export const nearby_lead = /** @type {(inputs: Nearby_LeadInputs) => LocalizedString} */ () => {
@@ -1689,6 +3286,86 @@ export const nearby_unknown_place = /** @type {(inputs: Nearby_Unknown_PlaceInpu
 	return /** @type {LocalizedString} */ (`Место не указано`)
 };
 
+export const new_badge_label = /** @type {(inputs: New_Badge_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Новое`)
+};
+
+export const new_group_hero_copy = /** @type {(inputs: New_Group_Hero_CopyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Название и участники. Чат сразу общий.`)
+};
+
+export const new_group_no_partners_body = /** @type {(inputs: New_Group_No_Partners_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сначала напишите кому-нибудь в личный чат — потом их можно добавить в группу.`)
+};
+
+export const new_group_page_title = /** @type {(inputs: New_Group_Page_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Новая группа`)
+};
+
+export const new_password_label = /** @type {(inputs: New_Password_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Новый пароль`)
+};
+
+export const new_resource_title = /** @type {(inputs: New_Resource_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Новое объявление`)
+};
+
+export const no_access_body = /** @type {(inputs: No_Access_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Этой группы для вас нет.`)
+};
+
+export const no_access_title = /** @type {(inputs: No_Access_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Нет доступа`)
+};
+
+export const no_direction_label = /** @type {(inputs: No_Direction_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Направление не выбрано`)
+};
+
+export const no_human_owner_note = /** @type {(inputs: No_Human_Owner_NoteInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`У группы нет человеческого владельца. Права управления определяются только действующим административным назначением территории.`)
+};
+
+export const no_listings_in_city = /** @type {(inputs: No_Listings_In_CityInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`В городе «${i?.city}» пока нет объявлений.`)
+};
+
+export const no_listings_with_matches_body = /** @type {(inputs: No_Listings_With_Matches_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Есть участники или города по этому запросу, но объявлений пока нет.`)
+};
+
+export const no_members_found = /** @type {(inputs: No_Members_FoundInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Участники не найдены.`)
+};
+
+export const no_results_for_query = /** @type {(inputs: No_Results_For_QueryInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`По запросу «${i?.query}» пока ничего не найдено.`)
+};
+
+export const nothing_found_title = /** @type {(inputs: Nothing_Found_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ничего не найдено`)
+};
+
+export const notifications_center_copy = /** @type {(inputs: Notifications_Center_CopyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Статусы модерации и важные изменения ваших объявлений.`)
+};
+
+export const notifications_center_title = /** @type {(inputs: Notifications_Center_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Центр уведомлений`)
+};
+
+export const notifications_command_desc = /** @type {(inputs: Notifications_Command_DescInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`События аккаунта и сообщества`)
+};
+
+export const notifications_empty_body = /** @type {(inputs: Notifications_Empty_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Здесь появятся результаты модерации и важные изменения ваших объявлений.`)
+};
+
+export const notifications_empty_title = /** @type {(inputs: Notifications_Empty_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Уведомлений нет`)
+};
+
 export const notifications_title = /** @type {(inputs: Notifications_TitleInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Уведомления`)
 };
@@ -1705,6 +3382,118 @@ export const notify_open_chat = /** @type {(inputs: Notify_Open_ChatInputs) => L
 	return /** @type {LocalizedString} */ (`Откройте чат в GRABIT.`)
 };
 
+export const now_kicker = /** @type {(inputs: Now_KickerInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сейчас`)
+};
+
+export const official_badge_grabit = /** @type {(inputs: Official_Badge_GrabitInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Официальная группа GRABIT`)
+};
+
+export const official_group_city = /** @type {(inputs: Official_Group_CityInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Официальная группа города`)
+};
+
+export const official_group_continent = /** @type {(inputs: Official_Group_ContinentInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Официальная группа континента`)
+};
+
+export const official_group_country = /** @type {(inputs: Official_Group_CountryInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Официальная группа страны`)
+};
+
+export const official_group_history_note = /** @type {(inputs: Official_Group_History_NoteInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`история доступна после вступления`)
+};
+
+export const official_group_join_history_note = /** @type {(inputs: Official_Group_Join_History_NoteInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`история группы доступна после вступления`)
+};
+
+export const official_group_ready_first = /** @type {(inputs: Official_Group_Ready_FirstInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Готова к первому участнику`)
+};
+
+export const official_group_world = /** @type {(inputs: Official_Group_WorldInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Официальная группа мира`)
+};
+
+export const official_groups_breadcrumb_hint = /** @type {(inputs: Official_Groups_Breadcrumb_HintInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Мир → континент → страна → город`)
+};
+
+export const official_groups_link = /** @type {(inputs: Official_Groups_LinkInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Официальные`)
+};
+
+export const official_groups_page_title = /** @type {(inputs: Official_Groups_Page_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Официальные группы`)
+};
+
+export const official_members_hidden_note = /** @type {(inputs: Official_Members_Hidden_NoteInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Список участников официальной группы скрыт для защиты приватности. Вы продолжаете видеть авторов сообщений внутри чата.`)
+};
+
+export const official_space_body = /** @type {(inputs: Official_Space_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Группа принадлежит платформе и запускается автоматически при первом вступлении. Первый участник не получает особых прав.`)
+};
+
+export const official_space_title = /** @type {(inputs: Official_Space_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Официальное пространство GRABIT`)
+};
+
+export const open_chat_action = /** @type {(inputs: Open_Chat_ActionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Открыть чат`)
+};
+
+export const open_cities_action = /** @type {(inputs: Open_Cities_ActionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Открыть города`)
+};
+
+export const open_on_map_label = /** @type {(inputs: Open_On_Map_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`На карте`)
+};
+
+export const other_city_action = /** @type {(inputs: Other_City_ActionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Другой город`)
+};
+
+export const other_subtitle = /** @type {(inputs: Other_SubtitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Остальные предложения и запросы`)
+};
+
+export const overview_heading = /** @type {(inputs: Overview_HeadingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Обзор`)
+};
+
+export const overview_subtitle = /** @type {(inputs: Overview_SubtitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ваш личный штурвал: объявления, связи, сообщения, активность и возможности в одном защищённом пространстве.`)
+};
+
+export const owner_center_desc = /** @type {(inputs: Owner_Center_DescInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Глобальное управление, безопасность и production`)
+};
+
+export const owner_center_title = /** @type {(inputs: Owner_Center_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Центр владельца`)
+};
+
+export const owner_leave_warning = /** @type {(inputs: Owner_Leave_WarningInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Перед выходом передайте владение другому участнику. Так группа не останется без управления.`)
+};
+
+export const owner_level_label = /** @type {(inputs: Owner_Level_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`ВЛАДЕЛЕЦ · УРОВЕНЬ 5`)
+};
+
+export const owner_only_irreversible_note = /** @type {(inputs: Owner_Only_Irreversible_NoteInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Это действие доступно только владельцу и не отменяется.`)
+};
+
+export const payment_title = /** @type {(inputs: Payment_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Оплата`)
+};
+
 export const place_chip_choose = /** @type {(inputs: Place_Chip_ChooseInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Выберите место`)
 };
@@ -1719,6 +3508,14 @@ export const place_chip_world = /** @type {(inputs: Place_Chip_WorldInputs) => L
 
 export const place_continue = /** @type {(inputs: Place_ContinueInputs) => LocalizedString} */ (i) => {
 	return /** @type {LocalizedString} */ (`Продолжить ${i?.name}`)
+};
+
+export const place_open_label = /** @type {(inputs: Place_Open_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Открыта`)
+};
+
+export const place_ready_label = /** @type {(inputs: Place_Ready_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Готова к вступлению`)
 };
 
 export const place_selector_close = /** @type {(inputs: Place_Selector_CloseInputs) => LocalizedString} */ () => {
@@ -1753,8 +3550,60 @@ export const place_selector_title = /** @type {(inputs: Place_Selector_TitleInpu
 	return /** @type {LocalizedString} */ (`Место`)
 };
 
+export const placeholder_address = /** @type {(inputs: Placeholder_AddressInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Город, район, улица`)
+};
+
+export const placeholder_contact = /** @type {(inputs: Placeholder_ContactInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`+33... или @username`)
+};
+
+export const placeholder_description = /** @type {(inputs: Placeholder_DescriptionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Условия, опыт, что предлагаете или ищете`)
+};
+
+export const placeholder_title = /** @type {(inputs: Placeholder_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Кратко, без лишнего`)
+};
+
+export const places_heading = /** @type {(inputs: Places_HeadingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Места`)
+};
+
+export const profession_help = /** @type {(inputs: Profession_HelpInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Начните печатать — каталог понимает русские, английские и французские названия. Если профессии ещё нет, её всё равно можно сохранить.`)
+};
+
+export const profession_hero_fallback_copy = /** @type {(inputs: Profession_Hero_Fallback_CopyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Объявления и статус по выбранной рубрике.`)
+};
+
+export const profession_placeholder = /** @type {(inputs: Profession_PlaceholderInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Например: электрик, сантехник, дизайнер...`)
+};
+
+export const profile_hero_copy = /** @type {(inputs: Profile_Hero_CopyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ваши объявления, сохранённые места и активность.`)
+};
+
 export const profile_login_write = /** @type {(inputs: Profile_Login_WriteInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Войти и написать`)
+};
+
+export const profile_no_resources_body = /** @type {(inputs: Profile_No_Resources_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`В профиле нет опубликованных объявлений.`)
+};
+
+export const profile_not_found_copy = /** @type {(inputs: Profile_Not_Found_CopyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Пользователь недоступен или публичный профиль ещё не создан.`)
+};
+
+export const profile_not_found_title = /** @type {(inputs: Profile_Not_Found_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Профиль не найден`)
+};
+
+export const profile_photo_title = /** @type {(inputs: Profile_Photo_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Фото профиля`)
 };
 
 export const profile_settings = /** @type {(inputs: Profile_SettingsInputs) => LocalizedString} */ () => {
@@ -1781,12 +3630,336 @@ export const profile_write_login_hint = /** @type {(inputs: Profile_Write_Login_
 	return /** @type {LocalizedString} */ (`Войдите, чтобы написать участнику.`)
 };
 
+export const promo_active_title = /** @type {(inputs: Promo_Active_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Продвижение активно`)
+};
+
+export const promo_active_until = /** @type {(inputs: Promo_Active_UntilInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Действует до ${i?.date}.`)
+};
+
+export const promo_bot_reason_label = /** @type {(inputs: Promo_Bot_Reason_LabelInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Причина проверки: ${i?.reason}`)
+};
+
+export const promo_button_short = /** @type {(inputs: Promo_Button_ShortInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Продвинуть`)
+};
+
+export const promo_discount_body = /** @type {(inputs: Promo_Discount_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Продвижение внутри GRABIT бесплатно на 30 дней.`)
+};
+
+export const promo_discount_note = /** @type {(inputs: Promo_Discount_NoteInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Карта и платёж не требуются. Социальные сети и внешние группы не подключаются.`)
+};
+
+export const promo_discount_title = /** @type {(inputs: Promo_Discount_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`100% скидка до 2028 года`)
+};
+
+export const promo_eyebrow = /** @type {(inputs: Promo_EyebrowInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Бесплатно до 2028 года`)
+};
+
+export const promo_hero_copy = /** @type {(inputs: Promo_Hero_CopyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`30 дней видимости выше в городе и категории.`)
+};
+
+export const promo_hero_title = /** @type {(inputs: Promo_Hero_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Продвижение внутри GRABIT`)
+};
+
+export const promo_not_yet_body = /** @type {(inputs: Promo_Not_Yet_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Кнопка продления откроется за 7 дней до окончания.`)
+};
+
+export const promo_not_yet_title = /** @type {(inputs: Promo_Not_Yet_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Продление пока не требуется`)
+};
+
+export const promo_pay_amount_prefix = /** @type {(inputs: Promo_Pay_Amount_PrefixInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`К оплате:`)
+};
+
+export const promo_pay_hero_copy = /** @type {(inputs: Promo_Pay_Hero_CopyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`После оплаты объявление уйдёт в городскую ленту и группу, если она настроена.`)
+};
+
+export const promo_pay_mock_button = /** @type {(inputs: Promo_Pay_Mock_ButtonInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Подтвердить оплату · ${i?.price}`)
+};
+
+export const promo_pay_mock_note = /** @type {(inputs: Promo_Pay_Mock_NoteInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Тестовый контур: кнопка фиксирует оплату без Stripe. Для продакшена задайте STRIPE_SECRET_KEY.`)
+};
+
+export const promo_pay_stripe_button = /** @type {(inputs: Promo_Pay_Stripe_ButtonInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Перейти к оплате Stripe · ${i?.price}`)
+};
+
+export const promo_pay_stripe_note = /** @type {(inputs: Promo_Pay_Stripe_NoteInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Оплата проходит через Stripe Checkout. После успешной оплаты объявление будет опубликовано автоматически.`)
+};
+
+export const promo_pay_title = /** @type {(inputs: Promo_Pay_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Оплата публикации в группе`)
+};
+
+export const promo_pay_unavailable = /** @type {(inputs: Promo_Pay_UnavailableInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Оплата временно недоступна. Платёжный сервис не настроен на этом сервере.`)
+};
+
+export const promo_pay_unavailable_note = /** @type {(inputs: Promo_Pay_Unavailable_NoteInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Для production требуется STRIPE_SECRET_KEY или явный ALLOW_MOCK_PROMOTION_PAYMENT=1 на localhost.`)
+};
+
+export const promo_preview_footer = /** @type {(inputs: Promo_Preview_FooterInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Выше в городе и своей категории`)
+};
+
+export const promo_preview_kicker = /** @type {(inputs: Promo_Preview_KickerInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`GRABIT · Внутреннее продвижение`)
+};
+
+export const promo_renew_button = /** @type {(inputs: Promo_Renew_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Продлить бесплатно на 30 дней`)
+};
+
+export const promo_start_button = /** @type {(inputs: Promo_Start_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Продвинуть бесплатно на 30 дней`)
+};
+
+export const promo_title = /** @type {(inputs: Promo_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Продвижение`)
+};
+
+export const publish_button = /** @type {(inputs: Publish_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Опубликовать`)
+};
+
 export const pwa_installed = /** @type {(inputs: Pwa_InstalledInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Уже скачано`)
 };
 
+export const rate_prompt_label = /** @type {(inputs: Rate_Prompt_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Оценить`)
+};
+
+export const rating_label = /** @type {(inputs: Rating_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Оценка`)
+};
+
 export const rating_votes = /** @type {(inputs: Rating_VotesInputs) => LocalizedString} */ (i) => {
 	return /** @type {LocalizedString} */ (`Оценка ${i?.rating} · ${i?.votes}`)
+};
+
+export const ready_link_label = /** @type {(inputs: Ready_Link_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Готовая ссылка`)
+};
+
+export const real_account_sections = /** @type {(inputs: Real_Account_SectionsInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Реальные разделы аккаунта`)
+};
+
+export const recent_searches_aria = /** @type {(inputs: Recent_Searches_AriaInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Недавние поиски`)
+};
+
+export const refine_search_body = /** @type {(inputs: Refine_Search_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Измените запрос или вернитесь уровнем выше.`)
+};
+
+export const rejected_hint = /** @type {(inputs: Rejected_HintInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Объявления, которым требуется исправление`)
+};
+
+export const rejected_label = /** @type {(inputs: Rejected_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Отклонено`)
+};
+
+export const rejection_reason_label = /** @type {(inputs: Rejection_Reason_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Причина отказа:`)
+};
+
+export const report_error_status = /** @type {(inputs: Report_Error_StatusInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Не удалось отправить жалобу.`)
+};
+
+export const report_label = /** @type {(inputs: Report_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Пожаловаться`)
+};
+
+export const report_reason_insult = /** @type {(inputs: Report_Reason_InsultInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Оскорбление`)
+};
+
+export const report_reason_other = /** @type {(inputs: Report_Reason_OtherInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Другое`)
+};
+
+export const report_reason_scam = /** @type {(inputs: Report_Reason_ScamInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Обман`)
+};
+
+export const report_reason_spam = /** @type {(inputs: Report_Reason_SpamInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Спам`)
+};
+
+export const report_sent_status = /** @type {(inputs: Report_Sent_StatusInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Жалоба отправлена`)
+};
+
+export const reset_link = /** @type {(inputs: Reset_LinkInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сбросить`)
+};
+
+export const resource_about_label = /** @type {(inputs: Resource_About_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Об объявлении`)
+};
+
+export const resource_add_action = /** @type {(inputs: Resource_Add_ActionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Добавить объявление`)
+};
+
+export const resource_author_label = /** @type {(inputs: Resource_Author_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Автор объявления`)
+};
+
+export const resource_author_profile_meta = /** @type {(inputs: Resource_Author_Profile_MetaInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Другие объявления и актуальный статус`)
+};
+
+export const resource_author_profile_title = /** @type {(inputs: Resource_Author_Profile_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Профиль участника`)
+};
+
+export const resource_empty_all_action = /** @type {(inputs: Resource_Empty_All_ActionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`К разделам`)
+};
+
+export const resource_empty_all_body = /** @type {(inputs: Resource_Empty_All_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`В этом городе пока нет опубликованных объявлений.`)
+};
+
+export const resource_empty_default_body = /** @type {(inputs: Resource_Empty_Default_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Добавьте первое объявление в этом разделе.`)
+};
+
+export const resource_empty_people_body = /** @type {(inputs: Resource_Empty_People_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Есть участники по этому запросу, но объявлений пока нет.`)
+};
+
+export const resource_empty_people_title = /** @type {(inputs: Resource_Empty_People_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Объявлений нет`)
+};
+
+export const resource_empty_seeker_body = /** @type {(inputs: Resource_Empty_Seeker_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Добавьте объявление или укажите профессию в профиле.`)
+};
+
+export const resource_empty_title = /** @type {(inputs: Resource_Empty_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Пока пусто`)
+};
+
+export const resource_form_heading_offer = /** @type {(inputs: Resource_Form_Heading_OfferInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Предлагаю работу`)
+};
+
+export const resource_found_count = /** @type {(inputs: Resource_Found_CountInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Найдено: ${i?.n}`)
+};
+
+export const resource_id_label = /** @type {(inputs: Resource_Id_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Номер объявления`)
+};
+
+export const resource_people_section_title = /** @type {(inputs: Resource_People_Section_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`По профессии`)
+};
+
+export const resources_section_title = /** @type {(inputs: Resources_Section_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Объявления`)
+};
+
+export const restore_access_button = /** @type {(inputs: Restore_Access_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Восстановить доступ`)
+};
+
+export const restrict_button = /** @type {(inputs: Restrict_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ограничить`)
+};
+
+export const revoke_invite_button = /** @type {(inputs: Revoke_Invite_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Отключить ссылку`)
+};
+
+export const role_admin = /** @type {(inputs: Role_AdminInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Администратор`)
+};
+
+export const role_member = /** @type {(inputs: Role_MemberInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Участник`)
+};
+
+export const role_owner = /** @type {(inputs: Role_OwnerInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Владелец`)
+};
+
+export const rubric_first_eyebrow = /** @type {(inputs: Rubric_First_EyebrowInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сначала рубрика`)
+};
+
+export const rubric_group_work = /** @type {(inputs: Rubric_Group_WorkInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Работа и работники`)
+};
+
+export const rubric_pick_hint = /** @type {(inputs: Rubric_Pick_HintInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Выберите, затем заполните объявление`)
+};
+
+export const rubric_picker_copy = /** @type {(inputs: Rubric_Picker_CopyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Один список для поиска и публикации — без свободного ввода.`)
+};
+
+export const rubric_picker_title = /** @type {(inputs: Rubric_Picker_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Выбор рубрики`)
+};
+
+export const rubric_prefix_label = /** @type {(inputs: Rubric_Prefix_LabelInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Рубрика: ${i?.rubric}`)
+};
+
+export const save_changes_button = /** @type {(inputs: Save_Changes_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сохранить изменения`)
+};
+
+export const save_info_button = /** @type {(inputs: Save_Info_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сохранить информацию`)
+};
+
+export const save_status_button = /** @type {(inputs: Save_Status_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сохранить статус`)
+};
+
+export const saved_resources_count = /** @type {(inputs: Saved_Resources_CountInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`Сохранённые объявления: ${i?.n}`)
+};
+
+export const saved_resources_title = /** @type {(inputs: Saved_Resources_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сохранённые объявления`)
+};
+
+export const search_first_body = /** @type {(inputs: Search_First_BodyInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Найдите людей и объявления`)
+};
+
+export const search_first_title = /** @type {(inputs: Search_First_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сначала поиск`)
+};
+
+export const search_member_label = /** @type {(inputs: Search_Member_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Поиск участника`)
 };
 
 export const search_title = /** @type {(inputs: Search_TitleInputs) => LocalizedString} */ () => {
@@ -1795,6 +3968,22 @@ export const search_title = /** @type {(inputs: Search_TitleInputs) => Localized
 
 export const search_what = /** @type {(inputs: Search_WhatInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Что искать`)
+};
+
+export const sections_heading = /** @type {(inputs: Sections_HeadingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Разделы`)
+};
+
+export const select_placeholder = /** @type {(inputs: Select_PlaceholderInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Выберите из списка`)
+};
+
+export const send_invite_button = /** @type {(inputs: Send_Invite_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Отправить приглашение`)
+};
+
+export const services_subtitle = /** @type {(inputs: Services_SubtitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Ищу специалиста или предлагаю услугу`)
 };
 
 export const share_card_sent = /** @type {(inputs: Share_Card_SentInputs) => LocalizedString} */ () => {
@@ -1833,6 +4022,102 @@ export const share_tagline = /** @type {(inputs: Share_TaglineInputs) => Localiz
 	return /** @type {LocalizedString} */ (`ЛЮДИ · РАБОТА · УСЛУГИ · БИЗНЕС`)
 };
 
+export const show_more_members_link = /** @type {(inputs: Show_More_Members_LinkInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Показать следующих`)
+};
+
+export const sort_by_rating = /** @type {(inputs: Sort_By_RatingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`По рейтингу`)
+};
+
+export const sort_newest = /** @type {(inputs: Sort_NewestInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Новые`)
+};
+
 export const specialist = /** @type {(inputs: SpecialistInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Специалист`)
+};
+
+export const status_approved_short = /** @type {(inputs: Status_Approved_ShortInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Одобрен`)
+};
+
+export const status_hidden_short = /** @type {(inputs: Status_Hidden_ShortInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Скрыт`)
+};
+
+export const status_not_set = /** @type {(inputs: Status_Not_SetInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Статус не указан`)
+};
+
+export const status_rejected_short = /** @type {(inputs: Status_Rejected_ShortInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Отклонён`)
+};
+
+export const status_saving = /** @type {(inputs: Status_SavingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Сохраняем...`)
+};
+
+export const status_sending = /** @type {(inputs: Status_SendingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Отправляем...`)
+};
+
+export const territory_manage_note = /** @type {(inputs: Territory_Manage_NoteInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Права действуют по вашему административному назначению. Сама официальная группа принадлежит платформе GRABIT.`)
+};
+
+export const this_city_fallback = /** @type {(inputs: This_City_FallbackInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`этот город`)
+};
+
+export const this_device_tag = /** @type {(inputs: This_Device_TagInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Это устройство`)
+};
+
+export const to_map_action = /** @type {(inputs: To_Map_ActionInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`На карту`)
+};
+
+export const transfer_ownership_button = /** @type {(inputs: Transfer_Ownership_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Передать владение`)
+};
+
+export const transport_subtitle = /** @type {(inputs: Transport_SubtitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Куплю, продам, аренда и перевозки`)
+};
+
+export const upload_photo_button = /** @type {(inputs: Upload_Photo_ButtonInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Загрузить фото`)
+};
+
+export const user_fallback_label = /** @type {(inputs: User_Fallback_LabelInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Пользователь`)
+};
+
+export const vacancies_heading = /** @type {(inputs: Vacancies_HeadingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Вакансии`)
+};
+
+export const vote_error_status = /** @type {(inputs: Vote_Error_StatusInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Не удалось сохранить оценку.`)
+};
+
+export const vote_saved_status = /** @type {(inputs: Vote_Saved_StatusInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Оценка сохранена`)
+};
+
+export const where_to_start_title = /** @type {(inputs: Where_To_Start_TitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`С чего начать`)
+};
+
+export const workers_subtitle = /** @type {(inputs: Workers_SubtitleInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Профессии и кто ищет работу`)
+};
+
+export const you_are_owner_heading = /** @type {(inputs: You_Are_Owner_HeadingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Вы владелец группы`)
+};
+
+export const you_manage_territory_heading = /** @type {(inputs: You_Manage_Territory_HeadingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Вы управляете этой территорией`)
 };

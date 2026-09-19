@@ -1,10 +1,10 @@
 use super::common::{
     back_hero, back_link, bottom_nav, empty_state_action, empty_state_card_with_actions,
     error_status_html, escape_html, guest_locked_section, icon, is_generic_profession_key,
-    kind_chip, my_resource_moderation_badge, navigation_card, page_document, page_shell,
-    premium_badge_html, profession_label, resource_card_link_class, resource_detail_section_class,
-    resource_listing_label, ru_count, search_people_cards, section_head, share_button, topbar,
-    verified_badge_html,
+    js_string, kind_chip, my_resource_moderation_badge, navigation_card, page_document,
+    page_shell, plural_count, premium_badge_html, profession_label, resource_card_link_class,
+    resource_detail_section_class, resource_listing_label, search_people_cards, section_head,
+    share_button, topbar, verified_badge_html,
 };
 
 pub struct RenderCategoryParams<'a> {
@@ -91,28 +91,28 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
     let cards = if resources.is_empty() {
         if people.is_empty() {
             empty_state_card_with_actions(
-                "Пока пусто",
-                if category.eq_ignore_ascii_case("all") {
-                    "В этом городе пока нет опубликованных объявлений."
+                &crate::i18n::t("resource_empty_title"),
+                &(if category.eq_ignore_ascii_case("all") {
+                    crate::i18n::t("resource_empty_all_body")
                 } else if listing_type == Some("seeker") {
-                    "Добавьте объявление или укажите профессию в профиле."
+                    crate::i18n::t("resource_empty_seeker_body")
                 } else {
-                    "Добавьте первое объявление в этом разделе."
-                },
+                    crate::i18n::t("resource_empty_default_body")
+                }),
                 &empty_state_action(
                     &add_url,
-                    if category.eq_ignore_ascii_case("all") {
-                        "К разделам"
+                    &(if category.eq_ignore_ascii_case("all") {
+                        crate::i18n::t("resource_empty_all_action")
                     } else {
-                        "Добавить"
-                    },
+                        crate::i18n::t("common_add")
+                    }),
                 ),
             )
         } else {
             empty_state_card_with_actions(
-                "Объявлений нет",
-                "Есть участники по этому запросу, но объявлений пока нет.",
-                &empty_state_action(&add_url, "Добавить объявление"),
+                &crate::i18n::t("resource_empty_people_title"),
+                &crate::i18n::t("resource_empty_people_body"),
+                &empty_state_action(&add_url, &crate::i18n::t("resource_add_action")),
             )
         }
     } else {
@@ -192,7 +192,7 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                         )
                     };
                     let resource_href = format!("/app/listing/{id}");
-                    let share_html = share_button(&resource_href, "Поделиться");
+                    let share_html = share_button(&resource_href, &crate::i18n::t("common_share"));
 
                     format!(
                         r#"
@@ -217,7 +217,7 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                             </div>
 
                             <div class="card-meta">
-                                Оценка {rating:.1} · {votes}
+                                {rating_label} {rating:.1} · {votes}
                             </div>
 
                             <div class="card-meta">
@@ -244,8 +244,9 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
                         premium_badge = premium_badge,
                         listing_label = listing_label,
                         description = safe_description,
+                        rating_label = crate::i18n::t("rating_label"),
                         rating = rating,
-                        votes = ru_count(*votes, "голос", "голоса", "голосов"),
+                        votes = plural_count(*votes, "count_vote_one", "count_vote_few", "count_vote_many"),
                         address = safe_address,
                         verified_badge = verified_badge,
                         write_html = write_html,
@@ -265,25 +266,30 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
         format!(
             r#"{head}
 <div>{cards}</div>"#,
-            head = section_head("По профессии", &format!("Найдено: {people_count}"), None,),
+            head = section_head(
+                &crate::i18n::t("resource_people_section_title"),
+                &crate::i18n::tf("resource_found_count", &[("n", &people_count.to_string())]),
+                None,
+            ),
             cards = search_people_cards(&people),
         )
     };
 
     let work_chips = if category.eq_ignore_ascii_case("work") {
         format!(
-            r#"<nav class="rm-kind-chips" aria-label="Что искать">
+            r#"<nav class="rm-kind-chips" aria-label="{aria}">
     {work}{workers}
 </nav>"#,
+            aria = crate::i18n::t("aria_what_to_search"),
             work = kind_chip(
                 listing_type == Some("offer"),
                 &category_list_href(ci, si, zi, category, Some("offer"), active_rubric, sort),
-                "Работа",
+                &crate::i18n::t("common_work"),
             ),
             workers = kind_chip(
                 listing_type == Some("seeker"),
                 &category_list_href(ci, si, zi, category, Some("seeker"), active_rubric, sort),
-                "Работники",
+                &crate::i18n::t("common_workers"),
             ),
         )
     } else {
@@ -298,11 +304,14 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
         } else {
             crate::catalog::RubricKind::Business
         };
-        let mut chips = String::from(r#"<nav class="rm-kind-chips" aria-label="Рубрика">"#);
+        let mut chips = format!(
+            r#"<nav class="rm-kind-chips" aria-label="{aria}">"#,
+            aria = crate::i18n::t("aria_rubric")
+        );
         chips.push_str(&kind_chip(
             active_rubric.is_none(),
             &category_list_href(ci, si, zi, category, listing_type, None, sort),
-            "Все",
+            &crate::i18n::t("common_all"),
         ));
         for rubric in crate::catalog::by_kind(rubric_kind) {
             chips.push_str(&kind_chip(
@@ -316,25 +325,30 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
     };
 
     let sort_chips = format!(
-        r#"<nav class="rm-kind-chips" aria-label="Сортировка">
+        r#"<nav class="rm-kind-chips" aria-label="{aria}">
     {rating}{newest}
 </nav>"#,
+        aria = crate::i18n::t("aria_sort"),
         rating = kind_chip(
             sort != "new",
             &category_list_href(ci, si, zi, category, listing_type, active_rubric, "rating"),
-            "По рейтингу",
+            &crate::i18n::t("sort_by_rating"),
         ),
         newest = kind_chip(
             sort == "new",
             &category_list_href(ci, si, zi, category, listing_type, active_rubric, "new"),
-            "Новые",
+            &crate::i18n::t("sort_newest"),
         ),
     );
 
     let section_head_resources = if resources.is_empty() {
         String::new()
     } else {
-        section_head("Объявления", &format!("Найдено: {}", count), None)
+        section_head(
+            &crate::i18n::t("resources_section_title"),
+            &crate::i18n::tf("resource_found_count", &[("n", &count.to_string())]),
+            None,
+        )
     };
 
     let content = format!(
@@ -360,36 +374,36 @@ pub fn render_category(params: RenderCategoryParams<'_>) -> String {
     );
 
     let heading = if let Some(rubric) = active_rubric.and_then(crate::catalog::by_id) {
-        rubric.label
+        rubric.label.to_string()
     } else {
         match (category.to_ascii_lowercase().as_str(), listing_type) {
-            ("all", _) => "Все объявления",
-            ("work", Some("offer")) => "Работа",
-            ("work", Some("seeker")) => "Работники",
-            ("work", _) => "Работа",
-            ("business" | "services", _) => "Бизнес",
-            _ => category,
+            ("all", _) => crate::i18n::t("category_all_title"),
+            ("work", Some("offer")) => crate::i18n::t("common_work"),
+            ("work", Some("seeker")) => crate::i18n::t("common_workers"),
+            ("work", _) => crate::i18n::t("common_work"),
+            ("business" | "services", _) => crate::i18n::t("common_business"),
+            _ => category.to_string(),
         }
     };
     let heading_copy = if category.eq_ignore_ascii_case("all") {
-        "Все опубликованные объявления в городе."
+        crate::i18n::t("category_all_copy")
     } else {
         match listing_type {
-            Some("offer") => "Вакансии и предложения работы в городе.",
-            Some("seeker") => "Объявления и специалисты по профессии в городе.",
-            _ => "Объявления города в этом разделе.",
+            Some("offer") => crate::i18n::t("category_offer_copy"),
+            Some("seeker") => crate::i18n::t("category_seeker_copy"),
+            _ => crate::i18n::t("category_default_copy"),
         }
     };
 
     page_shell(
         &format!("{} · GRABIT", heading),
-        &topbar("Категория", "globe"),
+        &topbar(&crate::i18n::t("nav_category"), "globe"),
         &back_hero(
-            &back_link(&city_url, "Вернуться к городу", "chevron"),
+            &back_link(&city_url, &crate::i18n::t("back_to_city"), "chevron"),
             "map",
-            "Раздел",
-            heading,
-            heading_copy,
+            &crate::i18n::t("category_eyebrow"),
+            &heading,
+            &heading_copy,
         ),
         &content,
         &bottom_nav("map"),
@@ -527,41 +541,50 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
         _ => "",
     };
     let (back_url, back_label) = if owner_preview {
-        ("/app/my-resources".to_string(), "Мои объявления")
+        ("/app/my-resources".to_string(), crate::i18n::t("my_resources_title"))
     } else if continent_index >= 0 && country_index >= 0 && city_index >= 0 {
         (
             format!(
                 "/app/{continent_index}/{country_index}/{city_index}/cat/{category_url}{type_query}"
             ),
-            "Вернуться к разделу",
+            crate::i18n::t("back_to_category"),
         )
     } else if let Some(city_id) = city_id {
-        (format!("/app/map/city/{city_id}"), "Вернуться в город")
+        (format!("/app/map/city/{city_id}"), crate::i18n::t("back_to_city"))
     } else {
-        ("/app".to_string(), "Вернуться к городам")
+        ("/app".to_string(), crate::i18n::t("back_to_cities"))
     };
     let moderation_banner = if !owner_preview {
         String::new()
     } else if moderation_status == "rejected" {
-        r#"<section class="card rm-resource-moderation-banner">
-    <div class="card-title">Объявление отклонено</div>
-    <div class="card-meta">Исправьте текст и сохраните снова — оно уйдёт на повторную проверку.</div>
-    <a href="/app/resource/{id}/edit" class="ui-button rm-auth-button">Редактировать</a>
-</section>"#
-            .replace("{id}", &id.to_string())
-    } else if is_active == 0 {
-        String::from(
+        format!(
             r#"<section class="card rm-resource-moderation-banner">
-    <div class="card-title">Объявление скрыто</div>
-    <div class="card-meta">Другие участники его не видят.</div>
+    <div class="card-title">{title}</div>
+    <div class="card-meta">{body}</div>
+    <a href="/app/resource/{id}/edit" class="ui-button rm-auth-button">{edit}</a>
 </section>"#,
+            title = crate::i18n::t("moderation_rejected_title"),
+            body = crate::i18n::t("moderation_rejected_body"),
+            edit = crate::i18n::t("common_edit"),
+            id = id,
+        )
+    } else if is_active == 0 {
+        format!(
+            r#"<section class="card rm-resource-moderation-banner">
+    <div class="card-title">{title}</div>
+    <div class="card-meta">{body}</div>
+</section>"#,
+            title = crate::i18n::t("moderation_hidden_title"),
+            body = crate::i18n::t("moderation_hidden_body"),
         )
     } else {
-        String::from(
+        format!(
             r#"<section class="card rm-resource-moderation-banner">
-    <div class="card-title">На проверке</div>
-    <div class="card-meta">Другие участники это объявление пока не видят. После одобрения оно появится в поиске и в городе.</div>
+    <div class="card-title">{title}</div>
+    <div class="card-meta">{body}</div>
 </section>"#,
+            title = crate::i18n::t("moderation_pending_title"),
+            body = crate::i18n::t("moderation_pending_body"),
         )
     };
 
@@ -574,18 +597,19 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
         <span class="rm-resource-listing-label">{listing_label}</span>
 
         <span id="rating-summary" class="rm-resource-rating-summary">
-            Оценка <strong>{rating:.1}</strong> · {votes}
+            {rating_label} <strong>{rating:.1}</strong> · {votes}
         </span>"#,
         premium_badge = premium_badge,
         verified_badge = verified_badge,
         listing_label = listing_label,
+        rating_label = crate::i18n::t("rating_label"),
         rating = rating,
-        votes = ru_count(votes, "голос", "голоса", "голосов"),
+        votes = plural_count(votes, "count_vote_one", "count_vote_few", "count_vote_many"),
     );
     let favorite_label = if viewer_favorite {
-        "В избранном"
+        crate::i18n::t("favorite_added_label")
     } else {
-        "В избранное"
+        crate::i18n::t("favorite_action_label")
     };
     let stars_html = (1..=5)
         .map(|score| {
@@ -625,18 +649,18 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
     <div id="favorite-status" class="ui-status rm-resource-favorite-status"></div>
 
     <div class="rm-resource-report-inline">
-        <div class="rm-resource-report-label">Пожаловаться</div>
+        <div class="rm-resource-report-label">{report_label}</div>
         <div class="rm-report-chips">
-            <button type="button" class="rm-report-chip" data-reason="Спам">Спам</button>
-            <button type="button" class="rm-report-chip" data-reason="Обман">Обман</button>
-            <button type="button" class="rm-report-chip" data-reason="Оскорбление">Оскорбление</button>
-            <button type="button" class="rm-report-chip" data-reason="Другая причина">Другое</button>
+            <button type="button" class="rm-report-chip" data-reason="Спам">{reason_spam}</button>
+            <button type="button" class="rm-report-chip" data-reason="Обман">{reason_scam}</button>
+            <button type="button" class="rm-report-chip" data-reason="Оскорбление">{reason_insult}</button>
+            <button type="button" class="rm-report-chip" data-reason="Другая причина">{reason_other}</button>
         </div>
         <div id="report-status" class="ui-status rm-resource-report-status"></div>
     </div>
 
     <div class="rm-resource-rating-block">
-        <div class="rm-resource-rating-kicker">Оценить</div>
+        <div class="rm-resource-rating-kicker">{rate_prompt}</div>
         <div id="rating-stars" class="rm-resource-stars">
             {stars_html}
         </div>
@@ -647,6 +671,12 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
             share_title = escape_html(title),
             share_text = escape_html(&format!("{listing_label} · {rubric_label}")),
             share_external = crate::i18n::t("share_external"),
+            report_label = crate::i18n::t("report_label"),
+            reason_spam = crate::i18n::t("report_reason_spam"),
+            reason_scam = crate::i18n::t("report_reason_scam"),
+            reason_insult = crate::i18n::t("report_reason_insult"),
+            reason_other = crate::i18n::t("report_reason_other"),
+            rate_prompt = crate::i18n::t("rate_prompt_label"),
             share_internal = crate::i18n::t("share_internal"),
             id = id,
         )
@@ -683,27 +713,31 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
     <div class="card-content rm-resource-owner-content">
 
         <div class="rm-resource-owner-kicker">
-            Автор объявления
+            {author_label}
         </div>
 
         <div class="card-title">
-            Профиль участника
+            {author_profile_title}
         </div>
 
         <div class="card-meta rm-resource-owner-meta">
-            Другие объявления и актуальный статус
+            {author_profile_meta}
         </div>
 
     </div>
 
     <a href="/app/user/{public_id}" class="rm-resource-owner-link">
-        Профиль
+        {profile_label}
     </a>
     {write_html}
 
 </section>
 "#,
             owner_icon = icon("user"),
+            author_label = crate::i18n::t("resource_author_label"),
+            author_profile_title = crate::i18n::t("resource_author_profile_title"),
+            author_profile_meta = crate::i18n::t("resource_author_profile_meta"),
+            profile_label = crate::i18n::t("common_profile"),
             public_id = urlencoding::encode(owner_public_id),
             write_html = if owner_user_id > 0 && !owner_preview {
                 format!(
@@ -732,16 +766,16 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
         String::new()
     };
     let external_label = if contact_clean.starts_with('@') {
-        "Telegram"
+        "Telegram".to_string()
     } else if contact_clean.starts_with("http://") || contact_clean.starts_with("https://") {
-        "Сайт"
+        crate::i18n::t("contact_type_website")
     } else if contact_clean
         .chars()
         .any(|c| c.is_ascii_digit() || c == '+')
     {
-        "Позвонить"
+        crate::i18n::t("contact_type_call")
     } else {
-        "Связаться"
+        crate::i18n::t("contact_type_contact")
     };
     let primary_contact = if !write_href.is_empty() {
         format!(
@@ -777,7 +811,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
 <section class="{detail_section_class}">
 
     <div class="rm-resource-section-kicker">
-        Об объявлении
+        {about_label}
     </div>
 
     <div class="rm-resource-description">
@@ -791,7 +825,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
 <section class="card rm-resource-section">
 
     <div class="rm-resource-section-kicker rm-resource-section-kicker--contacts">
-        Контакты
+        {contacts_label}
     </div>
 
     <div class="card-meta rm-resource-contact-line">
@@ -811,7 +845,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
            target="_blank"
            rel="noopener noreferrer"
            class="rm-resource-contact-btn rm-resource-contact-btn--neutral">
-            На карте
+            {on_map_label}
         </a>
 
     </div>
@@ -821,7 +855,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
 <section class="card rm-resource-section">
 
     <div class="rm-resource-section-kicker rm-resource-section-kicker--contacts">
-        Номер объявления
+        {id_label}
     </div>
 
     <div class="rm-resource-id-value">
@@ -831,13 +865,17 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
 </section>"####,
         moderation_banner = moderation_banner,
         public_actions = public_actions_html,
+        about_label = crate::i18n::t("resource_about_label"),
         description = safe_description,
         owner_profile_html = owner_profile_html,
+        contacts_label = crate::i18n::t("common_contacts"),
         address = safe_address,
         contact = safe_contact,
         primary_contact = primary_contact,
         extra_contact = extra_contact,
         map_href = safe_map_href,
+        on_map_label = crate::i18n::t("open_on_map_label"),
+        id_label = crate::i18n::t("resource_id_label"),
         detail_section_class = detail_section_class,
         id = id,
     );
@@ -849,6 +887,38 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
             r####"<script>
 (function () {{
     const resourceId = {id};
+    const isRuLocale = {is_ru};
+    const L = {{
+        favAdded: {fav_added_label},
+        favAction: {fav_action_label},
+        saving: {status_saving},
+        favAddedStatus: {favorite_added_status},
+        favRemovedStatus: {favorite_removed_status},
+        favError: {favorite_error_status},
+        connError: {error_connection},
+        sending: {status_sending},
+        reportSent: {report_sent_status},
+        reportError: {report_error_status},
+        voteError: {vote_error_status},
+        voteSaved: {vote_saved_status},
+        ratingLabel: {rating_label},
+        voteOne: {vote_one},
+        voteFew: {vote_few},
+        voteMany: {vote_many}
+    }};
+
+    function pluralVotes(n) {{
+        if (isRuLocale) {{
+            const abs = Math.abs(n) % 100;
+            const last = abs % 10;
+            let word = L.voteMany;
+            if (abs > 10 && abs < 20) word = L.voteMany;
+            else if (last === 1) word = L.voteOne;
+            else if (last >= 2 && last <= 4) word = L.voteFew;
+            return n + " " + word;
+        }}
+        return n + " " + (Math.abs(n) === 1 ? L.voteOne : L.voteMany);
+    }}
 
     const favoriteButton =
         document.getElementById("favorite-button");
@@ -861,8 +931,8 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
 
         favoriteButton.textContent =
             value
-                ? "В избранном"
-                : "В избранное";
+                ? L.favAdded
+                : L.favAction;
     }}
 
     async function responseData(response) {{
@@ -882,7 +952,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
             favoriteButton.disabled = true;
 
             if (favoriteStatus) {{
-                favoriteStatus.textContent = "Сохраняем...";
+                favoriteStatus.textContent = L.saving;
             }}
 
             try {{
@@ -902,16 +972,16 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
                     if (favoriteStatus) {{
                         favoriteStatus.textContent =
                             data.favorite
-                                ? "✓ Добавлено в избранное"
-                                : "Удалено из избранного";
+                                ? L.favAddedStatus
+                                : L.favRemovedStatus;
                     }}
                 }} else if (favoriteStatus) {{
-                    favoriteStatus.textContent = "Не удалось изменить избранное.";
+                    favoriteStatus.textContent = L.favError;
                 }}
             }} catch (_) {{
                 if (favoriteStatus) {{
                     favoriteStatus.textContent =
-                        "Ошибка соединения.";
+                        L.connError;
                 }}
             }}
 
@@ -934,7 +1004,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
 
             reportChips.forEach((item) => {{ item.disabled = true; }});
             if (reportStatus) {{
-                reportStatus.textContent = "Отправляем...";
+                reportStatus.textContent = L.sending;
             }}
 
             try {{
@@ -953,12 +1023,12 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
                 if (!data) return;
                 if (reportStatus) {{
                     reportStatus.textContent = data.ok
-                        ? "Жалоба отправлена"
-                        : "Не удалось отправить жалобу.";
+                        ? L.reportSent
+                        : L.reportError;
                 }}
             }} catch (_) {{
                 if (reportStatus) {{
-                    reportStatus.textContent = "Ошибка соединения.";
+                    reportStatus.textContent = L.connError;
                 }}
             }}
 
@@ -998,7 +1068,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
         star.addEventListener("click", async () => {{
             const score = Number(star.dataset.score);
 
-            status.textContent = "Сохраняем...";
+            status.textContent = L.saving;
             stars.forEach((item) => {{ item.disabled = true; }});
 
             try {{
@@ -1017,7 +1087,7 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
                 if (!data) return;
 
                 if (!data.ok) {{
-                    status.textContent = "Не удалось сохранить оценку.";
+                    status.textContent = L.voteError;
                     return;
                 }}
 
@@ -1025,22 +1095,13 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
                 paint(score);
 
                 if (summary) {{
-                    function ruVotes(n) {{
-                        const abs = Math.abs(n) % 100;
-                        const last = abs % 10;
-                        let word = "голосов";
-                        if (abs > 10 && abs < 20) word = "голосов";
-                        else if (last === 1) word = "голос";
-                        else if (last >= 2 && last <= 4) word = "голоса";
-                        return n + " " + word;
-                    }}
                     summary.innerHTML =
-                        `Оценка <strong>${{Number(data.rating).toFixed(1)}}</strong> · ${{ruVotes(Number(data.votes) || 0)}}`;
+                        `${{L.ratingLabel}} <strong>${{Number(data.rating).toFixed(1)}}</strong> · ${{pluralVotes(Number(data.votes) || 0)}}`;
                 }}
 
-                status.textContent = "Оценка сохранена";
+                status.textContent = L.voteSaved;
             }} catch (_) {{
-                status.textContent = "Ошибка соединения.";
+                status.textContent = L.connError;
             }} finally {{
                 stars.forEach((item) => {{ item.disabled = false; }});
             }}
@@ -1049,6 +1110,23 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
 }})();
 </script>"####,
             id = id,
+            is_ru = crate::i18n::locale() == "ru",
+            fav_added_label = js_string("favorite_added_label"),
+            fav_action_label = js_string("favorite_action_label"),
+            status_saving = js_string("status_saving"),
+            favorite_added_status = js_string("favorite_added_status"),
+            favorite_removed_status = js_string("favorite_removed_status"),
+            favorite_error_status = js_string("favorite_error_status"),
+            error_connection = js_string("error_connection"),
+            status_sending = js_string("status_sending"),
+            report_sent_status = js_string("report_sent_status"),
+            report_error_status = js_string("report_error_status"),
+            vote_error_status = js_string("vote_error_status"),
+            vote_saved_status = js_string("vote_saved_status"),
+            rating_label = js_string("rating_label"),
+            vote_one = js_string("count_vote_one"),
+            vote_few = js_string("count_vote_few"),
+            vote_many = js_string("count_vote_many"),
             viewer_score = viewer_score.clamp(0, 5),
         )
     };
@@ -1059,9 +1137,9 @@ pub fn render_resource_profile(params: RenderResourceProfileParams<'_>) -> Strin
         "",
         &format!(
             "{topbar}\n\n{hero}\n\n{content}",
-            topbar = topbar("Объявление", "map"),
+            topbar = topbar(&crate::i18n::t("common_listing"), "map"),
             hero = back_hero(
-                &back_link(&back_url, back_label, "arrow-left"),
+                &back_link(&back_url, &back_label, "arrow-left"),
                 "map-pin",
                 &rubric_label,
                 title,
@@ -1088,10 +1166,14 @@ pub fn render_internal_promotion(
     let state_html = if currently_active {
         format!(
             r#"<div class="card rm-promo-pending rm-promo-published">
-    <div class="card-title">Продвижение активно</div>
-    <div class="card-meta rm-promo-pending-copy">Действует до {}.</div>
+    <div class="card-title">{title}</div>
+    <div class="card-meta rm-promo-pending-copy">{body}</div>
 </div>"#,
-            escape_html(&crate::internal_promotions::format_until(active_until))
+            title = crate::i18n::t("promo_active_title"),
+            body = crate::i18n::tf(
+                "promo_active_until",
+                &[("date", &escape_html(&crate::internal_promotions::format_until(active_until)))]
+            ),
         )
     } else {
         String::new()
@@ -1107,65 +1189,73 @@ pub fn render_internal_promotion(
     </button>
 </form>"#,
             label = if currently_active {
-                "Продлить бесплатно на 30 дней"
+                crate::i18n::t("promo_renew_button")
             } else {
-                "Продвинуть бесплатно на 30 дней"
+                crate::i18n::t("promo_start_button")
             },
         )
     } else {
-        r#"<div class="card rm-promo-pending">
-    <div class="card-title">Продление пока не требуется</div>
+        format!(
+            r#"<div class="card rm-promo-pending">
+    <div class="card-title">{title}</div>
     <div class="card-meta rm-promo-pending-copy">
-        Кнопка продления откроется за 7 дней до окончания.
+        {body}
     </div>
-</div>"#
-            .to_string()
+</div>"#,
+            title = crate::i18n::t("promo_not_yet_title"),
+            body = crate::i18n::t("promo_not_yet_body"),
+        )
     };
 
     let content = format!(
         r#"<section class="card rm-promo-preview">
-    <div class="rm-promo-preview-head">GRABIT · Внутреннее продвижение</div>
+    <div class="rm-promo-preview-head">{preview_kicker}</div>
     <div class="rm-promo-preview-body">
         <div class="rm-promo-preview-category">{category}</div>
         <h2 class="rm-promo-preview-title">{title}</h2>
         <div class="rm-promo-preview-text">{description}</div>
         <div class="rm-promo-preview-address">{address}</div>
-        <div class="rm-promo-preview-footer">Выше в городе и своей категории</div>
+        <div class="rm-promo-preview-footer">{preview_footer}</div>
         <div class="rm-promo-preview-domain">grabitmap.com</div>
     </div>
 </section>
 
 <section class="card rm-promo-target-card">
-    <div class="card-title">100% скидка до 2028 года</div>
+    <div class="card-title">{discount_title}</div>
     <div class="card-meta rm-promo-target-copy">
-        Продвижение внутри GRABIT бесплатно на 30 дней.
+        {discount_body}
     </div>
     <div class="card-meta rm-promo-target-note">
-        Карта и платёж не требуются. Социальные сети и внешние группы не подключаются.
+        {discount_note}
     </div>
 </section>
 
 {state_html}
 {action_html}"#,
+        preview_kicker = crate::i18n::t("promo_preview_kicker"),
         category = escape_html(category),
         title = escape_html(title),
         description = escape_html(description),
         address = escape_html(address),
+        preview_footer = crate::i18n::t("promo_preview_footer"),
+        discount_title = crate::i18n::t("promo_discount_title"),
+        discount_body = crate::i18n::t("promo_discount_body"),
+        discount_note = crate::i18n::t("promo_discount_note"),
     );
 
     page_shell(
-        "Продвижение · GRABIT",
-        &topbar("Продвижение", "map-pin"),
+        &format!("{} · GRABIT", crate::i18n::t("promo_title")),
+        &topbar(&crate::i18n::t("promo_title"), "map-pin"),
         &back_hero(
             &back_link(
                 &format!("/app/resource/{resource_id}"),
-                "Объявление",
+                &crate::i18n::t("common_listing"),
                 "arrow-left",
             ),
             "map-pin",
-            "Бесплатно до 2028 года",
-            "Продвижение внутри GRABIT",
-            "30 дней видимости выше в городе и категории.",
+            &crate::i18n::t("promo_eyebrow"),
+            &crate::i18n::t("promo_hero_title"),
+            &crate::i18n::t("promo_hero_copy"),
         ),
         &content,
         "",
@@ -1187,8 +1277,8 @@ pub fn render_promotion_payment(
         .filter(|value| !value.trim().is_empty())
         .map(|value| {
             format!(
-                r#"<div class="card-meta rm-promo-bot-reason">Причина проверки: {}</div>"#,
-                escape_html(value)
+                r#"<div class="card-meta rm-promo-bot-reason">{}</div>"#,
+                crate::i18n::tf("promo_bot_reason_label", &[("reason", &escape_html(value))])
             )
         })
         .unwrap_or_default();
@@ -1200,14 +1290,14 @@ pub fn render_promotion_payment(
           action="/app/resource/{resource_id}/promote/pay/{request_id}"
           class="ui-form rm-promo-form">
         <button type="submit" class="ui-button rm-promo-submit">
-            Перейти к оплате Stripe · {price}
+            {label}
         </button>
     </form>"#,
                 resource_id = resource_id,
                 request_id = request_id,
-                price = price,
+                label = crate::i18n::tf("promo_pay_stripe_button", &[("price", &price)]),
             ),
-            "Оплата проходит через Stripe Checkout. После успешной оплаты объявление будет опубликовано автоматически.",
+            crate::i18n::t("promo_pay_stripe_note"),
         )
     } else if mock_allowed {
         (
@@ -1216,30 +1306,33 @@ pub fn render_promotion_payment(
           action="/app/resource/{resource_id}/promote/pay/{request_id}"
           class="ui-form rm-promo-form">
         <button type="submit" class="ui-button rm-promo-submit">
-            Подтвердить оплату · {price}
+            {label}
         </button>
     </form>"#,
                 resource_id = resource_id,
                 request_id = request_id,
-                price = price,
+                label = crate::i18n::tf("promo_pay_mock_button", &[("price", &price)]),
             ),
-            "Тестовый контур: кнопка фиксирует оплату без Stripe. Для продакшена задайте STRIPE_SECRET_KEY.",
+            crate::i18n::t("promo_pay_mock_note"),
         )
     } else {
         (
-            r#"<div class="card-meta rm-promo-payment-unavailable">
-        Оплата временно недоступна. Платёжный сервис не настроен на этом сервере.
-    </div>"#.to_string(),
-            "Для production требуется STRIPE_SECRET_KEY или явный ALLOW_MOCK_PROMOTION_PAYMENT=1 на localhost.",
+            format!(
+                r#"<div class="card-meta rm-promo-payment-unavailable">
+        {}
+    </div>"#,
+                crate::i18n::t("promo_pay_unavailable")
+            ),
+            crate::i18n::t("promo_pay_unavailable_note"),
         )
     };
 
     let content = format!(
         r#"
 <section class="card rm-promo-payment-card">
-    <div class="card-title">Оплата публикации в группе</div>
+    <div class="card-title">{pay_title}</div>
     <div class="card-meta rm-promo-price-note">
-        К оплате: <strong>{price}</strong>
+        {pay_amount_prefix} <strong>{price}</strong>
     </div>
     <div class="card-meta">{note}</div>
     {reason_html}
@@ -1249,26 +1342,28 @@ pub fn render_promotion_payment(
     </div>
 </section>
 "#,
+        pay_title = crate::i18n::t("promo_pay_title"),
+        pay_amount_prefix = crate::i18n::t("promo_pay_amount_prefix"),
         price = price,
         note = note,
         reason_html = reason_html,
         payment_form = payment_form,
-        payment_footnote = escape_html(payment_footnote),
+        payment_footnote = escape_html(&payment_footnote),
     );
 
     page_shell(
-        "Оплата · GRABIT",
-        &topbar("Оплата", "credit-card"),
+        &format!("{} · GRABIT", crate::i18n::t("payment_title")),
+        &topbar(&crate::i18n::t("payment_title"), "credit-card"),
         &back_hero(
             &back_link(
                 &format!("/app/resource/{resource_id}/promote"),
-                "Назад",
+                &crate::i18n::t("common_back"),
                 "arrow-left",
             ),
             "credit-card",
-            "Продвижение",
-            "Оплата",
-            "После оплаты объявление уйдёт в городскую ленту и группу, если она настроена.",
+            &crate::i18n::t("promo_title"),
+            &crate::i18n::t("payment_title"),
+            &crate::i18n::t("promo_pay_hero_copy"),
         ),
         &content,
         "",
@@ -1373,15 +1468,15 @@ pub fn render_my_resources(
     resources: Vec<crate::web::view_models::MyResourceRow>,
 ) -> String {
     let cards = if client_id.is_empty() {
-        guest_locked_section("Мои объявления", "/app/my-resources")
+        guest_locked_section(&crate::i18n::t("my_resources_title"), "/app/my-resources")
     } else if resources.is_empty() {
         empty_state_card_with_actions(
-            "Нет опубликованных объявлений",
-            "Добавьте объявление в выбранном городе и категории.",
+            &crate::i18n::t("my_resources_empty_title"),
+            &crate::i18n::t("my_resources_empty_body"),
             &format!(
                 "{}{}",
-                empty_state_action("/app/add", "Добавить объявление"),
-                empty_state_action("/app", "Открыть города"),
+                empty_state_action("/app/add", &crate::i18n::t("resource_add_action")),
+                empty_state_action("/app", &crate::i18n::t("open_cities_action")),
             ),
         )
     } else {
@@ -1432,8 +1527,11 @@ pub fn render_my_resources(
                     if *is_active == 0
                         && moderation_status != "rejected"
                     {
-                        r#"<div class="rm-my-resource-note rm-my-resource-note--hidden"><strong>Объявление скрыто.</strong> Публикация недоступна другим участникам.</div>"#
-                            .to_string()
+                        format!(
+                            r#"<div class="rm-my-resource-note rm-my-resource-note--hidden"><strong>{lead}</strong> {body}</div>"#,
+                            lead = crate::i18n::t("my_resource_hidden_lead"),
+                            body = crate::i18n::t("my_resource_hidden_body"),
+                        )
                     } else {
                         String::new()
                     };
@@ -1443,8 +1541,9 @@ pub fn render_my_resources(
                         && *is_active == 1
                     {
                         format!(
-                            r#"<a href="/app/resource/{id}/promote" class="rm-my-resource-action rm-my-resource-action--gold">Продвинуть</a>"#,
+                            r#"<a href="/app/resource/{id}/promote" class="rm-my-resource-action rm-my-resource-action--gold">{label}</a>"#,
                             id = id,
+                            label = crate::i18n::t("promo_button_short"),
                         )
                     } else {
                         String::new()
@@ -1455,8 +1554,9 @@ pub fn render_my_resources(
                         && !rejection_reason.trim().is_empty()
                     {
                         format!(
-                            r#"<div class="rm-my-resource-note rm-my-resource-note--rejected"><strong>Причина отказа:</strong> {}</div>"#,
-                            safe_rejection_reason
+                            r#"<div class="rm-my-resource-note rm-my-resource-note--rejected"><strong>{label}</strong> {reason}</div>"#,
+                            label = crate::i18n::t("rejection_reason_label"),
+                            reason = safe_rejection_reason
                         )
                     } else {
                         String::new()
@@ -1486,7 +1586,7 @@ pub fn render_my_resources(
                                     </div>
 
                                     <div class="rm-my-resource-rating">
-                                        Оценка {rating:.1} · {votes}
+                                        {rating_label} {rating:.1} · {votes}
                                     </div>
                                 </div>
 
@@ -1506,14 +1606,14 @@ pub fn render_my_resources(
 
                                     <a href="/app/resource/{id}/edit"
                                        class="rm-my-resource-action rm-my-resource-action--edit">
-                                        {edit_icon} Редактировать
+                                        {edit_icon} {edit_label}
                                     </a>
 
                                     {promotion_button}
 
                                     <a href="/app/listing/{id}"
                                        class="rm-my-resource-action rm-my-resource-action--neutral">
-                                        Открыть
+                                        {open_label}
                                     </a>
 
                                 </div>
@@ -1525,11 +1625,14 @@ pub fn render_my_resources(
                     id = id,
                     icon = icon("map-pin"),
                     edit_icon = icon("edit"),
+                    edit_label = crate::i18n::t("common_edit"),
+                    open_label = crate::i18n::t("common_open"),
                     title = safe_title,
                     category = category_line,
                     description = safe_description,
+                    rating_label = crate::i18n::t("rating_label"),
                     rating = rating,
-                    votes = ru_count(*votes, "голос", "голоса", "голосов"),
+                    votes = plural_count(*votes, "count_vote_one", "count_vote_few", "count_vote_many"),
                     premium_badge = premium_badge,
                     moderation_badge = moderation_badge,
                     rejection_html = rejection_html,
@@ -1549,14 +1652,14 @@ pub fn render_my_resources(
     );
 
     page_shell(
-        "Мои объявления · GRABIT",
-        &topbar("Мои объявления", "map"),
+        &format!("{} · GRABIT", crate::i18n::t("my_resources_title")),
+        &topbar(&crate::i18n::t("my_resources_title"), "map"),
         &back_hero(
-            &back_link("/app/me", "Профиль", "arrow-left"),
+            &back_link("/app/me", &crate::i18n::t("common_profile"), "arrow-left"),
             "user",
-            "Управление",
-            "Мои объявления",
-            "Ваши объявления по работе и бизнесу.",
+            &crate::i18n::t("management_eyebrow"),
+            &crate::i18n::t("my_resources_title"),
+            &crate::i18n::t("my_resources_hero_copy"),
         ),
         &content,
         &bottom_nav("menu"),
@@ -1607,13 +1710,18 @@ pub fn render_edit_resource(params: RenderEditResourceParams<'_>) -> String {
         format!(
             r#"
     <label class="ui-field">
-        <span class="ui-field-label">Тип объявления</span>
+        <span class="ui-field-label">{field_label}</span>
         <select name="listing_type" class="ui-input">
-            <option value="offer"{offer_selected}>Предложение работы</option>
-            <option value="seeker"{seeker_selected}>Ищу работу</option>
+            <option value="offer"{offer_selected}>{offer_label}</option>
+            <option value="seeker"{seeker_selected}>{seeker_label}</option>
         </select>
     </label>
-"#
+"#,
+            field_label = crate::i18n::t("field_listing_type"),
+            offer_selected = offer_selected,
+            offer_label = crate::i18n::t("common_offer"),
+            seeker_selected = seeker_selected,
+            seeker_label = crate::i18n::t("common_seeker"),
         )
     } else {
         String::new()
@@ -1636,7 +1744,7 @@ pub fn render_edit_resource(params: RenderEditResourceParams<'_>) -> String {
     {listing_type_field}
 
     <label class="ui-field">
-        <span class="ui-field-label">Название</span>
+        <span class="ui-field-label">{title_label}</span>
         <input
             name="title"
             required
@@ -1646,7 +1754,7 @@ pub fn render_edit_resource(params: RenderEditResourceParams<'_>) -> String {
     </label>
 
     <label class="ui-field">
-        <span class="ui-field-label">Описание</span>
+        <span class="ui-field-label">{description_label}</span>
         <textarea
             name="description"
             required
@@ -1656,7 +1764,7 @@ pub fn render_edit_resource(params: RenderEditResourceParams<'_>) -> String {
     </label>
 
     <label class="ui-field">
-        <span class="ui-field-label">Контакт или ссылка</span>
+        <span class="ui-field-label">{contact_label}</span>
         <input
             name="contact"
             maxlength="120"
@@ -1665,7 +1773,7 @@ pub fn render_edit_resource(params: RenderEditResourceParams<'_>) -> String {
     </label>
 
     <label class="ui-field">
-        <span class="ui-field-label">Адрес</span>
+        <span class="ui-field-label">{address_label}</span>
         <input
             name="address"
             maxlength="250"
@@ -1674,36 +1782,42 @@ pub fn render_edit_resource(params: RenderEditResourceParams<'_>) -> String {
     </label>
 
     <button type="submit" class="ui-button rm-auth-button">
-        Сохранить изменения
+        {save_label}
     </button>
 
     <div class="ui-form-note">
-        После сохранения объявление автоматически вернётся на повторную модерацию.
+        {resave_note}
     </div>
 
 </form>"####,
         id = id,
         listing_type_field = listing_type_field,
         rubric_field = rubric_field,
+        title_label = crate::i18n::t("field_title"),
         title = safe_title,
+        description_label = crate::i18n::t("field_description"),
         description = safe_description,
+        contact_label = crate::i18n::t("field_contact"),
         contact = safe_contact,
+        address_label = crate::i18n::t("field_address"),
         address = safe_address,
+        save_label = crate::i18n::t("save_changes_button"),
+        resave_note = crate::i18n::t("edit_resave_note"),
     );
 
     page_shell(
-        "Редактировать объявление · GRABIT",
-        &topbar("Редактирование", "map"),
+        &format!("{} · GRABIT", crate::i18n::t("edit_resource_title")),
+        &topbar(&crate::i18n::t("edit_title"), "map"),
         &back_hero(
             &back_link(
                 &format!("/app/listing/{}", id),
-                "Назад к объявлению",
+                &crate::i18n::t("back_to_listing"),
                 "arrow-left",
             ),
             "edit",
-            "Редактирование",
-            "Редактировать объявление",
-            &format!("Рубрика: {}", profession_label(rubric)),
+            &crate::i18n::t("edit_title"),
+            &crate::i18n::t("edit_resource_title"),
+            &crate::i18n::tf("rubric_prefix_label", &[("rubric", &profession_label(rubric))]),
         ),
         &content,
         &bottom_nav("menu"),
@@ -1746,25 +1860,25 @@ pub fn render_add_rubric_picker(
                 "building"
             },
             rubric.label,
-            "Выберите, затем заполните объявление",
+            &crate::i18n::t("rubric_pick_hint"),
         ));
     }
 
     let heading = match listing_type {
-        Some("seeker") => "Кем вы хотите работать?",
-        Some("offer") => "Какая вакансия?",
-        _ => "Выберите рубрику",
+        Some("seeker") => crate::i18n::t("add_heading_seeker"),
+        Some("offer") => crate::i18n::t("add_heading_offer"),
+        _ => crate::i18n::t("add_heading_default"),
     };
 
     page_shell(
-        "Выбор рубрики · GRABIT",
-        &topbar("Новое объявление", "globe"),
+        &format!("{} · GRABIT", crate::i18n::t("rubric_picker_title")),
+        &topbar(&crate::i18n::t("new_resource_title"), "globe"),
         &back_hero(
-            &back_link(&back_url, "Назад", "chevron"),
+            &back_link(&back_url, &crate::i18n::t("common_back"), "chevron"),
             "map",
-            "Сначала рубрика",
-            heading,
-            "Один список для поиска и публикации — без свободного ввода.",
+            &crate::i18n::t("rubric_first_eyebrow"),
+            &heading,
+            &crate::i18n::t("rubric_picker_copy"),
         ),
         &format!(r#"<div class="grid">{cards}</div>"#, cards = cards),
         &bottom_nav("map"),
@@ -1772,17 +1886,22 @@ pub fn render_add_rubric_picker(
 }
 
 fn rubric_select_html(selected: &str, kind: Option<crate::catalog::RubricKind>) -> String {
-    let mut options = String::from(r#"<option value="">Выберите из списка</option>"#);
+    let mut options = format!(
+        r#"<option value="">{}</option>"#,
+        crate::i18n::t("select_placeholder")
+    );
+    let work_group_label = crate::i18n::t("rubric_group_work");
+    let business_group_label = crate::i18n::t("common_business");
     let groups = match kind {
         Some(crate::catalog::RubricKind::Work) => {
-            vec![(crate::catalog::RubricKind::Work, "Работа и работники")]
+            vec![(crate::catalog::RubricKind::Work, work_group_label.as_str())]
         }
         Some(crate::catalog::RubricKind::Business) => {
-            vec![(crate::catalog::RubricKind::Business, "Бизнес")]
+            vec![(crate::catalog::RubricKind::Business, business_group_label.as_str())]
         }
         None => vec![
-            (crate::catalog::RubricKind::Work, "Работа и работники"),
-            (crate::catalog::RubricKind::Business, "Бизнес"),
+            (crate::catalog::RubricKind::Work, work_group_label.as_str()),
+            (crate::catalog::RubricKind::Business, business_group_label.as_str()),
         ],
     };
 
@@ -1810,12 +1929,14 @@ fn rubric_select_html(selected: &str, kind: Option<crate::catalog::RubricKind>) 
     format!(
         r#"
     <label class="ui-field">
-        <span class="ui-field-label">Рубрика</span>
+        <span class="ui-field-label">{field_label}</span>
         <select name="rubric" required class="ui-input">
             {options}
         </select>
     </label>
-"#
+"#,
+        field_label = crate::i18n::t("field_rubric"),
+        options = options,
     )
 }
 
@@ -1849,9 +1970,9 @@ pub fn render_add_resource(
         _ => "",
     };
     let heading = match listing_type {
-        Some("seeker") => "Ищу работу",
-        Some("offer") => "Предлагаю работу",
-        _ => "Новое объявление",
+        Some("seeker") => crate::i18n::t("common_seeker"),
+        Some("offer") => crate::i18n::t("resource_form_heading_offer"),
+        _ => crate::i18n::t("new_resource_title"),
     };
 
     let error_html = error
@@ -1873,56 +1994,56 @@ pub fn render_add_resource(
     <input type="hidden" name="rubric" value="{rubric_id}">
 
     <div class="ui-field">
-        <span class="ui-field-label">Рубрика</span>
+        <span class="ui-field-label">{rubric_field_label}</span>
         <div class="card-title">{rubric_label}</div>
-        <a class="card-meta" href="{picker_url}">Изменить рубрику</a>
+        <a class="card-meta" href="{picker_url}">{change_rubric_label}</a>
     </div>
 
     <label class="ui-field">
-        <span class="ui-field-label">Название</span>
+        <span class="ui-field-label">{title_label}</span>
         <input
             name="title"
             required
             maxlength="120"
-            placeholder="Кратко, без лишнего"
+            placeholder="{title_placeholder}"
             class="ui-input"
             value="{title_value}">
     </label>
 
     <label class="ui-field">
-        <span class="ui-field-label">Описание</span>
+        <span class="ui-field-label">{description_label}</span>
         <textarea
             name="description"
             required
             maxlength="1000"
             rows="5"
-            placeholder="Условия, опыт, что предлагаете или ищете"
+            placeholder="{description_placeholder}"
             class="ui-textarea">{description_value}</textarea>
     </label>
 
     <label class="ui-field">
-        <span class="ui-field-label">Контакт или ссылка</span>
+        <span class="ui-field-label">{contact_label}</span>
         <input
             name="contact"
             required
             maxlength="120"
-            placeholder="+33... или @username"
+            placeholder="{contact_placeholder}"
             class="ui-input"
             value="{contact_value}">
     </label>
 
     <label class="ui-field">
-        <span class="ui-field-label">Адрес</span>
+        <span class="ui-field-label">{address_label}</span>
         <input
             name="address"
             maxlength="200"
-            placeholder="Город, район, улица"
+            placeholder="{address_placeholder}"
             class="ui-input"
             value="{address_value}">
     </label>
 
     <button type="submit" class="ui-button rm-auth-button">
-        Опубликовать
+        {publish_label}
     </button>
 
 </form>"####,
@@ -1933,27 +2054,38 @@ pub fn render_add_resource(
         category_url = category_url,
         listing_hidden = listing_hidden,
         rubric_id = escape_html(rubric.id),
+        rubric_field_label = crate::i18n::t("field_rubric"),
         rubric_label = escape_html(rubric.label),
         picker_url = escape_html(&picker_url),
+        change_rubric_label = crate::i18n::t("change_rubric_action"),
+        title_label = crate::i18n::t("field_title"),
+        title_placeholder = escape_html(&crate::i18n::t("placeholder_title")),
         title_value = escape_html(title_value),
+        description_label = crate::i18n::t("field_description"),
+        description_placeholder = escape_html(&crate::i18n::t("placeholder_description")),
         description_value = escape_html(description_value),
+        contact_label = crate::i18n::t("field_contact"),
+        contact_placeholder = escape_html(&crate::i18n::t("placeholder_contact")),
         contact_value = escape_html(contact_value),
+        address_label = crate::i18n::t("field_address"),
+        address_placeholder = escape_html(&crate::i18n::t("placeholder_address")),
         address_value = escape_html(address_value),
+        publish_label = crate::i18n::t("publish_button"),
     );
 
     page_document(
-        "Добавить объявление · GRABIT",
+        &format!("{} · GRABIT", crate::i18n::t("add_resource_page_title")),
         "",
         "",
         &format!(
             "{topbar}\n\n{hero}\n\n{content}",
-            topbar = topbar("Новое объявление", "globe"),
+            topbar = topbar(&crate::i18n::t("new_resource_title"), "globe"),
             hero = back_hero(
-                &back_link(&picker_url, "К рубрикам", "chevron"),
+                &back_link(&picker_url, &crate::i18n::t("back_to_rubrics"), "chevron"),
                 "briefcase",
-                heading,
+                &heading,
                 rubric.label,
-                "Рубрика уже выбрана. Осталось заполнить детали.",
+                &crate::i18n::t("add_resource_hero_copy"),
             ),
             content = content,
         ),
@@ -2018,9 +2150,12 @@ mod catalog_publish_tests {
         assert!(html.contains("На проверке"));
         assert!(html.contains("Другие участники это объявление пока не видят"));
         assert!(html.contains("/app/my-resources"));
+        // Check element ids rather than translated text or CSS class names:
+        // the full i18n message table (all locale strings) and the shared
+        // stylesheet (all class rules) are always embedded on the page, so
+        // both would appear here regardless of whether this markup renders.
         assert!(!html.contains("id=\"favorite-button\""));
-        assert!(!html.contains("В избранное"));
-        assert!(!html.contains("Пожаловаться"));
+        assert!(!html.contains("id=\"report-status\""));
         assert!(html.contains("noindex"));
     }
 

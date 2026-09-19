@@ -43,13 +43,13 @@ fn hash_deletion_code(state: &AppState, email: &str, code: &str, expires_at: i64
 async fn send_deletion_code_email(email: &str, code: &str) -> Result<(), String> {
     send_transactional_email(
         email,
-        "Подтверждение удаления аккаунта GRABIT",
+        &crate::i18n::t("email_deletion_code_subject"),
         templates::transactional_code_email_html(
             "GRABIT",
-            "Код для удаления аккаунта:",
+            &crate::i18n::t("email_deletion_code_intro"),
             code,
-            "Код действует 15 минут. После подтверждения аккаунт будет скрыт сразу, а данные удалены безвозвратно через 30 дней.",
-            "Если вы не запрашивали удаление, проигнорируйте письмо — код никого не пустит в аккаунт.",
+            &crate::i18n::t("email_deletion_code_expiry"),
+            &crate::i18n::t("email_deletion_code_footer"),
         ),
     )
     .await
@@ -102,13 +102,10 @@ async fn send_deletion_cancel_link(state: &AppState, email: &str) {
 
     let _ = send_transactional_email(
         email,
-        "Удаление аккаунта GRABIT запланировано",
-        format!(
-            "<p>Аккаунт скрыт и будет удалён безвозвратно через 30 дней.</p>\
-             <p>Чтобы отменить: войдите в аккаунт как обычно, либо перейдите по ссылке ниже \
-             (действует 30 дней, можно использовать один раз):</p>\
-             <p><a href=\"{cancel_url}\">Отменить удаление</a></p>\
-             <p>Если вы не запрашивали удаление — срочно смените пароль.</p>"
+        &crate::i18n::t("email_deletion_scheduled_subject"),
+        crate::i18n::tf(
+            "email_deletion_scheduled_body_html",
+            &[("cancel_url", &cancel_url)],
         ),
     )
     .await;

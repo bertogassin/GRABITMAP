@@ -16,16 +16,24 @@ pub fn invite_share_block(public_id: &str) -> String {
 
     format!(
         r#"<section class="card rm-invite-card">
-    <div class="card-title">Пригласить друга</div>
-    <div class="card-meta">Отправьте личную ссылку для чата или поиска работы.</div>
+    <div class="card-title">{title}</div>
+    <div class="card-meta">{body}</div>
     <div class="rm-invite-actions">
-        <button type="button" class="ui-button" data-share data-share-title="GRABIT · написать" data-share-text="Напиши мне в GRABIT. Чат сразу, без заявки." data-share-url="{chat}" data-share-status="rm-invite-status">Чат</button>
-        <button type="button" class="ui-button" data-share data-share-title="GRABIT · работа" data-share-text="Ищем работу рядом в GRABIT. Заходи по ссылке." data-share-url="{work}" data-share-status="rm-invite-status">Работа</button>
+        <button type="button" class="ui-button" data-share data-share-title="{chat_share_title}" data-share-text="{chat_share_text}" data-share-url="{chat}" data-share-status="rm-invite-status">{chat_label}</button>
+        <button type="button" class="ui-button" data-share data-share-title="{work_share_title}" data-share-text="{work_share_text}" data-share-url="{work}" data-share-status="rm-invite-status">{work_label}</button>
     </div>
     <p id="rm-invite-status" class="rm-invite-status-message" role="status"></p>
 </section>"#,
+        title = crate::i18n::t("invite_friend_title"),
+        body = crate::i18n::t("invite_friend_body"),
+        chat_share_title = escape_html(&crate::i18n::t("invite_chat_share_title")),
+        chat_share_text = escape_html(&crate::i18n::t("invite_chat_share_text")),
         chat = escape_html(&invite_path(public_id, "chat")),
+        chat_label = crate::i18n::t("common_chat"),
+        work_share_title = escape_html(&crate::i18n::t("invite_work_share_title")),
+        work_share_text = escape_html(&crate::i18n::t("invite_work_share_text")),
         work = escape_html(&invite_path(public_id, "work")),
+        work_label = crate::i18n::t("common_work"),
     )
 }
 
@@ -33,17 +41,17 @@ pub fn render_invite_landing(name: &str, public_id: &str, to: &str) -> String {
     let next = invite_path(public_id, to);
     let next_q = urlencoding::encode(&next);
     let title = match to {
-        "chat" => "Друг зовёт в чат",
-        "work" => "Друг зовёт к работе",
-        _ => "Друг зовёт в GRABIT",
+        "chat" => crate::i18n::t("friend_invites_chat"),
+        "work" => crate::i18n::t("friend_invites_work"),
+        _ => crate::i18n::t("friend_invites_generic"),
     };
     let lead = match to {
-        "chat" => "Напишите сразу. Потом можно заблокировать или удалить.",
-        "work" => "После входа откроется поиск работы, и вы сразу сможете написать другу.",
-        _ => "Чат и поиск работы рядом. Войдите — и вы уже у друга.",
+        "chat" => crate::i18n::t("invite_chat_lead"),
+        "work" => crate::i18n::t("invite_work_lead"),
+        _ => crate::i18n::t("invite_generic_lead"),
     };
     let who = if name.trim().is_empty() {
-        "Участник GRABIT".to_string()
+        crate::i18n::t("member_fallback_name")
     } else {
         name.trim().to_string()
     };
@@ -53,17 +61,22 @@ pub fn render_invite_landing(name: &str, public_id: &str, to: &str) -> String {
 {back}
 {hero}
 <article class="card rm-document-card">
-    <p>Вас зовёт <strong>{who}</strong>.</p>
+    <p>{invited_by}</p>
     <div class="rm-invite-actions">
-        <a class="ui-button" href="/login?next={next}">Войти</a>
-        <a class="ui-button" href="/register?next={next}">Регистрация</a>
+        <a class="ui-button" href="/login?next={next}">{login}</a>
+        <a class="ui-button" href="/register?next={next}">{register}</a>
     </div>
 </article>"#,
-        topbar = topbar("Приглашение", "user"),
-        back = back_link("/app", "К карте", "arrow-left"),
-        hero = simple_hero("user", "GRABIT", title, lead),
-        who = escape_html(&who),
+        topbar = topbar(&crate::i18n::t("invite_topbar_title"), "user"),
+        back = back_link("/app", &crate::i18n::t("common_to_map"), "arrow-left"),
+        hero = simple_hero("user", "GRABIT", &title, &lead),
+        invited_by = crate::i18n::tf(
+            "invited_by_label",
+            &[("who", &format!("<strong>{}</strong>", escape_html(&who)))]
+        ),
         next = next_q,
+        login = crate::i18n::t("common_login"),
+        register = crate::i18n::t("common_register"),
     );
 
     page_document(

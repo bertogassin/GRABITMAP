@@ -180,13 +180,13 @@ fn hash_email_code(state: &AppState, email: &str, code: &str, expires_at: i64) -
 async fn send_email_code(email: &str, code: &str) -> Result<(), String> {
     send_transactional_email(
         email,
-        "Код входа в GRABIT",
+        &crate::i18n::t("email_login_code_subject"),
         transactional_code_email_html(
             "GRABIT",
-            "Ваш код входа:",
+            &crate::i18n::t("email_login_code_intro"),
             code,
-            "Код действует 10 минут.",
-            "Если вы не запрашивали вход, просто проигнорируйте это письмо.",
+            &crate::i18n::t("email_login_code_expiry"),
+            &crate::i18n::t("email_login_code_footer"),
         ),
     )
     .await

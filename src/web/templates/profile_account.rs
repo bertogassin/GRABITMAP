@@ -1,9 +1,9 @@
 use super::common::{
     back_hero, back_link, bottom_nav, bottom_nav_with_badges, empty_state_action,
     empty_state_card_with_actions, escape_html, guest_locked_section, guest_mode_panel, icon,
-    is_generic_profession_key, moderator_level_badge, navigation_card, page_document, page_shell,
-    premium_badge_html, profession_label, profile_resource_card, ru_count, ru_plural, section_head,
-    simple_hero, topbar, verified_badge_html,
+    is_generic_profession_key, js_string, moderator_level_badge, navigation_card, page_document,
+    page_shell, plural_count, plural_word, premium_badge_html, profession_label,
+    profile_resource_card, section_head, simple_hero, topbar, verified_badge_html,
 };
 
 pub struct RenderMeParams<'a> {
@@ -32,7 +32,10 @@ pub struct RenderMeParams<'a> {
 
 fn home_city_select_html(continent: i64, country: i64, city: i64) -> String {
     let world_data = crate::geography::world();
-    let mut options = String::from(r#"<option value="">Город не указан</option>"#);
+    let mut options = format!(
+        r#"<option value="">{}</option>"#,
+        crate::i18n::t("city_not_specified")
+    );
 
     for (ci, (continent_name, countries)) in world_data.iter().enumerate() {
         let ci = ci as i64;
@@ -65,34 +68,37 @@ fn home_city_select_html(continent: i64, country: i64, city: i64) -> String {
         r#"
     <label class="rm-profile-field rm-profile-field--spaced">
         <div class="rm-profile-field-label">
-            Ваш город
+            {field_label}
         </div>
         <select id="profile-home-city" class="ui-select">
             {options}
         </select>
         <div class="card-meta">
-            Нужен, чтобы вас находили в разделе «Работники» этого города.
+            {hint}
         </div>
     </label>
-"#
+"#,
+        field_label = crate::i18n::t("field_home_city"),
+        options = options,
+        hint = crate::i18n::t("home_city_hint"),
     )
 }
 
-fn session_device_label(user_agent: &str) -> &'static str {
+fn session_device_label(user_agent: &str) -> String {
     let agent = user_agent.to_lowercase();
 
     if agent.contains("telegram") {
-        "Telegram"
+        "Telegram".to_string()
     } else if agent.contains("android") {
-        "Android"
+        "Android".to_string()
     } else if agent.contains("iphone") || agent.contains("ipad") {
-        "iPhone / iPad"
+        "iPhone / iPad".to_string()
     } else if agent.contains("windows") {
-        "Windows"
+        "Windows".to_string()
     } else if agent.contains("mac os") || agent.contains("macintosh") {
-        "Mac"
+        "Mac".to_string()
     } else {
-        "Браузер"
+        crate::i18n::t("device_browser")
     }
 }
 
@@ -106,14 +112,14 @@ fn render_user_sessions_panel(sessions: &[crate::web::view_models::UserSessionRo
         .map(|session| {
             let device = session_device_label(&session.user_agent);
             let ip = if session.ip_address.is_empty() {
-                "IP не определён".to_string()
+                crate::i18n::t("ip_unknown")
             } else {
                 escape_html(&session.ip_address)
             };
             let current = if session.is_current {
-                r#"<span class="rm-session-current">Это устройство</span>"#
+                format!(r#"<span class="rm-session-current">{}</span>"#, crate::i18n::t("this_device_tag"))
             } else {
-                ""
+                String::new()
             };
             let revoke_form = if session.is_current {
                 String::new()
@@ -122,10 +128,11 @@ fn render_user_sessions_panel(sessions: &[crate::web::view_models::UserSessionRo
                     r#"<form method="post" action="/app/sessions/revoke" class="rm-session-form">
     <input type="hidden" name="session_public_id" value="{session_id}">
     <button type="submit" class="ui-button rm-session-revoke-btn">
-        Завершить
+        {label}
     </button>
 </form>"#,
                     session_id = escape_html(&session.session_public_id),
+                    label = crate::i18n::t("end_session_button"),
                 )
             };
 
@@ -150,57 +157,64 @@ fn render_user_sessions_panel(sessions: &[crate::web::view_models::UserSessionRo
     format!(
         r#"<section class="rm-sessions-panel">
     <div class="card-title rm-sessions-title">
-        Активные сессии
+        {title}
     </div>
     <div class="card-meta rm-sessions-copy">
-        Устройства, где вы вошли в GRABIT.
+        {copy}
     </div>
     {rows}
     <form method="post" action="/app/sessions/revoke-others" class="rm-sessions-revoke-all">
         <button type="submit" class="ui-button rm-sessions-revoke-all-btn">
-            Выйти на других устройствах
+            {logout_others}
         </button>
     </form>
 </section>"#,
+        title = crate::i18n::t("active_sessions_title"),
+        copy = crate::i18n::t("active_sessions_copy"),
         rows = rows,
+        logout_others = crate::i18n::t("logout_other_devices_button"),
     )
 }
 
 fn render_change_password_section() -> String {
-    r#"<details class="card">
-    <summary class="rm-profile-section-title">Сменить пароль</summary>
+    format!(
+        r#"<details class="card">
+    <summary class="rm-profile-section-title">{title}</summary>
     <div class="rm-danger-zone-body">
         <form method="post" action="/app/account/password" class="rm-danger-zone-form">
-            <label class="rm-auth-label" for="current-password-input">Текущий пароль</label>
+            <label class="rm-auth-label" for="current-password-input">{current_label}</label>
             <input id="current-password-input" name="current_password" type="password"
                    class="ui-input rm-auth-input" autocomplete="current-password" required>
 
-            <label class="rm-auth-label" for="new-password-input">Новый пароль</label>
+            <label class="rm-auth-label" for="new-password-input">{new_label}</label>
             <input id="new-password-input" name="new_password" type="password"
                    class="ui-input rm-auth-input" autocomplete="new-password" minlength="8" required>
 
-            <label class="rm-auth-label" for="new-password-confirm-input">Повторите новый пароль</label>
+            <label class="rm-auth-label" for="new-password-confirm-input">{confirm_label}</label>
             <input id="new-password-confirm-input" name="new_password_confirm" type="password"
                    class="ui-input rm-auth-input" autocomplete="new-password" minlength="8" required>
 
-            <button type="submit" class="ui-button">Сменить пароль</button>
+            <button type="submit" class="ui-button">{title}</button>
         </form>
     </div>
-</details>"#
-        .to_string()
+</details>"#,
+        title = crate::i18n::t("change_password_action"),
+        current_label = crate::i18n::t("current_password_label"),
+        new_label = crate::i18n::t("new_password_label"),
+        confirm_label = crate::i18n::t("confirm_new_password_label"),
+    )
 }
 
 fn render_account_danger_zone() -> String {
-    r#"<details class="card rm-danger-zone">
-    <summary class="rm-danger-zone-summary">Удалить аккаунт</summary>
+    format!(
+        r#"<details class="card rm-danger-zone">
+    <summary class="rm-danger-zone-summary">{title}</summary>
     <div class="rm-danger-zone-body">
         <p class="card-meta">
-            Аккаунт и объявления будут скрыты сразу. Все данные будут
-            безвозвратно удалены через 30 дней. Чтобы отменить — просто
-            войдите в аккаунт снова в течение этого времени.
+            {warning}
         </p>
         <form method="post" action="/app/account/delete" class="rm-danger-zone-form">
-            <label class="rm-auth-label" for="delete-password-input">Пароль</label>
+            <label class="rm-auth-label" for="delete-password-input">{password_label}</label>
             <input id="delete-password-input"
                    name="password"
                    type="password"
@@ -208,12 +222,15 @@ fn render_account_danger_zone() -> String {
                    autocomplete="current-password"
                    required>
             <button type="submit" class="ui-button rm-session-revoke-btn">
-                Удалить аккаунт
+                {title}
             </button>
         </form>
     </div>
-</details>"#
-        .to_string()
+</details>"#,
+        title = crate::i18n::t("delete_account_action"),
+        warning = crate::i18n::t("delete_account_warning"),
+        password_label = crate::i18n::t("auth_password"),
+    )
 }
 
 fn count_badge(count: i64) -> String {
@@ -257,7 +274,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
         .unwrap_or_default();
 
     let intent_status_text = if safe_intent_text.is_empty() {
-        "Статус не указан".to_string()
+        crate::i18n::t("status_not_set")
     } else if intent_until > 0 {
         safe_intent_text.to_string()
     } else {
@@ -273,9 +290,9 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     } else if !safe_username.is_empty() {
         format!("@{}", safe_username)
     } else if authenticated {
-        "Пользователь".to_string()
+        crate::i18n::t("user_fallback_label")
     } else {
-        "Гость".to_string()
+        crate::i18n::t("guest_fallback_label")
     };
 
     let moderator_badge = if moderator_level > 0 {
@@ -287,14 +304,15 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     let username_html = if !safe_username.is_empty() {
         format!(r#"<div class="rm-me-username">@{}</div>"#, safe_username)
     } else if authenticated {
-        r#"<div class="rm-me-username rm-me-username--guest">Аккаунт</div>"#.to_string()
+        format!(r#"<div class="rm-me-username rm-me-username--guest">{}</div>"#, crate::i18n::t("account_label"))
     } else {
         String::new()
     };
 
     let telegram_id_html = if authenticated && !invite_public_id.is_empty() {
         format!(
-            r#"<div class="rm-me-account-id">Номер аккаунта · {}</div>"#,
+            r#"<div class="rm-me-account-id">{} · {}</div>"#,
+            crate::i18n::t("account_number_label"),
             escape_html(invite_public_id)
         )
     } else {
@@ -349,8 +367,8 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
             navigation_card(
                 "/app/search",
                 "search",
-                "Сначала поиск",
-                "Найдите людей и объявления"
+                &crate::i18n::t("search_first_title"),
+                &crate::i18n::t("search_first_body"),
             ),
         )
     };
@@ -363,12 +381,13 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
       class="rm-me-logout-form">
     <button type="submit"
             class="ui-button rm-me-logout-btn">
-        Выйти из аккаунта
+        {logout_button}
     </button>
 </form>
 {sessions_panel}
 {password_section}
 {danger_zone}"#,
+            logout_button = crate::i18n::t("logout_button"),
             account_header = account_header,
             sessions_panel = render_user_sessions_panel(&user_sessions),
             password_section = render_change_password_section(),
@@ -388,7 +407,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
             {resources_count}
         </div>
         <div class="card-meta rm-me-stat-meta">
-            Мои объявления
+            {my_resources_label}
         </div>
     </div>
 
@@ -397,7 +416,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
             {favorites_count}
         </div>
         <div class="card-meta rm-me-stat-meta">
-            Избранное
+            {favorites_label}
         </div>
     </div>
 
@@ -406,7 +425,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
             {approved_count}
         </div>
         <div class="card-meta rm-me-stat-meta">
-            Одобрено
+            {approved_label}
         </div>
     </div>
 
@@ -415,7 +434,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
             {pending_count}
         </div>
         <div class="card-meta rm-me-stat-meta">
-            На проверке
+            {pending_label}
         </div>
     </div>
 
@@ -425,11 +444,11 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
 
     <div class="card-content">
         <div class="card-title rm-me-rejected-title">
-            Отклонено
+            {rejected_label}
         </div>
 
         <div class="card-meta rm-me-rejected-copy">
-            Объявления, которым требуется исправление
+            {rejected_hint}
         </div>
     </div>
 
@@ -440,9 +459,15 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
 </div>
 "#,
             resources_count = resources_count,
+            my_resources_label = crate::i18n::t("my_resources_title"),
             favorites_count = favorites_count,
+            favorites_label = crate::i18n::t("common_favorites"),
             approved_count = approved_count,
+            approved_label = crate::i18n::t("approved_label"),
             pending_count = pending_count,
+            pending_label = crate::i18n::t("moderation_pending_title"),
+            rejected_label = crate::i18n::t("rejected_label"),
+            rejected_hint = crate::i18n::t("rejected_hint"),
             rejected_count = rejected_count,
         )
     } else {
@@ -456,24 +481,24 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
             .saturating_add(unread_messages_count);
 
         let availability_class = "available";
-        let availability_text = "Можно писать сразу";
+        let availability_text = crate::i18n::t("available_now_label");
 
         let category_text = crate::catalog::resolve(category)
-            .map(|rubric| rubric.label)
-            .unwrap_or("Направление не выбрано");
+            .map(|rubric| rubric.label.to_string())
+            .unwrap_or_else(|| crate::i18n::t("no_direction_label"));
 
         let admin_navigation = if moderator_level > 0 {
             let (title, description, level_label) = if moderator_level == 5 {
                 (
-                    "Центр владельца",
-                    "Глобальное управление, безопасность и production",
-                    "ВЛАДЕЛЕЦ · УРОВЕНЬ 5".to_string(),
+                    crate::i18n::t("owner_center_title"),
+                    crate::i18n::t("owner_center_desc"),
+                    crate::i18n::t("owner_level_label"),
                 )
             } else {
                 (
-                    "Центр управления",
-                    "Модерация и управление вашей территорией",
-                    format!("АДМИНИСТРАТОР · УРОВЕНЬ {moderator_level}"),
+                    crate::i18n::t("admin_center_title"),
+                    crate::i18n::t("admin_center_desc"),
+                    crate::i18n::tf("admin_level_label", &[("level", &moderator_level.to_string())]),
                 )
             };
 
@@ -514,12 +539,10 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     border-radius:26px;
     background:
         radial-gradient(circle at 100% 0%,
-            rgba(126,212,228,.16),transparent 34%),
+            rgba(var(--text-rgb),.10),transparent 34%),
         radial-gradient(circle at 0% 100%,
             rgba(var(--text-rgb),.14),transparent 36%),
-        linear-gradient(145deg,
-            rgba(20,23,30,.98),
-            rgba(10,12,17,.98));
+        var(--card);
     box-shadow:
         0 24px 68px rgba(0,0,0,.30),
         0 0 48px rgba(var(--text-rgb),.06);
@@ -611,8 +634,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     padding:14px;
     border:1px solid rgba(255,255,255,.09);
     border-radius:16px;
-    background:
-        linear-gradient(145deg, rgba(255,255,255,.04), rgba(255,255,255,.015));
+    background: var(--surface);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
 }}
 .rm-center-metric strong {{
@@ -664,10 +686,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     border:1px solid rgba(255,255,255,.08);
     border-radius:18px;
     color:var(--text);
-    background:
-        linear-gradient(145deg,
-            rgba(255,255,255,.035),
-            rgba(255,255,255,.015));
+    background: var(--card);
     text-decoration:none;
     transition:
         transform .18s ease,
@@ -676,10 +695,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
 .rm-command-card:hover {{
     transform:translateY(-3px);
     border-color:rgba(var(--text-rgb),.36);
-    background:
-        linear-gradient(145deg,
-            rgba(var(--text-rgb),.10),
-            rgba(126,212,228,.05));
+    background: var(--card-hover);
     box-shadow:
         0 14px 36px rgba(0,0,0,.24),
         0 0 32px rgba(var(--text-rgb),.08);
@@ -742,17 +758,14 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
 }}
 .rm-admin-command {{
     border-color:rgba(var(--text-rgb),.24);
-    background:
-        linear-gradient(135deg,
-            rgba(var(--text-rgb),.075),
-            rgba(119,87,185,.055));
+    background: var(--card);
 }}
 .rm-future-panel {{
     margin-bottom:24px;
     padding:18px;
     border:1px dashed rgba(var(--text-rgb),.22);
     border-radius:19px;
-    background:rgba(var(--text-rgb),.025);
+    background: var(--surface);
 }}
 .rm-future-panel strong {{
     display:block;
@@ -805,13 +818,11 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
 
 <section class="rm-personal-center">
     <h1 class="rm-center-heading">
-        Обзор
+        {overview_heading}
     </h1>
 
     <p class="rm-center-subtitle">
-        Ваш личный штурвал: объявления, связи,
-        сообщения, активность и возможности
-        в одном защищённом пространстве.
+        {overview_subtitle}
     </p>
 
     <div class="rm-center-status">
@@ -830,23 +841,23 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
         </div>
         <div class="rm-center-metric">
             <strong>{approved_count}</strong>
-            <span>опубликовано</span>
+            <span>{metric_published}</span>
         </div>
         <div class="rm-center-metric">
             <strong>{favorites_count}</strong>
-            <span>в избранном</span>
+            <span>{metric_in_favorites}</span>
         </div>
         <div class="rm-center-metric attention">
             <strong>{attention_count}</strong>
-            <span>требуют внимания</span>
+            <span>{metric_needs_attention}</span>
         </div>
     </div>
 </section>
 
 <section class="rm-command-section">
     <div class="rm-command-title">
-        <h2>Мои направления</h2>
-        <span>Реальные разделы аккаунта</span>
+        <h2>{my_directions_heading}</h2>
+        <span>{real_account_sections}</span>
     </div>
 
     <div class="rm-command-grid">
@@ -856,9 +867,9 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
                 {plus_icon}
             </span>
             <span class="rm-command-copy">
-                <strong>Добавить объявление</strong>
+                <strong>{add_resource_label}</strong>
                 <small>
-                    Откроется последний город
+                    {add_resource_hint}
                 </small>
             </span>
             <span class="rm-command-arrow">
@@ -872,11 +883,9 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
                 {resources_icon}
             </span>
             <span class="rm-command-copy">
-                <strong>Мои объявления</strong>
+                <strong>{my_resources_label}</strong>
                 <small>
-                    Опубликовано: {approved_count} ·
-                    На проверке: {pending_count} ·
-                    Отклонено: {rejected_count}
+                    {resources_summary}
                 </small>
             </span>
             <span class="rm-command-arrow">
@@ -890,9 +899,9 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
                 {favorites_icon}
             </span>
             <span class="rm-command-copy">
-                <strong>Избранное</strong>
+                <strong>{favorites_label}</strong>
                 <small>
-                    Сохранённые объявления: {favorites_count}
+                    {saved_resources_count}
                 </small>
             </span>
             <span class="rm-command-arrow">
@@ -906,9 +915,9 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
                 {notifications_icon}
             </span>
             <span class="rm-command-copy">
-                <strong>Уведомления</strong>
+                <strong>{notifications_label}</strong>
                 <small>
-                    События аккаунта и сообщества
+                    {notifications_desc}
                 </small>
             </span>
             {notifications_badge}
@@ -923,9 +932,9 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
                 {search_icon}
             </span>
             <span class="rm-command-copy">
-                <strong>Найти возможности</strong>
+                <strong>{find_opportunities_title}</strong>
                 <small>
-                    Работа, работники и бизнес
+                    {find_opportunities_desc}
                 </small>
             </span>
             <span class="rm-command-arrow">
@@ -939,14 +948,36 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
 
 
 "#,
+            overview_heading = crate::i18n::t("overview_heading"),
+            overview_subtitle = crate::i18n::t("overview_subtitle"),
             availability_class = availability_class,
             availability_text = availability_text,
             category_text = category_text,
             resources_count = resources_count,
-            resources_word = ru_plural(resources_count, "объявление", "объявления", "объявлений"),
+            resources_word = plural_word(resources_count, "count_resource_one", "count_resource_few", "count_resource_many"),
+            metric_published = crate::i18n::t("metric_published"),
+            metric_in_favorites = crate::i18n::t("metric_in_favorites"),
+            metric_needs_attention = crate::i18n::t("metric_needs_attention"),
+            my_directions_heading = crate::i18n::t("my_directions_heading"),
+            real_account_sections = crate::i18n::t("real_account_sections"),
+            add_resource_label = crate::i18n::t("resource_add_action"),
+            add_resource_hint = crate::i18n::t("add_resource_last_city_hint"),
+            my_resources_label = crate::i18n::t("my_resources_title"),
+            resources_summary = crate::i18n::tf(
+                "my_resources_command_summary",
+                &[
+                    ("approved", &approved_count.to_string()),
+                    ("pending", &pending_count.to_string()),
+                    ("rejected", &rejected_count.to_string()),
+                ],
+            ),
+            favorites_label = crate::i18n::t("common_favorites"),
+            saved_resources_count = crate::i18n::tf("saved_resources_count", &[("n", &favorites_count.to_string())]),
+            notifications_label = crate::i18n::t("notifications_title"),
+            notifications_desc = crate::i18n::t("notifications_command_desc"),
+            find_opportunities_title = crate::i18n::t("find_opportunities_title"),
+            find_opportunities_desc = crate::i18n::t("find_opportunities_desc"),
             approved_count = approved_count,
-            pending_count = pending_count,
-            rejected_count = rejected_count,
             favorites_count = favorites_count,
             attention_count = attention_count,
             resources_icon = icon("map"),
@@ -979,12 +1010,11 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
 
         <div>
             <div class="card-title rm-profile-section-title">
-                Мой статус
+                {my_status_title}
             </div>
 
             <div class="card-meta rm-profile-section-copy">
-                Расскажите сообществу, что вы ищете
-                или что можете предложить.
+                {my_status_desc}
             </div>
         </div>
 
@@ -994,18 +1024,18 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     <div class="rm-profile-intent-box">
 
         <div class="rm-profile-avatar-status">
-            <label class="rm-me-avatar rm-me-avatar--upload" title="Фото профиля">
+            <label class="rm-me-avatar rm-me-avatar--upload" title="{profile_photo_title}">
                 {status_avatar}
                 <input id="rm-avatar-input" type="file" accept="image/jpeg,image/png,image/webp" class="chat-file-input">
             </label>
             <div>
                 <div class="rm-profile-intent-kicker">
-                    Сейчас
+                    {now_kicker}
                 </div>
                 <div id="intent-current" class="rm-profile-intent-text">
                     {intent_status_text}
                 </div>
-                <button type="button" id="rm-avatar-btn" class="ui-button rm-avatar-btn">Фото на аватар</button>
+                <button type="button" id="rm-avatar-btn" class="ui-button rm-avatar-btn">{avatar_upload_button}</button>
                 <div id="rm-avatar-status" class="card-meta"></div>
             </div>
         </div>
@@ -1033,14 +1063,14 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     <label class="rm-profile-field">
 
         <div class="rm-profile-field-label">
-            Что вы ищете или предлагаете
+            {field_intent}
         </div>
 
         <textarea
             id="profile-intent"
             maxlength="300"
             rows="4"
-            placeholder="Например: ищу электрика в своём городе или предлагаю перевозки..."
+            placeholder="{intent_placeholder}"
          class="ui-textarea">{safe_intent_text}</textarea>
 
     </label>
@@ -1049,7 +1079,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     <label class="rm-profile-field rm-profile-field--spaced">
 
         <div class="rm-profile-field-label">
-            Профессия или направление
+            {field_profession}
         </div>
 
         <input
@@ -1058,15 +1088,14 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
             list="profile-profession-suggestions"
             maxlength="80"
             value="{safe_category}"
-            placeholder="Например: электрик, сантехник, дизайнер..."
+            placeholder="{profession_placeholder}"
             autocomplete="off"
          class="ui-input">
 
         <datalist id="profile-profession-suggestions"></datalist>
 
         <div class="card-meta rm-profile-profession-help">
-            Начните печатать — каталог понимает русские, английские и французские названия.
-            Если профессии ещё нет, её всё равно можно сохранить.
+            {profession_help}
         </div>
 
     </label>
@@ -1076,28 +1105,28 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     <label class="rm-profile-field rm-profile-field--spaced">
 
         <div class="rm-profile-field-label">
-            Срок актуальности
+            {field_duration}
         </div>
 
         <select id="profile-duration" class="ui-select">
             <option value="0">
-                Без срока
+                {duration_none}
             </option>
 
             <option value="1">
-                1 день
+                {duration_1d}
             </option>
 
             <option value="3">
-                3 дня
+                {duration_3d}
             </option>
 
             <option value="7" selected>
-                7 дней
+                {duration_7d}
             </option>
 
             <option value="30">
-                30 дней
+                {duration_30d}
             </option>
         </select>
 
@@ -1108,7 +1137,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
         id="profile-save"
         type="button"
      class="ui-button rm-profile-save-btn">
-        Сохранить статус
+        {save_status_button}
     </button>
 
 
@@ -1119,6 +1148,11 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
         account_header = account_header,
         invite = super::invite::invite_share_block(invite_public_id),
         statistics = statistics,
+        my_status_title = crate::i18n::t("my_status_title"),
+        my_status_desc = crate::i18n::t("my_status_desc"),
+        profile_photo_title = crate::i18n::t("profile_photo_title"),
+        now_kicker = crate::i18n::t("now_kicker"),
+        avatar_upload_button = crate::i18n::t("avatar_upload_button"),
         settings_kicker = crate::i18n::t("profile_settings"),
         settings_link = crate::i18n::t("profile_settings_sound"),
         language_picker = crate::i18n::language_picker_html("/app/me"),
@@ -1131,13 +1165,46 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
         } else {
             icon("user").to_string()
         },
+        field_intent = crate::i18n::t("field_intent"),
+        intent_placeholder = crate::i18n::t("intent_placeholder"),
         safe_intent_text = safe_intent_text,
+        field_profession = crate::i18n::t("field_profession"),
+        profession_placeholder = crate::i18n::t("profession_placeholder"),
         safe_category = safe_category,
+        profession_help = crate::i18n::t("profession_help"),
         home_city_select =
             home_city_select_html(home_continent_index, home_country_index, home_city_index,),
+        field_duration = crate::i18n::t("field_duration"),
+        duration_none = crate::i18n::t("duration_none"),
+        duration_1d = crate::i18n::t("duration_1d"),
+        duration_3d = crate::i18n::t("duration_3d"),
+        duration_7d = crate::i18n::t("duration_7d"),
+        duration_30d = crate::i18n::t("duration_30d"),
+        save_status_button = crate::i18n::t("save_status_button"),
     );
 
-    let body_after_html = r####"
+    let profile_i18n_script = format!(
+        r#"<script>window.__profileI18n={{invalidCategory:{invalid_category},invalidIntent:{invalid_intent},invalidDuration:{invalid_duration},loginRequired:{login_required},rateLimited:{rate_limited},saveFailedLater:{save_failed_later},saveFailed:{save_failed},saving:{saving},statusSaved:{status_saved},statusNotSet:{status_not_set},connectionError:{connection_error},photoTooBig:{photo_too_big},compressingPhoto:{compressing_photo},photoOver8mb:{photo_over_8mb},savingPhoto:{saving_photo},photoUpdated:{photo_updated},photoSaveFailed:{photo_save_failed}}};</script>"#,
+        invalid_category = js_string("js_invalid_category"),
+        invalid_intent = js_string("js_invalid_intent"),
+        invalid_duration = js_string("js_invalid_duration"),
+        login_required = js_string("js_login_required"),
+        rate_limited = js_string("js_rate_limited"),
+        save_failed_later = js_string("js_save_failed_later"),
+        save_failed = js_string("js_save_failed"),
+        saving = js_string("status_saving"),
+        status_saved = js_string("js_status_saved"),
+        status_not_set = js_string("status_not_set"),
+        connection_error = js_string("error_connection"),
+        photo_too_big = js_string("chat_photo_too_big"),
+        compressing_photo = js_string("chat_compressing_photo"),
+        photo_over_8mb = js_string("chat_photo_over_8mb"),
+        saving_photo = js_string("js_saving_photo"),
+        photo_updated = js_string("js_photo_updated"),
+        photo_save_failed = js_string("js_photo_save_failed"),
+    );
+
+    let body_after_html = profile_i18n_script + r####"
 <script>
 (function () {
     "use strict";
@@ -1187,20 +1254,20 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     function profileErrorText(code) {
         switch (code) {
             case "invalid_category":
-                return "Проверьте название профессии.";
+                return window.__profileI18n.invalidCategory;
             case "invalid_intent":
-                return "Текст статуса слишком длинный.";
+                return window.__profileI18n.invalidIntent;
             case "invalid_duration":
-                return "Выберите срок показа статуса.";
+                return window.__profileI18n.invalidDuration;
             case "login_required":
-                return "Войдите в аккаунт.";
+                return window.__profileI18n.loginRequired;
             case "rate_limited":
-                return "Слишком часто. Подождите немного.";
+                return window.__profileI18n.rateLimited;
             case "database_error":
             case "database_unavailable":
-                return "Не удалось сохранить. Попробуйте позже.";
+                return window.__profileI18n.saveFailedLater;
             default:
-                return "Не удалось сохранить.";
+                return window.__profileI18n.saveFailed;
         }
     }
 
@@ -1310,7 +1377,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
             persistDraft();
 
             if (status) {
-                status.textContent = "Сохраняем...";
+                status.textContent = window.__profileI18n.saving;
             }
 
             try {
@@ -1361,17 +1428,17 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
                 if (current) {
                     current.textContent =
                         data.intent_text ||
-                        "Статус не указан";
+                        window.__profileI18n.statusNotSet;
                 }
 
                 if (status) {
                     status.textContent =
-                        "✓ Статус сохранён";
+                        window.__profileI18n.statusSaved;
                 }
             } catch (_) {
                 if (status) {
                     status.textContent =
-                        "Ошибка соединения.";
+                        window.__profileI18n.connectionError;
                 }
             } finally {
                 saveButton.disabled = false;
@@ -1391,7 +1458,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
             avatarInput.value = "";
             if (!file) return;
             if (file.size > 20 * 1024 * 1024) {
-                if (avatarStatus) avatarStatus.textContent = "Фото слишком большое";
+                if (avatarStatus) avatarStatus.textContent = window.__profileI18n.photoTooBig;
                 return;
             }
             function compressAvatar(source) {
@@ -1418,15 +1485,15 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
                     img.src = url;
                 });
             }
-            if (avatarStatus) avatarStatus.textContent = "Сжимаем фото…";
+            if (avatarStatus) avatarStatus.textContent = window.__profileI18n.compressingPhoto;
             compressAvatar(file).then(function (ready) {
             if (ready.size > 8 * 1024 * 1024) {
-                if (avatarStatus) avatarStatus.textContent = "Фото больше 8 МБ";
+                if (avatarStatus) avatarStatus.textContent = window.__profileI18n.photoOver8mb;
                 return;
             }
             var data = new FormData();
             data.append("image", ready, "avatar.jpg");
-            if (avatarStatus) avatarStatus.textContent = "Сохраняем фото…";
+            if (avatarStatus) avatarStatus.textContent = window.__profileI18n.savingPhoto;
             return fetch("/api/profile/avatar", {
                 method: "POST",
                 body: data,
@@ -1456,31 +1523,30 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
                     }
                     img.src = pack.body.url + "?t=" + Date.now();
                 });
-                if (avatarStatus) avatarStatus.textContent = "Фото обновлено";
+                if (avatarStatus) avatarStatus.textContent = window.__profileI18n.photoUpdated;
             });
             }).catch(function () {
-                if (avatarStatus) avatarStatus.textContent = "Не удалось сохранить фото";
+                if (avatarStatus) avatarStatus.textContent = window.__profileI18n.photoSaveFailed;
             });
         });
     }
 })();
-</script>"####
-        .to_string();
+</script>"####;
 
     let main_html = format!(
         "{topbar}\n\n{hero}\n\n{content}",
-        topbar = topbar("Профиль", "user"),
+        topbar = topbar(&crate::i18n::t("common_profile"), "user"),
         hero = simple_hero(
             "user",
             "GRABIT",
-            "Профиль",
-            "Ваши объявления, сохранённые места и активность.",
+            &crate::i18n::t("common_profile"),
+            &crate::i18n::t("profile_hero_copy"),
         ),
         content = content_html,
     );
 
     page_document(
-        "Профиль · GRABIT",
+        &format!("{} · GRABIT", crate::i18n::t("common_profile")),
         "",
         "",
         &main_html,
@@ -1498,15 +1564,15 @@ pub fn render_notifications(
     authenticated: bool,
 ) -> String {
     let cards = if !authenticated {
-        guest_locked_section("Уведомления", "/app/notifications")
+        guest_locked_section(&crate::i18n::t("notifications_title"), "/app/notifications")
     } else if notifications.is_empty() {
         empty_state_card_with_actions(
-            "Уведомлений нет",
-            "Здесь появятся результаты модерации и важные изменения ваших объявлений.",
+            &crate::i18n::t("notifications_empty_title"),
+            &crate::i18n::t("notifications_empty_body"),
             &format!(
                 "{}{}",
-                empty_state_action("/app/my-resources", "Мои объявления"),
-                empty_state_action("/app/add", "Добавить объявление"),
+                empty_state_action("/app/my-resources", &crate::i18n::t("my_resources_title")),
+                empty_state_action("/app/add", &crate::i18n::t("resource_add_action")),
             ),
         )
     } else {
@@ -1563,9 +1629,9 @@ pub fn render_notifications(
                     };
 
                     let unread_badge = if *is_read == 0 {
-                        r#"<span class="rm-notif-new">Новое</span>"#
+                        format!(r#"<span class="rm-notif-new">{}</span>"#, crate::i18n::t("new_badge_label"))
                     } else {
-                        ""
+                        String::new()
                     };
 
                     format!(
@@ -1579,7 +1645,7 @@ pub fn render_notifications(
                 {unread_badge}
             </div>
             <div class="card-meta rm-notif-message">{message}</div>
-            <span class="rm-notif-action rm-notif-action--gold">Открыть</span>
+            <span class="rm-notif-action rm-notif-action--gold">{open_label}</span>
         </div>
     </div>
 </a>
@@ -1591,6 +1657,7 @@ pub fn render_notifications(
                         title = safe_title,
                         message = safe_message,
                         unread_badge = unread_badge,
+                        open_label = crate::i18n::t("common_open"),
                     )
                 },
             )
@@ -1603,10 +1670,12 @@ pub fn render_notifications(
             .iter()
             .any(|(_, _, _, _, _, is_read, _)| *is_read == 0)
     {
-        r#"<div class="rm-notif-toolbar">
-    <a href="/app/notifications/read-all" class="rm-notif-read-all">Прочитать все</a>
-</div>"#
-            .to_string()
+        format!(
+            r#"<div class="rm-notif-toolbar">
+    <a href="/app/notifications/read-all" class="rm-notif-read-all">{}</a>
+</div>"#,
+            crate::i18n::t("mark_all_read_link")
+        )
     } else {
         String::new()
     };
@@ -1621,14 +1690,14 @@ pub fn render_notifications(
     );
 
     page_shell(
-        "Уведомления · GRABIT",
-        &topbar("Уведомления", "bell"),
+        &format!("{} · GRABIT", crate::i18n::t("notifications_title")),
+        &topbar(&crate::i18n::t("notifications_title"), "bell"),
         &back_hero(
-            &back_link("/app/me", "Профиль", "arrow-left"),
+            &back_link("/app/me", &crate::i18n::t("common_profile"), "arrow-left"),
             "user",
-            "Уведомления",
-            "Центр уведомлений",
-            "Статусы модерации и важные изменения ваших объявлений.",
+            &crate::i18n::t("notifications_title"),
+            &crate::i18n::t("notifications_center_title"),
+            &crate::i18n::t("notifications_center_copy"),
         ),
         &content,
         &bottom_nav("menu"),
@@ -1775,13 +1844,14 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
 <section class="card rm-public-section rm-public-section--intent">
 
     <div class="rm-public-kicker">
-        Актуальный статус
+        {kicker}
     </div>
 
     <div class="rm-public-intent-body">{intent}</div>
 
 </section>
 "#,
+            kicker = crate::i18n::t("current_status_kicker"),
             intent = safe_intent
         )
     };
@@ -1790,9 +1860,9 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
 
     let cards = if resources.is_empty() {
         empty_state_card_with_actions(
-            "Объявлений нет",
-            "В профиле нет опубликованных объявлений.",
-            &empty_state_action("/app/search", "Вернуться к поиску"),
+            &crate::i18n::t("resource_empty_people_title"),
+            &crate::i18n::t("profile_no_resources_body"),
+            &empty_state_action("/app/search", &crate::i18n::t("back_to_search_action")),
         )
     } else {
         resources
@@ -1833,8 +1903,11 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
             .join("")
     };
 
-    let section_head_resources =
-        section_head("Объявления участника", "Только активные и одобренные", None);
+    let section_head_resources = section_head(
+        &crate::i18n::t("member_resources_heading"),
+        &crate::i18n::t("member_resources_subcaption"),
+        None,
+    );
 
     let main_html = format!(
         r####"<section class="card rm-public-profile-card">
@@ -1893,11 +1966,11 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
         } else {
             person_line.clone()
         },
-        resource_word = ru_count(
+        resource_word = plural_count(
             resource_count as i64,
-            "объявление",
-            "объявления",
-            "объявлений"
+            "count_resource_one",
+            "count_resource_few",
+            "count_resource_many"
         ),
         contact_html = contact_html,
         intent_html = intent_html,
@@ -1912,16 +1985,16 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
         "",
         &format!(
             "{topbar}\n\n{hero}\n\n{content}",
-            topbar = topbar("Профессия", "user"),
+            topbar = topbar(&crate::i18n::t("map_profession_label"), "user"),
             hero = back_hero(
-                &back_link("/app/search", "Назад", "arrow-left",),
+                &back_link("/app/search", &crate::i18n::t("common_back"), "arrow-left",),
                 "user",
-                "Профессия",
+                &crate::i18n::t("map_profession_label"),
                 &profession,
-                if person_line.is_empty() {
-                    "Объявления и статус по выбранной рубрике."
+                &if person_line.is_empty() {
+                    crate::i18n::t("profession_hero_fallback_copy")
                 } else {
-                    person_line.as_str()
+                    person_line.clone()
                 },
             ),
             content = main_html,
@@ -1932,7 +2005,7 @@ pub fn render_public_user_profile(params: RenderPublicUserProfileParams<'_>) -> 
 }
 
 pub fn render_public_user_not_found() -> String {
-    let back_to_map = navigation_card("/app", "map", "Вернуться к городам", "");
+    let back_to_map = navigation_card("/app", "map", &crate::i18n::t("back_to_cities"), "");
 
     let content = format!(
         r#"<section>
@@ -1942,13 +2015,13 @@ pub fn render_public_user_not_found() -> String {
     );
 
     page_shell(
-        "Профиль не найден · GRABIT",
+        &format!("{} · GRABIT", crate::i18n::t("profile_not_found_title")),
         "",
         &simple_hero(
             "alert-triangle",
             "GRABIT",
-            "Профиль не найден",
-            "Пользователь недоступен или публичный профиль ещё не создан.",
+            &crate::i18n::t("profile_not_found_title"),
+            &crate::i18n::t("profile_not_found_copy"),
         ),
         &content,
         "",
@@ -1964,15 +2037,15 @@ pub fn render_favorites(
     authenticated: bool,
 ) -> String {
     let cards = if !authenticated {
-        guest_locked_section("Избранное", "/app/favorites")
+        guest_locked_section(&crate::i18n::t("common_favorites"), "/app/favorites")
     } else if resources.is_empty() {
         empty_state_card_with_actions(
-            "Избранное пока пустое",
-            "Откройте любое объявление и сохраните его в избранное.",
+            &crate::i18n::t("favorites_empty_title"),
+            &crate::i18n::t("favorites_empty_body"),
             &format!(
                 "{}{}",
-                empty_state_action("/app/search", "Найти объявления"),
-                empty_state_action("/app", "На карту"),
+                empty_state_action("/app/search", &crate::i18n::t("find_resources_action")),
+                empty_state_action("/app", &crate::i18n::t("to_map_action")),
             ),
         )
     } else {
@@ -2018,14 +2091,14 @@ pub fn render_favorites(
     );
 
     page_shell(
-        "Избранное · GRABIT",
-        &topbar("Избранное", "heart"),
+        &format!("{} · GRABIT", crate::i18n::t("common_favorites")),
+        &topbar(&crate::i18n::t("common_favorites"), "heart"),
         &back_hero(
-            &back_link("/app/me", "Профиль", "arrow-left"),
+            &back_link("/app/me", &crate::i18n::t("common_profile"), "arrow-left"),
             "heart",
-            "Избранное",
-            "Сохранённые объявления",
-            "Всё, что вы отметили сердцем.",
+            &crate::i18n::t("common_favorites"),
+            &crate::i18n::t("saved_resources_title"),
+            &crate::i18n::t("favorites_hero_copy"),
         ),
         &content,
         &bottom_nav("menu"),

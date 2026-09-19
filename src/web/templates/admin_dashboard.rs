@@ -65,7 +65,7 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     --owner-violet:#8974ff;
     --owner-blue:#64a8ff;
     --owner-danger:#ef5964;
-    --owner-panel:rgba(17,20,25,.86);
+    --owner-panel:var(--card);
     --owner-line:rgba(var(--text-rgb),.18);
     max-width:1180px;
 
@@ -87,13 +87,7 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     padding:28px;
     border:1px solid rgba(var(--text-rgb),.30);
     border-radius:26px;
-    background:
-        radial-gradient(circle at 85% 15%,
-            rgba(137,116,255,.16),transparent 34%),
-        radial-gradient(circle at 10% 100%,
-            rgba(42,199,133,.12),transparent 35%),
-        linear-gradient(145deg,
-            rgba(27,28,31,.98),rgba(8,10,13,.98));
+    background: var(--card);
     box-shadow:
         0 28px 80px rgba(0,0,0,.36),
         inset 0 1px rgba(255,255,255,.05);

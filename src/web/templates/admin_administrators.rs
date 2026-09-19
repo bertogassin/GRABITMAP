@@ -390,10 +390,7 @@ body {{
         16px
         max(32px,env(safe-area-inset-bottom));
     color:var(--text);
-    background:
-        radial-gradient(circle at 10% 0%,rgba(30,98,73,.18),transparent 34%),
-        radial-gradient(circle at 100% 8%,rgba(92,65,155,.18),transparent 32%),
-        linear-gradient(160deg,#090b10,#05070a 68%);
+    background: var(--bg);
     font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }}
 .page {{
@@ -449,9 +446,7 @@ body {{
     padding:28px;
     border:1px solid rgba(var(--text-rgb),.28);
     border-radius:26px;
-    background:
-        linear-gradient(135deg,rgba(var(--text-rgb),.10),transparent 42%),
-        linear-gradient(145deg,rgba(18,22,29,.96),rgba(10,12,17,.96));
+    background: var(--card);
     box-shadow:0 24px 70px rgba(0,0,0,.32);
 }}
 .hero::after {{
@@ -534,15 +529,12 @@ h1 {{
     padding:20px;
     border:1px solid rgba(255,255,255,.09);
     border-radius:22px;
-    background:
-        linear-gradient(145deg,rgba(20,23,30,.95),rgba(12,14,19,.96));
+    background: var(--card);
     box-shadow:0 15px 42px rgba(0,0,0,.20);
 }}
 .administrator-card.level-5 {{
     border-color:rgba(var(--text-rgb),.34);
-    background:
-        linear-gradient(135deg,rgba(var(--text-rgb),.09),transparent 38%),
-        linear-gradient(145deg,#17191e,#0c0e13);
+    background: var(--card);
 }}
 .administrator-top {{
     display:flex;

@@ -67,10 +67,7 @@ body{{
  padding:max(18px,env(safe-area-inset-top)) 16px
  max(34px,env(safe-area-inset-bottom));
  color:var(--text);
- background:
- radial-gradient(circle at 10% 0%,rgba(37,116,85,.18),transparent 36%),
- radial-gradient(circle at 100% 8%,rgba(97,70,160,.18),transparent 34%),
- linear-gradient(155deg,#090b10,#050609);
+ background: var(--bg);
  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
 }}
 .page{{width:min(700px,100%);margin:auto}}
@@ -82,14 +79,12 @@ body{{
 .hero,.card{{
  display:block;
  border:1px solid var(--line);border-radius:25px;
- background:linear-gradient(145deg,rgba(21,24,32,.97),rgba(10,12,17,.98));
+ background:var(--card);
  box-shadow:0 22px 65px rgba(0,0,0,.3)
 }}
 .hero{{
  padding:27px;
- background:
- linear-gradient(135deg,rgba(var(--text-rgb),.1),transparent 44%),
- linear-gradient(145deg,#181a21,#0b0d12)
+ background:var(--card);
 }}
 .kicker{{
  color:var(--gold);font-size:11px;font-weight:950;letter-spacing:.18em
