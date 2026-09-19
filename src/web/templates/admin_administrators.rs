@@ -435,7 +435,7 @@ body {{
     display:inline-flex;
     align-items:center;
     padding:0 15px;
-    border:1px solid rgba(223,192,127,.34);
+    border:1px solid rgba(var(--text-rgb),.34);
     border-radius:14px;
     color:var(--gold);
     background:var(--gold-soft);
@@ -447,10 +447,10 @@ body {{
     position:relative;
     overflow:hidden;
     padding:28px;
-    border:1px solid rgba(223,192,127,.28);
+    border:1px solid rgba(var(--text-rgb),.28);
     border-radius:26px;
     background:
-        linear-gradient(135deg,rgba(223,192,127,.10),transparent 42%),
+        linear-gradient(135deg,rgba(var(--text-rgb),.10),transparent 42%),
         linear-gradient(145deg,rgba(18,22,29,.96),rgba(10,12,17,.96));
     box-shadow:0 24px 70px rgba(0,0,0,.32);
 }}
@@ -461,10 +461,10 @@ body {{
     height:240px;
     right:-100px;
     top:-120px;
-    border:1px solid rgba(223,192,127,.18);
+    border:1px solid rgba(var(--text-rgb),.18);
     border-radius:50%;
     box-shadow:
-        0 0 0 34px rgba(223,192,127,.025),
+        0 0 0 34px rgba(var(--text-rgb),.025),
         0 0 0 70px rgba(168,147,255,.025);
 }}
 .kicker {{
@@ -539,9 +539,9 @@ h1 {{
     box-shadow:0 15px 42px rgba(0,0,0,.20);
 }}
 .administrator-card.level-5 {{
-    border-color:rgba(223,192,127,.34);
+    border-color:rgba(var(--text-rgb),.34);
     background:
-        linear-gradient(135deg,rgba(223,192,127,.09),transparent 38%),
+        linear-gradient(135deg,rgba(var(--text-rgb),.09),transparent 38%),
         linear-gradient(145deg,#17191e,#0c0e13);
 }}
 .administrator-top {{
@@ -678,9 +678,9 @@ h1 {{
     cursor:pointer;
 }}
 .lifecycle-form .warning-action {{
-    color:#ffc26f;
-    border-color:rgba(255,194,111,.30);
-    background:rgba(255,194,111,.08);
+    color:var(--warning);
+    border-color:rgba(var(--text-rgb),.30);
+    background:rgba(var(--text-rgb),.08);
 }}
 .lifecycle-form .restore-action {{
     color:var(--success);
@@ -695,10 +695,10 @@ h1 {{
 .owner-lock {{
     margin-top:17px;
     padding:13px;
-    border:1px solid rgba(223,192,127,.14);
+    border:1px solid rgba(var(--text-rgb),.14);
     border-radius:14px;
     color:var(--muted);
-    background:rgba(223,192,127,.035);
+    background:rgba(var(--text-rgb),.035);
     font-size:11px;
 }}
 .session-head {{

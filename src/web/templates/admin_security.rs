@@ -88,7 +88,7 @@ body{{
 .hero{{
  padding:27px;
  background:
- linear-gradient(135deg,rgba(223,192,127,.1),transparent 44%),
+ linear-gradient(135deg,rgba(var(--text-rgb),.1),transparent 44%),
  linear-gradient(145deg,#181a21,#0b0d12)
 }}
 .kicker{{
@@ -114,14 +114,14 @@ p{{color:var(--muted);line-height:1.6}}
 .card h2{{margin:0;font-size:21px}}
 .email{{
  margin:15px 0;padding:14px;border-radius:14px;
- color:var(--gold);background:rgba(223,192,127,.07);font-weight:850
+ color:var(--text);background:rgba(var(--text-rgb),.07);font-weight:850
 }}
 button,input{{
  width:100%;min-height:48px;border-radius:14px;font:inherit
 }}
 button{{
- border:1px solid rgba(223,192,127,.36);
- color:#17120a;background:linear-gradient(135deg,#f0d99f,#c9a65f);
+ border:1px solid var(--text);
+ color:var(--bg);background:var(--text);
  font-weight:950;cursor:pointer
 }}
 input{{

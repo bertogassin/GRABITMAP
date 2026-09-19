@@ -263,9 +263,24 @@ pub(crate) fn base_style() -> &'static str {
     /* Функциональные — только статус, не украшение */
     --success: #34d399;
     --warning: #fbbf24;
+    --on-warning: #1a1200;
     --danger: #fb7185;
     --on-danger: #1a0506;
     --info: #64a8ff;
+
+    /* Фирменный акцент — редкий, только для маркеров состояния:
+       активная вкладка, фокус поля, наведение на ссылку, "онлайн".
+       Не для кнопок/фонов/заголовков — там всё остаётся Ч/Б. */
+    --accent: #00e676;
+    --accent-rgb: 0, 230, 118;
+    --on-accent: #04140b;
+
+    /* Уровни модерации 1-5 — различение по цвету, свой оттенок на тёмную
+       и светлую тему; уровень 5 (владелец) намеренно монохромный. */
+    --mod-level-1: #69e6ae;
+    --mod-level-2: #8fc2ff;
+    --mod-level-3: #ff8a3d;
+    --mod-level-4: #c2b7ff;
 
     --radius: 20px;
     --radius-sm: 14px;
@@ -316,9 +331,19 @@ pub(crate) fn base_style() -> &'static str {
 
     --success: #34d399;
     --warning: #fbbf24;
+    --on-warning: #1a1200;
     --danger: #fb7185;
     --on-danger: #1a0506;
     --info: #64a8ff;
+
+    --accent: #00e676;
+    --accent-rgb: 0, 230, 118;
+    --on-accent: #04140b;
+
+    --mod-level-1: #69e6ae;
+    --mod-level-2: #8fc2ff;
+    --mod-level-3: #ff8a3d;
+    --mod-level-4: #c2b7ff;
 
     --theme-color: #000000;
     --bubble-peer: rgba(255, 255, 255, .05);
@@ -344,10 +369,20 @@ pub(crate) fn base_style() -> &'static str {
         --gold-soft: rgba(var(--text-rgb), .12);
 
         --success: #1f8a64;
-        --warning: #b06d12;
+        --warning: #976d00;
+        --on-warning: #ffffff;
         --danger: #c73a47;
         --on-danger: #ffffff;
         --info: #2f6db8;
+
+        --accent: #007a3d;
+        --accent-rgb: 0, 122, 61;
+        --on-accent: #ffffff;
+
+        --mod-level-1: #138652;
+        --mod-level-2: #006ef2;
+        --mod-level-3: #c74f00;
+        --mod-level-4: #7158ff;
 
         --theme-color: #ffffff;
         --bubble-peer: rgba(0, 0, 0, .04);
@@ -374,10 +409,20 @@ pub(crate) fn base_style() -> &'static str {
     --gold-soft: rgba(var(--text-rgb), .12);
 
     --success: #1f8a64;
-    --warning: #b06d12;
+    --warning: #976d00;
+    --on-warning: #ffffff;
     --danger: #c73a47;
     --on-danger: #ffffff;
     --info: #2f6db8;
+
+    --accent: #007a3d;
+    --accent-rgb: 0, 122, 61;
+    --on-accent: #ffffff;
+
+    --mod-level-1: #138652;
+    --mod-level-2: #006ef2;
+    --mod-level-3: #c74f00;
+    --mod-level-4: #7158ff;
 
     --theme-color: #ffffff;
     --bubble-peer: rgba(0, 0, 0, .04);
@@ -420,7 +465,7 @@ pub(crate) fn base_style() -> &'static str {
 }
 
 :root[data-theme="light"] .nav-item.active {
-    color: var(--text);
+    color: var(--accent);
     background: rgba(var(--text-rgb), .10);
 }
 
@@ -447,8 +492,8 @@ pub(crate) fn base_style() -> &'static str {
 :root[data-theme="light"] .ui-textarea:focus,
 :root[data-theme="light"] .ui-select:focus {
     background: var(--surface);
-    border-color: rgba(var(--text-rgb), .45);
-    box-shadow: 0 0 0 4px rgba(var(--text-rgb), .10);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(var(--accent-rgb), .16);
 }
 
 :root[data-theme="light"] .rm-kind-chip {
@@ -479,6 +524,14 @@ pub(crate) fn base_style() -> &'static str {
 
 * {
     box-sizing: border-box;
+}
+
+/* Фирменный акцент на наведении ссылки — только курсор задаёт, где он
+   виден, поэтому одновременно не более одного. Точечные ссылки в
+   футерах/навигации стилизуются отдельно с той же специфичностью и
+   не затрагиваются. */
+a:hover {
+    color: var(--accent);
 }
 
 @keyframes fadeInUp {
@@ -1275,7 +1328,7 @@ body::before { display: none; }
 }
 
 .nav-item.active {
-    color: var(--gold);
+    color: var(--accent);
 }
 
 .nav-item:active {
@@ -1309,7 +1362,7 @@ body::before { display: none; }
 .nav-item.active .icon {
     stroke-width: 2.2;
     filter: none;
-    color: var(--gold);
+    color: var(--accent);
 }
 
 .nav-item.active::after {
@@ -1643,7 +1696,7 @@ html[data-page="chat"] .rm-version-footer {
 
 .card:hover .card-icon {
     transform: scale(1.08);
-    color: #fff1d0;
+    color: var(--text);
     filter: drop-shadow(0 0 14px rgba(var(--text-rgb), .32));
 }
 
@@ -1764,7 +1817,7 @@ html[data-page="chat"] .rm-version-footer {
 
 .rm-auth-input:focus {
     outline: none;
-    border-bottom-color: var(--text);
+    border-bottom-color: var(--accent);
 }
 
 .rm-auth-input::placeholder {
@@ -2033,7 +2086,7 @@ html[data-page="chat"] .rm-version-footer {
     padding: 0;
     border: 0;
     background: transparent;
-    color: #b88932;
+    color: var(--text);
     font-size: inherit;
     letter-spacing: normal;
 }
@@ -2278,7 +2331,11 @@ a.feature.rm-feature-add {
 
 .ui-input:focus-visible,
 .ui-textarea:focus-visible,
-.ui-select:focus-visible,
+.ui-select:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
 .ui-button:focus-visible {
     outline: 2px solid rgba(var(--text-rgb),.70);
     outline-offset: 2px;
@@ -2287,9 +2344,9 @@ a.feature.rm-feature-add {
 .ui-input:focus,
 .ui-textarea:focus,
 .ui-select:focus {
-    border-color: rgba(var(--text-rgb),.45);
+    border-color: var(--accent);
     background: rgba(0,0,0,.065);
-    box-shadow: 0 0 0 4px rgba(var(--text-rgb),.06);
+    box-shadow: 0 0 0 4px rgba(var(--accent-rgb),.20);
     outline: none;
 }
 
@@ -2353,31 +2410,31 @@ a.feature.rm-feature-add {
 .rm-mod-level-badge--1 {
     background: rgba(42, 199, 133, .10);
     border: 1px solid rgba(42, 199, 133, .34);
-    color: #69e6ae;
+    color: var(--mod-level-1);
 }
 
 .rm-mod-level-badge--2 {
     background: rgba(100, 168, 255, .10);
     border: 1px solid rgba(100, 168, 255, .36);
-    color: #8fc2ff;
+    color: var(--mod-level-2);
 }
 
 .rm-mod-level-badge--3 {
-    background: linear-gradient(90deg, rgba(100, 168, 255, .09), rgba(var(--text-rgb), .08));
-    border: 1px solid rgba(var(--text-rgb), .38);
-    color: #e6d09f;
+    background: linear-gradient(90deg, rgba(255, 138, 61, .09), rgba(var(--text-rgb), .08));
+    border: 1px solid rgba(255, 138, 61, .38);
+    color: var(--mod-level-3);
 }
 
 .rm-mod-level-badge--4 {
     background: linear-gradient(90deg, rgba(137, 116, 255, .12), rgba(var(--text-rgb), .08));
     border: 1px solid rgba(137, 116, 255, .42);
-    color: #c2b7ff;
+    color: var(--mod-level-4);
 }
 
 .rm-mod-level-badge--5 {
     background: linear-gradient(90deg, rgba(var(--text-rgb), .15), rgba(137, 116, 255, .10));
     border: 1px solid rgba(var(--text-rgb), .48);
-    color: #f0d69c;
+    color: var(--text);
     box-shadow: 0 0 24px rgba(var(--text-rgb), .14);
 }
 
@@ -3294,7 +3351,7 @@ a.feature.rm-feature-add {
 .rm-mod-quick-title {
     font-size: 16px;
     font-weight: 800;
-    color: #f0d69c;
+    color: var(--text);
     margin-bottom: 6px;
 }
 
@@ -4625,7 +4682,7 @@ html[dir="rtl"] .rm-menu-row {
     padding: 6px 10px;
     border: 1px solid var(--line);
     border-radius: 999px;
-    color: var(--text);
+    color: var(--accent);
     background: rgba(255,255,255,.04);
     text-decoration: none;
     font-size: 12px;
@@ -5897,13 +5954,18 @@ fn admin_ops_styles() -> &'static str {
     r#"
 .rm-admin-ops {
     --ops-green: #46d39a;
-    --ops-gold: #d6b77a;
+    --ops-gold: var(--text);
     --ops-red: #ff7d7d;
     --ops-blue: #72aaff;
     --ops-line: rgba(255, 255, 255, .10);
     --ops-muted: #9aaba2;
     width: min(1100px, 100%);
     margin: 0 auto;
+}
+:root[data-theme="light"] .rm-admin-ops {
+    --ops-green: #1c855b;
+    --ops-red: #eb0000;
+    --ops-blue: #0a6bff;
 }
 .rm-admin-ops .topbar {
     display: flex;
@@ -6286,8 +6348,8 @@ fn admin_ops_styles() -> &'static str {
     padding: 0 20px;
     border: 0;
     border-radius: 14px;
-    color: #17120a;
-    background: linear-gradient(135deg, #ead29f, var(--ops-gold));
+    color: var(--bg);
+    background: var(--text);
     font-weight: 900;
     cursor: pointer;
 }
@@ -6415,8 +6477,8 @@ fn admin_ops_styles() -> &'static str {
     min-height: 43px;
     border: 0;
     border-radius: 11px;
-    color: #17120a;
-    background: linear-gradient(135deg, #ead29f, var(--ops-gold));
+    color: var(--bg);
+    background: var(--text);
     font-weight: 900;
     cursor: pointer;
 }
@@ -6504,8 +6566,8 @@ fn admin_ops_styles() -> &'static str {
     font-weight: 800;
 }
 .rm-admin-ops--helpers button.warning {
-    color: #231900;
-    background: #e8bd62;
+    color: var(--on-warning);
+    background: var(--warning);
 }
 .rm-admin-ops--helpers button.danger {
     color: #260707;
@@ -6610,10 +6672,10 @@ fn admin_ops_styles() -> &'static str {
 }
 .rm-admin-ops--assign button[type="submit"] {
     min-height: 52px;
-    border: 1px solid rgba(var(--text-rgb), .38);
+    border: 1px solid var(--text);
     border-radius: 15px;
-    color: #17130b;
-    background: linear-gradient(135deg, #efd49a, #cda85f);
+    color: var(--bg);
+    background: var(--text);
     font-size: 14px;
     font-weight: 950;
     cursor: pointer;
@@ -6811,7 +6873,7 @@ pub fn transactional_code_email_html(
             <p>{intro}</p>\
             <div style=\"font-size:34px;font-weight:800;letter-spacing:8px;margin:24px 0\">{code}</div>\
             <p>{expiry_note}</p>\
-            <p style=\"color:#777;font-size:13px\">{footer}</p>\
+            <p style=\"color:#595959;font-size:13px\">{footer}</p>\
         </div>",
         heading = escape_html(heading),
         intro = escape_html(intro),
@@ -7081,7 +7143,7 @@ mod public_entry_tests {
 
         assert_eq!(
             style
-                .matches(".nav-item.active {\n    color: var(--gold);\n}")
+                .matches(".nav-item.active {\n    color: var(--accent);\n}")
                 .count(),
             1
         );

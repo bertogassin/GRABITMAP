@@ -59,8 +59,8 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     let head = r#"
 <style>
 .admin-v2 {
-    --owner-gold:#d6b77a;
-    --owner-gold-soft:#f0d69c;
+    --owner-gold:var(--text);
+    --owner-gold-soft:var(--text);
     --owner-emerald:#2ac785;
     --owner-violet:#8974ff;
     --owner-blue:#64a8ff;
@@ -68,11 +68,18 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     --owner-panel:rgba(17,20,25,.86);
     --owner-line:rgba(var(--text-rgb),.18);
     max-width:1180px;
+
     margin:0 auto;
     padding:
         max(10px,env(safe-area-inset-top))
         0
         calc(100px + env(safe-area-inset-bottom));
+}
+:root[data-theme="light"] .admin-v2 {
+    --owner-emerald:#198558;
+    --owner-violet:#7158ff;
+    --owner-blue:#006df9;
+    --owner-danger:#e81120;
 }
 .admin-owner-hero {
     position:relative;
@@ -130,7 +137,7 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
 }
 .admin-owner-badge.safe {
     border-color:rgba(42,199,133,.30);
-    color:#69e6ae;
+    color:var(--owner-emerald);
 }
 .admin-section-title {
     margin:28px 0 13px;
@@ -210,7 +217,7 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     font-weight:900;
 }
 .admin-command-status {
-    color:#69e6ae;
+    color:var(--owner-emerald);
     font-size:12px;
     font-weight:850;
 }
@@ -314,7 +321,7 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     font-weight:850;
 }
 .admin-command-nav a:first-child {
-    color:#f4ddb0;
+    color:var(--text);
     background:rgba(var(--text-rgb),.10);
 }
 .admin-owner-hero::before {
@@ -397,7 +404,7 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     align-items:center;
     justify-content:center;
     border-radius:50%;
-    color:#f0d69c;
+    color:var(--text);
     font-size:17px;
     font-weight:950;
     letter-spacing:.08em;
@@ -431,18 +438,18 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     top:50%;
     left:calc(50% + 96px);
     border-radius:50%;
-    background:#69e6ae;
+    background:var(--owner-emerald);
     box-shadow:0 0 18px rgba(105,230,174,.8);
 }
 .admin-orbit--outer .admin-orbit-dot {
     left:calc(50% + 113px);
-    background:#64a8ff;
+    background:var(--owner-blue);
     box-shadow:0 0 18px rgba(100,168,255,.8);
 }
 .admin-orbit--vertical .admin-orbit-dot {
     left:calc(50% + 40px);
-    background:#f0d69c;
-    box-shadow:0 0 18px rgba(240,214,156,.75);
+    background:var(--text);
+    box-shadow:0 0 18px rgba(var(--text-rgb),.75);
 }
 .admin-visual-label {
     position:absolute;
@@ -457,7 +464,7 @@ pub(crate) fn render_admin_dashboard(data: AdminDashboardData<'_>) -> String {
     position:absolute;
     right:16px;
     top:14px;
-    color:#69e6ae;
+    color:var(--owner-emerald);
     font-size:10px;
     font-weight:900;
 }

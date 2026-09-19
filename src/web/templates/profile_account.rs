@@ -629,7 +629,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     font-size:10px;
 }}
 .rm-center-metric.attention strong {{
-    color:#ffc26f;
+    color:var(--warning);
 }}
 .rm-command-section {{
     margin-bottom:24px;
