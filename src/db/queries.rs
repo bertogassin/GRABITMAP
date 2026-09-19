@@ -834,6 +834,7 @@ pub fn init_db() -> Result<Connection> {
 
     ensure_profile_profession_column(&conn)?;
     crate::db::professions::initialize(&conn)?;
+    crate::db::catalog_translations::initialize(&conn)?;
     crate::db::services::initialize(&conn)?;
     crate::db::search_fts::ensure_profile_home_city_columns(&conn)?;
     crate::db::search_fts::ensure_resource_rubric_column(&conn)?;

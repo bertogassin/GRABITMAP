@@ -174,69 +174,108 @@ fn exactness(query: &str, hit: &GeoSearchHit) -> u8 {
 
 fn hydrate_hit(conn: &Connection, kind: &str, id: i64) -> Result<Option<GeoSearchHit>> {
     match kind {
-        "city" => conn
-            .query_row(
-                "SELECT city.name_ru,
-                        country.name_ru,
-                        (
-                            SELECT COUNT(*)
-                            FROM resources
-                            WHERE city_id = city.id
-                              AND moderation_status = 'approved'
-                              AND is_active = 1
-                        )
-                 FROM geo_cities AS city
-                 JOIN geo_countries AS country
-                   ON country.id = city.country_id
-                 WHERE city.id = ?1
-                   AND city.is_active = 1
-                   AND city.place_kind = 'city'
-                   AND country.is_active = 1",
-                [id],
-                |row| {
-                    Ok(GeoSearchHit {
-                        kind: "city".into(),
-                        id,
-                        name: row.get(0)?,
-                        subtitle: row.get(1)?,
-                        href: format!("/app/map/city/{id}"),
-                        cards: row.get(2)?,
-                    })
+        "city" => {
+            let row = conn
+                .query_row(
+                    "SELECT city.name_ru,
+                            city.stable_key,
+                            city.name_native,
+                            country.name_ru,
+                            country.iso2,
+                            (
+                                SELECT COUNT(*)
+                                FROM resources
+                                WHERE city_id = city.id
+                                  AND moderation_status = 'approved'
+                                  AND is_active = 1
+                            )
+                     FROM geo_cities AS city
+                     JOIN geo_countries AS country
+                       ON country.id = city.country_id
+                     WHERE city.id = ?1
+                       AND city.is_active = 1
+                       AND city.place_kind = 'city'
+                       AND country.is_active = 1",
+                    [id],
+                    |row| {
+                        Ok((
+                            row.get::<_, String>(0)?,
+                            row.get::<_, String>(1)?,
+                            row.get::<_, String>(2)?,
+                            row.get::<_, String>(3)?,
+                            row.get::<_, String>(4)?,
+                            row.get::<_, i64>(5)?,
+                        ))
+                    },
+                )
+                .optional()?;
+            Ok(row.map(
+                |(name_ru, stable_key, name_native, country_name_ru, iso2, cards)| GeoSearchHit {
+                    kind: "city".into(),
+                    id,
+                    name: crate::db::catalog_translations::city_name(
+                        conn,
+                        &stable_key,
+                        &name_ru,
+                        &name_native,
+                    ),
+                    subtitle: crate::db::catalog_translations::country_name(
+                        conn,
+                        &iso2,
+                        &country_name_ru,
+                    ),
+                    href: format!("/app/map/city/{id}"),
+                    cards,
                 },
-            )
-            .optional(),
-        "country" => conn
-            .query_row(
-                "SELECT country.name_ru,
-                        continent.name_ru,
-                        (
-                            SELECT COUNT(*)
-                            FROM resources AS resource
-                            JOIN geo_cities AS city
-                              ON city.id = resource.city_id
-                            WHERE city.country_id = country.id
-                              AND resource.moderation_status = 'approved'
-                              AND resource.is_active = 1
-                        )
-                 FROM geo_countries AS country
-                 JOIN geo_continents AS continent
-                   ON continent.id = country.continent_id
-                 WHERE country.id = ?1
-                   AND country.is_active = 1
-                   AND continent.is_active = 1",
-                [id],
-                |row| {
-                    Ok(GeoSearchHit {
-                        kind: "country".into(),
-                        id,
-                        name: row.get(0)?,
-                        subtitle: row.get(1)?,
-                        href: format!("/app/map/country/{id}"),
-                        cards: row.get(2)?,
-                    })
-                },
-            )
-            .optional(),
+            ))
+        }
+        "country" => {
+            let row = conn
+                .query_row(
+                    "SELECT country.name_ru,
+                            country.iso2,
+                            continent.name_ru,
+                            continent.code,
+                            (
+                                SELECT COUNT(*)
+                                FROM resources AS resource
+                                JOIN geo_cities AS city
+                                  ON city.id = resource.city_id
+                                WHERE city.country_id = country.id
+                                  AND resource.moderation_status = 'approved'
+                                  AND resource.is_active = 1
+                            )
+                     FROM geo_countries AS country
+                     JOIN geo_continents AS continent
+                       ON continent.id = country.continent_id
+                     WHERE country.id = ?1
+                       AND country.is_active = 1
+                       AND continent.is_active = 1",
+                    [id],
+                    |row| {
+                        Ok((
+                            row.get::<_, String>(0)?,
+                            row.get::<_, String>(1)?,
+                            row.get::<_, String>(2)?,
+                            row.get::<_, String>(3)?,
+                            row.get::<_, i64>(4)?,
+                        ))
+                    },
+                )
+                .optional()?;
+            Ok(row.map(|(name_ru, iso2, continent_name_ru, continent_code, cards)| GeoSearchHit {
+                kind: "country".into(),
+                id,
+                name: crate::db::catalog_translations::country_name(conn, &iso2, &name_ru),
+                subtitle: crate::db::catalog_translations::continent_name(
+                    conn,
+                    &continent_code,
+                    &continent_name_ru,
+                ),
+                href: format!("/app/map/country/{id}"),
+                cards,
+            }))
+        }
         _ => Ok(None),
     }
 }

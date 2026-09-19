@@ -87,7 +87,7 @@ body{{
  background:var(--card);
 }}
 .kicker{{
- color:var(--gold);font-size:11px;font-weight:950;letter-spacing:.18em
+ color:var(--emphasis);font-size:11px;font-weight:950;letter-spacing:.18em
 }}
 h1{{
  margin:13px 0 10px;font-size:clamp(34px,8vw,55px);

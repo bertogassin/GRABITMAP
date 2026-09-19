@@ -527,7 +527,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
             r#"
 <style id="resursmap-personal-center-v1">
 .rm-personal-center {{
-    --center-gold: var(--gold);
+    --center-gold: var(--emphasis);
     --center-green: var(--success);
     --center-blue: var(--info);
     --center-red: var(--danger);
@@ -537,12 +537,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     padding:24px;
     border:1px solid rgba(var(--text-rgb),.30);
     border-radius:26px;
-    background:
-        radial-gradient(circle at 100% 0%,
-            rgba(var(--text-rgb),.10),transparent 34%),
-        radial-gradient(circle at 0% 100%,
-            rgba(var(--text-rgb),.14),transparent 36%),
-        var(--card);
+    background: transparent;
     box-shadow:
         0 24px 68px rgba(0,0,0,.30),
         0 0 48px rgba(var(--text-rgb),.06);
@@ -600,10 +595,10 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     align-items:center;
     gap:7px;
     padding:0 11px;
-    border:1px solid rgba(255,255,255,.09);
+    border:1px solid var(--line);
     border-radius:999px;
     color:var(--muted);
-    background:rgba(255,255,255,.025);
+    background:transparent;
     font-size:10px;
     font-weight:850;
 }}
@@ -632,16 +627,15 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
 .rm-center-metric {{
     min-width:0;
     padding:14px;
-    border:1px solid rgba(255,255,255,.09);
+    border:1px solid var(--line);
     border-radius:16px;
-    background: var(--surface);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+    background: transparent;
 }}
 .rm-center-metric strong {{
     display:block;
     font-size:23px;
     line-height:1;
-    color:var(--gold-light);
+    color:var(--emphasis-light);
     text-shadow:0 0 24px rgba(var(--text-rgb),.12);
 }}
 .rm-center-metric span {{
@@ -649,9 +643,6 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     margin-top:7px;
     color:var(--muted);
     font-size:10px;
-}}
-.rm-center-metric.attention strong {{
-    color:var(--warning);
 }}
 .rm-command-section {{
     margin-bottom:24px;
@@ -686,7 +677,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     border:1px solid rgba(255,255,255,.08);
     border-radius:18px;
     color:var(--text);
-    background: var(--card);
+    background: transparent;
     text-decoration:none;
     transition:
         transform .18s ease,
@@ -695,7 +686,7 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
 .rm-command-card:hover {{
     transform:translateY(-3px);
     border-color:rgba(var(--text-rgb),.36);
-    background: var(--card-hover);
+    background: transparent;
     box-shadow:
         0 14px 36px rgba(0,0,0,.24),
         0 0 32px rgba(var(--text-rgb),.08);
@@ -758,14 +749,14 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
 }}
 .rm-admin-command {{
     border-color:rgba(var(--text-rgb),.24);
-    background: var(--card);
+    background: transparent;
 }}
 .rm-future-panel {{
     margin-bottom:24px;
     padding:18px;
     border:1px dashed rgba(var(--text-rgb),.22);
     border-radius:19px;
-    background: var(--surface);
+    background: transparent;
 }}
 .rm-future-panel strong {{
     display:block;
@@ -801,15 +792,6 @@ pub fn render_me(params: RenderMeParams<'_>) -> String {
     .rm-command-card {{
         transition:none;
     }}
-}}
-:root[data-theme="light"] .rm-status-pill {{
-    background:var(--surface);
-    border-color:rgba(26,29,33,.10);
-}}
-:root[data-theme="light"] .rm-center-metric {{
-    background:var(--surface);
-    border-color:rgba(26,29,33,.10);
-    box-shadow:0 8px 20px rgba(26,29,33,.05);
 }}
 :root[data-theme="light"] .rm-command-icon {{
     background:rgba(var(--text-rgb),.08);

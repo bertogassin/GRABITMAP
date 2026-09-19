@@ -163,18 +163,18 @@ pub async fn resource_create_start(State(state): State<AppState>, headers: Heade
         return Redirect::temporary(&format!("/app/add/city/{city_id}")).into_response();
     }
 
-    let continents = db
+    let mut continents: Vec<(i64, String, i64)> = db
         .prepare(
             "SELECT continent.id,
                     continent.name_ru,
+                    continent.code,
                     COUNT(country.id)
              FROM geo_continents AS continent
              LEFT JOIN geo_countries AS country
                ON country.continent_id = continent.id
               AND country.is_active = 1
              WHERE continent.is_active = 1
-             GROUP BY continent.id, continent.name_ru
-             ORDER BY continent.name_ru COLLATE NOCASE",
+             GROUP BY continent.id, continent.name_ru, continent.code",
         )
         .and_then(|mut statement| {
             statement
@@ -182,12 +182,23 @@ pub async fn resource_create_start(State(state): State<AppState>, headers: Heade
                     Ok((
                         row.get::<_, i64>(0)?,
                         row.get::<_, String>(1)?,
-                        row.get::<_, i64>(2)?,
+                        row.get::<_, String>(2)?,
+                        row.get::<_, i64>(3)?,
                     ))
                 })?
                 .collect::<Result<Vec<_>, _>>()
         })
-        .unwrap_or_default();
+        .unwrap_or_default()
+        .into_iter()
+        .map(|(id, name_ru, code, count)| {
+            (
+                id,
+                crate::db::catalog_translations::continent_name(&db, &code, &name_ru),
+                count,
+            )
+        })
+        .collect();
+    continents.sort_by(|a, b| a.1.to_lowercase().cmp(&b.1.to_lowercase()));
 
     let cards = continents
         .iter()
@@ -196,7 +207,7 @@ pub async fn resource_create_start(State(state): State<AppState>, headers: Heade
                 &format!("/app/add/continent/{id}"),
                 "globe",
                 name,
-                &templates::ru_count(*count, "страна", "страны", "стран"),
+                &templates::plural_count(*count, "count_country_one", "count_country_few", "count_country_many"),
             )
         })
         .collect::<Vec<_>>()
@@ -242,10 +253,11 @@ pub async fn resource_create_continent(
         return StatusCode::NOT_FOUND.into_response();
     };
 
-    let countries = db
+    let mut countries: Vec<(i64, String, i64)> = db
         .prepare(
             "SELECT country.id,
                     country.name_ru,
+                    country.iso2,
                     COUNT(city.id)
              FROM geo_countries AS country
              LEFT JOIN geo_cities AS city
@@ -254,8 +266,7 @@ pub async fn resource_create_continent(
               AND city.is_active = 1
              WHERE country.continent_id = ?1
                AND country.is_active = 1
-             GROUP BY country.id, country.name_ru
-             ORDER BY country.name_ru COLLATE NOCASE",
+             GROUP BY country.id, country.name_ru, country.iso2",
         )
         .and_then(|mut statement| {
             statement
@@ -263,12 +274,23 @@ pub async fn resource_create_continent(
                     Ok((
                         row.get::<_, i64>(0)?,
                         row.get::<_, String>(1)?,
-                        row.get::<_, i64>(2)?,
+                        row.get::<_, String>(2)?,
+                        row.get::<_, i64>(3)?,
                     ))
                 })?
                 .collect::<Result<Vec<_>, _>>()
         })
-        .unwrap_or_default();
+        .unwrap_or_default()
+        .into_iter()
+        .map(|(id, name_ru, iso2, count)| {
+            (
+                id,
+                crate::db::catalog_translations::country_name(&db, &iso2, &name_ru),
+                count,
+            )
+        })
+        .collect();
+    countries.sort_by(|a, b| a.1.to_lowercase().cmp(&b.1.to_lowercase()));
 
     let cards = countries
         .iter()
@@ -277,7 +299,7 @@ pub async fn resource_create_continent(
                 &format!("/app/add/country/{id}"),
                 "building",
                 name,
-                &templates::ru_count(*count, "город", "города", "городов"),
+                &templates::plural_count(*count, "count_city_one", "count_city_few", "count_city_many"),
             )
         })
         .collect::<Vec<_>>()
@@ -320,8 +342,10 @@ pub async fn resource_create_country(
     let location = db
         .query_row(
             "SELECT country.name_ru,
+                    country.iso2,
                     continent.id,
-                    continent.name_ru
+                    continent.name_ru,
+                    continent.code
              FROM geo_countries AS country
              JOIN geo_continents AS continent
                ON continent.id = country.continent_id
@@ -332,22 +356,29 @@ pub async fn resource_create_country(
             |row| {
                 Ok((
                     row.get::<_, String>(0)?,
-                    row.get::<_, i64>(1)?,
-                    row.get::<_, String>(2)?,
+                    row.get::<_, String>(1)?,
+                    row.get::<_, i64>(2)?,
+                    row.get::<_, String>(3)?,
+                    row.get::<_, String>(4)?,
                 ))
             },
         )
         .ok();
 
-    let Some((country, continent_id, continent)) = location else {
+    let Some((country_name_ru, iso2, continent_id, continent_name_ru, continent_code)) = location
+    else {
         return StatusCode::NOT_FOUND.into_response();
     };
+    let country = crate::db::catalog_translations::country_name(&db, &iso2, &country_name_ru);
+    let continent =
+        crate::db::catalog_translations::continent_name(&db, &continent_code, &continent_name_ru);
 
     let pattern = format!("%{}%", search.to_lowercase());
 
-    let cities = db
+    let mut cities: Vec<(i64, String, i64, bool)> = db
         .prepare(
-            "SELECT id, name_ru
+            "SELECT id, stable_key, name_ru, name_native, population,
+                    (lower(name_ru) = lower(?2)) AS is_exact
              FROM geo_cities
              WHERE country_id = ?1
                AND place_kind = 'city'
@@ -358,20 +389,42 @@ pub async fn resource_create_country(
                     OR lower(name_native) LIKE ?3
                     OR lower(name_ascii) LIKE ?3
                )
-             ORDER BY
-                CASE WHEN lower(name_ru) = lower(?2) THEN 0 ELSE 1 END,
-                population DESC,
-                name_ru COLLATE NOCASE
              LIMIT 250",
         )
         .and_then(|mut statement| {
             statement
                 .query_map(rusqlite::params![country_id, search, pattern], |row| {
-                    Ok((row.get::<_, i64>(0)?, row.get::<_, String>(1)?))
+                    Ok((
+                        row.get::<_, i64>(0)?,
+                        row.get::<_, String>(1)?,
+                        row.get::<_, String>(2)?,
+                        row.get::<_, String>(3)?,
+                        row.get::<_, i64>(4)?,
+                        row.get::<_, bool>(5)?,
+                    ))
                 })?
                 .collect::<Result<Vec<_>, _>>()
         })
-        .unwrap_or_default();
+        .unwrap_or_default()
+        .into_iter()
+        .map(|(id, stable_key, name_ru, name_native, population, is_exact)| {
+            (
+                id,
+                crate::db::catalog_translations::city_name(&db, &stable_key, &name_ru, &name_native),
+                population,
+                is_exact,
+            )
+        })
+        .collect();
+    cities.sort_by(|a, b| {
+        b.3.cmp(&a.3) // exact match first
+            .then(b.2.cmp(&a.2)) // population desc
+            .then(a.1.to_lowercase().cmp(&b.1.to_lowercase())) // localized name
+    });
+    let cities: Vec<(i64, String)> = cities
+        .into_iter()
+        .map(|(id, name, _, _)| (id, name))
+        .collect();
 
     let search_form = format!(
         r#"
@@ -441,9 +494,13 @@ pub async fn resource_create_city_page(
     let location = db
         .query_row(
             "SELECT city.name_ru,
+                    city.stable_key,
+                    city.name_native,
                     country.id,
                     country.name_ru,
-                    continent.name_ru
+                    country.iso2,
+                    continent.name_ru,
+                    continent.code
              FROM geo_cities AS city
              JOIN geo_countries AS country
                ON country.id = city.country_id
@@ -456,17 +513,40 @@ pub async fn resource_create_city_page(
             |row| {
                 Ok((
                     row.get::<_, String>(0)?,
-                    row.get::<_, i64>(1)?,
+                    row.get::<_, String>(1)?,
                     row.get::<_, String>(2)?,
-                    row.get::<_, String>(3)?,
+                    row.get::<_, i64>(3)?,
+                    row.get::<_, String>(4)?,
+                    row.get::<_, String>(5)?,
+                    row.get::<_, String>(6)?,
+                    row.get::<_, String>(7)?,
                 ))
             },
         )
         .ok();
 
-    let Some((city, country_id, country, continent)) = location else {
+    let Some((
+        city_name_ru,
+        stable_key,
+        city_name_native,
+        country_id,
+        country_name_ru,
+        iso2,
+        continent_name_ru,
+        continent_code,
+    )) = location
+    else {
         return StatusCode::NOT_FOUND.into_response();
     };
+    let city = crate::db::catalog_translations::city_name(
+        &db,
+        &stable_key,
+        &city_name_ru,
+        &city_name_native,
+    );
+    let country = crate::db::catalog_translations::country_name(&db, &iso2, &country_name_ru);
+    let continent =
+        crate::db::catalog_translations::continent_name(&db, &continent_code, &continent_name_ru);
 
     let kind = kind_from_query(query.kind.as_deref());
     let intent = intent_from_query(query.intent.as_deref());

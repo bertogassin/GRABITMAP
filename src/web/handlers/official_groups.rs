@@ -48,29 +48,29 @@ fn load_scope(db: &Connection, scope_type: &str, scope_id: i64) -> Option<ScopeL
         "world" if scope_id == 1 => Some(ScopeLocation {
             scope_type: "world".to_string(),
             scope_id,
-            name: "Весь мир".to_string(),
+            name: crate::i18n::t("place_chip_world"),
             parent_type: String::new(),
             parent_id: 0,
             parent_name: String::new(),
         }),
         "continent" => db
             .query_row(
-                "SELECT name_ru FROM geo_continents WHERE id = ?1 AND is_active = 1",
+                "SELECT name_ru, code FROM geo_continents WHERE id = ?1 AND is_active = 1",
                 [scope_id],
-                |row| row.get::<_, String>(0),
+                |row| Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?)),
             )
             .ok()
-            .map(|name| ScopeLocation {
+            .map(|(name_ru, code)| ScopeLocation {
                 scope_type: "continent".to_string(),
                 scope_id,
-                name,
+                name: crate::db::catalog_translations::continent_name(db, &code, &name_ru),
                 parent_type: "world".to_string(),
                 parent_id: 1,
-                parent_name: "Весь мир".to_string(),
+                parent_name: crate::i18n::t("place_chip_world"),
             }),
         "country" => db
             .query_row(
-                "SELECT country.name_ru, continent.id, continent.name_ru
+                "SELECT country.name_ru, country.iso2, continent.id, continent.name_ru, continent.code
                  FROM geo_countries AS country
                  JOIN geo_continents AS continent ON continent.id = country.continent_id
                  WHERE country.id = ?1
@@ -78,20 +78,32 @@ fn load_scope(db: &Connection, scope_type: &str, scope_id: i64) -> Option<ScopeL
                    AND continent.is_active = 1",
                 [scope_id],
                 |row| {
-                    Ok(ScopeLocation {
-                        scope_type: "country".to_string(),
-                        scope_id,
-                        name: row.get(0)?,
-                        parent_type: "continent".to_string(),
-                        parent_id: row.get(1)?,
-                        parent_name: row.get(2)?,
-                    })
+                    Ok((
+                        row.get::<_, String>(0)?,
+                        row.get::<_, String>(1)?,
+                        row.get::<_, i64>(2)?,
+                        row.get::<_, String>(3)?,
+                        row.get::<_, String>(4)?,
+                    ))
                 },
             )
-            .ok(),
+            .ok()
+            .map(|(name_ru, iso2, parent_id, parent_name_ru, parent_code)| ScopeLocation {
+                scope_type: "country".to_string(),
+                scope_id,
+                name: crate::db::catalog_translations::country_name(db, &iso2, &name_ru),
+                parent_type: "continent".to_string(),
+                parent_id,
+                parent_name: crate::db::catalog_translations::continent_name(
+                    db,
+                    &parent_code,
+                    &parent_name_ru,
+                ),
+            }),
         "city" => db
             .query_row(
-                "SELECT city.name_ru, country.id, country.name_ru
+                "SELECT city.name_ru, city.stable_key, city.name_native,
+                        country.id, country.name_ru, country.iso2
                  FROM geo_cities AS city
                  JOIN geo_countries AS country ON country.id = city.country_id
                  JOIN geo_continents AS continent ON continent.id = country.continent_id
@@ -102,17 +114,38 @@ fn load_scope(db: &Connection, scope_type: &str, scope_id: i64) -> Option<ScopeL
                    AND continent.is_active = 1",
                 [scope_id],
                 |row| {
-                    Ok(ScopeLocation {
-                        scope_type: "city".to_string(),
-                        scope_id,
-                        name: row.get(0)?,
-                        parent_type: "country".to_string(),
-                        parent_id: row.get(1)?,
-                        parent_name: row.get(2)?,
-                    })
+                    Ok((
+                        row.get::<_, String>(0)?,
+                        row.get::<_, String>(1)?,
+                        row.get::<_, String>(2)?,
+                        row.get::<_, i64>(3)?,
+                        row.get::<_, String>(4)?,
+                        row.get::<_, String>(5)?,
+                    ))
                 },
             )
-            .ok(),
+            .ok()
+            .map(
+                |(name_ru, stable_key, name_native, parent_id, country_name_ru, iso2)| {
+                    ScopeLocation {
+                        scope_type: "city".to_string(),
+                        scope_id,
+                        name: crate::db::catalog_translations::city_name(
+                            db,
+                            &stable_key,
+                            &name_ru,
+                            &name_native,
+                        ),
+                        parent_type: "country".to_string(),
+                        parent_id,
+                        parent_name: crate::db::catalog_translations::country_name(
+                            db,
+                            &iso2,
+                            &country_name_ru,
+                        ),
+                    }
+                },
+            ),
         _ => None,
     }
 }
@@ -344,27 +377,25 @@ fn load_children(
     let normalized_query = query.trim().to_lowercase();
     let sql = match location.scope_type.as_str() {
         "world" => {
-            "SELECT 'continent', place.id, place.name_ru,
+            "SELECT 'continent', place.id, place.name_ru, place.code, NULL,
                     COALESCE(scope.group_id, 0), COALESCE(group_row.member_count, 0)
              FROM geo_continents AS place
              LEFT JOIN chat_group_scopes AS scope
                ON scope.scope_type = 'continent' AND scope.scope_id = place.id
              LEFT JOIN chat_groups AS group_row ON group_row.id = scope.group_id
-             WHERE place.is_active = 1 AND ?1 > 0
-             ORDER BY place.name_ru COLLATE NOCASE"
+             WHERE place.is_active = 1 AND ?1 > 0"
         }
         "continent" => {
-            "SELECT 'country', place.id, place.name_ru,
+            "SELECT 'country', place.id, place.name_ru, place.iso2, NULL,
                     COALESCE(scope.group_id, 0), COALESCE(group_row.member_count, 0)
              FROM geo_countries AS place
              LEFT JOIN chat_group_scopes AS scope
                ON scope.scope_type = 'country' AND scope.scope_id = place.id
              LEFT JOIN chat_groups AS group_row ON group_row.id = scope.group_id
-             WHERE place.continent_id = ?1 AND place.is_active = 1
-             ORDER BY place.name_ru COLLATE NOCASE"
+             WHERE place.continent_id = ?1 AND place.is_active = 1"
         }
         "country" => {
-            "SELECT 'city', place.id, place.name_ru,
+            "SELECT 'city', place.id, place.name_ru, place.stable_key, place.name_native,
                     COALESCE(scope.group_id, 0), COALESCE(group_row.member_count, 0)
              FROM geo_cities AS place
              LEFT JOIN chat_group_scopes AS scope
@@ -372,31 +403,73 @@ fn load_children(
              LEFT JOIN chat_groups AS group_row ON group_row.id = scope.group_id
              WHERE place.country_id = ?1 AND place.is_active = 1
                AND place.place_kind = 'city'
-             ORDER BY place.population DESC, place.name_ru COLLATE NOCASE"
+             ORDER BY place.population DESC"
         }
         _ => return Vec::new(),
     };
-    db.prepare(sql)
+    let mut places: Vec<OfficialGroupPlace> = db
+        .prepare(sql)
         .and_then(|mut statement| {
             statement
                 .query_map([location.scope_id], |row| {
-                    Ok(OfficialGroupPlace {
-                        scope_type: row.get(0)?,
-                        scope_id: row.get(1)?,
-                        name: row.get(2)?,
-                        group_id: row.get(3)?,
-                        member_count: row.get(4)?,
-                    })
+                    Ok((
+                        OfficialGroupPlace {
+                            scope_type: row.get(0)?,
+                            scope_id: row.get(1)?,
+                            name: row.get(2)?,
+                            group_id: row.get(5)?,
+                            member_count: row.get(6)?,
+                        },
+                        row.get::<_, Option<String>>(3)?,
+                        row.get::<_, Option<String>>(4)?,
+                    ))
                 })?
                 .collect::<Result<Vec<_>, _>>()
         })
         .unwrap_or_default()
         .into_iter()
+        .map(|(mut place, extra1, extra2)| {
+            match place.scope_type.as_str() {
+                "continent" => {
+                    if let Some(code) = extra1 {
+                        place.name =
+                            crate::db::catalog_translations::continent_name(db, &code, &place.name);
+                    }
+                }
+                "country" => {
+                    if let Some(iso2) = extra1 {
+                        place.name =
+                            crate::db::catalog_translations::country_name(db, &iso2, &place.name);
+                    }
+                }
+                "city" => {
+                    if let Some(stable_key) = extra1 {
+                        let name_native = extra2.unwrap_or_default();
+                        place.name = crate::db::catalog_translations::city_name(
+                            db,
+                            &stable_key,
+                            &place.name,
+                            &name_native,
+                        );
+                    }
+                }
+                _ => {}
+            }
+            place
+        })
         .filter(|place| {
             normalized_query.is_empty() || place.name.to_lowercase().contains(&normalized_query)
         })
-        .take(100)
-        .collect()
+        .collect();
+    // Continents and countries list alphabetically in the display
+    // language. Cities keep the population-first order from SQL above
+    // (a deliberate "biggest cities first" ranking, not alphabetical)
+    // since re-sorting by name here would discard it.
+    if location.scope_type == "world" || location.scope_type == "continent" {
+        places.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+    }
+    places.truncate(100);
+    places
 }
 
 fn render_page(

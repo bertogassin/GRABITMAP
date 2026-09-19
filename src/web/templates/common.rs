@@ -26,10 +26,6 @@ pub(crate) fn ru_plural<'a>(n: i64, one: &'a str, few: &'a str, many: &'a str) -
     }
 }
 
-pub(crate) fn ru_count(n: i64, one: &'static str, few: &'static str, many: &'static str) -> String {
-    format!("{n} {}", ru_plural(n, one, few, many))
-}
-
 /// Locale-aware plural word, with no leading count. Uses Russian's three
 /// plural forms when the current locale is `ru`; falls back to a
 /// singular/plural split (n == 1 vs. everything else) for the rest, which
@@ -262,14 +258,16 @@ pub(crate) fn base_style() -> &'static str {
     r#"
 :root {
     /* Строгая монохромная тема: только чистый чёрный/белый для фона,
-       текста и кнопок. Серый — исключительно для плейсхолдеров,
-       разделителей и подписей (--muted/--line), не ниже 4.5:1. */
+       текста и кнопок. Серый — исключительно для плейсхолдеров и
+       подписей (--muted), не ниже 4.5:1. Карточки/панели/модалки/
+       чипы/вкладки/секции не заливаются — только фон страницы и
+       граница --line (rgba(--text-rgb), .12). */
     --bg: #000000;
     --bg-soft: #060606;
     --surface: #0d0d0f;
     --card: #141416;
     --card-hover: #1c1c1f;
-    --line: #7a7a7a;
+    --line: rgba(255, 255, 255, .12);
     --text-rgb: 255, 255, 255;
 
     --text: #ffffff;
@@ -278,10 +276,10 @@ pub(crate) fn base_style() -> &'static str {
 
     /* Акцент убран — токены остаются для обратной совместимости и
        теперь указывают на чёрно-белую пару, чтобы ничего не красить. */
-    --gold: var(--text);
-    --gold-light: var(--text);
-    --gold-glow: rgba(var(--text-rgb), .20);
-    --gold-soft: rgba(var(--text-rgb), .14);
+    --emphasis: var(--text);
+    --emphasis-light: var(--text);
+    --emphasis-glow: rgba(var(--text-rgb), .20);
+    --emphasis-soft: rgba(var(--text-rgb), .14);
 
     /* Функциональные — только статус, не украшение */
     --success: #34d399;
@@ -345,7 +343,7 @@ pub(crate) fn base_style() -> &'static str {
     --surface: #0d0d0f;
     --card: #141416;
     --card-hover: #1c1c1f;
-    --line: #7a7a7a;
+    --line: rgba(255, 255, 255, .12);
     --text-rgb: 255, 255, 255;
 
     --text: #ffffff;
@@ -381,15 +379,15 @@ pub(crate) fn base_style() -> &'static str {
         --surface: #ffffff;
         --card: #ffffff;
         --card-hover: #f6f6f6;
-        --line: #6b6b6b;
+        --line: rgba(0, 0, 0, .12);
         --text-rgb: 0, 0, 0;
 
         --text: #000000;
         --muted: #3d4450;
         --text-muted: #3d4450;
 
-        --gold-glow: rgba(var(--text-rgb), .28);
-        --gold-soft: rgba(var(--text-rgb), .12);
+        --emphasis-glow: rgba(var(--text-rgb), .28);
+        --emphasis-soft: rgba(var(--text-rgb), .12);
 
         --success: #1f8a64;
         --warning: #976d00;
@@ -421,15 +419,15 @@ pub(crate) fn base_style() -> &'static str {
     --surface: #ffffff;
     --card: #ffffff;
     --card-hover: #f6f6f6;
-    --line: #6b6b6b;
+    --line: rgba(0, 0, 0, .12);
     --text-rgb: 0, 0, 0;
 
     --text: #000000;
     --muted: #3d4450;
     --text-muted: #3d4450;
 
-    --gold-glow: rgba(var(--text-rgb), .28);
-    --gold-soft: rgba(var(--text-rgb), .12);
+    --emphasis-glow: rgba(var(--text-rgb), .28);
+    --emphasis-soft: rgba(var(--text-rgb), .12);
 
     --success: #1f8a64;
     --warning: #976d00;
@@ -521,12 +519,12 @@ pub(crate) fn base_style() -> &'static str {
 
 :root[data-theme="light"] .rm-kind-chip {
     border-color: rgba(var(--text-rgb), .28);
-    background: rgba(var(--text-rgb), .08);
+    background: transparent;
 }
 
 :root[data-theme="light"] .rm-kind-chip.is-active {
     border-color: rgba(var(--text-rgb), .48);
-    background: rgba(var(--text-rgb), .16);
+    background: transparent;
 }
 
 :root[data-theme="light"] .theme-toggle-btn {
@@ -717,7 +715,7 @@ body::before { display: none; }
     border: 1px solid rgba(var(--text-rgb), .32);
     border-radius: 14px;
 
-    color: var(--gold);
+    color: var(--emphasis);
 
     background: var(--surface);
 
@@ -729,7 +727,7 @@ body::before { display: none; }
 .brand-mark .brand-logo-icon {
     width: 24px;
     height: 24px;
-    color: var(--gold);
+    color: var(--emphasis);
 }
 
 .brand-logo-img {
@@ -749,7 +747,7 @@ body::before { display: none; }
     font-size: 17px;
     font-weight: 800;
     letter-spacing: .08em;
-    background: linear-gradient(135deg, var(--text) 0%, var(--gold-light) 100%);
+    background: linear-gradient(135deg, var(--text) 0%, var(--emphasis-light) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -775,18 +773,7 @@ body::before { display: none; }
     border: 1px solid var(--line);
     border-radius: 24px;
 
-    background:
-        radial-gradient(
-            circle at 100% 0%,
-            rgba(var(--text-rgb),.12),
-            transparent 36%
-        ),
-        radial-gradient(
-            circle at 0% 100%,
-            rgba(101,184,201,.09),
-            transparent 38%
-        ),
-        var(--card);
+    background: transparent;
 
     box-shadow:
         0 18px 48px rgba(0, 0, 0, .22),
@@ -815,7 +802,7 @@ body::before { display: none; }
     align-items: center;
     gap: 8px;
 
-    color: var(--gold-light);
+    color: var(--emphasis-light);
     font-size: 12px;
     font-weight: 600;
 
@@ -827,7 +814,7 @@ body::before { display: none; }
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--gold);
+    background: var(--emphasis);
     box-shadow: 0 0 14px rgba(var(--text-rgb),.70);
 }
 
@@ -941,7 +928,7 @@ body::before { display: none; }
     padding: 18px;
     border: 1px solid var(--line);
     border-radius: 24px;
-    background: var(--card);
+    background: transparent;
     box-shadow: 0 26px 70px rgba(0,0,0,.42);
 }
 
@@ -1003,7 +990,7 @@ body::before { display: none; }
 .section-title {
     margin: 0;
     padding-left: 12px;
-    border-left: 3px solid var(--gold-light);
+    border-left: 3px solid var(--emphasis-light);
     font-size: 18px;
     letter-spacing: -.02em;
     box-shadow: -8px 0 24px rgba(var(--text-rgb), .12);
@@ -1050,13 +1037,7 @@ body::before { display: none; }
     border: 1px solid var(--line);
     border-radius: var(--radius);
 
-    background:
-        linear-gradient(
-            145deg,
-            rgba(0,0,0,.055),
-            rgba(0,0,0,.018)
-        ),
-        var(--card);
+    background: transparent;
 
     box-shadow:
         0 12px 35px rgba(0,0,0,.18),
@@ -1078,18 +1059,13 @@ body::before { display: none; }
 .card:hover {
     transform: translateY(-2px);
 
-    border-color: var(--gold-glow);
+    border-color: var(--emphasis-glow);
 
-    background:
-        linear-gradient(
-            145deg,
-            var(--gold-soft),
-            rgba(255,255,255,.03)
-        );
+    background: transparent;
 
     box-shadow:
         0 22px 56px rgba(0,0,0,.32),
-        0 0 48px var(--gold-glow),
+        0 0 48px var(--emphasis-glow),
         inset 0 1px 0 rgba(255,255,255,.08);
 }
 
@@ -1102,7 +1078,7 @@ body::before { display: none; }
 
     flex: 0 0 auto;
 
-    color: var(--gold-light);
+    color: var(--emphasis-light);
 
     border: 1px solid rgba(var(--text-rgb), .28);
     border-radius: 16px;
@@ -1248,15 +1224,10 @@ body::before { display: none; }
     min-height: 125px;
     padding: 18px;
 
-    border: 1px solid rgba(0,0,0,.07);
+    border: 1px solid var(--line);
     border-radius: 20px;
 
-    background:
-        linear-gradient(
-            145deg,
-            rgba(0,0,0,.045),
-            rgba(0,0,0,.015)
-        );
+    background: transparent;
     box-shadow:
         0 12px 35px rgba(0,0,0,.16),
         inset 0 1px 0 rgba(0,0,0,.04);
@@ -1267,7 +1238,7 @@ body::before { display: none; }
 }
 
 .feature .icon {
-    color: var(--gold-light);
+    color: var(--emphasis-light);
     filter: drop-shadow(0 0 8px rgba(var(--text-rgb), .16));
 }
 
@@ -1497,7 +1468,7 @@ html[data-page="chat"] .rm-version-footer {
     place-items:center;
     width:18px;
     height:18px;
-    color:var(--gold);
+    color:var(--emphasis);
 }
 
 .topbar-account-icon .icon {
@@ -1530,8 +1501,7 @@ html[data-page="chat"] .rm-version-footer {
     padding: 22px 20px;
     margin-bottom: 18px;
     border-color: rgba(var(--text-rgb), .24);
-    background:
-        linear-gradient(145deg, rgba(var(--text-rgb), .08), rgba(126, 212, 228, .05));
+    background: transparent;
 }
 
 .rm-guest-title {
@@ -1555,7 +1525,7 @@ html[data-page="chat"] .rm-version-footer {
     padding: 16px;
     border: 1px solid var(--line);
     border-radius: 18px;
-    background: rgba(0, 0, 0, .03);
+    background: transparent;
 }
 
 .rm-session-row {
@@ -1573,7 +1543,7 @@ html[data-page="chat"] .rm-version-footer {
 }
 
 .rm-session-current {
-    color: var(--gold-light);
+    color: var(--emphasis-light);
     font-size: 10px;
     font-weight: 800;
     letter-spacing: .06em;
@@ -1609,7 +1579,7 @@ html[data-page="chat"] .rm-version-footer {
 }
 
 .theme-toggle-btn:hover {
-    color: var(--gold-light);
+    color: var(--emphasis-light);
     border-color: rgba(var(--text-rgb),.24);
     background: rgba(var(--text-rgb),.06);
 }
@@ -1628,7 +1598,7 @@ html[data-page="chat"] .rm-version-footer {
     font-weight: 700;
     letter-spacing: .06em;
     text-transform: uppercase;
-    color: var(--gold-light);
+    color: var(--emphasis-light);
 }
 
 .hero::before {
@@ -1683,7 +1653,7 @@ html[data-page="chat"] .rm-version-footer {
     padding: 0 13px;
     border-radius: 999px;
     border: 1px solid rgba(var(--text-rgb), .24);
-    background: rgba(var(--text-rgb), .08);
+    background: transparent;
     color: var(--text);
     text-decoration: none;
     font-size: 13px;
@@ -1692,8 +1662,8 @@ html[data-page="chat"] .rm-version-footer {
 
 .rm-kind-chip.is-active {
     border-color: rgba(var(--text-rgb), .48);
-    background: rgba(var(--text-rgb), .16);
-    color: var(--gold-light);
+    background: transparent;
+    color: var(--emphasis-light);
 }
 
 .card::before {
@@ -1725,7 +1695,7 @@ html[data-page="chat"] .rm-version-footer {
 
 .card:hover .card-arrow {
     transform: translateX(4px);
-    color: var(--gold-light);
+    color: var(--emphasis-light);
 }
 
 .feature:hover {
@@ -2054,7 +2024,7 @@ html[data-page="chat"] .rm-version-footer {
     flex: 1;
     height: 3px;
     border-radius: 2px;
-    background: var(--line);
+    background: rgba(var(--text-rgb), .24);
 }
 
 .rm-auth-strength[data-level="1"] i:nth-child(1) { background: var(--danger); }
@@ -2092,7 +2062,7 @@ html[data-page="chat"] .rm-version-footer {
     border-radius: 999px;
     border: 1px solid rgba(var(--text-rgb), .45);
     background: rgba(var(--text-rgb), .12);
-    color: var(--gold-light);
+    color: var(--emphasis-light);
     font-size: 10px;
     font-weight: 800;
     letter-spacing: .08em;
@@ -2169,7 +2139,7 @@ a.feature.rm-feature-add {
 }
 
 .rm-guest-hint a {
-    color: var(--gold-light);
+    color: var(--emphasis-light);
 }
 
 .rm-verified-badge {
@@ -2186,7 +2156,7 @@ a.feature.rm-feature-add {
     display: block;
     padding: 18px;
     margin-bottom: 14px;
-    border-left: 3px solid var(--gold-light);
+    border-left: 3px solid var(--emphasis-light);
     color: inherit;
     text-decoration: none;
 }
@@ -2201,7 +2171,7 @@ a.feature.rm-feature-add {
 }
 
 .rm-notif-card--chat {
-    border-left-color: var(--gold);
+    border-left-color: var(--emphasis);
 }
 
 .rm-notif-layout {
@@ -2234,11 +2204,11 @@ a.feature.rm-feature-add {
 }
 
 .rm-notif-icon--chat {
-    color: var(--gold);
+    color: var(--emphasis);
 }
 
 .rm-notif-icon--default {
-    color: var(--gold-light);
+    color: var(--emphasis-light);
 }
 
 .rm-notif-body {
@@ -2262,7 +2232,7 @@ a.feature.rm-feature-add {
 .rm-notif-new {
     font-size: 10px;
     font-weight: 900;
-    color: var(--gold);
+    color: var(--emphasis);
     text-transform: uppercase;
     letter-spacing: .06em;
 }
@@ -2284,7 +2254,7 @@ a.feature.rm-feature-add {
     color: var(--on-gold);
     font-size: 13px;
     font-weight: 800;
-    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    background: linear-gradient(135deg, var(--emphasis-light), var(--emphasis));
 }
 
 .rm-notif-action {
@@ -2806,8 +2776,8 @@ a.feature.rm-feature-add {
 .rm-profile-intent-box {
     padding: 12px 14px;
     border-radius: 13px;
-    background: rgba(0, 0, 0, .03);
-    border: 1px solid rgba(0, 0, 0, .07);
+    background: transparent;
+    border: 1px solid var(--line);
     margin-bottom: 16px;
 }
 
@@ -2854,7 +2824,7 @@ a.feature.rm-feature-add {
     border-color: rgba(var(--text-rgb), .28);
     border-radius: 14px;
     background: rgba(var(--text-rgb), .06);
-    color: var(--gold-light);
+    color: var(--emphasis-light);
     font-size: 14px;
     font-weight: 700;
 }
@@ -2882,7 +2852,7 @@ a.feature.rm-feature-add {
     font-size: 15px;
     font-weight: 900;
     color: var(--on-gold);
-    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    background: linear-gradient(135deg, var(--emphasis-light), var(--emphasis));
 }
 
 .rm-profile-save-status {
@@ -2914,7 +2884,7 @@ a.feature.rm-feature-add {
     font-weight: 900;
     background: rgba(var(--text-rgb), .12);
     border: 1px solid rgba(var(--text-rgb), .28);
-    color: var(--gold-light);
+    color: var(--emphasis-light);
 }
 
 .rm-public-section {
@@ -2950,7 +2920,7 @@ a.feature.rm-feature-add {
     justify-content: center;
     border-radius: 14px;
     border: 0;
-    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    background: linear-gradient(135deg, var(--emphasis-light), var(--emphasis));
     color: var(--on-gold);
     text-decoration: none;
     font-weight: 850;
@@ -3631,7 +3601,7 @@ a.feature.rm-feature-add {
     overflow: hidden;
     margin-bottom: 14px;
     border-color: rgba(var(--text-rgb), .34);
-    background: var(--card);
+    background: transparent;
     box-shadow: 0 18px 48px rgba(0, 0, 0, .22);
 }
 
@@ -3655,7 +3625,7 @@ a.feature.rm-feature-add {
     padding: 6px 8px;
     border: 1px solid rgba(var(--text-rgb), .30);
     border-radius: 999px;
-    color: var(--gold-light);
+    color: var(--emphasis-light);
     font-size: 9px;
     font-weight: 900;
     letter-spacing: .08em;
@@ -3699,7 +3669,7 @@ a.feature.rm-feature-add {
     place-items: center;
     border-radius: 10px;
     background: rgba(var(--text-rgb), .10);
-    color: var(--gold);
+    color: var(--emphasis);
     flex: 0 0 36px;
 }
 
@@ -3753,9 +3723,7 @@ a.feature.rm-feature-add {
     padding: 14px;
     border: 1px solid rgba(var(--text-rgb), .18);
     border-radius: 18px;
-    background:
-        radial-gradient(circle at 100% 0%, rgba(var(--text-rgb), .10), transparent 46%),
-        rgba(255, 255, 255, .02);
+    background: transparent;
 }
 
 .rm-lang-head {
@@ -3869,7 +3837,7 @@ html[dir="rtl"] .rm-menu-row {
 
 .rm-search-person-profession {
     margin-top: 4px;
-    color: var(--gold-light);
+    color: var(--emphasis-light);
     font-weight: 700;
 }
 
@@ -3878,7 +3846,7 @@ html[dir="rtl"] .rm-menu-row {
     padding: 10px 12px;
     border-radius: 12px;
     border: 1px solid rgba(var(--text-rgb), .20);
-    background: rgba(var(--text-rgb), .07);
+    background: transparent;
     font-size: 13px;
     line-height: 1.45;
     overflow-wrap: anywhere;
@@ -3921,7 +3889,7 @@ html[dir="rtl"] .rm-menu-row {
 .rm-resource-card--premium {
     margin-bottom: 16px;
     border: 1px solid rgba(var(--text-rgb), .55);
-    background: linear-gradient(145deg, var(--card), var(--card-hover));
+    background: transparent;
     box-shadow:
         0 10px 32px rgba(var(--text-rgb), .14),
         0 0 0 1px rgba(var(--text-rgb), .06);
@@ -3935,7 +3903,7 @@ html[dir="rtl"] .rm-menu-row {
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    background: linear-gradient(90deg, transparent, var(--emphasis), transparent);
 }
 
 .rm-resource-title-row {
@@ -4016,7 +3984,7 @@ html[dir="rtl"] .rm-menu-row {
     border-radius: 14px;
     border: 1px solid rgba(var(--text-rgb), .28);
     background: rgba(var(--text-rgb), .08);
-    color: var(--gold-light);
+    color: var(--emphasis-light);
     font-weight: 800;
 }
 
@@ -4043,7 +4011,7 @@ html[dir="rtl"] .rm-menu-row {
     padding: 14px;
     border-radius: 16px;
     border: 1px solid rgba(217, 119, 6, .18);
-    background: rgba(0, 0, 0, .03);
+    background: transparent;
 }
 
 .rm-resource-report-inline {
@@ -4067,8 +4035,8 @@ html[dir="rtl"] .rm-menu-row {
     padding: 0 12px;
     border-radius: 999px;
     border: 1px solid rgba(var(--text-rgb), .24);
-    background: rgba(var(--text-rgb), .08);
-    color: var(--gold-light);
+    background: transparent;
+    color: var(--emphasis-light);
     font-size: 13px;
     font-weight: 700;
 }
@@ -4130,7 +4098,7 @@ html[dir="rtl"] .rm-menu-row {
     padding: 0;
     border: 0;
     background: transparent;
-    color: var(--gold);
+    color: var(--emphasis);
     font-size: 22px;
     line-height: 1;
     box-shadow: none;
@@ -4155,12 +4123,12 @@ html[dir="rtl"] .rm-menu-row {
 
 .rm-resource-section--premium {
     border: 1px solid rgba(var(--text-rgb), .55);
-    background: linear-gradient(145deg, var(--card), var(--card-hover));
+    background: transparent;
     box-shadow: 0 12px 38px rgba(var(--text-rgb), .14);
 }
 
 .rm-resource-section--plain {
-    border: 1px solid rgba(0, 0, 0, .07);
+    border: 1px solid var(--line);
 }
 
 .rm-resource-section-kicker {
@@ -4224,7 +4192,7 @@ html[dir="rtl"] .rm-menu-row {
 
 .rm-resource-contact-btn--gold {
     border: 0;
-    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    background: linear-gradient(135deg, var(--emphasis-light), var(--emphasis));
     color: var(--on-gold);
 }
 
@@ -4325,7 +4293,7 @@ html[dir="rtl"] .rm-menu-row {
 
 .rm-my-resource-action--gold {
     font-weight: 850;
-    color: var(--gold-light);
+    color: var(--emphasis-light);
     border: 1px solid rgba(var(--text-rgb), .48);
     background: rgba(var(--text-rgb), .10);
 }
@@ -4413,7 +4381,7 @@ html[dir="rtl"] .rm-menu-row {
     overflow: hidden;
     padding: 0;
     border: 1px solid rgba(var(--text-rgb), .52);
-    background: var(--card);
+    background: transparent;
     box-shadow:
         0 22px 60px rgba(0, 0, 0, .30),
         0 0 38px rgba(var(--text-rgb), .08);
@@ -4422,7 +4390,7 @@ html[dir="rtl"] .rm-menu-row {
 .rm-promo-preview-head {
     padding: 15px 20px;
     border-bottom: 1px solid rgba(var(--text-rgb), .24);
-    color: var(--gold-light);
+    color: var(--emphasis-light);
     font-size: 12px;
     font-weight: 900;
     letter-spacing: .12em;
@@ -4467,7 +4435,7 @@ html[dir="rtl"] .rm-menu-row {
     margin-top: 20px;
     padding-top: 15px;
     border-top: 1px solid rgba(var(--text-rgb), .18);
-    color: var(--gold-light);
+    color: var(--emphasis-light);
     font-size: 12px;
     font-weight: 850;
 }
@@ -4568,7 +4536,7 @@ html[dir="rtl"] .rm-menu-row {
     min-height: 40px;
     border: 0;
     border-radius: 12px;
-    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    background: linear-gradient(135deg, var(--emphasis-light), var(--emphasis));
     color: var(--on-gold);
     font-size: 13px;
     font-weight: 800;
@@ -4614,13 +4582,13 @@ html[dir="rtl"] .rm-menu-row {
 .rm-profile-save-btn,
 .rm-promo-submit {
     border: 0;
-    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    background: linear-gradient(135deg, var(--emphasis-light), var(--emphasis));
     color: var(--on-gold);
 }
 
 .rm-empty-action {
     border: 0;
-    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    background: linear-gradient(135deg, var(--emphasis-light), var(--emphasis));
     color: var(--on-gold);
     text-decoration: none;
 }
@@ -4702,7 +4670,7 @@ html[dir="rtl"] .rm-menu-row {
     border: 1px solid var(--line);
     border-radius: 999px;
     color: var(--accent);
-    background: rgba(255,255,255,.04);
+    background: transparent;
     text-decoration: none;
     font-size: 12px;
     font-weight: 700;
@@ -4732,7 +4700,7 @@ html[dir="rtl"] .rm-menu-row {
     padding: 16px;
     border: 1px solid var(--line);
     border-radius: 22px;
-    background: var(--surface);
+    background: transparent;
     color: var(--text);
 }
 
@@ -7194,7 +7162,7 @@ mod public_entry_tests {
             );
         }
 
-        assert!(style.contains("border: 1px solid rgba(0,0,0,.07);"));
+        assert!(style.contains("border: 1px solid var(--line);"));
         assert!(style.contains("0 12px 35px rgba(0,0,0,.16),"));
     }
 
@@ -7337,7 +7305,7 @@ mod public_entry_tests {
             1
         );
         assert!(style.contains("border: 1px solid rgba(var(--text-rgb), .24);"));
-        assert!(style.contains(".rm-guest-hint a {\n    color: var(--gold-light);"));
+        assert!(style.contains(".rm-guest-hint a {\n    color: var(--emphasis-light);"));
     }
 
     #[test]
@@ -7432,7 +7400,7 @@ mod public_entry_tests {
 
         assert!(style.contains("position: relative;\n    overflow: hidden;"));
         assert!(style.contains("0 12px 35px rgba(0,0,0,.18),"));
-        assert!(style.contains("border-color: var(--gold-glow);"));
+        assert!(style.contains("border-color: var(--emphasis-glow);"));
         assert!(style.contains("0 22px 56px rgba(0,0,0,.32),"));
     }
 
@@ -7482,14 +7450,14 @@ mod public_entry_tests {
 
     #[test]
     fn russian_counts_follow_plural_rules() {
-        assert_eq!(ru_count(1, "страна", "страны", "стран"), "1 страна");
-        assert_eq!(ru_count(2, "страна", "страны", "стран"), "2 страны");
-        assert_eq!(ru_count(5, "страна", "страны", "стран"), "5 стран");
-        assert_eq!(ru_count(11, "страна", "страны", "стран"), "11 стран");
-        assert_eq!(ru_count(21, "страна", "страны", "стран"), "21 страна");
+        assert_eq!(ru_plural(1, "страна", "страны", "стран"), "страна");
+        assert_eq!(ru_plural(2, "страна", "страны", "стран"), "страны");
+        assert_eq!(ru_plural(5, "страна", "страны", "стран"), "стран");
+        assert_eq!(ru_plural(11, "страна", "страны", "стран"), "стран");
+        assert_eq!(ru_plural(21, "страна", "страны", "стран"), "страна");
         assert_eq!(
-            ru_count(1, "объявление", "объявления", "объявлений"),
-            "1 объявление"
+            ru_plural(1, "объявление", "объявления", "объявлений"),
+            "объявление"
         );
     }
 }

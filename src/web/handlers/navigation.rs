@@ -85,32 +85,48 @@ fn parse_positive_id(raw: Option<&str>) -> Option<i64> {
 }
 
 fn load_nearby_city(db: &rusqlite::Connection, city_id: i64) -> Option<NearbyCity> {
-    db.query_row(
-        "SELECT city.name_ru,
-                country.id,
-                country.name_ru,
-                city.latitude,
-                city.longitude
-         FROM geo_cities AS city
-         JOIN geo_countries AS country
-           ON country.id = city.country_id
-         WHERE city.id = ?1
-           AND city.place_kind = 'city'
-           AND city.is_active = 1
-           AND country.is_active = 1",
-        [city_id],
-        |row| {
-            Ok(NearbyCity {
-                id: city_id,
-                name: row.get(0)?,
-                country_id: row.get(1)?,
-                country_name: row.get(2)?,
-                latitude: row.get(3)?,
-                longitude: row.get(4)?,
-            })
-        },
-    )
-    .ok()
+    let row = db
+        .query_row(
+            "SELECT city.name_ru,
+                    city.stable_key,
+                    city.name_native,
+                    country.id,
+                    country.name_ru,
+                    country.iso2,
+                    city.latitude,
+                    city.longitude
+             FROM geo_cities AS city
+             JOIN geo_countries AS country
+               ON country.id = city.country_id
+             WHERE city.id = ?1
+               AND city.place_kind = 'city'
+               AND city.is_active = 1
+               AND country.is_active = 1",
+            [city_id],
+            |row| {
+                Ok((
+                    row.get::<_, String>(0)?,
+                    row.get::<_, String>(1)?,
+                    row.get::<_, String>(2)?,
+                    row.get::<_, i64>(3)?,
+                    row.get::<_, String>(4)?,
+                    row.get::<_, String>(5)?,
+                    row.get::<_, Option<f64>>(6)?,
+                    row.get::<_, Option<f64>>(7)?,
+                ))
+            },
+        )
+        .ok()?;
+    let (name_ru, stable_key, name_native, country_id, country_name_ru, iso2, latitude, longitude) =
+        row;
+    Some(NearbyCity {
+        id: city_id,
+        name: crate::db::catalog_translations::city_name(db, &stable_key, &name_ru, &name_native),
+        country_id,
+        country_name: crate::db::catalog_translations::country_name(db, &iso2, &country_name_ru),
+        latitude,
+        longitude,
+    })
 }
 
 fn official_group_exists(db: &rusqlite::Connection, city_id: i64) -> bool {
@@ -397,26 +413,45 @@ pub async fn app_geo_world(State(state): State<AppState>, headers: HeaderMap) ->
 
     let guest_mode = verify_user_session(&state, &headers).is_none();
 
-    let continents = state
+    let continents: Vec<(i64, String, i64)> = state
         .db_pool
         .get()
         .ok()
         .and_then(|conn| {
             let mut stmt = conn
                 .prepare(
-                    "SELECT continent.id,continent.name_ru,COUNT(country.id)
+                    "SELECT continent.id,continent.name_ru,continent.code,COUNT(country.id)
                      FROM geo_continents continent
                      LEFT JOIN geo_countries country
                        ON country.continent_id=continent.id AND country.is_active=1
                      WHERE continent.is_active=1
-                     GROUP BY continent.id,continent.name_ru
-                     ORDER BY continent.name_ru COLLATE NOCASE",
+                     GROUP BY continent.id,continent.name_ru,continent.code",
                 )
                 .ok()?;
             let rows = stmt
-                .query_map([], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)))
+                .query_map([], |row| {
+                    Ok((
+                        row.get::<_, i64>(0)?,
+                        row.get::<_, String>(1)?,
+                        row.get::<_, String>(2)?,
+                        row.get::<_, i64>(3)?,
+                    ))
+                })
                 .ok()?;
-            rows.collect::<Result<Vec<_>, _>>().ok()
+            let mut items: Vec<(i64, String, i64)> = rows
+                .collect::<Result<Vec<_>, _>>()
+                .ok()?
+                .into_iter()
+                .map(|(id, name_ru, code, count)| {
+                    (
+                        id,
+                        crate::db::catalog_translations::continent_name(&conn, &code, &name_ru),
+                        count,
+                    )
+                })
+                .collect();
+            items.sort_by(|a, b| a.1.to_lowercase().cmp(&b.1.to_lowercase()));
+            Some(items)
         })
         .unwrap_or_default();
 
@@ -437,32 +472,47 @@ pub async fn app_geo_continent(
         Ok(db) => db,
         Err(_) => return StatusCode::SERVICE_UNAVAILABLE.into_response(),
     };
-    let name = db
+    let location = db
         .query_row(
-            "SELECT name_ru FROM geo_continents WHERE id=?1 AND is_active=1",
+            "SELECT name_ru, code FROM geo_continents WHERE id=?1 AND is_active=1",
             [continent_id],
-            |row| row.get::<_, String>(0),
+            |row| Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?)),
         )
         .ok();
-    let Some(name) = name else {
+    let Some((name_ru, code)) = location else {
         return StatusCode::NOT_FOUND.into_response();
     };
-    let countries = db
+    let name = crate::db::catalog_translations::continent_name(&db, &code, &name_ru);
+    let mut countries: Vec<(i64, String, i64)> = db
         .prepare(
-            "SELECT country.id,country.name_ru,COUNT(city.id)
+            "SELECT country.id,country.name_ru,country.iso2,COUNT(city.id)
              FROM geo_countries country
              LEFT JOIN geo_cities city ON city.country_id=country.id AND city.place_kind='city'
              WHERE country.continent_id=?1 AND country.is_active=1
-             GROUP BY country.id,country.name_ru
-             ORDER BY country.name_ru COLLATE NOCASE",
+             GROUP BY country.id,country.name_ru,country.iso2",
         )
         .and_then(|mut stmt| {
             stmt.query_map([continent_id], |row| {
-                Ok((row.get(0)?, row.get(1)?, row.get(2)?))
+                Ok((
+                    row.get::<_, i64>(0)?,
+                    row.get::<_, String>(1)?,
+                    row.get::<_, String>(2)?,
+                    row.get::<_, i64>(3)?,
+                ))
             })?
             .collect::<Result<Vec<_>, _>>()
         })
-        .unwrap_or_default();
+        .unwrap_or_default()
+        .into_iter()
+        .map(|(id, name_ru, iso2, count)| {
+            (
+                id,
+                crate::db::catalog_translations::country_name(&db, &iso2, &name_ru),
+                count,
+            )
+        })
+        .collect();
+    countries.sort_by(|a, b| a.1.to_lowercase().cmp(&b.1.to_lowercase()));
     Html(templates::render_geo_continent(
         continent_id,
         &name,
@@ -481,16 +531,31 @@ pub async fn app_geo_country(
     };
     let location = db
         .query_row(
-            "SELECT country.name_ru,continent.id,continent.name_ru
+            "SELECT country.name_ru,country.iso2,continent.id,continent.name_ru,continent.code
              FROM geo_countries country JOIN geo_continents continent ON continent.id=country.continent_id
              WHERE country.id=?1 AND country.is_active=1 AND continent.is_active=1",
             [country_id],
-            |row| Ok((row.get::<_, String>(0)?, row.get::<_, i64>(1)?, row.get::<_, String>(2)?)),
+            |row| {
+                Ok((
+                    row.get::<_, String>(0)?,
+                    row.get::<_, String>(1)?,
+                    row.get::<_, i64>(2)?,
+                    row.get::<_, String>(3)?,
+                    row.get::<_, String>(4)?,
+                ))
+            },
         )
         .ok();
-    let Some((country, continent_id, continent)) = location else {
+    let Some((country_name_ru, iso2, continent_id, continent_name_ru, continent_code)) = location
+    else {
         return StatusCode::NOT_FOUND.into_response();
     };
+    let country = crate::db::catalog_translations::country_name(&db, &iso2, &country_name_ru);
+    let continent = crate::db::catalog_translations::continent_name(
+        &db,
+        &continent_code,
+        &continent_name_ru,
+    );
     let cities = load_country_cities(&db, country_id, "", 0, 80);
     let total = db
         .query_row(
@@ -519,9 +584,8 @@ fn load_country_cities(
 ) -> Vec<(i64, String)> {
     let normalized = query.trim().to_lowercase();
     db.prepare(
-        "SELECT id,name_ru,name_native,name_ascii FROM geo_cities
-         WHERE country_id=?1 AND place_kind='city'
-         ORDER BY name_ru COLLATE NOCASE,id",
+        "SELECT id,stable_key,name_ru,name_native,name_ascii FROM geo_cities
+         WHERE country_id=?1 AND place_kind='city'",
     )
     .and_then(|mut stmt| {
         let rows = stmt
@@ -531,20 +595,30 @@ fn load_country_cities(
                     row.get::<_, String>(1)?,
                     row.get::<_, String>(2)?,
                     row.get::<_, String>(3)?,
+                    row.get::<_, String>(4)?,
                 ))
             })?
             .collect::<Result<Vec<_>, _>>()?;
-        Ok(rows
+        let mut items: Vec<(i64, String)> = rows
             .into_iter()
-            .filter(|(_, name_ru, name_native, name_ascii)| {
+            .filter(|(_, _, name_ru, name_native, name_ascii)| {
                 normalized.is_empty()
                     || name_ru.to_lowercase().contains(&normalized)
                     || name_native.to_lowercase().contains(&normalized)
                     || name_ascii.to_lowercase().contains(&normalized)
             })
+            .map(|(id, stable_key, name_ru, name_native, _)| {
+                (
+                    id,
+                    crate::db::catalog_translations::city_name(db, &stable_key, &name_ru, &name_native),
+                )
+            })
+            .collect();
+        items.sort_by(|a, b| a.1.to_lowercase().cmp(&b.1.to_lowercase()).then(a.0.cmp(&b.0)));
+        Ok(items
+            .into_iter()
             .skip(offset as usize)
             .take(limit as usize)
-            .map(|(id, name_ru, _, _)| (id, name_ru))
             .collect())
     })
     .unwrap_or_default()
@@ -596,7 +670,9 @@ pub async fn app_geo_city(State(state): State<AppState>, Path(city_id): Path<i64
     };
     let location = db
         .query_row(
-            "SELECT city.name_ru,country.id,country.name_ru,continent.id,continent.name_ru
+            "SELECT city.name_ru,city.stable_key,city.name_native,
+                    country.id,country.name_ru,country.iso2,
+                    continent.id,continent.name_ru,continent.code
              FROM geo_cities city
              JOIN geo_countries country ON country.id=city.country_id
              JOIN geo_continents continent ON continent.id=country.continent_id
@@ -605,17 +681,44 @@ pub async fn app_geo_city(State(state): State<AppState>, Path(city_id): Path<i64
             |row| {
                 Ok((
                     row.get::<_, String>(0)?,
-                    row.get::<_, i64>(1)?,
+                    row.get::<_, String>(1)?,
                     row.get::<_, String>(2)?,
                     row.get::<_, i64>(3)?,
                     row.get::<_, String>(4)?,
+                    row.get::<_, String>(5)?,
+                    row.get::<_, i64>(6)?,
+                    row.get::<_, String>(7)?,
+                    row.get::<_, String>(8)?,
                 ))
             },
         )
         .ok();
-    let Some((city, country_id, country, continent_id, continent)) = location else {
+    let Some((
+        city_name_ru,
+        stable_key,
+        city_name_native,
+        country_id,
+        country_name_ru,
+        iso2,
+        continent_id,
+        continent_name_ru,
+        continent_code,
+    )) = location
+    else {
         return StatusCode::NOT_FOUND.into_response();
     };
+    let city = crate::db::catalog_translations::city_name(
+        &db,
+        &stable_key,
+        &city_name_ru,
+        &city_name_native,
+    );
+    let country = crate::db::catalog_translations::country_name(&db, &iso2, &country_name_ru);
+    let continent = crate::db::catalog_translations::continent_name(
+        &db,
+        &continent_code,
+        &continent_name_ru,
+    );
     let sectors = db
         .prepare(
             "SELECT sector.stable_key,sector.name_ru,COUNT(profession.id)
@@ -650,9 +753,9 @@ pub async fn app_geo_professions(
         Err(_) => return StatusCode::SERVICE_UNAVAILABLE.into_response(),
     };
     let city = db.query_row(
-        "SELECT city.name_ru,country.name_ru FROM geo_cities city JOIN geo_countries country ON country.id=city.country_id WHERE city.id=?1 AND city.place_kind='city'",
+        "SELECT city.name_ru,city.stable_key,city.name_native,country.name_ru,country.iso2 FROM geo_cities city JOIN geo_countries country ON country.id=city.country_id WHERE city.id=?1 AND city.place_kind='city'",
         [city_id],
-        |row| Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?)),
+        |row| Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?,row.get::<_,String>(2)?,row.get::<_,String>(3)?,row.get::<_,String>(4)?)),
     ).ok();
     let sector = db
         .query_row(
@@ -661,9 +764,18 @@ pub async fn app_geo_professions(
             |row| row.get::<_, String>(0),
         )
         .ok();
-    let (Some((city, country)), Some(sector)) = (city, sector) else {
+    let (Some((city_name_ru, stable_key, city_name_native, country_name_ru, iso2)), Some(sector)) =
+        (city, sector)
+    else {
         return StatusCode::NOT_FOUND.into_response();
     };
+    let city = crate::db::catalog_translations::city_name(
+        &db,
+        &stable_key,
+        &city_name_ru,
+        &city_name_native,
+    );
+    let country = crate::db::catalog_translations::country_name(&db, &iso2, &country_name_ru);
     let professions = db.prepare(
         "SELECT stable_key,name_ru FROM professions WHERE sector_key=?1 AND is_active=1 ORDER BY name_ru COLLATE NOCASE",
     ).and_then(|mut stmt| {
@@ -1352,12 +1464,15 @@ mod search_query_tests {
             CREATE TABLE geo_countries (
                 id INTEGER PRIMARY KEY,
                 name_ru TEXT NOT NULL,
+                iso2 TEXT NOT NULL DEFAULT '',
                 is_active INTEGER NOT NULL DEFAULT 1
             );
             CREATE TABLE geo_cities (
                 id INTEGER PRIMARY KEY,
                 country_id INTEGER NOT NULL,
+                stable_key TEXT NOT NULL DEFAULT '',
                 name_ru TEXT NOT NULL,
+                name_native TEXT NOT NULL DEFAULT '',
                 place_kind TEXT NOT NULL DEFAULT 'city',
                 is_active INTEGER NOT NULL DEFAULT 1,
                 latitude REAL,

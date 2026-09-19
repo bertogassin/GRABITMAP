@@ -526,7 +526,7 @@ pub fn render_geo_root(
     let styles = r#"<style>
 .rm-map-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:20px}
 .rm-map-stats div{padding:12px 6px;border:1px solid rgba(var(--text-rgb),.22);border-radius:15px;text-align:center;background:rgba(255,255,255,.025)}
-.rm-map-stats strong,.rm-map-stats span{display:block}.rm-map-stats strong{color:var(--gold-light);font-size:21px}.rm-map-stats span{margin-top:4px;color:var(--muted);font-size:9px;text-transform:uppercase}
+.rm-map-stats strong,.rm-map-stats span{display:block}.rm-map-stats strong{color:var(--emphasis-light);font-size:21px}.rm-map-stats span{margin-top:4px;color:var(--muted);font-size:9px;text-transform:uppercase}
 .rm-map-grid{align-items:stretch}
 .rm-continue-home{margin-bottom:14px}
 .rm-continue-card{padding:16px;display:grid;gap:10px}
@@ -910,10 +910,7 @@ pub fn render_continents(
         padding:14px 10px;
         border-radius:16px;
         border:1px solid rgba(var(--text-rgb),.24);
-        background: var(--card);
-        box-shadow:
-            inset 0 1px 0 rgba(255,255,255,.07),
-            0 10px 28px rgba(0,0,0,.20);
+        background: transparent;
         text-align:center;
     }
 
@@ -922,13 +919,8 @@ pub fn render_continents(
         font-size:clamp(18px,4vw,24px);
         font-weight:850;
         letter-spacing:-.03em;
-        color:var(--gold-light);
+        color:var(--emphasis-light);
         line-height:1;
-    }
-
-    .rm-stat-online strong {
-        color:var(--success);
-        text-shadow:0 0 20px rgba(111,232,184,.35);
     }
 
     .rm-stat span {
@@ -945,10 +937,7 @@ pub fn render_continents(
         margin-top:20px;
         padding:16px 16px 14px;
         border:1px solid rgba(var(--text-rgb),.28);
-        background: var(--surface);
-        box-shadow:
-            0 18px 44px rgba(0,0,0,.24),
-            inset 0 1px 0 rgba(255,255,255,.06);
+        background: transparent;
     }
 
     .rm-home-explorer-head {
@@ -987,7 +976,7 @@ pub fn render_continents(
     }
 
     .rm-home-explorer-icon {
-        color:var(--gold-light);
+        color:var(--emphasis-light);
         font-size:16px;
         line-height:1;
     }
@@ -1109,12 +1098,11 @@ pub fn render_continents(
     }
 
     :root[data-theme="light"] .rm-stat {
-        background:var(--surface);
-        box-shadow:0 8px 20px rgba(26,29,33,.06);
+        background:transparent;
     }
 
     :root[data-theme="light"] .rm-home-explorer {
-        background:var(--surface);
+        background:transparent;
     }
 
     :root[data-theme="light"] .rm-home-explorer-clear {

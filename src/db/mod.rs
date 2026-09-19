@@ -1,8 +1,12 @@
 pub mod admin_geography;
 pub mod admin_v2;
+pub mod catalog_translations;
 pub mod chat_groups;
 pub mod chat_pins;
 pub mod chat_preferences;
+pub mod city_translations_seed;
+pub mod continent_translations_seed;
+pub mod country_translations_seed;
 pub mod geo_search;
 pub mod geography_countries;
 pub mod geography_v2;

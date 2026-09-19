@@ -434,8 +434,8 @@ body {{
     padding:0 15px;
     border:1px solid rgba(var(--text-rgb),.34);
     border-radius:14px;
-    color:var(--gold);
-    background:var(--gold-soft);
+    color:var(--emphasis);
+    background:var(--emphasis-soft);
     text-decoration:none;
     font-size:12px;
     font-weight:950;
@@ -463,7 +463,7 @@ body {{
         0 0 0 70px rgba(168,147,255,.025);
 }}
 .kicker {{
-    color:var(--gold);
+    color:var(--emphasis);
     font-size:12px;
     font-weight:950;
     letter-spacing:.18em;
@@ -496,7 +496,7 @@ h1 {{
 }}
 .summary-card strong {{
     display:block;
-    color:var(--gold);
+    color:var(--emphasis);
     font-size:28px;
 }}
 .summary-card span {{
@@ -547,8 +547,8 @@ h1 {{
     display:grid;
     place-items:center;
     border-radius:17px;
-    color:var(--gold);
-    background:var(--gold-soft);
+    color:var(--emphasis);
+    background:var(--emphasis-soft);
     font-size:24px;
     font-weight:950;
 }}
@@ -585,7 +585,7 @@ h1 {{
 }}
 .role-name {{
     margin-top:17px;
-    color:var(--gold);
+    color:var(--emphasis);
     font-size:14px;
     font-weight:900;
 }}
@@ -636,7 +636,7 @@ h1 {{
     border-top:1px solid rgba(255,255,255,.07);
 }}
 .lifecycle-title {{
-    color:var(--gold);
+    color:var(--emphasis);
     font-size:12px;
     font-weight:900;
 }}
@@ -664,8 +664,8 @@ h1 {{
     padding:0 14px;
     border:1px solid var(--line);
     border-radius:12px;
-    color:var(--gold);
-    background:var(--gold-soft);
+    color:var(--emphasis);
+    background:var(--emphasis-soft);
     font-weight:900;
     cursor:pointer;
 }}
